@@ -310,7 +310,8 @@ export class InstrumentsService {
       requestedSeriesGroup = { seriesGroupId: { in: groupIds } };
     }
 
-    const instruments = await this.instrumentModel.findMany({
+    const rows = await this.instrumentModel.findMany({
+      select: { id: true },
       where: {
         AND: [
           subjectInstrumentIds ? { id: { in: subjectInstrumentIds } } : {},
@@ -321,7 +322,18 @@ export class InstrumentsService {
         ]
       }
     });
-    const instances = await this.instantiate(instruments);
+    const cache = this.virtualizationService.context.instruments;
+    const uncachedIds = rows.map(({ id }) => id).filter((id) => !cache.has(id));
+    if (uncachedIds.length > 0) {
+      // Scoped by the ids, which the query above already filtered for this caller.
+      const uncached = await this.instrumentModel.findMany({
+        select: { bundle: true, id: true },
+        where: { id: { in: uncachedIds } }
+      });
+      await this.instantiate(uncached);
+    }
+    // A row deleted between the two queries has no bundle to evaluate, so it has no instance either.
+    const instances = rows.flatMap(({ id }) => cache.get(id) ?? []);
     if (!query.kind) {
       return instances as WithID<SomeInstrument<TKind>>[];
     }

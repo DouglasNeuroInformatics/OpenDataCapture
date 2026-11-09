@@ -767,6 +767,7 @@ describe('InstrumentsService', () => {
       await instrumentsService.find({}, {}, ['group-1']);
 
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
+        select: { id: true },
         where: {
           AND: [
             { records: undefined },
@@ -1088,6 +1089,12 @@ describe('InstrumentsService', () => {
         where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), ownedSeriesFilter(['group-1'])] }
       });
     });
+
+    it('should evaluate a bundle once however often it is requested, serving repeats from the cache', async () => {
+      await instrumentsService.findBundleById('form');
+      await instrumentsService.findBundleById('form');
+      expect(virtualizationService.eval).toHaveBeenCalledOnce();
+    });
   });
 
   describe('updateSeriesArchive', () => {
@@ -1282,14 +1289,50 @@ describe('InstrumentsService', () => {
   });
 
   describe('find (evaluation)', () => {
+    const storedRows = [
+      { bundle: 'FORM_BUNDLE', id: 'hash:FORM_A-1' },
+      { bundle: 'SERIES_BUNDLE', id: 'series-1' }
+    ];
+
     beforeEach(() => {
-      instrumentModel.findMany.mockResolvedValue([
-        { bundle: 'FORM_BUNDLE', id: 'hash:FORM_A-1' },
-        { bundle: 'SERIES_BUNDLE', id: 'series-1' }
-      ]);
+      instrumentModel.findMany.mockImplementation(({ where }: any) => {
+        return Promise.resolve(where.id ? storedRows.filter(({ id }) => where.id.in.includes(id)) : storedRows);
+      });
       virtualizationService.eval.mockImplementation((code) => {
         return okAsync(code === 'FORM_BUNDLE' ? formInstance('FORM_A', 1) : existingSeries);
       });
+    });
+
+    it('should read the bundle only of an instrument it has not evaluated yet', async () => {
+      instanceCache.set('series-1', { ...existingSeries, id: 'series-1' });
+
+      const result = await instrumentsService.find();
+
+      expect(instrumentModel.findMany).toHaveBeenLastCalledWith({
+        select: { bundle: true, id: true },
+        where: { id: { in: ['hash:FORM_A-1'] } }
+      });
+      expect(result.map(({ id }) => id)).toEqual(['hash:FORM_A-1', 'series-1']);
+    });
+
+    it('should not read any bundle when every instrument is already evaluated', async () => {
+      await instrumentsService.find();
+      instrumentModel.findMany.mockClear();
+
+      await instrumentsService.find();
+
+      expect(instrumentModel.findMany).toHaveBeenCalledOnce();
+      expect(instrumentModel.findMany).toHaveBeenCalledWith(expect.objectContaining({ select: { id: true } }));
+    });
+
+    it('should drop an instrument deleted before its bundle was read, rather than return an undefined instance', async () => {
+      instrumentModel.findMany
+        .mockResolvedValueOnce(storedRows.map(({ id }) => ({ id })))
+        .mockResolvedValueOnce([storedRows[0]!]);
+
+      const result = await instrumentsService.find();
+
+      expect(result.map(({ id }) => id)).toEqual(['hash:FORM_A-1']);
     });
 
     it('should return only instruments of the requested kind', async () => {
@@ -1310,7 +1353,7 @@ describe('InstrumentsService', () => {
 
     it('should scope owned series to the named series group in preference to the caller groups', async () => {
       await instrumentsService.find({ seriesGroupId: 'group-2' }, {}, ['group-1']);
-      expect(instrumentModel.findMany.mock.lastCall?.[0]).toMatchObject({
+      expect(instrumentModel.findMany.mock.calls[0]?.[0]).toMatchObject({
         where: {
           AND: [
             {},
