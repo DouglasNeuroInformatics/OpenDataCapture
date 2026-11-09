@@ -1,10 +1,16 @@
 import { $AuditLogsPage, AUDIT_LOGS_MAX_PAGE_SIZE, AUDIT_LOGS_PAGE_SIZE } from '@opendatacapture/schemas/audit';
-import type { $AuditLog, $AuditLogsQueryParams, $AuditLogsQuerySearchParams } from '@opendatacapture/schemas/audit';
+import type {
+  $AuditLog,
+  $AuditLogsQueryParams,
+  $AuditLogsQuerySearchParams,
+  $AuditLogsSortBy
+} from '@opendatacapture/schemas/audit';
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 type AuditLogsQueryParams = $AuditLogsQuerySearchParams & {
   page?: number;
+  sortBy?: $AuditLogsSortBy;
   sortOrder?: 'asc' | 'desc';
 };
 

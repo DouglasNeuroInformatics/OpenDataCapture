@@ -7,6 +7,8 @@ export class UploadInstrumentPage extends AppPage {
   readonly fileInput: Locator;
   readonly pageHeader: Locator;
   readonly submitButton: Locator;
+  readonly templateButton: Locator;
+  readonly templateErrorHeading: Locator;
   readonly tryAgainButton: Locator;
 
   constructor(page: Page) {
@@ -16,6 +18,8 @@ export class UploadInstrumentPage extends AppPage {
     this.submitButton = page.getByRole('button', { name: 'Submit' });
     this.errorHeading = page.getByRole('heading', { name: 'An error has happened within the request' });
     this.tryAgainButton = page.getByRole('button', { name: 'Try Again' });
+    this.templateButton = page.getByRole('button', { name: 'Template' });
+    this.templateErrorHeading = page.getByRole('heading', { name: 'Error Occurred Downloading Sample Template' });
   }
 
   async uploadFile(file: Parameters<Locator['setInputFiles']>[0]) {

@@ -142,7 +142,7 @@ test.describe('gateway remote assignment', () => {
     // the page is addressed by subject id, not the (now irrelevant) in-memory session.
     await expect(async () => {
       await page.reload();
-      await expect(page.getByRole('table')).toContainText('Complete', { timeout: 5_000 });
+      await expect(page.getByTestId('data-table-row').first()).toContainText('Complete', { timeout: 5_000 });
     }).toPass({ timeout: 90_000 });
   });
 });

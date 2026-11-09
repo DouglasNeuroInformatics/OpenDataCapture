@@ -4,6 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { InstrumentRepoSyncLogTable } from '../InstrumentRepoSyncLogTable';
 
+import type { InstrumentRepoSyncLogSort } from '../InstrumentRepoSyncLogTable';
+
 import '@/services/i18n';
 
 const theme = vi.hoisted(() => ({ current: 'light' }));
@@ -30,17 +32,17 @@ const logFixture = (overrides: Partial<InstrumentRepoSyncLog> = {}): InstrumentR
 type TableProps = {
   logs: InstrumentRepoSyncLog[];
   onPageChange?: (page: number) => void;
-  onSortOrderChange?: (sortOrder: 'asc' | 'desc') => void;
+  onSortChange?: (sort: InstrumentRepoSyncLogSort) => void;
   pageCount?: number;
-  sortOrder?: 'asc' | 'desc';
+  sort?: InstrumentRepoSyncLogSort;
 };
 
-const Table = ({ pageCount = 1, sortOrder = 'desc', ...props }: TableProps) => (
+const Table = ({ pageCount = 1, sort = { sortBy: 'createdAt', sortOrder: 'desc' }, ...props }: TableProps) => (
   <InstrumentRepoSyncLogTable
     pageCount={pageCount}
-    sortOrder={sortOrder}
+    sort={sort}
     onPageChange={() => undefined}
-    onSortOrderChange={() => undefined}
+    onSortChange={() => undefined}
     {...props}
   />
 );
@@ -165,33 +167,54 @@ describe('InstrumentRepoSyncLogTable', () => {
     expect(within(rows()[0]!).getByText('Newer')).toBeTruthy();
   });
 
+  const headerButton = (name: string) => {
+    return within(screen.getByTestId('data-table-head')).getByText(name).closest('button')!;
+  };
+
   it('should ask for the other order when the date header is clicked, rather than sort the page', () => {
-    const onSortOrderChange = vi.fn();
-    render(<Table logs={[logFixture()]} onSortOrderChange={onSortOrderChange} />);
+    const onSortChange = vi.fn();
+    render(<Table logs={[logFixture()]} onSortChange={onSortChange} />);
 
-    fireEvent.click(within(screen.getByTestId('data-table-head')).getByText('Date'));
+    fireEvent.click(headerButton('Date'));
 
-    expect(onSortOrderChange).toHaveBeenCalledWith('asc');
+    expect(onSortChange).toHaveBeenCalledWith({ sortBy: 'createdAt', sortOrder: 'asc' });
   });
 
   it('should cycle the order it asks for, since the column clears back to ascending', () => {
-    const onSortOrderChange = vi.fn();
-    render(<Table logs={[logFixture()]} onSortOrderChange={onSortOrderChange} />);
-    const date = within(screen.getByTestId('data-table-head')).getByText('Date');
+    const onSortChange = vi.fn();
+    render(<Table logs={[logFixture()]} onSortChange={onSortChange} />);
 
-    fireEvent.click(date);
-    fireEvent.click(date);
-    fireEvent.click(date);
+    fireEvent.click(headerButton('Date'));
+    fireEvent.click(headerButton('Date'));
+    fireEvent.click(headerButton('Date'));
 
-    expect(onSortOrderChange.mock.calls.flat()).toEqual(['asc', 'desc', 'asc']);
+    expect(onSortChange.mock.calls.flat().map(({ sortOrder }) => sortOrder)).toEqual(['asc', 'desc', 'asc']);
   });
 
-  it('should offer no sorting on a column the server cannot order by, so no control can mislead', () => {
+  it.each([
+    ['Repository', 'repoName'],
+    ['Action', 'action'],
+    ['Status', 'status'],
+    ['Imported', 'importedCount'],
+    ['Failed', 'failedCount']
+  ])('should ask the server to order by %s, since it holds every page', (name, sortBy) => {
+    const onSortChange = vi.fn();
+    render(<Table logs={[logFixture()]} onSortChange={onSortChange} />);
+
+    fireEvent.click(headerButton(name));
+
+    expect(onSortChange.mock.lastCall?.[0]).toMatchObject({ sortBy });
+  });
+
+  it('should show the direction only on the column the server ordered by', () => {
+    render(<Table logs={[logFixture()]} sort={{ sortBy: 'status', sortOrder: 'asc' }} />);
+    expect(headerButton('Status').querySelector('.lucide-chevron-up')).toBeTruthy();
+    expect(headerButton('Date').querySelector('.lucide-chevrons-up-down')).toBeTruthy();
+  });
+
+  it('should offer no sorting on the messages column, which holds a button rather than a value', () => {
     render(<Table logs={[logFixture({ message: 'Repository not found' })]} />);
-    const head = within(screen.getByTestId('data-table-head'));
-    expect(head.getByText('Date').tagName).toBe('BUTTON');
-    expect(head.getByText('Status').tagName).not.toBe('BUTTON');
-    expect(head.getByText('Repository').tagName).not.toBe('BUTTON');
+    expect(within(screen.getByTestId('data-table-head')).getByText('Messages').closest('button')).toBeNull();
   });
 
   it('should ask for the next page rather than hold the whole history', () => {

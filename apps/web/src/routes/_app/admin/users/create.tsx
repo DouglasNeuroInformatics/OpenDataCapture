@@ -3,6 +3,7 @@ import React from 'react';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Button, CopyButton, Dialog, Form, Heading, Label } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useFocusFirstInvalidField } from '@opendatacapture/react-core';
 import type { Language } from '@opendatacapture/schemas/core';
 import { $BasePermissionLevel, $BaseUserData } from '@opendatacapture/schemas/user';
 import type { $CreateUserData } from '@opendatacapture/schemas/user';
@@ -36,6 +37,7 @@ const RouteComponent = () => {
   const mailErrorMessage = useMailErrorMessage();
   const passwordErrorMessage = usePasswordErrorMessage();
   const { applyGeneratedPassword, generatedPassword, generatePassword, isGeneratedPassword } = usePasswordGenerator();
+  const { containerRef, onFailedSubmit, onSuccessfulSubmit } = useFocusFirstInvalidField();
 
   // When the welcome email cannot be delivered, we surface its rendered text here so
   // the admin can copy it and send it manually. Navigation is deferred until dismissed.
@@ -47,19 +49,6 @@ const RouteComponent = () => {
   const emailLanguage = activeLanguages.includes(emailLanguageChoice) ? emailLanguageChoice : activeLanguages[0];
 
   const handleSubmit = async (data: $CreateUserData) => {
-    // check if username exists
-    const existingUsername = await axios.get<{ success: boolean }>(
-      `/v1/users/check-username/${encodeURIComponent(data.username)}`
-    );
-
-    if (existingUsername.data.success === true) {
-      notification.addNotification({
-        message: t('common.usernameExists'),
-        type: 'error'
-      });
-      return;
-    }
-
     const createUserFailedMessage = t({
       en: 'Failed to create user',
       es: 'Error al crear el usuario',
@@ -118,7 +107,7 @@ const RouteComponent = () => {
   };
 
   return (
-    <div>
+    <div ref={containerRef}>
       <PageHeader>
         <Heading className="text-center" variant="h2">
           {t({
@@ -368,8 +357,23 @@ const RouteComponent = () => {
                 path: ['groupIds']
               });
             }
+          })
+          .check(async (ctx) => {
+            const existingUsername = await axios.get<{ success: boolean }>(
+              `/v1/users/check-username/${encodeURIComponent(ctx.value.username.toLowerCase())}`
+            );
+            if (existingUsername.data.success) {
+              ctx.issues.push({
+                code: 'custom',
+                input: ctx.value.username,
+                message: t('common.usernameExists'),
+                path: ['username']
+              });
+            }
           })}
+        onError={onFailedSubmit}
         onSubmit={({ email, groupIds, permissionSetId, phoneNumber, ...data }) => {
+          onSuccessfulSubmit();
           return handleSubmit({
             ...data,
             email: omittedIfBlank(email),
@@ -381,7 +385,8 @@ const RouteComponent = () => {
               data.basePermissionLevel === 'ADMIN' || permissionSetId === NO_PERMISSION_SET
                 ? undefined
                 : permissionSetId,
-            phoneNumber: omittedIfBlank(phoneNumber)
+            phoneNumber: omittedIfBlank(phoneNumber),
+            username: data.username.toLowerCase()
           });
         }}
       />

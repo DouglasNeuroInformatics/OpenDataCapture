@@ -194,7 +194,7 @@ test.describe('admin management', () => {
     await expect(page).toHaveURL('/admin/users');
   });
 
-  test('should create a user through the UI and show it in the users list @smoke', async ({
+  test('should create a user through the UI with the username lowercased and show it in the users list @smoke', async ({
     api,
     authenticateAs,
     page,
@@ -206,7 +206,7 @@ test.describe('admin management', () => {
     await authenticateAs('ADMIN');
     await page.goto('/admin/users/create');
 
-    await page.getByLabel('Username').fill(username);
+    await page.getByLabel('Username').fill(username.toUpperCase());
     await page.getByLabel('Password', { exact: true }).fill(SEEDED_USER_PASSWORD);
     await page.getByLabel('Confirm Password').fill(SEEDED_USER_PASSWORD);
     await page.getByLabel('First Name').fill('Test');
@@ -297,6 +297,39 @@ test.describe('admin management', () => {
 
     await dismissWelcomeEmailFallback(page);
     await expect(page).toHaveURL('/admin/users');
+  });
+
+  test('should show a username taken in another case as an error on the focused field, without creating the user', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const { user } = await api.createUser({ username: `taken_${uniqueId}` });
+
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users/create');
+
+    await page.getByLabel('Username').fill(user.username.toUpperCase());
+    await page.getByLabel('Password', { exact: true }).fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('Confirm Password').fill(SEEDED_USER_PASSWORD);
+    await page.getByLabel('First Name').fill('Test');
+    await page.getByLabel('Last Name').fill('User');
+    await page.getByTestId('basePermissionLevel-select-trigger').click();
+    await page.getByTestId('basePermissionLevel-select-item-ADMIN').click();
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(page.getByTestId('error-message-text').filter({ hasText: 'Username already exists' })).toBeVisible();
+    await expect(page.getByLabel('Username')).toBeFocused();
+    await expect(page).toHaveURL('/admin/users/create');
+  });
+
+  test('should refuse a username that differs from an existing one only by case over the API', async ({
+    api,
+    uniqueId
+  }) => {
+    await api.createUser({ username: `taken_${uniqueId}` });
+    await expect(api.createUser({ username: `TAKEN_${uniqueId.toUpperCase()}` })).rejects.toThrow(/already exists/);
   });
 
   test('should reject a phone number with too few digits over the API', async ({ api }) => {

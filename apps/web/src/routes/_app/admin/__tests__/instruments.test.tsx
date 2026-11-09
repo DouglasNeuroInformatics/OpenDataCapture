@@ -129,6 +129,8 @@ const renderPage = (view?: 'forms' | 'series') => {
 
 const rows = () => screen.getAllByTestId('data-table-row');
 
+const headerButton = (name: string) => within(screen.getByTestId('data-table-head')).getByText(name).closest('button')!;
+
 const cellTexts = (rowIndex = 0) => {
   return [...rows()[rowIndex]!.querySelectorAll('span[title]')].map((cell) => cell.getAttribute('title'));
 };
@@ -172,6 +174,17 @@ describe('Route', () => {
         [{ queryKey: ['groups'] }]
       ]);
     });
+
+    it.each(['Name', 'Source', 'Groups Using It', 'Kind', 'Edition', 'Added'])(
+      'should sort the forms by %s when its header is clicked',
+      (name) => {
+        mocks.instrumentInfo = [scalarFixture({ id: 'form-1', title: 'Form' })];
+        renderPage();
+        expect(headerButton(name).querySelector('.lucide-chevrons-up-down')).toBeTruthy();
+        fireEvent.click(headerButton(name));
+        expect(headerButton(name).querySelector('.lucide-chevrons-up-down')).toBeNull();
+      }
+    );
 
     it('should open the forms view when no view is requested', () => {
       renderPage();
@@ -295,6 +308,14 @@ describe('Route', () => {
   });
 
   describe('admin instruments series view', () => {
+    it.each(['Name', 'Group', 'Created', 'Status'])('should sort by %s when its header is clicked', (name) => {
+      mocks.seriesOverview = [overviewFixture()];
+      renderPage('series');
+      expect(headerButton(name).querySelector('.lucide-chevrons-up-down')).toBeTruthy();
+      fireEvent.click(headerButton(name));
+      expect(headerButton(name).querySelector('.lucide-chevrons-up-down')).toBeNull();
+    });
+
     it('should describe an active series shared across every group', () => {
       mocks.seriesOverview = [overviewFixture()];
       renderPage('series');

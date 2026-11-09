@@ -1,18 +1,18 @@
 // Assignment creation has been moved to the dedicated remote assignment page (/session/remote-assignment).
 // This page now only displays existing assignments and allows viewing/canceling them.
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, Heading, Input, Label, Sheet, Table } from '@douglasneuroinformatics/libui/components';
+import { Button, DataTable, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { Assignment, AssignmentStatus } from '@opendatacapture/schemas/assignment';
-import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
 import { AssignmentEmailForm } from '@/components/AssignmentEmailForm';
 import { QRCode } from '@/components/QRCode';
+import { SortableHeader } from '@/components/SortableHeader';
 import { config } from '@/config';
 import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useInstrument } from '@/hooks/useInstrument';
@@ -89,15 +89,8 @@ const AssignmentsTable: React.FC<{
   selectedId: null | string;
 }> = ({ assignments, onSelection, selectedId }) => {
   const { t } = useTranslation('datahub');
-  const [instruments, setInstruments] = useState<{ [key: string]: UnilingualInstrumentInfo }>({});
-
   const instrumentInfoQuery = useInstrumentInfoQuery();
-
-  useEffect(() => {
-    setInstruments(
-      Object.fromEntries((instrumentInfoQuery.data ?? []).map((instrument) => [instrument.id, instrument]))
-    );
-  }, [instrumentInfoQuery.data]);
+  const instruments = new Map((instrumentInfoQuery.data ?? []).map((instrument) => [instrument.id, instrument]));
 
   const formatStatus = (status: AssignmentStatus) => {
     switch (status) {
@@ -112,35 +105,50 @@ const AssignmentsTable: React.FC<{
     }
   };
 
+  // Tanstack caches a column's value on the row object, so a value that depends on a separately
+  // loaded query has to be in the row, or the sort would keep what it read before the query settled.
+  const rows = assignments.map((assignment) => ({
+    ...assignment,
+    instrumentTitle: instruments.get(assignment.instrumentId)?.details.title ?? assignment.instrumentId,
+    statusLabel: formatStatus(assignment.status)
+  }));
+
   return (
-    <div className="bg-card text-muted-foreground rounded-md border tracking-tight shadow-xs">
-      <Table>
-        <Table.Header>
-          <Table.Row>
-            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.title')}</Table.Head>
-            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.assignedAt')}</Table.Head>
-            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.expiresAt')}</Table.Head>
-            <Table.Head className="text-foreground whitespace-nowrap">{t('assignments.status')}</Table.Head>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {assignments.map((assignment) => (
-            <Table.Row
-              className="cursor-pointer"
-              data-state={selectedId === assignment.id ? 'selected' : undefined}
-              data-testid="assignment-row"
-              key={assignment.id}
-              onClick={() => onSelection(assignment)}
-            >
-              <Table.Cell>{instruments[assignment.instrumentId]?.details.title ?? assignment.instrumentId}</Table.Cell>
-              <Table.Cell>{toBasicISOString(assignment.createdAt)}</Table.Cell>
-              <Table.Cell>{toBasicISOString(assignment.expiresAt)}</Table.Cell>
-              <Table.Cell>{formatStatus(assignment.status)}</Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
-    </div>
+    <DataTable
+      disableSearch
+      columns={[
+        {
+          accessorKey: 'instrumentTitle',
+          cell: (ctx) => (
+            <span className="flex items-center">
+              {ctx.getValue<string>()}
+              <span
+                className="hidden"
+                data-row-selected={selectedId === ctx.row.original.id ? 'true' : 'false'}
+                data-testid="assignment-row-selection"
+              />
+            </span>
+          ),
+          header: ({ column }) => <SortableHeader column={column} label={t('assignments.title')} />
+        },
+        {
+          accessorKey: 'createdAt',
+          cell: (ctx) => toBasicISOString(ctx.getValue<Date>()),
+          header: ({ column }) => <SortableHeader column={column} label={t('assignments.assignedAt')} />
+        },
+        {
+          accessorKey: 'expiresAt',
+          cell: (ctx) => toBasicISOString(ctx.getValue<Date>()),
+          header: ({ column }) => <SortableHeader column={column} label={t('assignments.expiresAt')} />
+        },
+        {
+          accessorKey: 'statusLabel',
+          header: ({ column }) => <SortableHeader column={column} label={t('assignments.status')} />
+        }
+      ]}
+      data={rows}
+      onRowClick={onSelection}
+    />
   );
 };
 

@@ -59,8 +59,12 @@ const renderAssignments = (assignments: Assignment[] | undefined) => {
   render(<Component />);
 };
 
+const cellTexts = () => {
+  return Array.from(screen.getByTestId('data-table-row').children).map((cell) => cell.textContent);
+};
+
 const openAssignment = (index = 0) => {
-  fireEvent.click(screen.getAllByTestId('assignment-row')[index]!);
+  fireEvent.click(screen.getAllByTestId('data-table-row')[index]!);
 };
 
 const runGuard = () => {
@@ -116,24 +120,18 @@ describe('Route', () => {
 
     it('should render no rows while the assignments have not loaded', () => {
       renderAssignments(undefined);
-      expect(screen.queryAllByTestId('assignment-row')).toHaveLength(0);
+      expect(screen.queryAllByTestId('data-table-row')).toHaveLength(0);
     });
 
     it('should show the instrument title and the assigned and expiry dates of each assignment', () => {
       renderAssignments([createAssignment()]);
-      const cells = within(screen.getByTestId('assignment-row')).getAllByRole('cell');
-      expect(cells.map((cell) => cell.textContent)).toEqual([
-        'Happiness Questionnaire',
-        '2026-01-15',
-        '2026-07-01',
-        'Outstanding'
-      ]);
+      expect(cellTexts()).toEqual(['Happiness Questionnaire', '2026-01-15', '2026-07-01', 'Outstanding']);
     });
 
     it('should fall back to the instrument id when the instrument is not among the known instruments', () => {
       mocks.instrumentInfo = undefined;
       renderAssignments([createAssignment()]);
-      expect(within(screen.getByTestId('assignment-row')).getAllByRole('cell')[0]!.textContent).toBe('instrument-1');
+      expect(cellTexts()[0]).toBe('instrument-1');
     });
 
     it.each<[AssignmentStatus, string]>([
@@ -143,14 +141,22 @@ describe('Route', () => {
       ['OUTSTANDING', 'Outstanding']
     ])('should display the %s status as %s', (status, label) => {
       renderAssignments([createAssignment({ status })]);
-      expect(within(screen.getByTestId('assignment-row')).getAllByRole('cell')[3]!.textContent).toBe(label);
+      expect(cellTexts()[3]).toBe(label);
     });
 
     it('should mark only the clicked row as selected', () => {
       renderAssignments([createAssignment(), createAssignment({ id: 'assignment-2' })]);
       openAssignment(1);
-      const rows = screen.getAllByTestId('assignment-row');
-      expect(rows.map((row) => row.getAttribute('data-state'))).toEqual([null, 'selected']);
+      const selection = screen.getAllByTestId('assignment-row-selection');
+      expect(selection.map((row) => row.getAttribute('data-row-selected'))).toEqual(['false', 'true']);
+    });
+
+    it.each(['Title', 'Assigned', 'Expires', 'Status'])('should sort by %s when its header is clicked', (name) => {
+      const header = () => within(screen.getByTestId('data-table-head')).getByText(name).closest('button')!;
+      renderAssignments([createAssignment(), createAssignment({ id: 'assignment-2' })]);
+      expect(header().querySelector('.lucide-chevrons-up-down')).toBeTruthy();
+      fireEvent.click(header());
+      expect(header().querySelector('.lucide-chevrons-up-down')).toBeNull();
     });
   });
 

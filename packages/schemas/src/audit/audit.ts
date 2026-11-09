@@ -34,10 +34,14 @@ export const $AuditLogsQuerySearchParams = z.object({
   userId: z.string().optional()
 });
 
+export type $AuditLogsSortBy = z.infer<typeof $AuditLogsSortBy>;
+export const $AuditLogsSortBy = z.enum(['action', 'entity', 'group', 'timestamp', 'user']);
+
 export type $AuditLogsQueryParams = z.infer<typeof $AuditLogsQueryParams>;
 export const $AuditLogsQueryParams = $AuditLogsQuerySearchParams.extend({
   limit: $NumberLike.pipe(z.number().int().positive().max(AUDIT_LOGS_MAX_PAGE_SIZE)).default(AUDIT_LOGS_PAGE_SIZE),
   page: $NumberLike.pipe(z.number().int().positive()).default(1),
+  sortBy: $AuditLogsSortBy.default('timestamp'),
   sortOrder: z.enum(['asc', 'desc']).default('desc')
 });
 

@@ -13,6 +13,8 @@ import type { Merge } from 'type-fest';
 import { z as z3 } from 'zod/v3';
 import { z as z4 } from 'zod/v4';
 
+import { LANGUAGES } from './language';
+
 const INTERNAL_HEADERS = ['subjectID', 'date'];
 
 const INTERNAL_HEADERS_SAMPLE_DATA = ['string', 'yyyy-mm-dd'];
@@ -93,30 +95,111 @@ const ZOD_TYPE_NAMES = [
   'ZodEnum',
   'ZodArray',
   'ZodObject',
-  'ZodEffects'
+  'ZodEffects',
+  'ZodLiteral',
+  'ZodNativeEnum',
+  'ZodUnion',
+  'ZodRecord'
 ] as const;
 
-class UploadError extends Error {
-  description: {
-    [L in Language]?: string;
-  };
+type UploadErrorDescription = { [L in Language]?: string };
 
-  constructor(description: { [L in Language]?: string }) {
+class UploadError extends Error {
+  description: UploadErrorDescription;
+
+  constructor(description: UploadErrorDescription) {
     super();
     this.description = description;
   }
 }
 
 class UnexpectedZodTypeError extends UploadError {
-  private constructor(description: { [L in Language]?: string }) {
+  private constructor(description: UploadErrorDescription) {
     super(description);
   }
 
   static forTypeName(typeName: string | undefined) {
     return new this({
-      en: `Unexpected Zod type name '${typeName}'`,
-      fr: `Nom de type Zod inattendu '${typeName}'`
+      en: `Unsupported Zod type '${typeName}'`,
+      es: `Tipo de Zod no compatible '${typeName}'`,
+      fr: `Type Zod non pris en charge '${typeName}'`
     });
+  }
+}
+
+function locateUploadError(error: UploadError, { column, row }: { column: string; row?: number }): UploadError {
+  const location: { [L in Language]: string } =
+    row === undefined
+      ? {
+          en: `at column name: '${column}'`,
+          es: `en la columna: '${column}'`,
+          fr: `au nom de colonne : '${column}'`
+        }
+      : {
+          en: `at column name: '${column}' and row number '${row}'`,
+          es: `en la columna: '${column}' y el número de fila '${row}'`,
+          fr: `au nom de colonne : '${column}' et numéro de ligne '${row}'`
+        };
+  return new UploadError(
+    Object.fromEntries(
+      LANGUAGES.flatMap((language) => {
+        const text = error.description[language];
+        return text === undefined ? [] : [[language, `${text} ${location[language]}`]];
+      })
+    )
+  );
+}
+
+type LiteralOption = boolean | number | string;
+
+function toLiteralOption(value: unknown): LiteralOption {
+  if (typeof value === 'boolean' || typeof value === 'number' || typeof value === 'string') {
+    return value;
+  }
+  throw new UploadError({
+    en: `Unsupported literal value '${String(value)}' of type '${typeof value}'`,
+    es: `Valor literal no compatible '${String(value)}' de tipo '${typeof value}'`,
+    fr: `Valeur littérale non prise en charge '${String(value)}' de type '${typeof value}'`
+  });
+}
+
+// A numeric TypeScript enum also maps each value back to its name, and those reverse entries are not values.
+function enumLikeValues(entries: { [key: string]: number | string }): (number | string)[] {
+  const numericValues = new Set(Object.values(entries).filter((value) => typeof value === 'number'));
+  return Object.entries(entries)
+    .filter(([key]) => !numericValues.has(Number(key)))
+    .map(([, value]) => value);
+}
+
+function nonLiteralUnionError() {
+  return new UploadError({
+    en: 'Unsupported Zod union: every member must be a literal value',
+    es: 'Unión de Zod no compatible: cada miembro debe ser un valor literal',
+    fr: 'Union Zod non prise en charge : chaque membre doit être une valeur littérale'
+  });
+}
+
+function formatOptions(options: readonly LiteralOption[]) {
+  return options.join('/');
+}
+
+function parseOptionEntry(entry: string, options: readonly LiteralOption[]): LiteralOption {
+  const selectedOption = options.find((option) => String(option) === entry);
+  if (selectedOption === undefined) {
+    throw new UploadError({
+      en: `Invalid value '${entry}': expected one of ${formatOptions(options)}`,
+      es: `Valor no válido '${entry}': se esperaba uno de ${formatOptions(options)}`,
+      fr: `Valeur invalide '${entry}' : une des valeurs ${formatOptions(options)} était attendue`
+    });
+  }
+  return selectedOption;
+}
+
+function sampleDataForColumn(column: string, generateSampleData: () => string): string {
+  try {
+    return generateSampleData();
+  } catch (error) {
+    throw error instanceof UploadError ? locateUploadError(error, { column }) : error;
   }
 }
 
@@ -155,29 +238,78 @@ function extractRecordArrayEntry(entry: string): { [key: string]: string }[] {
     recordArrayDataList.pop();
   }
 
-  return recordArrayDataList.map((listData) => {
-    const recordsList = listData.split(',');
-    if (recordsList.some((str) => str === '')) {
+  return recordArrayDataList.map(parseRecordFields);
+}
+
+function parseRecordFields(fieldList: string): { [key: string]: string } {
+  const recordsList = fieldList.split(',');
+  if (recordsList.some((str) => str === '')) {
+    throw new UploadError({
+      en: `One or more of the record fields was left empty`,
+      fr: `Un ou plusieurs champs de l'enregistrement ont été laissés vides`
+    });
+  }
+  const records: { [key: string]: string } = {};
+  recordsList.forEach((rawRecord, i) => {
+    const separatorIndex = rawRecord.indexOf(':');
+    const recordKey = rawRecord.slice(0, separatorIndex).trim();
+    const recordValue = rawRecord.slice(separatorIndex + 1).trim();
+    if (separatorIndex === -1 || !recordKey) {
       throw new UploadError({
-        en: `One or more of the record array fields was left empty`,
-        fr: `Un ou plusieurs champs du tableau d'enregistrements ont été laissés vides`
+        en: `Malformed record at index ${i}`,
+        fr: `Enregistrement mal formé à l'index ${i}`
       });
     }
-    const records: { [key: string]: string } = {};
-    recordsList.forEach((rawRecord, i) => {
-      const separatorIndex = rawRecord.indexOf(':');
-      const recordKey = rawRecord.slice(0, separatorIndex).trim();
-      const recordValue = rawRecord.slice(separatorIndex + 1).trim();
-      if (separatorIndex === -1 || !recordKey) {
-        throw new UploadError({
-          en: `Malformed record at index ${i}`,
-          fr: `Enregistrement mal formé à l'index ${i}`
-        });
-      }
-      //recordValue can be empty if the value is optional
-      records[recordKey] = recordValue;
+    //recordValue can be empty if the value is optional
+    records[recordKey] = recordValue;
+  });
+  return records;
+}
+
+function parseRecordEntry(
+  entry: string,
+  keys: null | readonly string[],
+  parseValue: (value: string) => unknown
+): { [key: string]: unknown } {
+  const opening = 'RECORD(';
+  const closing = ')';
+  if (!entry.startsWith(opening) || !entry.endsWith(closing)) {
+    throw new UploadError({
+      en: `Syntax error in RECORD declaration: ${entry}`,
+      es: `Error de sintaxis en la declaración RECORD: ${entry}`,
+      fr: `Erreur de syntaxe dans la déclaration RECORD : ${entry}`
     });
-    return records;
+  }
+  return mapValues(parseRecordFields(entry.slice(opening.length, -closing.length)), (value, key) => {
+    if (keys && !keys.includes(key)) {
+      throw new UploadError({
+        en: `Unknown key '${key}' in RECORD: expected one of ${keys.join('/')}`,
+        es: `Clave desconocida '${key}' en RECORD: se esperaba una de ${keys.join('/')}`,
+        fr: `Clé inconnue '${key}' dans RECORD : une des clés ${keys.join('/')} était attendue`
+      });
+    }
+    return parseValue(value);
+  });
+}
+
+function formatRecordSample(keys: null | readonly string[], valueSample: string) {
+  const fields = keys ? keys.map((key) => `${key}: ${valueSample}`).join(', ') : `key: ${valueSample}, ...`;
+  return `RECORD(${fields})`;
+}
+
+function unsupportedRecordKeyError() {
+  return new UploadError({
+    en: 'Unsupported Zod record: keys must be an enum or strings',
+    es: 'Registro de Zod no compatible: las claves deben ser un enum o cadenas',
+    fr: 'Enregistrement Zod non pris en charge : les clés doivent être un enum ou des chaînes'
+  });
+}
+
+function unsupportedRecordValueError(typeName: string) {
+  return new UploadError({
+    en: `Unsupported Zod record: values must be numbers or fixed choices, not '${typeName}'`,
+    es: `Registro de Zod no compatible: los valores deben ser números u opciones fijas, no '${typeName}'`,
+    fr: `Enregistrement Zod non pris en charge : les valeurs doivent être des nombres ou des choix fixes, pas '${typeName}'`
   });
 }
 
@@ -198,13 +330,35 @@ export namespace Zod3 {
 
   type ZodObjectArrayDef = z3.ZodArrayDef & { type: z3.AnyZodObject };
 
-  export type ZodTypeNameResult = {
-    enumValues?: readonly string[];
-    isOptional: boolean;
-    multiKeys?: string[];
-    multiValues?: ZodTypeNameResult[];
-    typeName: RequiredZodTypeName;
-  };
+  type OptionZodTypeName = Extract<RequiredZodTypeName, 'ZodEnum' | 'ZodLiteral' | 'ZodNativeEnum' | 'ZodUnion'>;
+
+  export type ZodTypeNameResult =
+    | {
+        enumValues: readonly LiteralOption[];
+        isOptional: boolean;
+        typeName: OptionZodTypeName;
+      }
+    | {
+        enumValues?: readonly string[];
+        isOptional: boolean;
+        multiKeys?: string[];
+        multiValues?: ZodTypeNameResult[];
+        typeName: Exclude<RequiredZodTypeName, 'ZodRecord' | OptionZodTypeName>;
+      }
+    | {
+        isOptional: boolean;
+        recordKeys: null | readonly string[];
+        recordValue: ZodTypeNameResult;
+        typeName: 'ZodRecord';
+      };
+
+  const RECORD_VALUE_TYPE_NAMES: readonly RequiredZodTypeName[] = [
+    'ZodEnum',
+    'ZodLiteral',
+    'ZodNativeEnum',
+    'ZodNumber',
+    'ZodUnion'
+  ];
 
   function isZodEffects(value: unknown): value is z3.ZodEffects<z3.ZodType> {
     return isObjectLike(value) && value.constructor.name === 'ZodEffects';
@@ -218,6 +372,10 @@ export namespace Zod3 {
     return isObjectLike(value) && value.constructor.name === 'ZodObject';
   }
 
+  function hasTypeName(value: unknown): value is { typeName: string } {
+    return isPlainObject(value) && typeof value.typeName === 'string';
+  }
+
   function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
     return isPlainObject(value) && ZOD_TYPE_NAMES.includes(value.typeName as ZodTypeName);
   }
@@ -228,6 +386,26 @@ export namespace Zod3 {
 
   function isZodEnumDef(def: AnyZodTypeDef): def is z3.ZodEnumDef {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodEnum;
+  }
+
+  function isZodNativeEnumDef(def: AnyZodTypeDef): def is z3.ZodNativeEnumDef {
+    return def.typeName === z3.ZodFirstPartyTypeKind.ZodNativeEnum;
+  }
+
+  function isZodLiteralDef(def: AnyZodTypeDef): def is z3.ZodLiteralDef<unknown> {
+    return def.typeName === z3.ZodFirstPartyTypeKind.ZodLiteral;
+  }
+
+  function isZodUnionDef(def: AnyZodTypeDef): def is z3.ZodUnionDef {
+    return def.typeName === z3.ZodFirstPartyTypeKind.ZodUnion;
+  }
+
+  function isZodRecordDef(def: AnyZodTypeDef): def is z3.ZodRecordDef<z3.ZodTypeAny> {
+    return def.typeName === z3.ZodFirstPartyTypeKind.ZodRecord;
+  }
+
+  function isZodStringDef(def: AnyZodTypeDef): def is z3.ZodStringDef {
+    return def.typeName === z3.ZodFirstPartyTypeKind.ZodString;
   }
 
   function isZodSetDef(def: AnyZodTypeDef): def is z3.ZodSetDef {
@@ -246,6 +424,32 @@ export namespace Zod3 {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodEffects;
   }
 
+  function literalValueOfUnionOption(option: z3.ZodTypeAny): LiteralOption {
+    const def: unknown = option._def;
+    if (!(isZodTypeDef(def) && isZodLiteralDef(def))) {
+      throw nonLiteralUnionError();
+    }
+    return toLiteralOption(def.value);
+  }
+
+  function recordKeysOf(keyType: z3.ZodTypeAny): null | readonly string[] {
+    const def: unknown = keyType._def;
+    if (isZodTypeDef(def) && isZodEnumDef(def)) {
+      return def.values;
+    } else if (isZodTypeDef(def) && isZodStringDef(def)) {
+      return null;
+    }
+    throw unsupportedRecordKeyError();
+  }
+
+  function recordValueOf(valueType: z3.ZodTypeAny): ZodTypeNameResult {
+    const result = getZodTypeName(valueType);
+    if (!RECORD_VALUE_TYPE_NAMES.includes(result.typeName)) {
+      throw unsupportedRecordValueError(result.typeName);
+    }
+    return result;
+  }
+
   function interpretZodArray(def: ZodObjectArrayDef, isOptional?: boolean): ZodTypeNameResult {
     const listOfZodElements: ZodTypeNameResult[] = [];
     const listOfZodKeys: string[] = [];
@@ -253,18 +457,8 @@ export namespace Zod3 {
     const shape = def.type.shape as { [key: string]: z3.ZodTypeAny };
 
     for (const [key, insideType] of Object.entries(shape)) {
-      const def: unknown = insideType._def;
-      if (isZodTypeDef(def)) {
-        const innerTypeName = getZodTypeName(insideType);
-        listOfZodElements.push(innerTypeName);
-        listOfZodKeys.push(key);
-      } else {
-        console.error({ def });
-        throw new UploadError({
-          en: `Unhandled case!`,
-          fr: `Cas non géré !`
-        });
-      }
+      listOfZodElements.push(getZodTypeName(insideType));
+      listOfZodKeys.push(key);
     }
     if (listOfZodElements.length === 0) {
       throw new UploadError({
@@ -283,14 +477,38 @@ export namespace Zod3 {
   export function getZodTypeName(schema: z3.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
     const def: unknown = schema._def;
     if (!isZodTypeDef(def)) {
-      console.error(`Cannot parse ZodType from schema: ${JSON.stringify(schema)}`);
-      throw new UploadError({ en: 'Unexpected Error', fr: 'Erreur inattendue' });
+      throw UnexpectedZodTypeError.forTypeName(hasTypeName(def) ? def.typeName : undefined);
     } else if (isZodOptionalDef(def)) {
       return getZodTypeName(def.innerType, true);
     } else if (isZodEnumDef(def)) {
       return {
         enumValues: def.values,
         isOptional: Boolean(isOptional),
+        typeName: def.typeName
+      };
+    } else if (isZodNativeEnumDef(def)) {
+      return {
+        enumValues: enumLikeValues(def.values),
+        isOptional: Boolean(isOptional),
+        typeName: def.typeName
+      };
+    } else if (isZodLiteralDef(def)) {
+      return {
+        enumValues: [toLiteralOption(def.value)],
+        isOptional: Boolean(isOptional),
+        typeName: def.typeName
+      };
+    } else if (isZodUnionDef(def)) {
+      return {
+        enumValues: def.options.map(literalValueOfUnionOption),
+        isOptional: Boolean(isOptional),
+        typeName: def.typeName
+      };
+    } else if (isZodRecordDef(def)) {
+      return {
+        isOptional: Boolean(isOptional),
+        recordKeys: recordKeysOf(def.keyType),
+        recordValue: recordValueOf(def.valueType),
         typeName: def.typeName
       };
     } else if (isZodObjectArrayDef(def)) {
@@ -313,28 +531,33 @@ export namespace Zod3 {
     }
     return {
       isOptional: Boolean(isOptional),
-      typeName: def.typeName satisfies ZodTypeName as RequiredZodTypeName
+      typeName: def.typeName satisfies ZodTypeName as Exclude<RequiredZodTypeName, 'ZodRecord' | OptionZodTypeName>
     };
   }
 
-  export function generateSampleData({
-    enumValues,
-    isOptional,
-    multiKeys,
-    multiValues,
-    typeName
-  }: ZodTypeNameResult): string {
+  export function generateSampleData(result: ZodTypeNameResult): string {
+    const { isOptional, typeName } = result;
     switch (typeName) {
       case 'ZodBoolean':
         return formatOptionalEntry('true/false', isOptional);
       case 'ZodDate':
         return formatOptionalEntry('yyyy-mm-dd', isOptional);
+      case 'ZodEnum':
+      case 'ZodLiteral':
+      case 'ZodNativeEnum':
+      case 'ZodUnion':
+        return formatOptionalEntry(formatOptions(result.enumValues), isOptional);
       case 'ZodNumber':
         return formatOptionalEntry('number', isOptional);
+      case 'ZodRecord':
+        return formatOptionalEntry(
+          formatRecordSample(result.recordKeys, generateSampleData(result.recordValue)),
+          isOptional
+        );
       case 'ZodSet':
         try {
-          if (enumValues) {
-            return formatOptionalEntry(`SET(${enumValues.join('/')}, ...)`, isOptional);
+          if (result.enumValues) {
+            return formatOptionalEntry(`SET(${result.enumValues.join('/')}, ...)`, isOptional);
           }
           return formatOptionalEntry('SET(a,b,c)', isOptional);
         } catch {
@@ -345,29 +568,10 @@ export namespace Zod3 {
         }
       case 'ZodString':
         return formatOptionalEntry('string', isOptional);
-      case 'ZodEnum':
-        try {
-          let possibleEnumOutputs = '';
-          if (!enumValues) {
-            throw new UploadError({
-              en: 'Enum values do not exist',
-              fr: `Values d'Enum n'existe pas`
-            });
-          }
-          for (const val of enumValues) {
-            possibleEnumOutputs += `${val}/`;
-          }
-          possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
-          return formatOptionalEntry(possibleEnumOutputs, isOptional);
-        } catch {
-          throw new UploadError({
-            en: 'Invalid Enum error',
-            fr: 'Erreur Enum invalide'
-          });
-        }
       case 'ZodArray':
       case 'ZodObject':
         try {
+          const { multiKeys, multiValues } = result;
           let multiString = 'RECORD_ARRAY( ';
           if (!(multiValues && multiKeys)) {
             throw new UploadError({
@@ -405,10 +609,12 @@ export namespace Zod3 {
     if (entry === '' && convertResult.isOptional) {
       return undefined;
     }
-    switch (convertResult.typeName) {
+    const { typeName } = convertResult;
+    switch (typeName) {
       case 'ZodArray':
-      case 'ZodObject':
-        if (!convertResult.multiKeys || !convertResult.multiValues) {
+      case 'ZodObject': {
+        const { multiKeys, multiValues } = convertResult;
+        if (!multiKeys || !multiValues) {
           throw new UploadError({
             en: 'Record Array keys or values do not exist',
             fr: "Les clés ou valeurs du tableau d'enregistrements n'existent pas"
@@ -417,29 +623,37 @@ export namespace Zod3 {
 
         return extractRecordArrayEntry(entry).map((parsedRecord) => {
           const result: { [key: string]: unknown } = {};
-          convertResult.multiKeys!.forEach((key, index) => {
+          multiKeys.forEach((key, index) => {
             const rawValue = parsedRecord[key];
             if (rawValue !== undefined) {
-              result[key] = interpretZodConvertResult(convertResult.multiValues![index]!, rawValue);
+              result[key] = interpretZodConvertResult(multiValues[index]!, rawValue);
             }
           });
           return result;
         });
+      }
 
       case 'ZodBoolean':
         return parseBooleanEntry(entry);
       case 'ZodDate':
         return parseDateEntry(entry);
       case 'ZodEnum':
-        return entry;
+      case 'ZodLiteral':
+      case 'ZodNativeEnum':
+      case 'ZodUnion':
+        return parseOptionEntry(entry, convertResult.enumValues);
       case 'ZodNumber':
         return parseNumberEntry(entry);
+      case 'ZodRecord':
+        return parseRecordEntry(entry, convertResult.recordKeys, (value) => {
+          return interpretZodConvertResult(convertResult.recordValue, value);
+        });
       case 'ZodSet':
         return parseSetEntry(entry);
       case 'ZodString':
         return entry;
       default:
-        throw UnexpectedZodTypeError.forTypeName(convertResult.typeName);
+        throw UnexpectedZodTypeError.forTypeName(typeName);
     }
   }
 
@@ -463,8 +677,7 @@ export namespace Zod3 {
     const sampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
 
     for (const col of columnNames) {
-      const typeNameResult = getZodTypeName(shape[col]!);
-      sampleData.push(generateSampleData(typeNameResult));
+      sampleData.push(sampleDataForColumn(col, () => generateSampleData(getZodTypeName(shape[col]!))));
     }
 
     return {
@@ -592,12 +805,7 @@ export namespace Zod3 {
               jsonLine[headers[i]!] = result;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
-                reject(
-                  new UploadError({
-                    en: `${error.description.en} at column name: '${key}' and row number '${rowNumber}'`,
-                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}'`
-                  })
-                );
+                reject(locateUploadError(error, { column: key, row: rowNumber }));
                 return;
               }
               console.error(error);
@@ -635,12 +843,23 @@ export namespace Zod3 {
 export namespace Zod4 {
   type TypeName = Extract<
     z4.core.$ZodTypeDef['type'],
-    'array' | 'boolean' | 'date' | 'enum' | 'number' | 'object' | 'optional' | 'set' | 'string'
+    | 'array'
+    | 'boolean'
+    | 'date'
+    | 'enum'
+    | 'literal'
+    | 'number'
+    | 'object'
+    | 'optional'
+    | 'record'
+    | 'set'
+    | 'string'
+    | 'union'
   >;
 
   type BaseZodConvertResult = {
     isOptional: boolean;
-    typeName: Exclude<TypeName, 'array' | 'enum' | 'object' | 'set'>;
+    typeName: Exclude<TypeName, 'array' | 'enum' | 'literal' | 'object' | 'record' | 'set' | 'union'>;
   };
 
   type ArrayZodConvertResult = Merge<
@@ -654,8 +873,8 @@ export namespace Zod4 {
   type EnumZodConvertResult = Merge<
     BaseZodConvertResult,
     {
-      enumValues: readonly string[];
-      typeName: 'enum';
+      enumValues: readonly LiteralOption[];
+      typeName: 'enum' | 'literal' | 'union';
     }
   >;
 
@@ -669,6 +888,15 @@ export namespace Zod4 {
     }
   >;
 
+  type RecordZodConvertResult = Merge<
+    BaseZodConvertResult,
+    {
+      keys: null | readonly string[];
+      typeName: 'record';
+      valueType: ZodConvertResult;
+    }
+  >;
+
   type SetZodConvertResult = Merge<
     BaseZodConvertResult,
     {
@@ -678,7 +906,38 @@ export namespace Zod4 {
   >;
 
   type ZodConvertResult =
-    ArrayZodConvertResult | BaseZodConvertResult | EnumZodConvertResult | ObjectZodConvertResult | SetZodConvertResult;
+    | ArrayZodConvertResult
+    | BaseZodConvertResult
+    | EnumZodConvertResult
+    | ObjectZodConvertResult
+    | RecordZodConvertResult
+    | SetZodConvertResult;
+
+  const RECORD_VALUE_TYPE_NAMES: readonly TypeName[] = ['enum', 'literal', 'number', 'union'];
+
+  function recordKeysOf(keyType: unknown): null | readonly string[] {
+    if (keyType instanceof z4.ZodEnum) {
+      return enumLikeValues(keyType.def.entries).map(String);
+    } else if (keyType instanceof z4.ZodString) {
+      return null;
+    }
+    throw unsupportedRecordKeyError();
+  }
+
+  function recordValueOf(valueType: unknown): ZodConvertResult {
+    const result = parseZodSchema(valueType);
+    if (!RECORD_VALUE_TYPE_NAMES.includes(result.typeName)) {
+      throw unsupportedRecordValueError(result.typeName);
+    }
+    return result;
+  }
+
+  function literalValuesOfUnionOption(option: unknown): LiteralOption[] {
+    if (!(option instanceof z4.ZodLiteral)) {
+      throw nonLiteralUnionError();
+    }
+    return option.def.values.map(toLiteralOption);
+  }
 
   function parseZodSchema(schema: unknown, isOptional = false): ZodConvertResult {
     switch (true) {
@@ -711,7 +970,19 @@ export namespace Zod4 {
         };
       case schema instanceof z4.ZodEnum:
         return {
-          enumValues: schema.options.map(String),
+          enumValues: enumLikeValues(schema.def.entries),
+          isOptional,
+          typeName: schema.def.type
+        };
+      case schema instanceof z4.ZodLiteral:
+        return {
+          enumValues: schema.def.values.map(toLiteralOption),
+          isOptional,
+          typeName: schema.def.type
+        };
+      case schema instanceof z4.ZodUnion:
+        return {
+          enumValues: schema.def.options.flatMap(literalValuesOfUnionOption),
           isOptional,
           typeName: schema.def.type
         };
@@ -719,6 +990,13 @@ export namespace Zod4 {
         return {
           isOptional,
           typeName: schema.def.type
+        };
+      case schema instanceof z4.ZodRecord:
+        return {
+          isOptional,
+          keys: recordKeysOf(schema.def.keyType),
+          typeName: schema.def.type,
+          valueType: recordValueOf(schema.def.valueType)
         };
       case schema instanceof z4.ZodSet:
         return {
@@ -763,9 +1041,15 @@ export namespace Zod4 {
       case 'date':
         return parseDateEntry(entry);
       case 'enum':
-        return entry;
+      case 'literal':
+      case 'union':
+        return parseOptionEntry(entry, convertResult.enumValues);
       case 'number':
         return parseNumberEntry(entry);
+      case 'record':
+        return parseRecordEntry(entry, convertResult.keys, (value) => {
+          return interpretZodConvertResult(convertResult.valueType, value);
+        });
       case 'set':
         return parseSetEntry(entry);
       case 'string':
@@ -784,14 +1068,10 @@ export namespace Zod4 {
         return formatOptionalEntry('true/false', convertResult.isOptional);
       case 'date':
         return formatOptionalEntry('yyyy-mm-dd', convertResult.isOptional);
-      case 'enum': {
-        let possibleEnumOutputs = '';
-        for (const val of convertResult.enumValues) {
-          possibleEnumOutputs += `${val}/`;
-        }
-        possibleEnumOutputs = possibleEnumOutputs.slice(0, -1);
-        return formatOptionalEntry(possibleEnumOutputs, convertResult.isOptional);
-      }
+      case 'enum':
+      case 'literal':
+      case 'union':
+        return formatOptionalEntry(formatOptions(convertResult.enumValues), convertResult.isOptional);
       case 'number':
         return formatOptionalEntry('number', convertResult.isOptional);
       case 'object': {
@@ -805,6 +1085,11 @@ export namespace Zod4 {
         });
         return output;
       }
+      case 'record':
+        return formatOptionalEntry(
+          formatRecordSample(convertResult.keys, generateSampleData(convertResult.valueType)),
+          convertResult.isOptional
+        );
       case 'set': {
         const innerTypeSample = generateSampleData(convertResult.innerType);
         return formatOptionalEntry(`SET(${innerTypeSample})`, convertResult.isOptional);
@@ -832,7 +1117,7 @@ export namespace Zod4 {
 
     Object.entries(instrumentSchema.shape).forEach(([key, subschema]) => {
       csvColumns.push(key);
-      sampleData.push(generateSampleData(parseZodSchema(subschema)));
+      sampleData.push(sampleDataForColumn(key, () => generateSampleData(parseZodSchema(subschema))));
     });
 
     return {
@@ -949,12 +1234,7 @@ export namespace Zod4 {
               jsonLine[headers[i]!] = result;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
-                reject(
-                  new UploadError({
-                    en: `${error.description.en} at column name: '${key}' and row number '${rowNumber}'`,
-                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}'`
-                  })
-                );
+                reject(locateUploadError(error, { column: key, row: rowNumber }));
                 return;
               }
               console.error(error);

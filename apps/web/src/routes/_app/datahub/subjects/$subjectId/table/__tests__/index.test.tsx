@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/datahub/subjects/$subjectId/table/index';
@@ -68,6 +68,14 @@ describe('Route', () => {
   it('should add a snake-cased column for each record field, so the headers match the exported column names', () => {
     renderTable([record()]);
     expect(headers()).toEqual(['DATE_COLLECTED', 'COLLECTION_METHOD', 'SERIES', 'TOTAL_SCORE']);
+  });
+
+  it('should sort by a record field, since every column of the record table is sortable', () => {
+    renderTable([record({ __id__: 'high', totalScore: 9 }), record({ __id__: 'low', totalScore: 1 })]);
+    const button = within(screen.getByTestId('data-table-head')).getByText('TOTAL_SCORE').closest('button')!;
+    expect(button.querySelector('.lucide-chevrons-up-down')).toBeTruthy();
+    fireEvent.click(button);
+    expect(button.querySelector('.lucide-chevrons-up-down')).toBeNull();
   });
 
   // The provenance columns describe where a record came from rather than what it measured, so they

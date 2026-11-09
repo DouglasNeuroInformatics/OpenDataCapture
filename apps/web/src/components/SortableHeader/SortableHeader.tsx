@@ -23,11 +23,13 @@ export const SortableHeader = <TRow,>({ column, label, sortOrder }: SortableHead
   const Icon = sorted ? SORT_ICONS[sorted] : ChevronsUpDownIcon;
   return (
     <button
-      className="hover:text-foreground flex items-center gap-1 transition-colors"
+      className="hover:text-foreground flex min-w-0 items-center gap-1 transition-colors"
       type="button"
       onClick={() => column.toggleSorting()}
     >
-      {label}
+      <span className="truncate" title={label}>
+        {label}
+      </span>
       <Icon className={cn('h-3.5 w-3.5 shrink-0', !sorted && 'opacity-40')} />
     </button>
   );

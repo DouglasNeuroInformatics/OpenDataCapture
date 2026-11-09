@@ -46,6 +46,9 @@ function expectRejection(promise: Promise<unknown>, en: string) {
   return expect(promise).rejects.toMatchObject({ description: { en } });
 }
 
+/** A numeric enum as TypeScript compiles it: every value is also mapped back to its name. */
+const Severity = { 0: 'Mild', 1: 'Severe', Mild: 0, Severe: 1 } as const;
+
 let consoleError: ReturnType<typeof vi.spyOn>;
 
 describe('Zod3', () => {
@@ -110,6 +113,97 @@ describe('Zod3', () => {
       });
     });
 
+    it('should read a literal as its one allowed value', () => {
+      expect(Zod3.getZodTypeName(z3.literal(7))).toStrictEqual({
+        enumValues: [7],
+        isOptional: false,
+        typeName: 'ZodLiteral'
+      });
+    });
+
+    it('should read a union of literals as its allowed values, keeping their types', () => {
+      expect(
+        Zod3.getZodTypeName(z3.union([z3.literal(0), z3.literal('n/a'), z3.literal(true)]).optional())
+      ).toStrictEqual({ enumValues: [0, 'n/a', true], isOptional: true, typeName: 'ZodUnion' });
+    });
+
+    it('should read the values of a numeric native enum without its reverse mappings', () => {
+      expect(Zod3.getZodTypeName(z3.nativeEnum(Severity))).toStrictEqual({
+        enumValues: [0, 1],
+        isOptional: false,
+        typeName: 'ZodNativeEnum'
+      });
+    });
+
+    it('should read the values of a string native enum', () => {
+      expect(Zod3.getZodTypeName(z3.nativeEnum({ Left: 'left', Right: 'right' }))).toMatchObject({
+        enumValues: ['left', 'right']
+      });
+    });
+
+    it('should reject a union with a member that is not a literal, since a cell could not say which member it is', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.union([z3.literal(1), z3.string()])))).toStrictEqual({
+        en: 'Unsupported Zod union: every member must be a literal value',
+        es: 'Unión de Zod no compatible: cada miembro debe ser un valor literal',
+        fr: 'Union Zod non prise en charge : chaque membre doit être une valeur littérale'
+      });
+    });
+
+    it('should reject a union with a member of a type it does not know', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.union([z3.literal(1), z3.null()])))).toMatchObject({
+        en: 'Unsupported Zod union: every member must be a literal value'
+      });
+    });
+
+    it('should reject a literal that a cell cannot express', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.literal(null)))).toStrictEqual({
+        en: "Unsupported literal value 'null' of type 'object'",
+        es: "Valor literal no compatible 'null' de tipo 'object'",
+        fr: "Valeur littérale non prise en charge 'null' de type 'object'"
+      });
+    });
+
+    it('should read a record keyed by an enum as its keys and the type of its values', () => {
+      const schema = z3.record(z3.enum(['monday', 'friday']), z3.union([z3.literal(1), z3.literal(2)]));
+      expect(Zod3.getZodTypeName(schema)).toStrictEqual({
+        isOptional: false,
+        recordKeys: ['monday', 'friday'],
+        recordValue: { enumValues: [1, 2], isOptional: false, typeName: 'ZodUnion' },
+        typeName: 'ZodRecord'
+      });
+    });
+
+    it('should read a record keyed by any string as having no fixed keys', () => {
+      expect(Zod3.getZodTypeName(z3.record(z3.number()).optional())).toStrictEqual({
+        isOptional: true,
+        recordKeys: null,
+        recordValue: { isOptional: false, typeName: 'ZodNumber' },
+        typeName: 'ZodRecord'
+      });
+    });
+
+    it('should reject a record whose keys are neither an enum nor strings', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.record(z3.number(), z3.number())))).toStrictEqual({
+        en: 'Unsupported Zod record: keys must be an enum or strings',
+        es: 'Registro de Zod no compatible: las claves deben ser un enum o cadenas',
+        fr: 'Enregistrement Zod non pris en charge : les clés doivent être un enum ou des chaînes'
+      });
+    });
+
+    it('should reject a record whose keys are of a type it does not know', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.record(z3.symbol(), z3.number())))).toMatchObject({
+        en: 'Unsupported Zod record: keys must be an enum or strings'
+      });
+    });
+
+    it('should reject a record whose values could contain the separators of a RECORD cell', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.record(z3.string())))).toStrictEqual({
+        en: "Unsupported Zod record: values must be numbers or fixed choices, not 'ZodString'",
+        es: "Registro de Zod no compatible: los valores deben ser números u opciones fijas, no 'ZodString'",
+        fr: "Enregistrement Zod non pris en charge : les valeurs doivent être des nombres ou des choix fixes, pas 'ZodString'"
+      });
+    });
+
     it('should parse a set of free-form values without enum values', () => {
       expect(Zod3.getZodTypeName(z3.set(z3.string()))).toStrictEqual({ isOptional: false, typeName: 'ZodSet' });
     });
@@ -118,20 +212,31 @@ describe('Zod3', () => {
       expect(Zod3.getZodTypeName(z3.array(z3.string()))).toStrictEqual({ isOptional: false, typeName: 'ZodArray' });
     });
 
-    it('should reject a schema type that cannot be represented in a CSV', () => {
-      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.literal('a')))).toMatchObject({ en: 'Unexpected Error' });
+    it('should name the type of a schema that cannot be represented in a CSV', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.tuple([z3.string()])))).toStrictEqual({
+        en: "Unsupported Zod type 'ZodTuple'",
+        es: "Tipo de Zod no compatible 'ZodTuple'",
+        fr: "Type Zod non pris en charge 'ZodTuple'"
+      });
+    });
+
+    it('should reject a field that is not a Zod schema without naming a type', () => {
+      const notASchema = Object.assign(z3.string(), { _def: {} });
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(notASchema))).toMatchObject({
+        en: "Unsupported Zod type 'undefined'"
+      });
     });
 
     it('should reject a set whose value type cannot be represented in a CSV', () => {
-      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.set(z3.literal('a'))))).toMatchObject({
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.set(z3.tuple([z3.string()]))))).toMatchObject({
         en: 'Invalid inner type: ZodSet value type must have a valid type definition'
       });
     });
 
-    it('should reject an array of objects with a field that cannot be represented in a CSV', () => {
-      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.array(z3.object({ a: z3.literal('x') }))))).toMatchObject({
-        en: 'Unhandled case!'
-      });
+    it('should name the type of a field in an array of objects that cannot be represented in a CSV', () => {
+      expect(
+        uploadErrorOf(() => Zod3.getZodTypeName(z3.array(z3.object({ a: z3.tuple([z3.string()]) }))))
+      ).toMatchObject({ en: "Unsupported Zod type 'ZodTuple'" });
     });
 
     it('should reject an array of objects without any fields', () => {
@@ -185,10 +290,24 @@ describe('Zod3', () => {
       );
     });
 
-    it('should reject an enum without values', () => {
-      expect(uploadErrorOf(() => Zod3.generateSampleData({ isOptional: false, typeName: 'ZodEnum' }))).toMatchObject({
-        en: 'Invalid Enum error'
-      });
+    it.each([
+      ['a literal', z3.literal('only'), 'only'],
+      ['a union of literals', z3.union([z3.literal(0), z3.literal(1), z3.literal(2)]), '0/1/2'],
+      ['a native enum', z3.nativeEnum(Severity), '0/1'],
+      ['an optional union of literals', z3.union([z3.literal(0), z3.literal(1)]).optional(), '0/1 (optional)']
+    ])('should list the allowed values of %s', (_, schema, sample) => {
+      expect(Zod3.generateSampleData(Zod3.getZodTypeName(schema))).toBe(sample);
+    });
+
+    it('should show every key of a record keyed by an enum with the sample of its values', () => {
+      const schema = z3.record(z3.enum(['monday', 'friday']), z3.union([z3.literal(1), z3.literal(2)]));
+      expect(Zod3.generateSampleData(Zod3.getZodTypeName(schema))).toBe('RECORD(monday: 1/2, friday: 1/2)');
+    });
+
+    it('should show a generic key for a record keyed by any string', () => {
+      expect(Zod3.generateSampleData(Zod3.getZodTypeName(z3.record(z3.number()).optional()))).toBe(
+        'RECORD(key: number, ...) (optional)'
+      );
     });
 
     it('should describe every field of a record array, separated by commas', () => {
@@ -253,6 +372,33 @@ describe('Zod3', () => {
       expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(z3.string().refine(Boolean))))).toMatchObject({
         en: 'Validation schema for this instrument is invalid'
       });
+    });
+
+    it('should name the column and type of a field that cannot be represented in a CSV', () => {
+      const schema = z3.object({ pair: z3.tuple([z3.string()]), score: z3.number() });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toStrictEqual({
+        en: "Unsupported Zod type 'ZodTuple' at column name: 'pair'",
+        es: "Tipo de Zod no compatible 'ZodTuple' en la columna: 'pair'",
+        fr: "Type Zod non pris en charge 'ZodTuple' au nom de colonne : 'pair'"
+      });
+    });
+
+    it('should locate an error only in the languages it was written in', () => {
+      const schema = z3.object({ tags: z3.set(z3.tuple([z3.string()])) });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toStrictEqual({
+        en: "Invalid inner type: ZodSet value type must have a valid type definition at column name: 'tags'",
+        fr: "Type interne invalide : le type de valeur ZodSet doit avoir une définition de type valide au nom de colonne : 'tags'"
+      });
+    });
+
+    it('should not present an unexpected failure as an upload error', () => {
+      const failure = new Error('def is unreadable');
+      const unreadable = Object.defineProperty(z3.string(), '_def', {
+        get(): never {
+          throw failure;
+        }
+      });
+      expect(() => createUploadTemplateCSV(instrumentWith(z3.object({ unreadable })))).toThrow(failure);
     });
   });
 
@@ -480,30 +626,163 @@ describe('Zod3', () => {
       ]);
       await expectRejection(
         processInstrumentCSV(file, instrumentWith(z3.object({ score: z3.number().refine(Boolean) }))),
-        "Unexpected Zod type name 'ZodEffects' at column name: 'score' and row number '1'"
+        "Unsupported Zod type 'ZodEffects' at column name: 'score' and row number '1'"
       );
     });
 
-    it('should fall back to a generic error when an unsupported field schema cannot be serialized for logging', async () => {
+    it('should name the type of an unsupported field whose schema cannot be serialized to JSON', async () => {
       const file = csvFile([
         ['subjectID', 'date', 'big'],
         ['subject1', '2024-01-01', '1']
       ]);
       await expectRejection(
         processInstrumentCSV(file, instrumentWith(z3.object({ big: z3.literal(1n) }))),
-        'Error parsing CSV'
+        "Unsupported literal value '1' of type 'bigint' at column name: 'big' and row number '1'"
       );
     });
 
-    it('should reject a row the instrument schema does not accept', async () => {
+    it('should convert a cell to the literal it names, with the type the schema declares', async () => {
+      const instrument = instrumentWith(
+        z3.object({
+          putbacks: z3.union([z3.literal(0), z3.literal(1), z3.literal(2), z3.literal(3)]),
+          retries: z3.union([z3.literal(0), z3.literal(1)]).optional(),
+          severity: z3.nativeEnum(Severity),
+          side: z3.literal('left')
+        })
+      );
+      const file = csvFile([
+        ['subjectID', 'date', 'putbacks', 'retries', 'severity', 'side'],
+        ['subject1', '2024-01-01', '2', '', '1', 'left']
+      ]);
+      await expect(processInstrumentCSV(file, instrument)).resolves.toStrictEqual([
+        {
+          date: new Date('2024-01-01'),
+          putbacks: 2,
+          retries: undefined,
+          severity: 1,
+          side: 'left',
+          subjectID: 'subject1'
+        }
+      ]);
+    });
+
+    it('should reject a value outside the allowed literals, naming them with the column and row', async () => {
+      const instrument = instrumentWith(z3.object({ putbacks: z3.union([z3.literal(0), z3.literal(1)]) }));
+      const file = csvFile([
+        ['subjectID', 'date', 'putbacks'],
+        ['subject1', '2024-01-01', '0'],
+        ['subject2', '2024-01-01', '7']
+      ]);
+      await expect(processInstrumentCSV(file, instrument)).rejects.toMatchObject({
+        description: {
+          en: "Invalid value '7': expected one of 0/1 at column name: 'putbacks' and row number '2'",
+          es: "Valor no válido '7': se esperaba uno de 0/1 en la columna: 'putbacks' y el número de fila '2'",
+          fr: "Valeur invalide '7' : une des valeurs 0/1 était attendue au nom de colonne : 'putbacks' et numéro de ligne '2'"
+        }
+      });
+    });
+
+    it('should reject an enum value outside its options by column and row, rather than as a schema failure', async () => {
       const file = csvFile([
         ['subjectID', 'date', 'choice'],
         ['subject1', '2024-01-01', 'c']
       ]);
       await expectRejection(
         processInstrumentCSV(file, instrumentWith(z3.object({ choice: z3.enum(['a', 'b']) }))),
+        "Invalid value 'c': expected one of a/b at column name: 'choice' and row number '1'"
+      );
+    });
+
+    it('should fall back to a generic error when a value fails to convert for an unexpected reason', async () => {
+      const unreadable = Object.defineProperty(z3.string(), '_def', {
+        get(): never {
+          throw new Error('def is unreadable');
+        }
+      });
+      const file = csvFile([
+        ['subjectID', 'date', 'unreadable'],
+        ['subject1', '2024-01-01', '1']
+      ]);
+      await expectRejection(processInstrumentCSV(file, instrumentWith(z3.object({ unreadable }))), 'Error parsing CSV');
+    });
+
+    it('should reject a row the instrument schema does not accept', async () => {
+      const file = csvFile([
+        ['subjectID', 'date', 'score'],
+        ['subject1', '2024-01-01', '11']
+      ]);
+      await expectRejection(
+        processInstrumentCSV(file, instrumentWith(z3.object({ score: z3.number().max(10) }))),
         'Schema parsing failed: refer to the browser console for further details'
       );
+    });
+
+    describe('records', () => {
+      const instrument = instrumentWith(
+        z3.object({
+          ratings: z3.record(z3.enum(['monday', 'friday']), z3.union([z3.literal(1), z3.literal(2), z3.literal(3)]))
+        })
+      );
+
+      const processRatings = (value: string) => {
+        return processInstrumentCSV(
+          csvFile([
+            ['subjectID', 'date', 'ratings'],
+            ['subject1', '2024-01-01', value]
+          ]),
+          instrument
+        );
+      };
+
+      it('should convert each value of a record with the type the schema declares', async () => {
+        await expect(processRatings('RECORD(monday: 3, friday: 1)')).resolves.toMatchObject([
+          { ratings: { friday: 1, monday: 3 } }
+        ]);
+      });
+
+      it('should accept any key in a record keyed by any string', async () => {
+        const file = csvFile([
+          ['subjectID', 'date', 'weights'],
+          ['subject1', '2024-01-01', 'RECORD(week1: 21.5, week2: 22)']
+        ]);
+        await expect(
+          processInstrumentCSV(file, instrumentWith(z3.object({ weights: z3.record(z3.number()) })))
+        ).resolves.toMatchObject([{ weights: { week1: 21.5, week2: 22 } }]);
+      });
+
+      it('should reject a key outside the keys of the record, naming them with the column and row', async () => {
+        await expect(processRatings('RECORD(monday: 3, sunday: 1)')).rejects.toMatchObject({
+          description: {
+            en: "Unknown key 'sunday' in RECORD: expected one of monday/friday at column name: 'ratings' and row number '1'",
+            es: "Clave desconocida 'sunday' en RECORD: se esperaba una de monday/friday en la columna: 'ratings' y el número de fila '1'",
+            fr: "Clé inconnue 'sunday' dans RECORD : une des clés monday/friday était attendue au nom de colonne : 'ratings' et numéro de ligne '1'"
+          }
+        });
+      });
+
+      it('should reject a value outside the options of the record', async () => {
+        await expectRejection(
+          processRatings('RECORD(monday: 9)'),
+          "Invalid value '9': expected one of 1/2/3 at column name: 'ratings' and row number '1'"
+        );
+      });
+
+      it('should reject a cell that is not written as a RECORD', async () => {
+        await expect(processRatings('RECORD(monday: 3')).rejects.toMatchObject({
+          description: {
+            en: "Syntax error in RECORD declaration: RECORD(monday: 3 at column name: 'ratings' and row number '1'",
+            es: "Error de sintaxis en la declaración RECORD: RECORD(monday: 3 en la columna: 'ratings' y el número de fila '1'",
+            fr: "Erreur de syntaxe dans la déclaration RECORD : RECORD(monday: 3 au nom de colonne : 'ratings' et numéro de ligne '1'"
+          }
+        });
+      });
+
+      it('should reject a record with no fields', async () => {
+        await expectRejection(
+          processRatings('RECORD()'),
+          "One or more of the record fields was left empty at column name: 'ratings' and row number '1'"
+        );
+      });
     });
 
     describe('record arrays', () => {
@@ -556,6 +835,19 @@ describe('Zod3', () => {
           processItems('RECORD_ARRAY(name:item1,quantity)'),
           "Malformed record at index 1 at column name: 'items' and row number '1'"
         );
+      });
+
+      it('should convert a literal field of a record to the literal it names', async () => {
+        const file = csvFile([
+          ['subjectID', 'date', 'trials'],
+          ['subject1', '2024-01-01', 'RECORD_ARRAY(arena:2;arena:4;)']
+        ]);
+        const schema = z3.object({
+          trials: z3.array(z3.object({ arena: z3.union([z3.literal(1), z3.literal(2), z3.literal(4)]) }))
+        });
+        await expect(processInstrumentCSV(file, instrumentWith(schema))).resolves.toMatchObject([
+          { trials: [{ arena: 2 }, { arena: 4 }] }
+        ]);
       });
     });
   });
@@ -641,8 +933,9 @@ describe('Zod4', () => {
 
     it('should reject a type name it has no sample for', () => {
       expect(uploadErrorOf(() => Zod4.generateSampleData({ isOptional: false, typeName: 'optional' }))).toEqual({
-        en: "Unexpected Zod type name 'optional'",
-        fr: "Nom de type Zod inattendu 'optional'"
+        en: "Unsupported Zod type 'optional'",
+        es: "Tipo de Zod no compatible 'optional'",
+        fr: "Type Zod non pris en charge 'optional'"
       });
     });
   });
@@ -685,16 +978,72 @@ describe('Zod4', () => {
       });
     });
 
+    it('should list the allowed values of literal, literal union and native enum fields', () => {
+      const schema = z4.object({
+        arena: z4.union([z4.literal(1), z4.literal(2), z4.literal([3, 4])]),
+        retries: z4.union([z4.literal(0), z4.literal(1)]).optional(),
+        severity: z4.nativeEnum(Severity),
+        side: z4.literal('left')
+      });
+      expect(createUploadTemplateCSV(instrumentWith(schema)).content).toBe(
+        unparse([
+          ['subjectID', 'date', 'arena', 'retries', 'severity', 'side'],
+          ['string', 'yyyy-mm-dd', '1/2/3/4', '0/1 (optional)', '0/1', 'left']
+        ])
+      );
+    });
+
+    it('should show the keys of a record keyed by an enum, and a generic key for one keyed by any string', () => {
+      const schema = z4.object({
+        ratings: z4.record(z4.enum(['monday', 'friday']), z4.union([z4.literal(1), z4.literal(2)])),
+        weights: z4.record(z4.string(), z4.number()).optional()
+      });
+      expect(createUploadTemplateCSV(instrumentWith(schema)).content).toBe(
+        unparse([
+          ['subjectID', 'date', 'ratings', 'weights'],
+          ['string', 'yyyy-mm-dd', 'RECORD(monday: 1/2, friday: 1/2)', 'RECORD(key: number, ...) (optional)']
+        ])
+      );
+    });
+
+    it('should reject a record whose keys are neither an enum nor strings', () => {
+      const schema = z4.object({ byIndex: z4.record(z4.number(), z4.number()) });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toMatchObject({
+        en: "Unsupported Zod record: keys must be an enum or strings at column name: 'byIndex'"
+      });
+    });
+
+    it('should reject a record whose values could contain the separators of a RECORD cell', () => {
+      const schema = z4.object({ notes: z4.record(z4.string(), z4.string()) });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toMatchObject({
+        en: "Unsupported Zod record: values must be numbers or fixed choices, not 'string' at column name: 'notes'"
+      });
+    });
+
+    it('should reject a union with a member that is not a literal, since a cell could not say which member it is', () => {
+      const schema = z4.object({ mixed: z4.union([z4.literal(1), z4.string()]) });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toMatchObject({
+        en: "Unsupported Zod union: every member must be a literal value at column name: 'mixed'"
+      });
+    });
+
+    it('should reject a literal that a cell cannot express', () => {
+      const schema = z4.object({ nothing: z4.literal(null) });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toMatchObject({
+        en: "Unsupported literal value 'null' of type 'object' at column name: 'nothing'"
+      });
+    });
+
     it('should reject a schema that is not an object', () => {
       expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(z4.string())))).toMatchObject({
         en: 'Expected schema to be instance of ZodObject'
       });
     });
 
-    it('should reject a field type that cannot be represented in a CSV', () => {
+    it('should name the column and type of a field that cannot be represented in a CSV', () => {
       expect(
-        uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(z4.object({ kind: z4.literal('a') }))))
-      ).toMatchObject({ en: "Unexpected Zod type name 'literal'" });
+        uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(z4.object({ pair: z4.tuple([z4.string()]) }))))
+      ).toMatchObject({ en: "Unsupported Zod type 'tuple' at column name: 'pair'" });
     });
   });
 
@@ -770,6 +1119,74 @@ describe('Zod4', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]?.status).toBe('active');
+    });
+
+    it('should convert a cell to the literal it names, with the type the schema declares', async () => {
+      const instrument = instrumentWith(
+        z4.object({
+          arena: z4.union([z4.literal(1), z4.literal(2), z4.literal(3), z4.literal(4)]),
+          retries: z4.union([z4.literal(0), z4.literal(1)]).optional(),
+          severity: z4.nativeEnum(Severity),
+          side: z4.literal('left')
+        })
+      );
+      const file = csvFile([
+        ['subjectID', 'date', 'arena', 'retries', 'severity', 'side'],
+        ['subject1', '2024-01-01', '3', '', '1', 'left']
+      ]);
+      await expect(processInstrumentCSV(file, instrument)).resolves.toStrictEqual([
+        { arena: 3, date: new Date('2024-01-01'), retries: undefined, severity: 1, side: 'left', subjectID: 'subject1' }
+      ]);
+    });
+
+    it('should reject a value outside the allowed literals, naming them with the column and row', async () => {
+      const file = csvFile([
+        ['subjectID', 'date', 'arena'],
+        ['subject1', '2024-01-01', '5']
+      ]);
+      await expectRejection(
+        processInstrumentCSV(file, instrumentWith(z4.object({ arena: z4.union([z4.literal(1), z4.literal(2)]) }))),
+        "Invalid value '5': expected one of 1/2 at column name: 'arena' and row number '1'"
+      );
+    });
+
+    it('should reject an enum value outside its options by column and row, rather than as a schema failure', async () => {
+      const file = csvFile([
+        ['subjectID', 'date', 'level'],
+        ['subject1', '2024-01-01', 'medium']
+      ]);
+      await expectRejection(
+        processInstrumentCSV(file, instrumentWith(z4.object({ level: z4.enum(['low', 'high']) }))),
+        "Invalid value 'medium': expected one of low/high at column name: 'level' and row number '1'"
+      );
+    });
+
+    it('should convert each value of a record with the type the schema declares', async () => {
+      const instrument = instrumentWith(
+        z4.object({
+          ratings: z4.record(z4.enum(['monday', 'friday']), z4.union([z4.literal(1), z4.literal(2), z4.literal(3)])),
+          weights: z4.record(z4.string(), z4.number())
+        })
+      );
+      const file = csvFile([
+        ['subjectID', 'date', 'ratings', 'weights'],
+        ['subject1', '2024-01-01', 'RECORD(monday: 3, friday: 1)', 'RECORD(week1: 21.5)']
+      ]);
+      await expect(processInstrumentCSV(file, instrument)).resolves.toMatchObject([
+        { ratings: { friday: 1, monday: 3 }, weights: { week1: 21.5 } }
+      ]);
+    });
+
+    it('should reject a key outside the keys of a record, naming them with the column and row', async () => {
+      const instrument = instrumentWith(z4.object({ ratings: z4.record(z4.enum(['monday', 'friday']), z4.number()) }));
+      const file = csvFile([
+        ['subjectID', 'date', 'ratings'],
+        ['subject1', '2024-01-01', 'RECORD(monday: 3, sunday: 1)']
+      ]);
+      await expectRejection(
+        processInstrumentCSV(file, instrument),
+        "Unknown key 'sunday' in RECORD: expected one of monday/friday at column name: 'ratings' and row number '1'"
+      );
     });
 
     it('should process array of objects', async () => {
@@ -911,13 +1328,13 @@ describe('Zod4', () => {
         z4.array(z4.string()),
         "Unsupported type for innerType of array record 'string': must be 'object'"
       ],
-      ['nested', 'a', z4.object({ a: z4.string() }), "Unexpected Zod type name 'object'"],
+      ['nested', 'a', z4.object({ a: z4.string() }), "Unsupported Zod type 'object'"],
       ['items', 'items', z4.array(z4.object({ name: z4.string() })), 'Syntax error in RECORD_ARRAY declaration: items'],
       [
         'items',
         'RECORD_ARRAY(name:a,,name:b)',
         z4.array(z4.object({ name: z4.string() })),
-        'One or more of the record array fields was left empty'
+        'One or more of the record fields was left empty'
       ],
       ['items', 'RECORD_ARRAY(:a)', z4.array(z4.object({ name: z4.string() })), 'Malformed record at index 0']
     ])(
@@ -947,14 +1364,142 @@ describe('Zod4', () => {
 
     it('should reject a row the instrument schema does not accept', async () => {
       const file = csvFile([
-        ['subjectID', 'date', 'level'],
-        ['subject1', '2024-01-01', 'medium']
+        ['subjectID', 'date', 'score'],
+        ['subject1', '2024-01-01', '11']
       ]);
       await expectRejection(
-        processInstrumentCSV(file, instrumentWith(z4.object({ level: z4.enum(['low', 'high']) }))),
+        processInstrumentCSV(file, instrumentWith(z4.object({ score: z4.number().max(10) }))),
         'Schema parsing failed: refer to the browser console for further details'
       );
     });
+  });
+});
+
+// The validation schema of the comprehensive form example in
+// packages/instrument-guidelines/AGENTS.md §14.1, copied here: an instrument written from the guide
+// has to be uploadable.
+/* eslint-disable perfectionist/sort-objects -- kept in the guide's order, so the copy can be compared with its source line by line */
+const guideComprehensiveFormSchema = z4
+  .object({
+    agreedToTerms: z4.boolean(),
+    currentlyEmployed: z4.boolean(),
+    dateOfBirth: z4.date(),
+    overallHappiness: z4.number().int().min(1).max(10),
+    educationLevel: z4.union([z4.literal(1), z4.literal(2), z4.literal(3)]),
+    firstName: z4.string(),
+    preferredLanguage: z4.enum(['en', 'fr']),
+    additionalComments: z4.string().optional(),
+    preferredActivities: z4.set(z4.enum(['reading', 'sports', 'cooking'])),
+    weeklyMoodRatings: z4.record(
+      z4.enum(['monday', 'wednesday', 'friday']),
+      z4.union([z4.literal(1), z4.literal(2), z4.literal(3), z4.literal(4)])
+    ),
+    medications: z4.array(
+      z4.object({
+        medicationName: z4.string(),
+        dosageMg: z4.number()
+      })
+    ),
+    hasChronicCondition: z4.boolean(),
+    chronicConditionName: z4.string().optional()
+  })
+  .superRefine((data, ctx) => {
+    if (data.hasChronicCondition && !data.chronicConditionName) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['chronicConditionName'],
+        message: 'This field is required / Ce champ est obligatoire.'
+      });
+    }
+  });
+/* eslint-enable perfectionist/sort-objects */
+
+const guideComprehensiveFormColumns = [
+  'subjectID',
+  'date',
+  'agreedToTerms',
+  'currentlyEmployed',
+  'dateOfBirth',
+  'overallHappiness',
+  'educationLevel',
+  'firstName',
+  'preferredLanguage',
+  'additionalComments',
+  'preferredActivities',
+  'weeklyMoodRatings',
+  'medications',
+  'hasChronicCondition',
+  'chronicConditionName'
+];
+
+describe('createUploadTemplateCSV', () => {
+  it("should describe every field of the instrument guide's comprehensive form example", () => {
+    expect(createUploadTemplateCSV(instrumentWith(guideComprehensiveFormSchema)).content).toBe(
+      unparse([
+        guideComprehensiveFormColumns,
+        [
+          'string',
+          'yyyy-mm-dd',
+          'true/false',
+          'true/false',
+          'yyyy-mm-dd',
+          'number',
+          '1/2/3',
+          'string',
+          'en/fr',
+          'string (optional)',
+          'SET(reading/sports/cooking)',
+          'RECORD(monday: 1/2/3/4, wednesday: 1/2/3/4, friday: 1/2/3/4)',
+          'RECORD_ARRAY(medicationName: string,dosageMg: number; ...)',
+          'true/false',
+          'string (optional)'
+        ]
+      ])
+    );
+  });
+});
+
+describe('processInstrumentCSV', () => {
+  it("should import a row written for the instrument guide's comprehensive form example", async () => {
+    const file = csvFile([
+      guideComprehensiveFormColumns,
+      [
+        'subject1',
+        '2024-01-01',
+        'true',
+        'false',
+        '1990-05-17',
+        '7',
+        '2',
+        'Ada',
+        'fr',
+        '',
+        'SET(reading, cooking)',
+        'RECORD(monday: 3, wednesday: 4, friday: 2)',
+        'RECORD_ARRAY(medicationName: Aspirin, dosageMg: 81;)',
+        'false',
+        ''
+      ]
+    ]);
+    await expect(processInstrumentCSV(file, instrumentWith(guideComprehensiveFormSchema))).resolves.toStrictEqual([
+      {
+        additionalComments: undefined,
+        agreedToTerms: true,
+        chronicConditionName: undefined,
+        currentlyEmployed: false,
+        date: new Date('2024-01-01'),
+        dateOfBirth: new Date('1990-05-17'),
+        educationLevel: 2,
+        firstName: 'Ada',
+        hasChronicCondition: false,
+        medications: [{ dosageMg: 81, medicationName: 'Aspirin' }],
+        overallHappiness: 7,
+        preferredActivities: new Set(['cooking', 'reading']),
+        preferredLanguage: 'fr',
+        subjectID: 'subject1',
+        weeklyMoodRatings: { friday: 2, monday: 3, wednesday: 4 }
+      }
+    ]);
   });
 });
 
