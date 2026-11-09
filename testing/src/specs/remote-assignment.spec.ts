@@ -1,3 +1,6 @@
+import type { BulkAssignmentFailure } from '@opendatacapture/schemas/assignment';
+
+import { AccessibleInstrumentsPage } from '../pages/_app/instruments/accessible-instruments.page';
 import { RemoteAssignmentPage } from '../pages/_app/session/remote-assignment.page';
 import { baseURL } from '../support/env';
 import { expect, test } from '../support/fixtures';
@@ -59,6 +62,88 @@ test.describe('remote assignment', () => {
     await searchInput.fill('');
     await tagButton.click();
     await expect.poll(() => page.getByRole('menuitemcheckbox').allTextContents()).toEqual(initialOptions);
+  });
+
+  test('should not offer a file instrument for remote assignment, though an in-person session offers it', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    await startSession(getPageModel, `File${uniqueId}`, `Subject${uniqueId}`, 'Female');
+
+    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+    await page.waitForURL('**/instruments/accessible-instruments');
+    await expect(new AccessibleInstrumentsPage(page).instrumentCard('Arbitrary File Upload')).toBeVisible();
+
+    await page.getByTestId('nav-button-/session/remote-assignment').click();
+    await page.waitForURL('**/session/remote-assignment');
+    const remoteAssignmentPage = new RemoteAssignmentPage(page);
+    await expect(remoteAssignmentPage.instrumentCard('Happiness Questionnaire')).toBeVisible();
+    await expect(remoteAssignmentPage.instrumentCard('Arbitrary File Upload')).toHaveCount(0);
+  });
+
+  // `api.createGroup` grants every instrument, the file instrument included, so the refusal comes
+  // from the file rule rather than the group's opt-in list.
+  test('should refuse to assign a file instrument remotely, with or without a group, and create nothing', async ({
+    adminToken,
+    api,
+    apiRequestContext
+  }) => {
+    const group = await api.createGroup();
+    const subjectId = await api.createSubject(group.id);
+    const instrumentId = await api.findInstrumentId('FILE');
+
+    for (const groupId of [group.id, undefined]) {
+      const response = await apiRequestContext.post('/api/v1/assignments', {
+        data: { expiresAt: new Date(Date.now() + 86_400_000), groupId, instrumentId, subjectId },
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+      expect(response.status()).toBe(422);
+      expect(((await response.json()) as BulkAssignmentFailure).issues).toContainEqual({
+        instrumentIds: [instrumentId],
+        kind: 'INSTRUMENT_UNAVAILABLE'
+      });
+    }
+    expect(await api.findAssignments(subjectId)).toHaveLength(0);
+  });
+
+  // Assigned without a group, so the group's opt-in list cannot be what refuses it.
+  test('should refuse to assign a series with a file item remotely', async ({
+    adminToken,
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const headers = { Authorization: `Bearer ${adminToken}` };
+    const group = await api.createGroup();
+    const subjectId = await api.createSubject(group.id);
+    const instruments = (await (await apiRequestContext.get('/api/v1/instruments/info', { headers })).json()) as {
+      internal?: { edition: number; name: string };
+      kind: string;
+    }[];
+    const items = ['FORM', 'FILE'].map((kind) => instruments.find((instrument) => instrument.kind === kind)!.internal);
+    const series = await apiRequestContext.post('/api/v1/instruments/series', {
+      data: {
+        confirmDuplicate: true,
+        details: { title: `File Series ${uniqueId}` },
+        groupId: group.id,
+        items,
+        language: 'en'
+      },
+      headers
+    });
+    expect(series.status(), await series.text()).toBe(201);
+    const { instrumentId } = (await series.json()) as { instrumentId: string };
+
+    const response = await apiRequestContext.post('/api/v1/assignments', {
+      data: { expiresAt: new Date(Date.now() + 86_400_000), instrumentId, subjectId },
+      headers
+    });
+    expect(response.status()).toBe(422);
+    expect(((await response.json()) as BulkAssignmentFailure).issues).toContainEqual({
+      instrumentIds: [instrumentId],
+      kind: 'INSTRUMENT_UNAVAILABLE'
+    });
   });
 
   test('should create a remote assignment and display the link', async ({ getPageModel, page, uniqueId }) => {
