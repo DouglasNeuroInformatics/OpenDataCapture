@@ -1,25 +1,26 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
 
 import { snakeToCamelCase, toLowerCase } from '@douglasneuroinformatics/libjs';
-import { Button, DataTable, DropdownMenu, Heading, TanstackTable } from '@douglasneuroinformatics/libui/components';
+import { Button, DataTable, DropdownMenu, Heading } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { $AuditLogsQuerySearchParams } from '@opendatacapture/schemas/audit';
+import { $AuditLogsQuerySearchParams, $AuditLogsSortBy } from '@opendatacapture/schemas/audit';
 import type {
-  $AuditLog,
   $AuditLogAction,
   $AuditLogEntity,
   $AuditLogsQuerySearchParams as AuditLogsSearchParams
 } from '@opendatacapture/schemas/audit';
 import { createFileRoute } from '@tanstack/react-router';
-import { ArrowDownIcon, ArrowUpIcon, CalendarIcon, DownloadIcon, XIcon } from 'lucide-react';
+import { CalendarIcon, DownloadIcon, XIcon } from 'lucide-react';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
 import { FilterMenu } from '@/components/FilterMenu';
 import { PageHeader } from '@/components/PageHeader';
+import { SortableHeader } from '@/components/SortableHeader';
 import { auditLogsQueryOptions, fetchAllAuditLogs, useAuditLogsQuery } from '@/hooks/useAuditLogsQuery';
 import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { resolveTheme } from '@/utils/chart-theme';
+import { readServerSort } from '@/utils/data-table';
 import { getAuditActionColor } from '@/utils/tag-colors';
 
 type DateFormat = 'iso' | 'local';
@@ -28,7 +29,7 @@ type SortOrder = 'asc' | 'desc';
 
 const INITIAL_PAGE = 1;
 
-const INITIAL_SORT_ORDER: SortOrder = 'desc';
+const INITIAL_SORT: { sortBy: $AuditLogsSortBy; sortOrder: SortOrder } = { sortBy: 'timestamp', sortOrder: 'desc' };
 
 const ACTIONS: $AuditLogAction[] = ['CREATE', 'DELETE', 'UPDATE', 'ARCHIVE', 'UNARCHIVE', 'LOGIN', 'SEND_EMAIL'];
 
@@ -41,34 +42,6 @@ const ENTITIES: $AuditLogEntity[] = [
   'SUBJECT',
   'USER'
 ];
-
-// The sort direction is rendered from the value the rows were actually fetched with, rather than from
-// `column.getIsSorted()`: in server mode the table mounts with no sorting state of its own, so the
-// column would read as unsorted even though the server has already ordered by timestamp descending.
-const SortableHeader = ({
-  column,
-  label,
-  sortOrder
-}: {
-  column: TanstackTable.Column<$AuditLog>;
-  label: string;
-  sortOrder: SortOrder;
-}) => {
-  return (
-    <button
-      className="hover:text-foreground flex items-center gap-2"
-      type="button"
-      onClick={column.getToggleSortingHandler()}
-    >
-      {label}
-      {sortOrder === 'asc' ? (
-        <ArrowUpIcon className="opacity-50" style={{ height: '14px', width: 'auto' }} />
-      ) : (
-        <ArrowDownIcon className="opacity-50" style={{ height: '14px', width: 'auto' }} />
-      )}
-    </button>
-  );
-};
 
 const DateFormatMenu = ({ onChange, value }: { onChange: (value: DateFormat) => void; value: DateFormat }) => {
   const { t } = useTranslation();
@@ -192,9 +165,12 @@ const AuditLogsToolbar = () => {
 
 const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search }) => {
   const [page, setPage] = useState(INITIAL_PAGE);
-  const [sortOrder, setSortOrder] = useState<SortOrder>(INITIAL_SORT_ORDER);
+  const [sort, setSort] = useState(INITIAL_SORT);
 
-  const auditLogsQuery = useAuditLogsQuery({ params: { ...search, page, sortOrder } });
+  const auditLogsQuery = useAuditLogsQuery({ params: { ...search, page, ...sort } });
+  // In server mode the table mounts with no sorting state of its own, so the column it is ordered by
+  // is told its direction, or it would read as unsorted.
+  const sortOrderOf = (sortBy: $AuditLogsSortBy) => (sort.sortBy === sortBy ? sort.sortOrder : undefined);
 
   const { resolvedLanguage, t } = useTranslation();
   const [theme] = useTheme();
@@ -226,10 +202,9 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
             return formatTimestamp(value);
           },
           enableResizing: false,
-          enableSorting: true,
           header: ({ column }) => (
             <div className="flex items-center gap-2">
-              <SortableHeader column={column} label={t('common.time')} sortOrder={sortOrder} />
+              <SortableHeader column={column} label={t('common.time')} sortOrder={sortOrderOf('timestamp')} />
               <DateFormatMenu value={dateFormat} onChange={setDateFormat} />
             </div>
           ),
@@ -244,7 +219,9 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
             const value = ctx.getValue() as string;
             return <span className="overflow-hidden text-ellipsis whitespace-nowrap">{value}</span>;
           },
-          header: t('common.user'),
+          header: ({ column }) => (
+            <SortableHeader column={column} label={t('common.user')} sortOrder={sortOrderOf('user')} />
+          ),
           id: 'user'
         },
         {
@@ -253,7 +230,9 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
             const value = ctx.getValue() as string;
             return <span className="overflow-hidden text-ellipsis whitespace-nowrap">{value}</span>;
           },
-          header: t('common.activeGroup'),
+          header: ({ column }) => (
+            <SortableHeader column={column} label={t('common.activeGroup')} sortOrder={sortOrderOf('group')} />
+          ),
           id: 'group'
         },
         {
@@ -268,7 +247,9 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
               />
             );
           },
-          header: t('common.action')
+          header: ({ column }) => (
+            <SortableHeader column={column} label={t('common.action')} sortOrder={sortOrderOf('action')} />
+          )
         },
         {
           accessorKey: 'entity',
@@ -280,7 +261,9 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
               </span>
             );
           },
-          header: t('common.entity')
+          header: ({ column }) => (
+            <SortableHeader column={column} label={t('common.entity')} sortOrder={sortOrderOf('entity')} />
+          )
         }
       ]}
       data={auditLogsQuery.data?.data ?? []}
@@ -288,11 +271,8 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
       pageCount={auditLogsQuery.data?.pageCount ?? 0}
       onPaginationChange={({ pageIndex }) => setPage(pageIndex + 1)}
       onSortingChange={(state) => {
-        const timestamp = state.find(({ id }) => id === 'timestamp');
-        if (timestamp) {
-          setSortOrder(timestamp.desc ? 'desc' : 'asc');
-          setPage(INITIAL_PAGE);
-        }
+        setSort(readServerSort(state, $AuditLogsSortBy.options));
+        setPage(INITIAL_PAGE);
       }}
     />
   );
@@ -324,7 +304,7 @@ export const Route = createFileRoute('/_app/admin/audit/logs')({
   loader: async ({ context, deps }) => {
     await Promise.all([
       context.queryClient.ensureQueryData(
-        auditLogsQueryOptions({ params: { ...deps.search, page: INITIAL_PAGE, sortOrder: INITIAL_SORT_ORDER } })
+        auditLogsQueryOptions({ params: { ...deps.search, page: INITIAL_PAGE, ...INITIAL_SORT } })
       ),
       context.queryClient.ensureQueryData(groupsQueryOptions()),
       context.queryClient.ensureQueryData(usersQueryOptions())

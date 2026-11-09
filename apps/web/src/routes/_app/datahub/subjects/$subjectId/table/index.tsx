@@ -7,6 +7,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { SelectEdition } from '@/components/SelectEdition';
 import { SelectInstrument } from '@/components/SelectInstrument';
+import { SortableHeader } from '@/components/SortableHeader';
 import { TimeDropdown } from '@/components/TimeDropdown';
 import { TruncatedCell } from '@/components/TruncatedCell';
 import { useInstrumentVisualization } from '@/hooks/useInstrumentVisualization';
@@ -36,7 +37,7 @@ const RouteComponent = () => {
             const value = formatRecordValue(ctx.getValue());
             return <TruncatedCell data-testid={`subject-table-cell-${subItem}`} title={String(value)} value={value} />;
           },
-          header: camelToSnakeCase(subItem).toUpperCase(),
+          header: ({ column }) => <SortableHeader column={column} label={camelToSnakeCase(subItem).toUpperCase()} />,
           id: subItem
         });
       }
@@ -81,7 +82,7 @@ const RouteComponent = () => {
                 }
                 return value;
               },
-              header: 'DATE_COLLECTED'
+              header: ({ column }) => <SortableHeader column={column} label="DATE_COLLECTED" />
             },
             ...metadataColumns,
             ...columns

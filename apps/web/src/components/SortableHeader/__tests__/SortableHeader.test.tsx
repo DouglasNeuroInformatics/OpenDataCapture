@@ -15,6 +15,11 @@ describe('SortableHeader', () => {
     expect(screen.getByRole('button', { name: /Instrument/u })).toBeTruthy();
   });
 
+  it('should carry the full label as a hover title, since a narrow column clips it', () => {
+    render(<SortableHeader<Row> column={columnOf(false)} label="Dernière synchronisation" />);
+    expect(screen.getByText('Dernière synchronisation').getAttribute('title')).toBe('Dernière synchronisation');
+  });
+
   it('should ask the column to toggle its sort when clicked', () => {
     const toggleSorting = vi.fn();
     render(<SortableHeader<Row> column={columnOf(false, toggleSorting)} label="Records" />);

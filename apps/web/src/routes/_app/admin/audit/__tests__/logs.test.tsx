@@ -2,7 +2,7 @@ import type { DataTableProps } from '@douglasneuroinformatics/libui/components';
 import type { $AuditLog, $AuditLogsPage, $AuditLogsQuerySearchParams } from '@opendatacapture/schemas/audit';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { User } from '@opendatacapture/schemas/user';
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { auditLogsQueryOptions } from '@/hooks/useAuditLogsQuery';
@@ -160,7 +160,9 @@ const navigatedSearch = (current: AuditLogsSearch = mocks.search) => {
   return typeof search === 'function' ? search(current) : search;
 };
 
-const timeHeaderButton = () => within(screen.getByTestId('data-table-head')).getByText('Time', { selector: 'button' });
+const headerButton = (name: string) => within(screen.getByTestId('data-table-head')).getByText(name).closest('button')!;
+
+const timeHeaderButton = () => headerButton('Time');
 
 const goToPage = (page: number) => {
   screen
@@ -200,7 +202,7 @@ describe('Route', () => {
       const { ensureQueryData, promise } = runLoader(search);
       await promise;
       expect(ensureQueryData.mock.calls.map(([options]) => options.queryKey)).toEqual([
-        auditLogsQueryOptions({ params: { ...search, page: 1, sortOrder: 'desc' } }).queryKey,
+        auditLogsQueryOptions({ params: { ...search, page: 1, sortBy: 'timestamp', sortOrder: 'desc' } }).queryKey,
         groupsQueryOptions().queryKey,
         usersQueryOptions().queryKey
       ]);
@@ -338,7 +340,7 @@ describe('Route', () => {
     it('should request the first page newest first, with the active filters', () => {
       mocks.search = { userId: 'user-1' };
       renderPage();
-      expect(lastQueryParams()).toEqual({ page: 1, sortOrder: 'desc', userId: 'user-1' });
+      expect(lastQueryParams()).toEqual({ page: 1, sortBy: 'timestamp', sortOrder: 'desc', userId: 'user-1' });
     });
 
     it('should show who acted, in which group, and the translated action and entity', () => {
@@ -411,36 +413,51 @@ describe('Route', () => {
 
     it('should mark the time column as descending before the user sorts, matching the server order', () => {
       renderPage();
-      expect(timeHeaderButton().querySelector('.lucide-arrow-down')).toBeTruthy();
+      expect(timeHeaderButton().querySelector('.lucide-chevron-down')).toBeTruthy();
     });
 
     it('should request the next page when the user pages forward', () => {
       renderPage();
       goToPage(2);
-      expect(lastQueryParams()).toEqual({ page: 2, sortOrder: 'desc' });
+      expect(lastQueryParams()).toEqual({ page: 2, sortBy: 'timestamp', sortOrder: 'desc' });
     });
 
     it('should sort oldest first on the first click of the time header, since the logs already arrive newest first', () => {
       renderPage();
       goToPage(2);
       fireEvent.click(timeHeaderButton());
-      expect(lastQueryParams()).toEqual({ page: 1, sortOrder: 'asc' });
-      expect(timeHeaderButton().querySelector('.lucide-arrow-up')).toBeTruthy();
+      expect(lastQueryParams()).toEqual({ page: 1, sortBy: 'timestamp', sortOrder: 'asc' });
+      expect(timeHeaderButton().querySelector('.lucide-chevron-up')).toBeTruthy();
     });
 
     it('should return to newest first on the second click of the time header', () => {
       renderPage();
       fireEvent.click(timeHeaderButton());
       fireEvent.click(timeHeaderButton());
-      expect(lastQueryParams()).toEqual({ page: 1, sortOrder: 'desc' });
-      expect(timeHeaderButton().querySelector('.lucide-arrow-down')).toBeTruthy();
+      expect(lastQueryParams()).toEqual({ page: 1, sortBy: 'timestamp', sortOrder: 'desc' });
+      expect(timeHeaderButton().querySelector('.lucide-chevron-down')).toBeTruthy();
     });
 
-    it('should ignore a sorting change that does not involve the time column', () => {
+    it.each([
+      ['User', 'user'],
+      ['Active Group', 'group'],
+      ['Action', 'action'],
+      ['Entity', 'entity']
+    ])(
+      'should ask the server to order by %s and return to the first page, since it holds every page',
+      (name, sortBy) => {
+        renderPage();
+        goToPage(2);
+        fireEvent.click(headerButton(name));
+        expect(lastQueryParams()).toEqual({ page: 1, sortBy, sortOrder: 'asc' });
+      }
+    );
+
+    it('should dim the time column once another column orders the table', () => {
       renderPage();
-      goToPage(2);
-      act(() => mocks.reportSorting!([]));
-      expect(lastQueryParams()).toEqual({ page: 2, sortOrder: 'desc' });
+      fireEvent.click(headerButton('User'));
+      expect(timeHeaderButton().querySelector('.lucide-chevrons-up-down')).toBeTruthy();
+      expect(headerButton('User').querySelector('.lucide-chevron-up')).toBeTruthy();
     });
 
     it('should return to the first page when the filters change', () => {
@@ -448,7 +465,7 @@ describe('Route', () => {
       goToPage(2);
       mocks.search = { action: 'LOGIN' };
       rerender(<AuditLogsPage />);
-      expect(lastQueryParams()).toEqual({ action: 'LOGIN', page: 1, sortOrder: 'desc' });
+      expect(lastQueryParams()).toEqual({ action: 'LOGIN', page: 1, sortBy: 'timestamp', sortOrder: 'desc' });
     });
   });
 });

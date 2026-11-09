@@ -62,7 +62,7 @@ const rows = () => screen.getAllByTestId('data-table-row');
 const usernames = () => rows().map((row) => row.querySelector('[data-row-selected]')!.parentElement!.textContent);
 
 const header = (label: string) => {
-  return within(screen.getByTestId('data-table-head')).getByText(label, { selector: 'button' });
+  return within(screen.getByTestId('data-table-head')).getByText(label).closest('button')!;
 };
 
 const openRowActions = (rowIndex = 0) => {

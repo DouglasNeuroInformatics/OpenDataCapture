@@ -2,12 +2,14 @@ import {
   $InstrumentRepoSyncLogsPage,
   INSTRUMENT_REPO_SYNC_LOGS_PAGE_SIZE
 } from '@opendatacapture/schemas/instrument-repo';
+import type { InstrumentRepoSyncLogsSortBy } from '@opendatacapture/schemas/instrument-repo';
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 type InstrumentRepoSyncLogsQueryParams = {
   page?: number;
   repoId?: string;
+  sortBy?: InstrumentRepoSyncLogsSortBy;
   sortOrder?: 'asc' | 'desc';
 };
 

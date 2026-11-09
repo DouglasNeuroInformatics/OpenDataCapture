@@ -398,7 +398,7 @@ describe('InstrumentReposService', () => {
   });
 
   describe('findSyncLogs', () => {
-    const query = { limit: 10, page: 1, sortOrder: 'desc' } as const;
+    const query = { limit: 10, page: 1, sortBy: 'createdAt', sortOrder: 'desc' } as const;
 
     it('should return the requested page of the history, with how many pages there are', async () => {
       instrumentRepoSyncLogModel.findMany.mockResolvedValueOnce([{ id: 'log-1' }]);
@@ -410,7 +410,7 @@ describe('InstrumentReposService', () => {
         total: 25
       });
       expect(instrumentRepoSyncLogModel.findMany).toHaveBeenCalledWith({
-        orderBy: { createdAt: 'desc' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         skip: 0,
         take: 10,
         where: { AND: [{}], repoId: undefined }
@@ -442,9 +442,30 @@ describe('InstrumentReposService', () => {
       await service.findSyncLogs({ ...query, sortOrder: 'asc' });
 
       expect(instrumentRepoSyncLogModel.findMany.mock.lastCall?.[0]).toMatchObject({
-        orderBy: { createdAt: 'asc' }
+        orderBy: [{ createdAt: 'asc' }, { id: 'desc' }]
       });
     });
+
+    it.each([
+      ['action', [{ action: 'asc' }]],
+      ['failedCount', [{ failures: { _count: 'asc' } }]],
+      ['importedCount', [{ importedCount: 'asc' }]],
+      ['repoName', [{ repoName: 'asc' }]],
+      // A null message sorts lowest, so this runs success, partial, failed, matching the derived status.
+      ['status', [{ message: 'asc' }, { failures: { _count: 'asc' } }]]
+    ] as const)(
+      'should order by %s, breaking ties on the id so pages neither repeat nor skip',
+      async (sortBy, orderBy) => {
+        instrumentRepoSyncLogModel.findMany.mockResolvedValueOnce([]);
+        instrumentRepoSyncLogModel.count.mockResolvedValueOnce(0);
+
+        await service.findSyncLogs({ ...query, sortBy, sortOrder: 'asc' });
+
+        expect(instrumentRepoSyncLogModel.findMany.mock.lastCall?.[0]).toMatchObject({
+          orderBy: [...orderBy, { id: 'desc' }]
+        });
+      }
+    );
   });
 
   describe('findLatestSyncLogs', () => {

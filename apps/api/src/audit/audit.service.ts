@@ -1,7 +1,24 @@
 import { InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
-import type { $AuditLogsPage, $AuditLogsQueryParams } from '@opendatacapture/schemas/audit';
+import type { $AuditLogsPage, $AuditLogsQueryParams, $AuditLogsSortBy } from '@opendatacapture/schemas/audit';
+
+type SortOrder = $AuditLogsQueryParams['sortOrder'];
+
+/**
+ * The trailing id makes the order total, since Mongo may otherwise return tied rows in a different
+ * order per page, repeating some rows and skipping others.
+ */
+const getOrderBy = (sortBy: $AuditLogsSortBy, sortOrder: SortOrder) => {
+  const orderBy = {
+    action: { action: sortOrder },
+    entity: { entity: sortOrder },
+    group: { group: { name: sortOrder } },
+    timestamp: { timestamp: sortOrder },
+    user: { user: { username: sortOrder } }
+  }[sortBy];
+  return [orderBy, { id: 'desc' as const }];
+};
 
 @Injectable()
 export class AuditService {
@@ -13,13 +30,14 @@ export class AuditService {
     groupId,
     limit,
     page,
+    sortBy,
     sortOrder,
     userId
   }: $AuditLogsQueryParams): Promise<$AuditLogsPage> {
     const where = { action, entity, groupId, userId };
     const [data, total] = await Promise.all([
       this.auditLogModel.findMany({
-        orderBy: { timestamp: sortOrder },
+        orderBy: getOrderBy(sortBy, sortOrder),
         select: {
           action: true,
           entity: true,
