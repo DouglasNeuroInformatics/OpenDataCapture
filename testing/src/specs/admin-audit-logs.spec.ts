@@ -1,3 +1,5 @@
+import type { $AuditLog } from '@opendatacapture/schemas/audit';
+
 import { ApiClient } from '../support/api-client';
 import { ADMIN } from '../support/constants';
 import { expect, test } from '../support/fixtures';
@@ -116,5 +118,65 @@ test.describe('admin audit logs fetching', () => {
     // eslint-disable-next-line playwright/no-networkidle -- proving no duplicate request fires needs a quiet period, which is what network idle is
     await page.waitForLoadState('networkidle');
     expect(auditLogsRequests).toHaveLength(2);
+  });
+});
+
+/** The entry among `entries` whose metadata names `value` under `key`, which is how an entry says what it acted on. */
+function entryNaming(entries: $AuditLog[], key: string, value: string) {
+  return entries.find(({ metadata }) => metadata?.[key] === value);
+}
+
+test.describe('admin audit log coverage', () => {
+  test.describe('users', () => {
+    test('should record who created a user', async ({ api }) => {
+      const { user } = await api.createUser();
+
+      const entries = await api.findAuditLogs({ action: 'CREATE', entity: 'USER' });
+      expect(entryNaming(entries, 'targetUserId', user.id)?.user?.username).toBe(ADMIN.username);
+    });
+
+    test('should record which fields an update changed, and not their values', async ({ api }) => {
+      const { user } = await api.createUser();
+      await api.updateUser(user.id, { firstName: 'Renamed', lastName: user.lastName });
+
+      const entry = entryNaming(await api.findAuditLogs({ action: 'UPDATE', entity: 'USER' }), 'targetUserId', user.id);
+      expect(entry?.metadata?.fields).toBe('firstName');
+      expect(JSON.stringify(entry)).not.toContain('Renamed');
+    });
+
+    test('should record a change to the permissions a user holds', async ({ api }) => {
+      const { user } = await api.createUser();
+      await api.setUserPermissions(user.id, [{ action: 'read', groupId: null, subject: 'Subject' }]);
+
+      const entry = entryNaming(await api.findAuditLogs({ action: 'UPDATE', entity: 'USER' }), 'targetUserId', user.id);
+      expect(entry?.metadata?.fields).toBe('additionalPermissions');
+    });
+
+    test('should record a user updating their own account, as that user', async ({ api, apiRequestContext }) => {
+      const { credentials, user } = await api.createUser();
+      const self = new ApiClient(apiRequestContext, await ApiClient.login(apiRequestContext, credentials));
+      await self.updateSelf(user.id, { firstName: 'Renamed' });
+
+      const entry = entryNaming(await api.findAuditLogs({ action: 'UPDATE', entity: 'USER' }), 'targetUserId', user.id);
+      expect(entry?.metadata?.fields).toBe('firstName');
+      expect(entry?.user?.username).toBe(credentials.username);
+    });
+
+    test('should record archiving a user as an archive', async ({ api }) => {
+      const { user } = await api.createUser();
+      await api.archiveUser(user.id);
+
+      const entries = await api.findAuditLogs({ action: 'ARCHIVE', entity: 'USER' });
+      expect(entryNaming(entries, 'targetUserId', user.id)).toBeDefined();
+    });
+
+    test('should record unarchiving a user as an unarchive', async ({ api }) => {
+      const { user } = await api.createUser();
+      await api.archiveUser(user.id);
+      await api.unarchiveUser(user.id);
+
+      const entries = await api.findAuditLogs({ action: 'UNARCHIVE', entity: 'USER' });
+      expect(entryNaming(entries, 'targetUserId', user.id)).toBeDefined();
+    });
   });
 });

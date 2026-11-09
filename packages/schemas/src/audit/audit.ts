@@ -30,7 +30,7 @@ export type AuditedAction<TEntity extends AuditedEntity = AuditedEntity> = (type
 export const AUDITED_ACTIONS = {
   ASSIGNMENT: ['CREATE', 'SEND_EMAIL', 'UPDATE'],
   INSTRUMENT: ['ARCHIVE', 'UNARCHIVE'],
-  USER: ['LOGIN', 'UPDATE']
+  USER: ['ARCHIVE', 'CREATE', 'LOGIN', 'UNARCHIVE', 'UPDATE']
 } as const satisfies { [TEntity in $AuditLogEntity]?: readonly $AuditLogAction[] };
 
 /** The number of audit logs shown per page, matching the page size used by the client's data table. */

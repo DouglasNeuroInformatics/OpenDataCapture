@@ -1,6 +1,6 @@
 import type { $CreateAssignmentData, Assignment } from '@opendatacapture/schemas/assignment';
 import { AUDIT_LOGS_MAX_PAGE_SIZE } from '@opendatacapture/schemas/audit';
-import type { $AuditLog, $AuditLogAction, $AuditLogsPage } from '@opendatacapture/schemas/audit';
+import type { $AuditLog, $AuditLogsPage, AuditedAction, AuditedEntity } from '@opendatacapture/schemas/audit';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Language, Permissions } from '@opendatacapture/schemas/core';
 import type { $CreateGroupData, Group } from '@opendatacapture/schemas/group';
@@ -19,7 +19,13 @@ import type {
 } from '@opendatacapture/schemas/permission-set';
 import type { $CreateSessionData, Session, SessionType } from '@opendatacapture/schemas/session';
 import type { $CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { $CreateUserData, $UpdateUserData, $UpdateUserPermissionsData, User } from '@opendatacapture/schemas/user';
+import type {
+  $CreateUserData,
+  $SelfUpdateUserData,
+  $UpdateUserData,
+  $UpdateUserPermissionsData,
+  User
+} from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
 import { E2E_MAIL_CONFIG, SEEDED_USER_PASSWORD } from './constants';
@@ -229,15 +235,21 @@ export class ApiClient {
     );
   }
 
-  /** The newest audit entries for one action, as the audit log page and its JSON download read them. */
-  async findAuditLogs(action: $AuditLogAction): Promise<$AuditLog[]> {
+  /** The newest audit entries for one action on one entity, as the audit log page and its JSON download read them. */
+  async findAuditLogs<TEntity extends AuditedEntity>({
+    action,
+    entity
+  }: {
+    action: AuditedAction<TEntity>;
+    entity: TEntity;
+  }): Promise<$AuditLog[]> {
     const { data } = await this.expectJson<$AuditLogsPage>(
       this.request.get(`${API}/audit/logs`, {
         headers: this.authHeaders,
-        params: { action, limit: AUDIT_LOGS_MAX_PAGE_SIZE }
+        params: { action, entity, limit: AUDIT_LOGS_MAX_PAGE_SIZE }
       }),
       200,
-      `find the '${action}' audit logs`
+      `find the '${action}' '${entity}' audit logs`
     );
     return data;
   }
@@ -359,6 +371,21 @@ export class ApiClient {
   /** Links a user to a permission set, removing any custom grants they held. */
   async setUserPermissionSet(id: string, permissionSetId: string): Promise<User> {
     return this.putUserPermissions(id, { kind: 'permissionSet', permissionSetId });
+  }
+
+  async unarchiveUser(id: string): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/users/${id}/unarchive`, { headers: this.authHeaders }),
+      `unarchive user '${id}'`
+    );
+  }
+
+  /** Updates the account this client is signed in as, through the route the profile page uses. */
+  async updateSelf(id: string, data: $SelfUpdateUserData): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/users/self-update/${id}`, { data, headers: this.authHeaders }),
+      `update own account '${id}'`
+    );
   }
 
   /** Updates a user's profile fields, which is everything except their permissions. */

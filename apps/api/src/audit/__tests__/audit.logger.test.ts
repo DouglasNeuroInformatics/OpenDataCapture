@@ -58,4 +58,22 @@ describe('AuditLogger', () => {
       expect(auditLogModel.create.mock.lastCall?.[0]?.data.timestamp).toBeGreaterThanOrEqual(before);
     });
   });
+
+  describe('logUpdate', () => {
+    it('should record the names of the changed fields, sorted, beside the metadata it is given', async () => {
+      await auditLogger.logUpdate('USER', ['lastName', 'email'], {
+        groupId: null,
+        metadata: { targetUserId: 'user-2' },
+        userId: 'user-1'
+      });
+      expect(auditLogModel.create.mock.lastCall?.[0]).toMatchObject({
+        data: { action: 'UPDATE', entity: 'USER', metadata: { fields: 'email,lastName', targetUserId: 'user-2' } }
+      });
+    });
+
+    it('should record nothing for an update that changed nothing, so a resubmitted form adds no entry', async () => {
+      await auditLogger.logUpdate('USER', [], { groupId: null, userId: 'user-1' });
+      expect(auditLogModel.create).not.toHaveBeenCalled();
+    });
+  });
 });

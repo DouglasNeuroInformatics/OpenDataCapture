@@ -10,6 +10,7 @@ import type { Group } from '@opendatacapture/schemas/group';
 import type { BasePermissionLevel } from '@opendatacapture/schemas/user';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { AbilityFactory } from '@/auth/ability.factory';
 import { createAppAbility } from '@/auth/ability.utils';
 import { ROUTE_ACCESS_METADATA_KEY } from '@/core/decorators/route-access.decorator';
@@ -48,6 +49,7 @@ const createUserData = {
 describe('UsersController', () => {
   let usersController: UsersController;
   let usersService: MockedInstance<UsersService>;
+  let auditLogger: MockedInstance<AuditLogger>;
   let groupsService: MockedInstance<GroupsService>;
   let mailService: MockedInstance<MailService>;
 
@@ -56,12 +58,14 @@ describe('UsersController', () => {
       controllers: [UsersController],
       providers: [
         MockFactory.createForService(UsersService),
+        MockFactory.createForService(AuditLogger),
         MockFactory.createForService(GroupsService),
         MockFactory.createForService(MailService)
       ]
     }).compile();
     usersController = moduleRef.get(UsersController);
     usersService = moduleRef.get(UsersService);
+    auditLogger = moduleRef.get(AuditLogger);
     groupsService = moduleRef.get(GroupsService);
     mailService = moduleRef.get(MailService);
   });
@@ -72,7 +76,7 @@ describe('UsersController', () => {
 
   describe('create', () => {
     beforeEach(() => {
-      usersService.create.mockResolvedValue({ id: 'user-1', username: createUserData.username });
+      usersService.create.mockResolvedValue({ id: 'user-2', username: createUserData.username });
       groupsService.findById.mockImplementation((id: string, _options?: unknown) => {
         return Promise.resolve({ id, name: `Name of ${id}` });
       });
@@ -84,14 +88,14 @@ describe('UsersController', () => {
     });
 
     it('returns the created user together with the welcome email result', async () => {
-      await expect(usersController.create(createUserData, ability)).resolves.toMatchObject({
-        id: 'user-1',
+      await expect(usersController.create(createUserData, currentUser)).resolves.toMatchObject({
+        id: 'user-2',
         welcomeEmail: { status: 'SENT' }
       });
     });
 
     it('sends the welcome email with the login url derived from the request origin', async () => {
-      await usersController.create(createUserData, ability, 'https://odc.example.org');
+      await usersController.create(createUserData, currentUser, 'https://odc.example.org');
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({
         email: createUserData.email,
         url: 'https://odc.example.org/auth/login',
@@ -100,25 +104,25 @@ describe('UsersController', () => {
     });
 
     it('never hands the password to the welcome email', async () => {
-      await usersController.create(createUserData, ability, 'https://odc.example.org');
+      await usersController.create(createUserData, currentUser, 'https://odc.example.org');
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).not.toHaveProperty('password');
     });
 
     it('sends an empty url when the origin header is absent', async () => {
-      await usersController.create(createUserData, ability);
+      await usersController.create(createUserData, currentUser);
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ url: '' });
     });
 
     // The controller forwards whatever was asked for and leaves the default to the mail service.
     it('passes the language query param through to sendNewUserEmail', async () => {
-      await usersController.create(createUserData, ability);
+      await usersController.create(createUserData, currentUser);
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ language: undefined });
-      await usersController.create(createUserData, ability, undefined, 'fr');
+      await usersController.create(createUserData, currentUser, undefined, 'fr');
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ language: 'fr' });
     });
 
     it('joins the names of the resolved groups', async () => {
-      await usersController.create(createUserData, ability);
+      await usersController.create(createUserData, currentUser);
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({
         group: 'Name of group-1, Name of group-2'
       });
@@ -127,7 +131,7 @@ describe('UsersController', () => {
     // Without this, dropping `{ ability }` from the service calls would leave every other test
     // green while the lookups silently read across every group.
     it('scopes both the create and the group lookups to the caller ability', async () => {
-      await usersController.create(createUserData, ability);
+      await usersController.create(createUserData, currentUser);
       expect(usersService.create).toHaveBeenCalledWith(createUserData, { ability });
       expect(groupsService.findById).toHaveBeenCalledWith('group-1', { ability });
       expect(groupsService.findById).toHaveBeenCalledWith('group-2', { ability });
@@ -139,18 +143,33 @@ describe('UsersController', () => {
           ? Promise.reject(new NotFoundException())
           : Promise.resolve({ id, name: `Name of ${id}` });
       });
-      await usersController.create(createUserData, ability);
+      await usersController.create(createUserData, currentUser);
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ group: 'Name of group-2' });
     });
 
     it('propagates a group lookup failure that is not a permission denial', async () => {
       groupsService.findById.mockRejectedValue(new Error('connection lost'));
-      await expect(usersController.create(createUserData, ability)).rejects.toThrow('connection lost');
+      await expect(usersController.create(createUserData, currentUser)).rejects.toThrow('connection lost');
       expect(mailService.sendNewUserEmail).not.toHaveBeenCalled();
     });
 
+    it('records who created the user, naming the new account, since the service records nothing', async () => {
+      await usersController.create(createUserData, currentUser);
+      expect(auditLogger.log).toHaveBeenCalledWith('CREATE', 'USER', {
+        groupId: null,
+        metadata: { targetUserId: 'user-2' },
+        userId: currentUser.id
+      });
+    });
+
+    it('records no creation when the service refuses it', async () => {
+      usersService.create.mockRejectedValue(new Error('conflict'));
+      await expect(usersController.create(createUserData, currentUser)).rejects.toThrow('conflict');
+      expect(auditLogger.log).not.toHaveBeenCalled();
+    });
+
     it('passes an empty group name when the user has no groups', async () => {
-      await usersController.create({ ...createUserData, groupIds: [] }, ability);
+      await usersController.create({ ...createUserData, groupIds: [] }, currentUser);
       expect(groupsService.findById).not.toHaveBeenCalled();
       expect(mailService.sendNewUserEmail.mock.lastCall?.[0]).toMatchObject({ group: '' });
     });
@@ -219,22 +238,26 @@ describe('UsersController', () => {
   });
 
   describe('updatePermissions', () => {
-    it('should forward custom grants with the caller ability, so the write is scoped', async () => {
+    it('should forward custom grants with the current user, so the write is scoped and attributed', async () => {
       const permissions: Permissions = [{ action: 'read', groupId: 'group-1', subject: 'Subject' }];
-      await usersController.updatePermissions('user-1', { kind: 'custom', permissions }, ability);
+      await usersController.updatePermissions('user-1', { kind: 'custom', permissions }, currentUser);
       expect(usersService.updatePermissions).toHaveBeenCalledWith(
         'user-1',
         { kind: 'custom', permissions },
-        { ability }
+        currentUser
       );
     });
 
-    it('should forward a permission set with the caller ability, so the write is scoped', async () => {
-      await usersController.updatePermissions('user-1', { kind: 'permissionSet', permissionSetId: 'set-1' }, ability);
+    it('should forward a permission set with the current user, so the write is scoped and attributed', async () => {
+      await usersController.updatePermissions(
+        'user-1',
+        { kind: 'permissionSet', permissionSetId: 'set-1' },
+        currentUser
+      );
       expect(usersService.updatePermissions).toHaveBeenCalledWith(
         'user-1',
         { kind: 'permissionSet', permissionSetId: 'set-1' },
-        { ability }
+        currentUser
       );
     });
   });

@@ -11,6 +11,7 @@ import {
 } from '@opendatacapture/schemas/user';
 import type { CreateUserResponse } from '@opendatacapture/schemas/user';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import type { AppAbility } from '@/auth/auth.types';
 import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorator';
 import { GroupsService } from '@/groups/groups.service';
@@ -28,6 +29,7 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
+    private readonly auditLogger: AuditLogger,
     private readonly groupsService: GroupsService,
     private readonly mailService: MailService
   ) {}
@@ -51,11 +53,18 @@ export class UsersController {
   @RouteAccess(ADMIN_ONLY)
   async create(
     @Body() user: $CreateUserData,
-    @CurrentUser('ability') ability: AppAbility,
+    @CurrentUser() currentUser: RequestUser,
     @Headers('origin') origin?: string,
     @Query('language', new ParseSchemaPipe({ schema: $Language.optional() })) language?: Language
   ): Promise<CreateUserResponse> {
+    const { ability } = currentUser;
     const created = await this.usersService.create(user, { ability });
+    // Logged here rather than in the service, which setup and demo seeding also call with no one acting.
+    await this.auditLogger.log('CREATE', 'USER', {
+      groupId: null,
+      metadata: { targetUserId: created.id },
+      userId: currentUser.id
+    });
     // Attempt to send the welcome email. The result is always returned (even when
     // mail is disabled or the user has no email) so the client can fall back to a
     // copy-pasteable message; the client ignores it entirely when mail is off.
@@ -105,9 +114,9 @@ export class UsersController {
   updatePermissions(
     @Param('id') id: string,
     @Body() data: $UpdateUserPermissionsData,
-    @CurrentUser('ability') ability: AppAbility
+    @CurrentUser() currentUser: RequestUser
   ) {
-    return this.usersService.updatePermissions(id, data, { ability });
+    return this.usersService.updatePermissions(id, data, currentUser);
   }
 
   @ApiOperation({ summary: 'Self Update User' })
