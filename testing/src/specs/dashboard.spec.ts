@@ -91,9 +91,12 @@ test.describe('dashboard', () => {
 
     await expect(dashboardPage.statisticRecords.getByRole('heading')).toHaveText('5');
     await dashboardPage.statisticRecords.click();
-    await expect(dashboardPage.recordsDialog.getByRole('listitem').filter({ hasText: title })).toHaveText(
-      new RegExp(`${title}\\s*5$`)
-    );
+    // The only instrument holding records in this group, so the default most-records-first order puts it on top.
+    const recordRows = dashboardPage.recordsDialog.getByTestId('data-table-row');
+    await expect(recordRows.first()).toHaveText(new RegExp(`^${title}\\s*5$`));
+    await dashboardPage.recordsDialog.getByRole('searchbox').fill(title);
+    await expect(recordRows).toHaveCount(1);
+    await expect(recordRows).toHaveText(new RegExp(`^${title}\\s*5$`));
     await page.keyboard.press('Escape');
 
     await dashboardPage.statisticInstruments.click();

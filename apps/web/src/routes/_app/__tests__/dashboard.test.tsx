@@ -182,6 +182,16 @@ const listItems = (dialog: HTMLElement) => {
     .map((item) => item.textContent);
 };
 
+const recordRows = (dialog: HTMLElement) => {
+  return within(dialog)
+    .getAllByTestId('data-table-row')
+    .map((row) => Array.from(row.children, (cell) => cell.textContent));
+};
+
+const recordsHeader = (dialog: HTMLElement, label: string) => {
+  return within(within(dialog).getByTestId('data-table-head')).getByText(label).closest('button')!;
+};
+
 const runLoader = async () => {
   const loader = Route.options.loader as (opts: object) => Promise<void>;
   try {
@@ -288,28 +298,70 @@ describe('Route', () => {
     it('should count the records of each instrument in the records dialog', () => {
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['Alpha Scale 2', 'Beta Task 1']);
+      expect(recordRows(dialog)).toEqual([
+        ['Alpha Scale', '2'],
+        ['Beta Task', '1']
+      ]);
+    });
+
+    it('should list the instrument with the most records first, so the busiest are seen without sorting', () => {
+      mocks.records = { data: [{ instrumentId: 'beta' }, { instrumentId: 'beta' }, { instrumentId: 'alpha' }] };
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      expect(recordRows(dialog).map(([title]) => title)).toEqual(['Beta Task', 'Alpha Scale']);
+    });
+
+    it('should sort the records dialog by title when its header is clicked', () => {
+      mocks.records = { data: [{ instrumentId: 'beta' }, { instrumentId: 'beta' }, { instrumentId: 'alpha' }] };
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      fireEvent.click(recordsHeader(dialog, 'Title'));
+      expect(recordRows(dialog).map(([title]) => title)).toEqual(['Alpha Scale', 'Beta Task']);
+    });
+
+    it('should reverse the record count order when the number header is clicked', () => {
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      fireEvent.click(recordsHeader(dialog, 'Number'));
+      expect(recordRows(dialog).map(([title]) => title)).toEqual(['Beta Task', 'Alpha Scale']);
+    });
+
+    it('should narrow the records dialog to the instruments matching its search', () => {
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      const search = within(within(dialog).getByTestId('data-table-search-bar')).getByRole('searchbox');
+      fireEvent.change(search, { target: { value: 'Beta' } });
+      expect(recordRows(dialog)).toEqual([['Beta Task', '1']]);
     });
 
     it('should count the records of every edition, so older editions are not dropped from the dialog', () => {
       mocks.records = { data: [{ instrumentId: 'alpha-1' }, { instrumentId: 'alpha-1' }, { instrumentId: 'alpha' }] };
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['Alpha Scale 3', 'Beta Task 0']);
+      expect(recordRows(dialog)).toEqual([
+        ['Alpha Scale', '3'],
+        ['Beta Task', '0']
+      ]);
     });
 
     it('should count each record under its own edition while the other editions are unavailable', () => {
       mocks.allEditions = { data: undefined };
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['Alpha Scale 2', 'Beta Task 1']);
+      expect(recordRows(dialog)).toEqual([
+        ['Alpha Scale', '2'],
+        ['Beta Task', '1']
+      ]);
     });
 
     it('should count zero records for each instrument while records are unavailable', () => {
       mocks.records = { data: undefined };
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['Alpha Scale 0', 'Beta Task 0']);
+      expect(recordRows(dialog)).toEqual([
+        ['Alpha Scale', '0'],
+        ['Beta Task', '0']
+      ]);
     });
 
     it('should report a failure to load instruments in the records dialog, since records are counted per instrument', () => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Dialog, Heading, Spinner, StatisticCard } from '@douglasneuroinformatics/libui/components';
+import { DataTable, Dialog, Heading, Spinner, StatisticCard } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
@@ -10,6 +10,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { PageHeader } from '@/components/PageHeader';
+import { SortableHeader } from '@/components/SortableHeader';
+import { TruncatedCell } from '@/components/TruncatedCell';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
@@ -365,48 +367,40 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <ul className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
-                    {!instrumentInfo && (
-                      <p>
-                        {t({
-                          en: 'Error finding records',
-                          es: 'Error al buscar los registros',
-                          fr: "Erreur lors de la recherche d'enregistrements"
-                        })}
-                      </p>
-                    )}
-                    {instrumentInfo && (
-                      <AnimatePresence mode="popLayout">
-                        <div className="flex justify-between gap-4 font-bold">
-                          <p>
-                            {t({
-                              en: 'Title',
-                              es: 'Título',
-                              fr: 'Titre'
-                            })}
-                          </p>{' '}
-                          <p>{t({ en: 'Number', es: 'Número', fr: 'Nombre' })}</p>
-                        </div>
-                        <hr />
-                        {recordCounter.map((instrument, i) => {
-                          return (
-                            <motion.li
-                              layout
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0 }}
-                              initial={{ opacity: 0 }}
-                              key={instrument.id}
-                              transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
-                            >
-                              <div className="flex justify-between gap-4">
-                                <p>{instrument.instrumentTitle}</p> <p>{instrument.count}</p>
-                              </div>
-                            </motion.li>
-                          );
-                        })}
-                      </AnimatePresence>
-                    )}
-                  </ul>
+                  {instrumentInfo ? (
+                    <DataTable
+                      columns={[
+                        {
+                          accessorKey: 'instrumentTitle',
+                          cell: ({ getValue }) => (
+                            <TruncatedCell title={getValue<string>()} value={getValue<string>()} />
+                          ),
+                          header: ({ column }) => (
+                            <SortableHeader column={column} label={t({ en: 'Title', es: 'Título', fr: 'Titre' })} />
+                          ),
+                          id: 'instrumentTitle'
+                        },
+                        {
+                          accessorKey: 'count',
+                          header: ({ column }) => (
+                            <SortableHeader column={column} label={t({ en: 'Number', es: 'Número', fr: 'Nombre' })} />
+                          ),
+                          id: 'count',
+                          size: 110
+                        }
+                      ]}
+                      data={recordCounter}
+                      initialState={{ columnPinning: { right: ['count'] }, sorting: [{ desc: true, id: 'count' }] }}
+                    />
+                  ) : (
+                    <p>
+                      {t({
+                        en: 'Error finding records',
+                        es: 'Error al buscar los registros',
+                        fr: "Erreur lors de la recherche d'enregistrements"
+                      })}
+                    </p>
+                  )}
                 </Dialog.Content>
               </Dialog>
             </div>
