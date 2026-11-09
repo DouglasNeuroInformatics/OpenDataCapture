@@ -83,8 +83,23 @@ export class InstrumentsService {
     private readonly virtualizationService: VirtualizationService<InstrumentVirtualizationContext>
   ) {}
 
-  async count(options: EntityOperationOptions = {}): Promise<number> {
-    return (await this.find({}, options)).length;
+  /**
+   * The number of instruments the dashboard lists for the group: the latest edition of each, as
+   * `findInfo` reports them, narrowed to those the group may administer.
+   */
+  async count(currentUser: RequestUser, requestedGroupId?: string): Promise<number> {
+    const infos = await this.findInfo({}, currentUser, requestedGroupId);
+    if (!requestedGroupId) {
+      return infos.length;
+    }
+    const group = await this.groupModel.findFirst({
+      select: { accessibleInstrumentIds: true },
+      where: { AND: [accessibleQuery(currentUser.ability, 'read', 'Group')], id: requestedGroupId }
+    });
+    if (!group) {
+      throw new NotFoundException(`Failed to find group with ID: ${requestedGroupId}`);
+    }
+    return infos.filter((info) => group.accessibleInstrumentIds.includes(info.id)).length;
   }
 
   async create(

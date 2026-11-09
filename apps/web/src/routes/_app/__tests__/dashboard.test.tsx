@@ -40,13 +40,20 @@ const SUMMARY: Summary = {
 };
 
 const INSTRUMENTS = [
-  { details: { title: 'Alpha Scale' }, id: 'alpha', kind: 'FORM' },
-  { details: { title: 'Beta Task' }, id: 'beta', kind: 'INTERACTIVE' }
+  { details: { title: 'Alpha Scale' }, id: 'alpha', internal: { edition: 2, name: 'ALPHA' }, kind: 'FORM' },
+  { details: { title: 'Beta Task' }, id: 'beta', internal: { edition: 1, name: 'BETA' }, kind: 'INTERACTIVE' }
+];
+
+const ALL_EDITIONS = [
+  { details: { title: 'Alpha Scale' }, id: 'alpha-1', internal: { edition: 1, name: 'ALPHA' }, kind: 'FORM' },
+  ...INSTRUMENTS,
+  { details: { title: 'Gamma Series' }, id: 'gamma', kind: 'SERIES' }
 ];
 
 const RESEARCH_GROUP: CurrentGroup = { accessibleInstrumentIds: ['alpha'], id: 'group-1', type: 'RESEARCH' };
 
 type DashboardMocks = {
+  allEditions: QueryResult<typeof ALL_EDITIONS>;
   ensureQueryData: Mock<(options: unknown) => Promise<unknown>>;
   instruments: QueryResult<typeof INSTRUMENTS>;
   navigate: Mock<(options: unknown) => void>;
@@ -64,6 +71,7 @@ type DashboardMocks = {
 };
 
 const mocks = vi.hoisted((): DashboardMocks => ({
+  allEditions: {},
   ensureQueryData: vi.fn(),
   instruments: {},
   navigate: vi.fn(),
@@ -93,7 +101,11 @@ vi.mock('@/hooks/useSummaryQuery', async (importOriginal) => ({
     return mocks.summary;
   }
 }));
-vi.mock('@/hooks/useInstrumentInfoQuery', () => ({ useInstrumentInfoQuery: () => mocks.instruments }));
+vi.mock('@/hooks/useInstrumentInfoQuery', () => ({
+  useInstrumentInfoQuery: (options?: { params?: { allEditions?: boolean } }) => {
+    return options?.params?.allEditions ? mocks.allEditions : mocks.instruments;
+  }
+}));
 vi.mock('@/hooks/useInstrumentRecords', () => ({
   useInstrumentRecords: (options: unknown) => {
     mocks.useInstrumentRecords(options);
@@ -188,6 +200,7 @@ describe('Route', () => {
       mocks.store.currentGroup = null;
       mocks.summary = { data: SUMMARY };
       mocks.instruments = { data: INSTRUMENTS };
+      mocks.allEditions = { data: ALL_EDITIONS };
       mocks.records = { data: [{ instrumentId: 'alpha' }, { instrumentId: 'alpha' }, { instrumentId: 'beta' }] };
       mocks.users = { data: [{ username: 'alice' }, { username: 'bob' }] };
       mocks.tooltipProps = { active: false };
@@ -273,6 +286,20 @@ describe('Route', () => {
     });
 
     it('should count the records of each instrument in the records dialog', () => {
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      expect(listItems(dialog)).toEqual(['Alpha Scale 2', 'Beta Task 1']);
+    });
+
+    it('should count the records of every edition, so older editions are not dropped from the dialog', () => {
+      mocks.records = { data: [{ instrumentId: 'alpha-1' }, { instrumentId: 'alpha-1' }, { instrumentId: 'alpha' }] };
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      expect(listItems(dialog)).toEqual(['Alpha Scale 3', 'Beta Task 0']);
+    });
+
+    it('should count each record under its own edition while the other editions are unavailable', () => {
+      mocks.allEditions = { data: undefined };
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
       expect(listItems(dialog)).toEqual(['Alpha Scale 2', 'Beta Task 1']);

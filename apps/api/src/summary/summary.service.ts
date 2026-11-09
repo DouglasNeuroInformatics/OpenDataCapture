@@ -1,7 +1,7 @@
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { Injectable } from '@nestjs/common';
 import type { Summary } from '@opendatacapture/schemas/summary';
 
-import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
@@ -21,7 +21,8 @@ export class SummaryService {
     private readonly subjectsService: SubjectsService
   ) {}
 
-  async getSummary(groupId?: string, { ability }: EntityOperationOptions = {}): Promise<Summary> {
+  async getSummary(currentUser: RequestUser, groupId?: string): Promise<Summary> {
+    const { ability } = currentUser;
     const filter = groupId ? { groupIds: { has: groupId } } : ({} as { [key: string]: unknown });
     const sessionFilter = groupId ? { groupId } : {};
     const recordFilter = groupId ? { groupId } : {};
@@ -39,7 +40,7 @@ export class SummaryService {
     // the slowest query rather than the sum of all of them.
     const [instruments, records, sessions, subjects, users, recordTrend, sessionTrend, subjectTrend] =
       await Promise.all([
-        this.instrumentsService.count(),
+        this.instrumentsService.count(currentUser, groupId),
         this.instrumentRecordsService.count(recordFilter, { ability }),
         this.sessionsService.count(sessionFilter, { ability }),
         this.subjectsService.count(filter, { ability }),

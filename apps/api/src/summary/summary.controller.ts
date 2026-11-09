@@ -1,8 +1,8 @@
 import { CurrentUser } from '@douglasneuroinformatics/libnest';
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { Controller, Get, Query } from '@nestjs/common';
 import type { Summary } from '@opendatacapture/schemas/summary';
 
-import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
 import { SummaryService } from './summary.service';
@@ -19,7 +19,7 @@ export class SummaryController {
     { action: 'read', subject: 'Subject' },
     { action: 'read', subject: 'User' }
   ])
-  async getSummary(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string): Promise<Summary> {
-    return this.summaryService.getSummary(groupId, { ability });
+  async getSummary(@CurrentUser() currentUser: RequestUser, @Query('groupId') groupId?: string): Promise<Summary> {
+    return this.summaryService.getSummary(currentUser, groupId);
   }
 }

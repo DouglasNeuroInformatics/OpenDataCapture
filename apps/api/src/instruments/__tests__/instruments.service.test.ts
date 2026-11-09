@@ -1244,11 +1244,40 @@ describe('InstrumentsService', () => {
   });
 
   describe('count', () => {
-    it('should count every instrument', async () => {
-      const find = vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries, formInstance('FORM_A', 1)]);
+    beforeEach(() => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([
+        formInstance('FORM_A', 1),
+        formInstance('FORM_A', 2),
+        formInstance('FORM_B', 1)
+      ]);
+      instrumentModel.findMany.mockResolvedValue([]);
+    });
 
-      await expect(instrumentsService.count()).resolves.toBe(2);
-      expect(find).toHaveBeenCalledWith({}, {});
+    it('should count each instrument once whatever its number of editions, as the instruments dialog lists it', async () => {
+      await expect(instrumentsService.count(adminUser)).resolves.toBe(2);
+    });
+
+    it('should count only the instruments the group may administer, so the card matches its dialog', async () => {
+      groupModel.findFirst.mockResolvedValue({ accessibleInstrumentIds: ['hash:FORM_A-1', 'hash:FORM_A-2'] });
+
+      await expect(instrumentsService.count(adminUser, 'group-1')).resolves.toBe(1);
+    });
+
+    it('should look the group up within what the caller may read, so another group cannot be counted', async () => {
+      groupModel.findFirst.mockResolvedValue({ accessibleInstrumentIds: [] });
+
+      await instrumentsService.count(adminUser, 'group-1');
+
+      expect(groupModel.findFirst).toHaveBeenCalledWith({
+        select: { accessibleInstrumentIds: true },
+        where: { AND: [accessibleQuery(adminUser.ability, 'read', 'Group')], id: 'group-1' }
+      });
+    });
+
+    it('should reject a group that cannot be found rather than count nothing', async () => {
+      groupModel.findFirst.mockResolvedValue(null);
+
+      await expect(instrumentsService.count(adminUser, 'group-1')).rejects.toThrow(NotFoundException);
     });
   });
 

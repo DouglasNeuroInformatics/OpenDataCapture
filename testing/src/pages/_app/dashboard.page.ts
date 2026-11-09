@@ -3,7 +3,9 @@ import type { Locator, Page } from '@playwright/test';
 import { AppPage } from './route.page';
 
 export class DashboardPage extends AppPage {
+  readonly instrumentsDialog: Locator;
   readonly pageHeader: Locator;
+  readonly recordsDialog: Locator;
   readonly recordsSessionsChart: Locator;
   readonly statisticInstruments: Locator;
   readonly statisticRecords: Locator;
@@ -24,5 +26,7 @@ export class DashboardPage extends AppPage {
     this.recordsSessionsChart = page.getByTestId('dashboard-chart-records-sessions');
     this.subjectsGrowthChart = page.getByTestId('dashboard-chart-subjects-growth');
     this.usersDialog = page.getByTestId('dashboard-users-Modal-dialog');
+    this.instrumentsDialog = page.getByTestId('dashboard-instruments-Modal-dialog');
+    this.recordsDialog = page.getByTestId('dashboard-record-Modal-dialog');
   }
 }

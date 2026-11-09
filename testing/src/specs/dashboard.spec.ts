@@ -1,4 +1,23 @@
+import { DashboardPage } from '../pages/_app/dashboard.page';
 import { expect, test } from '../support/fixtures';
+
+function scoreFormBundle({ edition, name, title }: { edition: number; name: string; title: string }) {
+  return `(async () => {
+    const runtimeImport = (specifier) => import(globalThis.__resolveImport?.(specifier) ?? specifier);
+    const { z } = await runtimeImport('/runtime/v1/zod@3.x/index.js');
+    return {
+      __runtimeVersion: 1,
+      content: { score: { kind: 'number', label: 'Score', variant: 'input' } },
+      details: { description: 'A form with one number field', license: 'Apache-2.0', title: ${JSON.stringify(title)} },
+      internal: { edition: ${edition}, name: ${JSON.stringify(name)} },
+      kind: 'FORM',
+      language: 'en',
+      measures: null,
+      tags: [],
+      validationSchema: z.object({ score: z.number() })
+    };
+  })()`;
+}
 
 test.describe('dashboard', () => {
   test('should display the dashboard header @smoke', async ({ getPageModel }) => {
@@ -44,6 +63,45 @@ test.describe('dashboard', () => {
     await dashboardPage.statisticUsers.click();
     await expect(dashboardPage.usersDialog).toBeVisible();
     await expect(dashboardPage.usersDialog).toContainText('Users');
+  });
+
+  // A record keeps the id of the edition it was collected with, so the records dialog once counted
+  // only the latest edition's records, and the instruments card counted every edition in the database.
+  // Edition 2 is stored after the group exists, so the group gains it the way an upgrade does.
+  test('should count the records of every edition of an instrument, matching both cards to their dialogs', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const name = `DASHBOARD_EDITIONS_${uniqueId}`;
+    const title = `Dashboard Editions ${uniqueId}`;
+    const editionOneId = await api.createInstrument(scoreFormBundle({ edition: 1, name, title }));
+    const group = await api.createGroup();
+    const editionTwoId = await api.createInstrument(scoreFormBundle({ edition: 2, name, title }));
+    const session = await api.createSession(group.id, { id: `dashboard_editions_${uniqueId}` });
+    for (const instrumentId of [editionOneId, editionOneId, editionOneId, editionTwoId, editionTwoId]) {
+      await api.createRecord(group.id, instrumentId, session, { score: 1 });
+    }
+    const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const dashboardPage = new DashboardPage(page);
+    await dashboardPage.goto('/dashboard');
+
+    await expect(dashboardPage.statisticRecords.getByRole('heading')).toHaveText('5');
+    await dashboardPage.statisticRecords.click();
+    await expect(dashboardPage.recordsDialog.getByRole('listitem').filter({ hasText: title })).toHaveText(
+      new RegExp(`${title}\\s*5$`)
+    );
+    await page.keyboard.press('Escape');
+
+    await dashboardPage.statisticInstruments.click();
+    const instrumentRows = dashboardPage.instrumentsDialog.getByRole('listitem');
+    await expect(instrumentRows.filter({ hasText: title })).toHaveCount(1);
+    const instrumentRowCount = await instrumentRows.count();
+    await page.keyboard.press('Escape');
+    await expect(dashboardPage.statisticInstruments.getByRole('heading')).toHaveText(String(instrumentRowCount));
   });
 
   test.describe('as an administrator', () => {

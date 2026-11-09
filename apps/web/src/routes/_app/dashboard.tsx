@@ -26,6 +26,7 @@ const RouteComponent = () => {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const instrumentInfoQuery = useInstrumentInfoQuery();
+  const allEditionsQuery = useInstrumentInfoQuery({ params: { allEditions: true } });
   const userInfoQuery = useUsersQuery({
     params: {
       groupId: currentGroup?.id
@@ -53,12 +54,21 @@ const RouteComponent = () => {
     };
   });
 
-  const recordIds = recordsQuery.data?.map((record) => record.instrumentId);
+  // A record keeps the id of the edition it was collected with, so records are counted under the
+  // instrument's name to include every edition in the row for its latest one.
+  const instrumentKeyById = new Map(
+    allEditionsQuery.data?.map((instrument) => {
+      return [instrument.id, instrument.kind === 'SERIES' ? instrument.id : instrument.internal.name];
+    })
+  );
+  const instrumentKey = (instrumentId: string) => instrumentKeyById.get(instrumentId) ?? instrumentId;
+
+  const recordKeys = recordsQuery.data?.map((record) => instrumentKey(record.instrumentId));
 
   const recordCounter =
     instrumentInfo?.map((title) => {
       return {
-        count: recordIds?.filter((val) => val === title.id).length ?? 0,
+        count: recordKeys?.filter((key) => key === instrumentKey(title.id)).length ?? 0,
         id: title.id,
         instrumentTitle: title.title
       };
