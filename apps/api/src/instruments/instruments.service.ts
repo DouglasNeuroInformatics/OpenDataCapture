@@ -9,7 +9,12 @@ import {
   UnprocessableEntityException
 } from '@nestjs/common';
 import { bundle } from '@opendatacapture/instrument-bundler';
-import { getSeriesInstrumentItems, isScalarInstrument, isSeriesInstrument } from '@opendatacapture/instrument-utils';
+import {
+  getSeriesInstrumentItems,
+  isFileInstrument,
+  isScalarInstrument,
+  isSeriesInstrument
+} from '@opendatacapture/instrument-utils';
 import type {
   AnyInstrument,
   AnyScalarInstrument,
@@ -411,6 +416,24 @@ export class InstrumentsService {
     }));
   }
 
+  /**
+   * Which of the given instruments cannot be assigned remotely: an archived series, a file
+   * instrument, whose uploads the gateway has no way to deliver, and a series with a file item, which
+   * the series renderer cannot show either. An unknown id is skipped, so the caller's own rule decides
+   * it. Unscoped by the caller's ability: it only narrows ids the caller already named, and every
+   * other check on them is made separately.
+   */
+  async findUnassignableIds(ids: string[]): Promise<string[]> {
+    const instruments = await this.instrumentModel.findMany({
+      select: { archivedAt: true, bundle: true, id: true },
+      where: { id: { in: ids } }
+    });
+    const isUnassignable = await Promise.all(
+      instruments.map(async (instrument) => Boolean(instrument.archivedAt) || (await this.collectsFiles(instrument)))
+    );
+    return instruments.filter((_, index) => isUnassignable[index]).map(({ id }) => id);
+  }
+
   generateInstrumentId(instrument: AnyInstrument, seriesGroupId?: string) {
     if (isScalarInstrument(instrument)) {
       return this.generateScalarInstrumentId(instrument);
@@ -535,6 +558,25 @@ export class InstrumentsService {
       InstrumentLanguage,
       string[]
     >;
+  }
+
+  /**
+   * A series bundle does not say what kind its items are, so each item is evaluated. An item that
+   * no longer exists is left to `findBundleById`, which refuses it when the assignment is sent.
+   */
+  private async collectsFiles(instrument: Pick<InstrumentBundleContainer, 'bundle' | 'id'>): Promise<boolean> {
+    const instance = await this.getInstrumentInstance(instrument);
+    if (!isSeriesInstrument(instance)) {
+      return isFileInstrument(instance);
+    }
+    const itemIds = getSeriesInstrumentItems(instance.content).map((internal) => {
+      return this.generateScalarInstrumentId({ internal });
+    });
+    const items = await this.instrumentModel.findMany({
+      select: { bundle: true, id: true },
+      where: { id: { in: itemIds } }
+    });
+    return (await this.instantiate(items)).some(isFileInstrument);
   }
 
   /**

@@ -13,6 +13,7 @@ import { AuditLogger } from '@/audit/audit.logger';
 import { AbilityFactory } from '@/auth/ability.factory';
 import { createAppAbility } from '@/auth/ability.utils';
 import { GatewayService } from '@/gateway/gateway.service';
+import { InstrumentsService } from '@/instruments/instruments.service';
 
 import { AssignmentsService } from '../assignments.service';
 
@@ -82,10 +83,10 @@ describe('AssignmentsService', () => {
   let assignmentsService: AssignmentsService;
   let assignmentModel: MockedInstance<Model<'Assignment'>>;
   let groupModel: MockedInstance<Model<'Group'>>;
-  let instrumentModel: MockedInstance<Model<'Instrument'>>;
   let subjectModel: MockedInstance<Model<'Subject'>>;
   let auditLogger: MockedInstance<AuditLogger>;
   let gatewayService: MockedInstance<GatewayService>;
+  let instrumentsService: MockedInstance<InstrumentsService>;
   let loggingService: MockedInstance<LoggingService>;
 
   /** Compiles a fresh service against `config`, since the participant link base is fixed at construction. */
@@ -95,7 +96,6 @@ describe('AssignmentsService', () => {
         AssignmentsService,
         MockFactory.createForModelToken(getModelToken('Assignment')),
         MockFactory.createForModelToken(getModelToken('Group')),
-        MockFactory.createForModelToken(getModelToken('Instrument')),
         MockFactory.createForModelToken(getModelToken('Subject')),
         { provide: AuditLogger, useValue: { log: vi.fn() } },
         { provide: ConfigService, useValue: config },
@@ -107,23 +107,24 @@ describe('AssignmentsService', () => {
             deleteRemoteAssignment: vi.fn()
           }
         },
+        { provide: InstrumentsService, useValue: { findUnassignableIds: vi.fn() } },
         { provide: LoggingService, useValue: { error: vi.fn() } }
       ]
     }).compile();
 
     assignmentModel = moduleRef.get(getModelToken('Assignment'));
     groupModel = moduleRef.get(getModelToken('Group'));
-    instrumentModel = moduleRef.get(getModelToken('Instrument'));
     subjectModel = moduleRef.get(getModelToken('Subject'));
     auditLogger = moduleRef.get(AuditLogger);
     gatewayService = moduleRef.get(GatewayService);
+    instrumentsService = moduleRef.get(InstrumentsService);
     loggingService = moduleRef.get(LoggingService);
     assignmentsService = moduleRef.get(AssignmentsService);
 
     groupModel.findFirst.mockResolvedValue({ accessibleInstrumentIds: ['instrument-1', 'instrument-2'], id: GROUP_ID });
     subjectModel.findMany.mockResolvedValue([{ id: 'subject-1' }, { id: 'subject-2' }]);
     assignmentModel.findMany.mockResolvedValue([]);
-    instrumentModel.findMany.mockResolvedValue([]);
+    instrumentsService.findUnassignableIds.mockResolvedValue([]);
     assignmentModel.create.mockImplementation(({ data }: any) => {
       return Promise.resolve({ ...data, instrumentId: 'instrument-1' });
     });
@@ -175,9 +176,27 @@ describe('AssignmentsService', () => {
     // An archived series stays on the group's opt-in list so unarchiving restores it, so that list
     // alone would still admit it.
     it('should refuse an archived series the group has opted into, since archiving retires it from new assignments', async () => {
-      instrumentModel.findMany.mockResolvedValueOnce([{ id: 'instrument-1' }]);
+      instrumentsService.findUnassignableIds.mockResolvedValueOnce(['instrument-1']);
       const failure = await failureOf(assignmentsService.bulkPreflight(request(), permissiveUser()));
       expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-1'], kind: 'INSTRUMENT_UNAVAILABLE' });
+    });
+
+    it('should ask which of every requested instrument cannot be assigned remotely, whatever the group opted into', async () => {
+      await failureOf(
+        assignmentsService.bulkPreflight(
+          request({
+            timepoints: [
+              { expiresAt: futureDate(), instrumentId: 'instrument-1' },
+              { expiresAt: futureDate(), instrumentId: 'instrument-other' }
+            ]
+          }),
+          permissiveUser()
+        )
+      );
+      expect(instrumentsService.findUnassignableIds).toHaveBeenCalledExactlyOnceWith([
+        'instrument-1',
+        'instrument-other'
+      ]);
     });
 
     it('should restrict subjects to the selected group and the caller ability', async () => {
@@ -251,6 +270,21 @@ describe('AssignmentsService', () => {
       expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-other'], kind: 'INSTRUMENT_UNAVAILABLE' });
     });
 
+    it('should refuse to assign a file instrument, since the gateway has no way to upload its files', async () => {
+      instrumentsService.findUnassignableIds.mockResolvedValueOnce(['instrument-1']);
+      const failure = await failureOf(assignmentsService.create(data(), userAt('GROUP_MANAGER')));
+      expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-1'], kind: 'INSTRUMENT_UNAVAILABLE' });
+      expect(gatewayService.createRemoteAssignment).not.toHaveBeenCalled();
+    });
+
+    it('should refuse an administrator an ungrouped assignment of a file instrument, which skips the group checks', async () => {
+      instrumentsService.findUnassignableIds.mockResolvedValueOnce(['instrument-1']);
+      const failure = await failureOf(assignmentsService.create({ ...data(), groupId: undefined }, userAt('ADMIN')));
+      expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-1'], kind: 'INSTRUMENT_UNAVAILABLE' });
+      expect(instrumentsService.findUnassignableIds).toHaveBeenCalledExactlyOnceWith(['instrument-1']);
+      expect(gatewayService.createRemoteAssignment).not.toHaveBeenCalled();
+    });
+
     it('should refuse a subject outside the group, so its participant link cannot be issued elsewhere', async () => {
       subjectModel.findMany.mockResolvedValueOnce([]);
       const failure = await failureOf(assignmentsService.create(data(), userAt('GROUP_MANAGER')));
@@ -287,7 +321,7 @@ describe('AssignmentsService', () => {
     });
 
     it('should refuse an administrator an ungrouped assignment of an archived series, which skips the group checks', async () => {
-      instrumentModel.findMany.mockResolvedValueOnce([{ id: 'instrument-1' }]);
+      instrumentsService.findUnassignableIds.mockResolvedValueOnce(['instrument-1']);
       const failure = await failureOf(assignmentsService.create({ ...data(), groupId: undefined }, userAt('ADMIN')));
       expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-1'], kind: 'INSTRUMENT_UNAVAILABLE' });
       expect(assignmentModel.create).not.toHaveBeenCalled();
@@ -392,6 +426,24 @@ describe('AssignmentsService', () => {
       await expect(assignmentsService.createBulk(request(), permissiveUser())).rejects.toBeInstanceOf(
         UnprocessableEntityException
       );
+      expect(assignmentModel.create).not.toHaveBeenCalled();
+      expect(gatewayService.createRemoteAssignments).not.toHaveBeenCalled();
+    });
+
+    it('should refuse to assign a file instrument, since the gateway has no way to upload its files', async () => {
+      instrumentsService.findUnassignableIds.mockResolvedValueOnce(['instrument-2']);
+      const failure = await failureOf(
+        assignmentsService.createBulk(
+          request({
+            timepoints: [
+              { expiresAt: futureDate(), instrumentId: 'instrument-1' },
+              { expiresAt: futureDate(), instrumentId: 'instrument-2' }
+            ]
+          }),
+          permissiveUser()
+        )
+      );
+      expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-2'], kind: 'INSTRUMENT_UNAVAILABLE' });
       expect(assignmentModel.create).not.toHaveBeenCalled();
       expect(gatewayService.createRemoteAssignments).not.toHaveBeenCalled();
     });
