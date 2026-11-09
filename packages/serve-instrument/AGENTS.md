@@ -34,6 +34,16 @@ instrument directory and exposes `close()`; `InstrumentLoaderMap` and both handl
 handler) that is not wired into that chain leaks a live watcher per `Server` instance, which keeps
 the process alive and, in tests, keeps firing against deleted temp directories.
 
+**A request or a rebuild must never reject unhandled.** Both handlers' `handle` and
+`InstrumentLoader.updateEncodedBundle` run detached from an http request callback or an `fs.watch`
+callback, where Node turns an unhandled rejection into a process exit, killing every instrument in
+`--all` mode. `Server`'s request callback catches a rejected `handle`, logs it and answers 500; that
+works only because every `await` in `handle` runs before `writeHead`, so render the page first and
+write the head after. `updateEncodedBundle` keeps the directory listing and file reads inside its
+`try` and clears `encodedBundle` on failure, so a deleted instrument answers 404 (503 in single
+mode) instead of its last bundle. Each watcher also has an `'error'` listener (Windows reports a
+deleted directory as `EPERM` there).
+
 **`cli.ts` validation belongs in commander's parsers, not the `.action()` body.** `parseTarget` is
 passed to `.argument()` and `parsePort` to `.option()`, so an `InvalidArgumentError` thrown by
 either takes commander's print-message-and-`process.exit(1)` path. `parseTarget` needs the `--all` flag,
@@ -57,8 +67,9 @@ stubs the `__ROOT_PROPS__` global before importing the entry. `src/__tests__/ser
 real `Server` against real temp-directory fixtures and drives it with real `fetch` calls; it stubs the
 `client.js` / `__TAILWIND_STYLES__` globals that only exist post-build, wraps instrument-bundler's
 `bundle` in `vi.fn(actual.bundle)` so a test can force a rejection, and replaces `fs.watch` at the
-module level (it is a named ESM export, which `vi.spyOn` cannot touch) so a test can fire the rebuild
-callback on demand and assert every watcher's `close()` ran after `stop()`.
+module level (it is a named ESM export, which `vi.spyOn` cannot touch) so a test can fire one directory's rebuild
+callback on demand, emit `'error'` on its watcher, and assert every watcher's `close()` ran after
+`stop()`.
 
 There is no `dev` script either: `pnpm --filter @opendatacapture/serve-instrument build`, then
 `node dist/cli.js <dir>`.
