@@ -7,7 +7,7 @@ import { AUDIT_LOGS_MAX_PAGE_SIZE } from '@opendatacapture/schemas/audit';
 import type { $AuditLog, $AuditLogsPage, AuditedAction, AuditedEntity } from '@opendatacapture/schemas/audit';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Language, Permissions } from '@opendatacapture/schemas/core';
-import type { $CreateGroupData, Group } from '@opendatacapture/schemas/group';
+import type { $CreateGroupData, $UpdateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type {
   $CreateInstrumentRecordData,
@@ -87,11 +87,7 @@ export class ApiClient {
       201,
       'create group'
     );
-    const accessibleInstrumentIds = await this.getAccessibleInstrumentIds();
-    await this.expectOk(
-      this.request.patch(`${API}/groups/${group.id}`, { data: { accessibleInstrumentIds }, headers: this.authHeaders }),
-      'grant instrument access'
-    );
+    await this.updateGroup(group.id, { accessibleInstrumentIds: await this.getAccessibleInstrumentIds() });
     return group;
   }
 
@@ -418,6 +414,14 @@ export class ApiClient {
     await this.expectOk(
       this.request.patch(`${API}/users/${id}/unarchive`, { headers: this.authHeaders }),
       `unarchive user '${id}'`
+    );
+  }
+
+  /** Updates a group through the route the web app's group management uses. */
+  async updateGroup(id: string, data: $UpdateGroupData): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/groups/${id}`, { data, headers: this.authHeaders }),
+      `update group '${id}'`
     );
   }
 

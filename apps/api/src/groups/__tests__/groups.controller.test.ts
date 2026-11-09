@@ -1,12 +1,15 @@
 import { LoggingService } from '@douglasneuroinformatics/libnest';
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
+import { ConflictException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { BasePermissionLevel } from '@opendatacapture/schemas/user';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { AbilityFactory } from '@/auth/ability.factory';
 import { createAppAbility } from '@/auth/ability.utils';
 import { ROUTE_ACCESS_METADATA_KEY } from '@/core/decorators/route-access.decorator';
@@ -17,17 +20,21 @@ import { GroupsService } from '../groups.service';
 
 const createAbility = () => createAppAbility([{ action: 'read', subject: 'Group' }]);
 
+const currentUser = { ability: createAppAbility([{ action: 'manage', subject: 'all' }]), id: 'admin-1' } as RequestUser;
+
 describe('GroupsController', () => {
   let groupsController: GroupsController;
   let groupsService: MockedInstance<GroupsService>;
+  let auditLogger: MockedInstance<AuditLogger>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [GroupsController],
-      providers: [MockFactory.createForService(GroupsService)]
+      providers: [MockFactory.createForService(GroupsService), MockFactory.createForService(AuditLogger)]
     }).compile();
     groupsController = moduleRef.get(GroupsController);
     groupsService = moduleRef.get(GroupsService);
+    auditLogger = moduleRef.get(AuditLogger);
   });
 
   it('should be defined', () => {
@@ -35,9 +42,32 @@ describe('GroupsController', () => {
   });
 
   describe('create', () => {
+    beforeEach(() => {
+      groupsService.create.mockResolvedValue({ id: 'group-1', name: 'Test Group' });
+    });
+
     it('should pass the provided object to the groups service', async () => {
-      await groupsController.create({ name: 'Test Group', type: 'CLINICAL' });
+      await groupsController.create({ name: 'Test Group', type: 'CLINICAL' }, currentUser);
       expect(groupsService.create.mock.lastCall?.[0]).toMatchObject({ name: 'Test Group' });
+    });
+
+    it('should record who created the group, in the new group, since the service records nothing', async () => {
+      await expect(groupsController.create({ name: 'Test Group', type: 'CLINICAL' }, currentUser)).resolves.toEqual({
+        id: 'group-1',
+        name: 'Test Group'
+      });
+      expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('CREATE', 'GROUP', {
+        groupId: 'group-1',
+        userId: currentUser.id
+      });
+    });
+
+    it('should record no creation the service refused', async () => {
+      groupsService.create.mockRejectedValueOnce(new ConflictException());
+      await expect(groupsController.create({ name: 'Test Group', type: 'CLINICAL' }, currentUser)).rejects.toThrow(
+        ConflictException
+      );
+      expect(auditLogger.log).not.toHaveBeenCalled();
     });
   });
 
@@ -126,15 +156,14 @@ describe('GroupsController', () => {
   });
 
   describe('updateById', () => {
-    it("should forward the update scoped to the current user's ability", async () => {
-      const ability = createAbility();
-      await groupsController.updateById('123', { name: 'Renamed Group' }, ability);
-      expect(groupsService.updateById).toHaveBeenCalledWith('123', { name: 'Renamed Group' }, { ability });
+    it('should forward the update with the current user, so it is scoped and recorded', async () => {
+      await groupsController.updateById('123', { name: 'Renamed Group' }, currentUser);
+      expect(groupsService.updateById).toHaveBeenCalledWith('123', { name: 'Renamed Group' }, currentUser);
     });
 
     it('should return the group updated by the groups service', async () => {
       groupsService.updateById.mockResolvedValueOnce({ name: 'Renamed Group' });
-      await expect(groupsController.updateById('123', { name: 'Renamed Group' })).resolves.toMatchObject({
+      await expect(groupsController.updateById('123', { name: 'Renamed Group' }, currentUser)).resolves.toMatchObject({
         name: 'Renamed Group'
       });
     });

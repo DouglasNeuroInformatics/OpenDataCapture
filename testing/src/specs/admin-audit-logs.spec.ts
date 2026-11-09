@@ -273,4 +273,34 @@ test.describe('admin audit log coverage', () => {
       expect(entry?.group?.name).toBe(group.name);
     });
   });
+
+  test.describe('groups', () => {
+    test.use({ actingRole: 'ADMIN' });
+
+    test('should show who created a group under its own group, entity and action filters', async ({
+      api,
+      getPageModel
+    }) => {
+      const group = await api.createGroup();
+
+      const auditLogsPage = await getPageModel('/admin/audit/logs');
+      await auditLogsPage.filterBy('group', group.name);
+      await auditLogsPage.filterBy('entity', 'Group');
+      await auditLogsPage.filterBy('action', 'Create');
+
+      const rows = auditLogsPage.dataTable.getByTestId('data-table-row');
+      await expect(rows).toHaveCount(1);
+      await expect(rows.first()).toContainText(ADMIN.username);
+    });
+
+    test('should record which fields a group update changed', async ({ api, uniqueId }) => {
+      const group = await api.createGroup();
+      const name = `Renamed Group ${uniqueId}`;
+      await api.updateGroup(group.id, { name });
+
+      const entries = await api.findAuditLogs({ action: 'UPDATE', entity: 'GROUP' });
+      const changes = entries.filter((entry) => entry.group?.name === name).map(({ metadata }) => metadata?.fields);
+      expect(changes).toContain('name');
+    });
+  });
 });

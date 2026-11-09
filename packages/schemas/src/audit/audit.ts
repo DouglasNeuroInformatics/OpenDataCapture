@@ -29,6 +29,7 @@ export type AuditedAction<TEntity extends AuditedEntity = AuditedEntity> = (type
  */
 export const AUDITED_ACTIONS = {
   ASSIGNMENT: ['CREATE', 'DELETE', 'SEND_EMAIL', 'UPDATE'],
+  GROUP: ['CREATE', 'UPDATE'],
   INSTRUMENT: ['ARCHIVE', 'CREATE', 'DELETE', 'UNARCHIVE'],
   INSTRUMENT_RECORD: ['DELETE', 'UPDATE'],
   SUBJECT: ['DELETE'],
