@@ -37,10 +37,16 @@ the process alive and, in tests, keeps firing against deleted temp directories.
 **`cli.ts` validation belongs in commander's parsers, not the `.action()` body.** `parseTarget` is
 passed to `.argument()` and `parsePort` to `.option()`, so an `InvalidArgumentError` thrown by
 either takes commander's print-message-and-`process.exit(1)` path. `parseTarget` needs the `--all` flag,
-which is safe because commander runs argument parsers after option parsing — `program.opts()` is
+which is safe because commander runs argument parsers after option parsing — `withOptions.opts()` is
 already populated inside it, whatever order the flags appear in. Validating inside `.action()`
 instead would escape that handling: the body is `async`, and `program.parse()` does not await it, so
 the throw would surface as a bare unhandled rejection with a stack trace rather than a clean error.
+
+**The options and the `.argument()`/`.action()` chain are two consts on purpose.**
+`@commander-js/extra-typings` infers `opts()` from the `.option()` calls on the chained value, so
+the parser cannot read `--all` off `program`, the const its own chain initializes (TS7022), or off
+a bare `new Command()`, whose `opts()` is `{}`. It reads it off `withOptions`, the same object at
+run time. Merging the two consts back into one is a type error, not a cleanup.
 
 **`program.parse()` does not await the async `.action()` body.** Anything that throws _after_
 validation — `Server.create` failing to resolve runtime metadata, `listen` hitting `EADDRINUSE` —

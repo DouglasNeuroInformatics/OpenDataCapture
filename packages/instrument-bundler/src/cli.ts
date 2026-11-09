@@ -3,7 +3,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import { Command, InvalidArgumentError } from 'commander';
+import { Command, InvalidArgumentError } from '@commander-js/extra-typings';
 import { glob } from 'glob';
 
 import { name, version } from '../package.json';
@@ -12,24 +12,24 @@ import { inferLoader } from './utils.js';
 
 import type { BundlerInput } from './schemas.js';
 
-const program = new Command();
-program.name(name);
-program.version(version);
-program.allowExcessArguments(false);
-program.argument('<target>', 'the directory to search for instruments', (path: string) => {
-  if (!fs.existsSync(path)) {
-    throw new InvalidArgumentError('Directory does not exist');
-  } else if (!fs.lstatSync(path).isDirectory()) {
-    throw new InvalidArgumentError('Not a directory');
-  }
-  return path;
-});
-program.requiredOption('--outdir <path>', 'path to output directory');
-program.option('--clean', 'delete the output directory before build');
-program.option('--declaration', 'emit typescript declarations');
-program.option('--raw', 'output raw bundle rather than as default export string');
-program.option('--no-minify', 'disable minification');
-program.option('--verbose', 'enable verbose mode');
+const program = new Command()
+  .name(name)
+  .version(version)
+  .allowExcessArguments(false)
+  .argument('<target>', 'the directory to search for instruments', (path: string) => {
+    if (!fs.existsSync(path)) {
+      throw new InvalidArgumentError('Directory does not exist');
+    } else if (!fs.lstatSync(path).isDirectory()) {
+      throw new InvalidArgumentError('Not a directory');
+    }
+    return path;
+  })
+  .requiredOption('--outdir <path>', 'path to output directory')
+  .option('--clean', 'delete the output directory before build')
+  .option('--declaration', 'emit typescript declarations')
+  .option('--raw', 'output raw bundle rather than as default export string')
+  .option('--no-minify', 'disable minification')
+  .option('--verbose', 'enable verbose mode');
 program.parse();
 
 const options = program.opts();
@@ -42,13 +42,13 @@ logger.verbose = (message: string) => {
   }
 };
 
-let inputBase = program.args[0]!;
+let inputBase = program.processedArgs[0];
 if (!path.isAbsolute(inputBase)) {
   inputBase = path.resolve(process.cwd(), inputBase);
 }
 logger.verbose(`Resolved input base: ${inputBase}`);
 
-let outputBase = options.outdir as string;
+let outputBase = options.outdir;
 if (!path.isAbsolute(outputBase)) {
   outputBase = path.resolve(process.cwd(), outputBase);
 }
@@ -94,7 +94,7 @@ for (const targetDir of targetDirs) {
 
   logger.verbose('Generating bundle...');
 
-  const output = await bundle({ inputs, minify: !options.minify === false });
+  const output = await bundle({ inputs, minify: options.minify });
 
   logger.verbose(`Writing output bundle to file: ${outputBundlePath}`);
 

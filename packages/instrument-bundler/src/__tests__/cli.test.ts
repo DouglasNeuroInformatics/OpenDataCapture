@@ -41,6 +41,18 @@ describe('cli', () => {
     expect(content.trimStart().startsWith('(async')).toBe(true);
   });
 
+  it('should write a longer, unminified bundle when --no-minify is given', async () => {
+    const minifiedOutputBase = path.join(tmpDir, 'minified');
+    process.argv = ['node', 'cli.js', inputBase, '--outdir', minifiedOutputBase, '--raw'];
+    await import('../cli.js');
+    vi.resetModules();
+    process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase, '--raw', '--no-minify'];
+    await import('../cli.js');
+    const minified = fs.readFileSync(path.join(minifiedOutputBase, 'FORM_INSTRUMENT_STUB.js'), 'utf-8');
+    const unminified = fs.readFileSync(path.join(outputBase, 'FORM_INSTRUMENT_STUB.js'), 'utf-8');
+    expect(unminified.length).toBeGreaterThan(minified.length);
+  });
+
   it('should wrap the bundle as a default export string when --raw is not given', async () => {
     process.argv = ['node', 'cli.js', inputBase, '--outdir', outputBase];
     await import('../cli.js');

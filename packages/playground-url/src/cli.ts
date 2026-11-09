@@ -2,8 +2,8 @@ import { spawn } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
+import { Command, InvalidArgumentError } from '@commander-js/extra-typings';
 import chalk from 'chalk';
-import { Command, InvalidArgumentError } from 'commander';
 
 import { name, version } from '../package.json';
 import { DEFAULT_PLAYGROUND_URL, encodeShareURL } from './share-url.js';
@@ -72,9 +72,7 @@ function openInBrowser(url: string): void {
   }).unref();
 }
 
-const program = new Command();
-
-program
+const program = new Command()
   .name(name)
   .description('Generate an Open Data Capture playground link from an instrument directory')
   .version(version)
@@ -84,14 +82,7 @@ program
   .option('-f, --fullscreen', 'share a read-only fullscreen preview rather than the editor')
   .option('-b, --base-url <url>', 'the playground origin to link to', parseBaseURL, DEFAULT_PLAYGROUND_URL)
   .option('-o, --open', 'open the generated link in your default browser')
-  .action((target: string) => {
-    const { baseUrl, fullscreen, label, open } = program.opts<{
-      baseUrl: string;
-      fullscreen?: boolean;
-      label?: string;
-      open?: boolean;
-    }>();
-
+  .action((target, { baseUrl, fullscreen, label, open }) => {
     const files = readInstrumentFiles(target);
     if (files.length === 0) {
       process.stderr.write(chalk.red(`✘ No shareable source files found in ${target}\n`));

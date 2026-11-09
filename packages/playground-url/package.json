@@ -37,6 +37,7 @@
     "lz-string": "^1.5.0"
   },
   "devDependencies": {
+    "@commander-js/extra-typings": "catalog:",
     "esbuild": "catalog:",
     "zod": "workspace:zod__3.x@*"
   }

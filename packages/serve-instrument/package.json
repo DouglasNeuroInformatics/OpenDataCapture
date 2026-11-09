@@ -29,6 +29,7 @@
     "esbuild": "catalog:"
   },
   "devDependencies": {
+    "@commander-js/extra-typings": "catalog:",
     "@douglasneuroinformatics/libjs": "catalog:",
     "@douglasneuroinformatics/libui": "catalog:",
     "@opendatacapture/instrument-bundler": "workspace:",
