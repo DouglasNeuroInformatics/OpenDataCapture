@@ -241,6 +241,84 @@ test.describe('upload', () => {
     });
   }
 
+  // The instrument guide validates a number-record field with a record keyed by an enum, which the
+  // page could neither describe nor import.
+  for (const zodEntry of ['index.js', 'v4.js'] as const) {
+    test.describe(`record field of a form written against zod@3.x/${zodEntry}`, () => {
+      let title: string;
+
+      test.beforeEach(async ({ api, uniqueId }) => {
+        title = `Record Upload ${uniqueId}`;
+        await api.createInstrument(
+          formBundle({
+            content: `{
+              ratings: {
+                items: { friday: { label: 'Friday' }, monday: { label: 'Monday' } },
+                kind: 'number-record',
+                label: 'Ratings',
+                options: { 1: 'Poor', 2: 'Fair', 3: 'Good' },
+                variant: 'likert'
+              }
+            }`,
+            name: `RECORD_UPLOAD_${uniqueId}`,
+            title,
+            validationSchema: `z.object({
+              ratings: z.record(z.enum(['monday', 'friday']), z.union([z.literal(1), z.literal(2), z.literal(3)]))
+            })`,
+            zodEntry
+          })
+        );
+      });
+
+      test('should show every key of the record with its allowed values in the template', async ({
+        isolatedGroupManager,
+        page
+      }) => {
+        await isolatedGroupManager();
+        const uploadPage = new UploadPage(page);
+        await uploadPage.goto('/upload');
+        await uploadPage.selectInstrument(title);
+        await page.waitForURL('**/upload/**');
+
+        const uploadInstrumentPage = new UploadInstrumentPage(page);
+        const downloadPromise = page.waitForEvent('download');
+        await uploadInstrumentPage.templateButton.click();
+        const download = await downloadPromise;
+
+        const template = (await readFile(await download.path())).toString();
+        expect(template).toBe('subjectID,date,ratings\r\nstring,yyyy-mm-dd,"RECORD(monday: 1/2/3, friday: 1/2/3)"');
+      });
+
+      test('should store an uploaded RECORD cell as an object of numbers', async ({
+        adminToken,
+        apiRequestContext,
+        isolatedGroupManager,
+        page,
+        uniqueId
+      }) => {
+        const group = await isolatedGroupManager();
+        const csv = ['subjectID,date,ratings', `Record${uniqueId},2024-01-15,"RECORD(monday: 3, friday: 1)"`].join(
+          '\n'
+        );
+
+        const uploadPage = new UploadPage(page);
+        await uploadPage.goto('/upload');
+        await uploadPage.selectInstrument(title);
+        await page.waitForURL('**/upload/**');
+
+        const uploadInstrumentPage = new UploadInstrumentPage(page);
+        await uploadInstrumentPage.uploadFile({ buffer: Buffer.from(csv), mimeType: 'text/csv', name: 'ratings.csv' });
+        await uploadInstrumentPage.submitButton.click();
+        await expect(page.getByText('Success')).toBeVisible();
+
+        const records = await apiRequestContext.get(`/api/v1/instrument-records?groupId=${group.id}`, {
+          headers: { Authorization: `Bearer ${adminToken}` }
+        });
+        expect(await records.json()).toMatchObject([{ data: { ratings: { friday: 1, monday: 3 } } }]);
+      });
+    });
+  }
+
   // The response was previously every record in the group for the instrument, so a second upload
   // leaked the first one's records back to the caller. An earlier upload to the same group and
   // instrument is what distinguishes the scoped response from the group-wide one.

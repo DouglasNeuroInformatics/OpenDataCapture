@@ -163,6 +163,47 @@ describe('Zod3', () => {
       });
     });
 
+    it('should read a record keyed by an enum as its keys and the type of its values', () => {
+      const schema = z3.record(z3.enum(['monday', 'friday']), z3.union([z3.literal(1), z3.literal(2)]));
+      expect(Zod3.getZodTypeName(schema)).toStrictEqual({
+        isOptional: false,
+        recordKeys: ['monday', 'friday'],
+        recordValue: { enumValues: [1, 2], isOptional: false, typeName: 'ZodUnion' },
+        typeName: 'ZodRecord'
+      });
+    });
+
+    it('should read a record keyed by any string as having no fixed keys', () => {
+      expect(Zod3.getZodTypeName(z3.record(z3.number()).optional())).toStrictEqual({
+        isOptional: true,
+        recordKeys: null,
+        recordValue: { isOptional: false, typeName: 'ZodNumber' },
+        typeName: 'ZodRecord'
+      });
+    });
+
+    it('should reject a record whose keys are neither an enum nor strings', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.record(z3.number(), z3.number())))).toStrictEqual({
+        en: 'Unsupported Zod record: keys must be an enum or strings',
+        es: 'Registro de Zod no compatible: las claves deben ser un enum o cadenas',
+        fr: 'Enregistrement Zod non pris en charge : les clés doivent être un enum ou des chaînes'
+      });
+    });
+
+    it('should reject a record whose keys are of a type it does not know', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.record(z3.symbol(), z3.number())))).toMatchObject({
+        en: 'Unsupported Zod record: keys must be an enum or strings'
+      });
+    });
+
+    it('should reject a record whose values could contain the separators of a RECORD cell', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.record(z3.string())))).toStrictEqual({
+        en: "Unsupported Zod record: values must be numbers or fixed choices, not 'ZodString'",
+        es: "Registro de Zod no compatible: los valores deben ser números u opciones fijas, no 'ZodString'",
+        fr: "Enregistrement Zod non pris en charge : les valeurs doivent être des nombres ou des choix fixes, pas 'ZodString'"
+      });
+    });
+
     it('should parse a set of free-form values without enum values', () => {
       expect(Zod3.getZodTypeName(z3.set(z3.string()))).toStrictEqual({ isOptional: false, typeName: 'ZodSet' });
     });
@@ -256,6 +297,17 @@ describe('Zod3', () => {
       ['an optional union of literals', z3.union([z3.literal(0), z3.literal(1)]).optional(), '0/1 (optional)']
     ])('should list the allowed values of %s', (_, schema, sample) => {
       expect(Zod3.generateSampleData(Zod3.getZodTypeName(schema))).toBe(sample);
+    });
+
+    it('should show every key of a record keyed by an enum with the sample of its values', () => {
+      const schema = z3.record(z3.enum(['monday', 'friday']), z3.union([z3.literal(1), z3.literal(2)]));
+      expect(Zod3.generateSampleData(Zod3.getZodTypeName(schema))).toBe('RECORD(monday: 1/2, friday: 1/2)');
+    });
+
+    it('should show a generic key for a record keyed by any string', () => {
+      expect(Zod3.generateSampleData(Zod3.getZodTypeName(z3.record(z3.number()).optional()))).toBe(
+        'RECORD(key: number, ...) (optional)'
+      );
     });
 
     it('should describe every field of a record array, separated by commas', () => {
@@ -665,6 +717,74 @@ describe('Zod3', () => {
       );
     });
 
+    describe('records', () => {
+      const instrument = instrumentWith(
+        z3.object({
+          ratings: z3.record(z3.enum(['monday', 'friday']), z3.union([z3.literal(1), z3.literal(2), z3.literal(3)]))
+        })
+      );
+
+      const processRatings = (value: string) => {
+        return processInstrumentCSV(
+          csvFile([
+            ['subjectID', 'date', 'ratings'],
+            ['subject1', '2024-01-01', value]
+          ]),
+          instrument
+        );
+      };
+
+      it('should convert each value of a record with the type the schema declares', async () => {
+        await expect(processRatings('RECORD(monday: 3, friday: 1)')).resolves.toMatchObject([
+          { ratings: { friday: 1, monday: 3 } }
+        ]);
+      });
+
+      it('should accept any key in a record keyed by any string', async () => {
+        const file = csvFile([
+          ['subjectID', 'date', 'weights'],
+          ['subject1', '2024-01-01', 'RECORD(week1: 21.5, week2: 22)']
+        ]);
+        await expect(
+          processInstrumentCSV(file, instrumentWith(z3.object({ weights: z3.record(z3.number()) })))
+        ).resolves.toMatchObject([{ weights: { week1: 21.5, week2: 22 } }]);
+      });
+
+      it('should reject a key outside the keys of the record, naming them with the column and row', async () => {
+        await expect(processRatings('RECORD(monday: 3, sunday: 1)')).rejects.toMatchObject({
+          description: {
+            en: "Unknown key 'sunday' in RECORD: expected one of monday/friday at column name: 'ratings' and row number '1'",
+            es: "Clave desconocida 'sunday' en RECORD: se esperaba una de monday/friday en la columna: 'ratings' y el número de fila '1'",
+            fr: "Clé inconnue 'sunday' dans RECORD : une des clés monday/friday était attendue au nom de colonne : 'ratings' et numéro de ligne '1'"
+          }
+        });
+      });
+
+      it('should reject a value outside the options of the record', async () => {
+        await expectRejection(
+          processRatings('RECORD(monday: 9)'),
+          "Invalid value '9': expected one of 1/2/3 at column name: 'ratings' and row number '1'"
+        );
+      });
+
+      it('should reject a cell that is not written as a RECORD', async () => {
+        await expect(processRatings('RECORD(monday: 3')).rejects.toMatchObject({
+          description: {
+            en: "Syntax error in RECORD declaration: RECORD(monday: 3 at column name: 'ratings' and row number '1'",
+            es: "Error de sintaxis en la declaración RECORD: RECORD(monday: 3 en la columna: 'ratings' y el número de fila '1'",
+            fr: "Erreur de syntaxe dans la déclaration RECORD : RECORD(monday: 3 au nom de colonne : 'ratings' et numéro de ligne '1'"
+          }
+        });
+      });
+
+      it('should reject a record with no fields', async () => {
+        await expectRejection(
+          processRatings('RECORD()'),
+          "One or more of the record fields was left empty at column name: 'ratings' and row number '1'"
+        );
+      });
+    });
+
     describe('record arrays', () => {
       const instrument = instrumentWith(
         z3.object({ items: z3.array(z3.object({ name: z3.string(), quantity: z3.number().optional() })) })
@@ -873,6 +993,33 @@ describe('Zod4', () => {
       );
     });
 
+    it('should show the keys of a record keyed by an enum, and a generic key for one keyed by any string', () => {
+      const schema = z4.object({
+        ratings: z4.record(z4.enum(['monday', 'friday']), z4.union([z4.literal(1), z4.literal(2)])),
+        weights: z4.record(z4.string(), z4.number()).optional()
+      });
+      expect(createUploadTemplateCSV(instrumentWith(schema)).content).toBe(
+        unparse([
+          ['subjectID', 'date', 'ratings', 'weights'],
+          ['string', 'yyyy-mm-dd', 'RECORD(monday: 1/2, friday: 1/2)', 'RECORD(key: number, ...) (optional)']
+        ])
+      );
+    });
+
+    it('should reject a record whose keys are neither an enum nor strings', () => {
+      const schema = z4.object({ byIndex: z4.record(z4.number(), z4.number()) });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toMatchObject({
+        en: "Unsupported Zod record: keys must be an enum or strings at column name: 'byIndex'"
+      });
+    });
+
+    it('should reject a record whose values could contain the separators of a RECORD cell', () => {
+      const schema = z4.object({ notes: z4.record(z4.string(), z4.string()) });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toMatchObject({
+        en: "Unsupported Zod record: values must be numbers or fixed choices, not 'string' at column name: 'notes'"
+      });
+    });
+
     it('should reject a union with a member that is not a literal, since a cell could not say which member it is', () => {
       const schema = z4.object({ mixed: z4.union([z4.literal(1), z4.string()]) });
       expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toMatchObject({
@@ -1011,6 +1158,34 @@ describe('Zod4', () => {
       await expectRejection(
         processInstrumentCSV(file, instrumentWith(z4.object({ level: z4.enum(['low', 'high']) }))),
         "Invalid value 'medium': expected one of low/high at column name: 'level' and row number '1'"
+      );
+    });
+
+    it('should convert each value of a record with the type the schema declares', async () => {
+      const instrument = instrumentWith(
+        z4.object({
+          ratings: z4.record(z4.enum(['monday', 'friday']), z4.union([z4.literal(1), z4.literal(2), z4.literal(3)])),
+          weights: z4.record(z4.string(), z4.number())
+        })
+      );
+      const file = csvFile([
+        ['subjectID', 'date', 'ratings', 'weights'],
+        ['subject1', '2024-01-01', 'RECORD(monday: 3, friday: 1)', 'RECORD(week1: 21.5)']
+      ]);
+      await expect(processInstrumentCSV(file, instrument)).resolves.toMatchObject([
+        { ratings: { friday: 1, monday: 3 }, weights: { week1: 21.5 } }
+      ]);
+    });
+
+    it('should reject a key outside the keys of a record, naming them with the column and row', async () => {
+      const instrument = instrumentWith(z4.object({ ratings: z4.record(z4.enum(['monday', 'friday']), z4.number()) }));
+      const file = csvFile([
+        ['subjectID', 'date', 'ratings'],
+        ['subject1', '2024-01-01', 'RECORD(monday: 3, sunday: 1)']
+      ]);
+      await expectRejection(
+        processInstrumentCSV(file, instrument),
+        "Unknown key 'sunday' in RECORD: expected one of monday/friday at column name: 'ratings' and row number '1'"
       );
     });
 
@@ -1159,7 +1334,7 @@ describe('Zod4', () => {
         'items',
         'RECORD_ARRAY(name:a,,name:b)',
         z4.array(z4.object({ name: z4.string() })),
-        'One or more of the record array fields was left empty'
+        'One or more of the record fields was left empty'
       ],
       ['items', 'RECORD_ARRAY(:a)', z4.array(z4.object({ name: z4.string() })), 'Malformed record at index 0']
     ])(
@@ -1197,6 +1372,134 @@ describe('Zod4', () => {
         'Schema parsing failed: refer to the browser console for further details'
       );
     });
+  });
+});
+
+// The validation schema of the comprehensive form example in
+// packages/instrument-guidelines/AGENTS.md §14.1, copied here: an instrument written from the guide
+// has to be uploadable.
+/* eslint-disable perfectionist/sort-objects -- kept in the guide's order, so the copy can be compared with its source line by line */
+const guideComprehensiveFormSchema = z4
+  .object({
+    agreedToTerms: z4.boolean(),
+    currentlyEmployed: z4.boolean(),
+    dateOfBirth: z4.date(),
+    overallHappiness: z4.number().int().min(1).max(10),
+    educationLevel: z4.union([z4.literal(1), z4.literal(2), z4.literal(3)]),
+    firstName: z4.string(),
+    preferredLanguage: z4.enum(['en', 'fr']),
+    additionalComments: z4.string().optional(),
+    preferredActivities: z4.set(z4.enum(['reading', 'sports', 'cooking'])),
+    weeklyMoodRatings: z4.record(
+      z4.enum(['monday', 'wednesday', 'friday']),
+      z4.union([z4.literal(1), z4.literal(2), z4.literal(3), z4.literal(4)])
+    ),
+    medications: z4.array(
+      z4.object({
+        medicationName: z4.string(),
+        dosageMg: z4.number()
+      })
+    ),
+    hasChronicCondition: z4.boolean(),
+    chronicConditionName: z4.string().optional()
+  })
+  .superRefine((data, ctx) => {
+    if (data.hasChronicCondition && !data.chronicConditionName) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['chronicConditionName'],
+        message: 'This field is required / Ce champ est obligatoire.'
+      });
+    }
+  });
+/* eslint-enable perfectionist/sort-objects */
+
+const guideComprehensiveFormColumns = [
+  'subjectID',
+  'date',
+  'agreedToTerms',
+  'currentlyEmployed',
+  'dateOfBirth',
+  'overallHappiness',
+  'educationLevel',
+  'firstName',
+  'preferredLanguage',
+  'additionalComments',
+  'preferredActivities',
+  'weeklyMoodRatings',
+  'medications',
+  'hasChronicCondition',
+  'chronicConditionName'
+];
+
+describe('createUploadTemplateCSV', () => {
+  it("should describe every field of the instrument guide's comprehensive form example", () => {
+    expect(createUploadTemplateCSV(instrumentWith(guideComprehensiveFormSchema)).content).toBe(
+      unparse([
+        guideComprehensiveFormColumns,
+        [
+          'string',
+          'yyyy-mm-dd',
+          'true/false',
+          'true/false',
+          'yyyy-mm-dd',
+          'number',
+          '1/2/3',
+          'string',
+          'en/fr',
+          'string (optional)',
+          'SET(reading/sports/cooking)',
+          'RECORD(monday: 1/2/3/4, wednesday: 1/2/3/4, friday: 1/2/3/4)',
+          'RECORD_ARRAY(medicationName: string,dosageMg: number; ...)',
+          'true/false',
+          'string (optional)'
+        ]
+      ])
+    );
+  });
+});
+
+describe('processInstrumentCSV', () => {
+  it("should import a row written for the instrument guide's comprehensive form example", async () => {
+    const file = csvFile([
+      guideComprehensiveFormColumns,
+      [
+        'subject1',
+        '2024-01-01',
+        'true',
+        'false',
+        '1990-05-17',
+        '7',
+        '2',
+        'Ada',
+        'fr',
+        '',
+        'SET(reading, cooking)',
+        'RECORD(monday: 3, wednesday: 4, friday: 2)',
+        'RECORD_ARRAY(medicationName: Aspirin, dosageMg: 81;)',
+        'false',
+        ''
+      ]
+    ]);
+    await expect(processInstrumentCSV(file, instrumentWith(guideComprehensiveFormSchema))).resolves.toStrictEqual([
+      {
+        additionalComments: undefined,
+        agreedToTerms: true,
+        chronicConditionName: undefined,
+        currentlyEmployed: false,
+        date: new Date('2024-01-01'),
+        dateOfBirth: new Date('1990-05-17'),
+        educationLevel: 2,
+        firstName: 'Ada',
+        hasChronicCondition: false,
+        medications: [{ dosageMg: 81, medicationName: 'Aspirin' }],
+        overallHappiness: 7,
+        preferredActivities: new Set(['cooking', 'reading']),
+        preferredLanguage: 'fr',
+        subjectID: 'subject1',
+        weeklyMoodRatings: { friday: 2, monday: 3, wednesday: 4 }
+      }
+    ]);
   });
 });
 

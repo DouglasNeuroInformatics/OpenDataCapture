@@ -98,7 +98,8 @@ const ZOD_TYPE_NAMES = [
   'ZodEffects',
   'ZodLiteral',
   'ZodNativeEnum',
-  'ZodUnion'
+  'ZodUnion',
+  'ZodRecord'
 ] as const;
 
 type UploadErrorDescription = { [L in Language]?: string };
@@ -237,29 +238,78 @@ function extractRecordArrayEntry(entry: string): { [key: string]: string }[] {
     recordArrayDataList.pop();
   }
 
-  return recordArrayDataList.map((listData) => {
-    const recordsList = listData.split(',');
-    if (recordsList.some((str) => str === '')) {
+  return recordArrayDataList.map(parseRecordFields);
+}
+
+function parseRecordFields(fieldList: string): { [key: string]: string } {
+  const recordsList = fieldList.split(',');
+  if (recordsList.some((str) => str === '')) {
+    throw new UploadError({
+      en: `One or more of the record fields was left empty`,
+      fr: `Un ou plusieurs champs de l'enregistrement ont été laissés vides`
+    });
+  }
+  const records: { [key: string]: string } = {};
+  recordsList.forEach((rawRecord, i) => {
+    const separatorIndex = rawRecord.indexOf(':');
+    const recordKey = rawRecord.slice(0, separatorIndex).trim();
+    const recordValue = rawRecord.slice(separatorIndex + 1).trim();
+    if (separatorIndex === -1 || !recordKey) {
       throw new UploadError({
-        en: `One or more of the record array fields was left empty`,
-        fr: `Un ou plusieurs champs du tableau d'enregistrements ont été laissés vides`
+        en: `Malformed record at index ${i}`,
+        fr: `Enregistrement mal formé à l'index ${i}`
       });
     }
-    const records: { [key: string]: string } = {};
-    recordsList.forEach((rawRecord, i) => {
-      const separatorIndex = rawRecord.indexOf(':');
-      const recordKey = rawRecord.slice(0, separatorIndex).trim();
-      const recordValue = rawRecord.slice(separatorIndex + 1).trim();
-      if (separatorIndex === -1 || !recordKey) {
-        throw new UploadError({
-          en: `Malformed record at index ${i}`,
-          fr: `Enregistrement mal formé à l'index ${i}`
-        });
-      }
-      //recordValue can be empty if the value is optional
-      records[recordKey] = recordValue;
+    //recordValue can be empty if the value is optional
+    records[recordKey] = recordValue;
+  });
+  return records;
+}
+
+function parseRecordEntry(
+  entry: string,
+  keys: null | readonly string[],
+  parseValue: (value: string) => unknown
+): { [key: string]: unknown } {
+  const opening = 'RECORD(';
+  const closing = ')';
+  if (!entry.startsWith(opening) || !entry.endsWith(closing)) {
+    throw new UploadError({
+      en: `Syntax error in RECORD declaration: ${entry}`,
+      es: `Error de sintaxis en la declaración RECORD: ${entry}`,
+      fr: `Erreur de syntaxe dans la déclaration RECORD : ${entry}`
     });
-    return records;
+  }
+  return mapValues(parseRecordFields(entry.slice(opening.length, -closing.length)), (value, key) => {
+    if (keys && !keys.includes(key)) {
+      throw new UploadError({
+        en: `Unknown key '${key}' in RECORD: expected one of ${keys.join('/')}`,
+        es: `Clave desconocida '${key}' en RECORD: se esperaba una de ${keys.join('/')}`,
+        fr: `Clé inconnue '${key}' dans RECORD : une des clés ${keys.join('/')} était attendue`
+      });
+    }
+    return parseValue(value);
+  });
+}
+
+function formatRecordSample(keys: null | readonly string[], valueSample: string) {
+  const fields = keys ? keys.map((key) => `${key}: ${valueSample}`).join(', ') : `key: ${valueSample}, ...`;
+  return `RECORD(${fields})`;
+}
+
+function unsupportedRecordKeyError() {
+  return new UploadError({
+    en: 'Unsupported Zod record: keys must be an enum or strings',
+    es: 'Registro de Zod no compatible: las claves deben ser un enum o cadenas',
+    fr: 'Enregistrement Zod non pris en charge : les clés doivent être un enum ou des chaînes'
+  });
+}
+
+function unsupportedRecordValueError(typeName: string) {
+  return new UploadError({
+    en: `Unsupported Zod record: values must be numbers or fixed choices, not '${typeName}'`,
+    es: `Registro de Zod no compatible: los valores deben ser números u opciones fijas, no '${typeName}'`,
+    fr: `Enregistrement Zod non pris en charge : les valeurs doivent être des nombres ou des choix fixes, pas '${typeName}'`
   });
 }
 
@@ -293,8 +343,22 @@ export namespace Zod3 {
         isOptional: boolean;
         multiKeys?: string[];
         multiValues?: ZodTypeNameResult[];
-        typeName: Exclude<RequiredZodTypeName, OptionZodTypeName>;
+        typeName: Exclude<RequiredZodTypeName, 'ZodRecord' | OptionZodTypeName>;
+      }
+    | {
+        isOptional: boolean;
+        recordKeys: null | readonly string[];
+        recordValue: ZodTypeNameResult;
+        typeName: 'ZodRecord';
       };
+
+  const RECORD_VALUE_TYPE_NAMES: readonly RequiredZodTypeName[] = [
+    'ZodEnum',
+    'ZodLiteral',
+    'ZodNativeEnum',
+    'ZodNumber',
+    'ZodUnion'
+  ];
 
   function isZodEffects(value: unknown): value is z3.ZodEffects<z3.ZodType> {
     return isObjectLike(value) && value.constructor.name === 'ZodEffects';
@@ -336,6 +400,14 @@ export namespace Zod3 {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodUnion;
   }
 
+  function isZodRecordDef(def: AnyZodTypeDef): def is z3.ZodRecordDef<z3.ZodTypeAny> {
+    return def.typeName === z3.ZodFirstPartyTypeKind.ZodRecord;
+  }
+
+  function isZodStringDef(def: AnyZodTypeDef): def is z3.ZodStringDef {
+    return def.typeName === z3.ZodFirstPartyTypeKind.ZodString;
+  }
+
   function isZodSetDef(def: AnyZodTypeDef): def is z3.ZodSetDef {
     return def.typeName === z3.ZodFirstPartyTypeKind.ZodSet;
   }
@@ -358,6 +430,24 @@ export namespace Zod3 {
       throw nonLiteralUnionError();
     }
     return toLiteralOption(def.value);
+  }
+
+  function recordKeysOf(keyType: z3.ZodTypeAny): null | readonly string[] {
+    const def: unknown = keyType._def;
+    if (isZodTypeDef(def) && isZodEnumDef(def)) {
+      return def.values;
+    } else if (isZodTypeDef(def) && isZodStringDef(def)) {
+      return null;
+    }
+    throw unsupportedRecordKeyError();
+  }
+
+  function recordValueOf(valueType: z3.ZodTypeAny): ZodTypeNameResult {
+    const result = getZodTypeName(valueType);
+    if (!RECORD_VALUE_TYPE_NAMES.includes(result.typeName)) {
+      throw unsupportedRecordValueError(result.typeName);
+    }
+    return result;
   }
 
   function interpretZodArray(def: ZodObjectArrayDef, isOptional?: boolean): ZodTypeNameResult {
@@ -414,6 +504,13 @@ export namespace Zod3 {
         isOptional: Boolean(isOptional),
         typeName: def.typeName
       };
+    } else if (isZodRecordDef(def)) {
+      return {
+        isOptional: Boolean(isOptional),
+        recordKeys: recordKeysOf(def.keyType),
+        recordValue: recordValueOf(def.valueType),
+        typeName: def.typeName
+      };
     } else if (isZodObjectArrayDef(def)) {
       return interpretZodArray(def, isOptional);
     } else if (isZodSetDef(def)) {
@@ -434,7 +531,7 @@ export namespace Zod3 {
     }
     return {
       isOptional: Boolean(isOptional),
-      typeName: def.typeName satisfies ZodTypeName as Exclude<RequiredZodTypeName, OptionZodTypeName>
+      typeName: def.typeName satisfies ZodTypeName as Exclude<RequiredZodTypeName, 'ZodRecord' | OptionZodTypeName>
     };
   }
 
@@ -452,6 +549,11 @@ export namespace Zod3 {
         return formatOptionalEntry(formatOptions(result.enumValues), isOptional);
       case 'ZodNumber':
         return formatOptionalEntry('number', isOptional);
+      case 'ZodRecord':
+        return formatOptionalEntry(
+          formatRecordSample(result.recordKeys, generateSampleData(result.recordValue)),
+          isOptional
+        );
       case 'ZodSet':
         try {
           if (result.enumValues) {
@@ -542,6 +644,10 @@ export namespace Zod3 {
         return parseOptionEntry(entry, convertResult.enumValues);
       case 'ZodNumber':
         return parseNumberEntry(entry);
+      case 'ZodRecord':
+        return parseRecordEntry(entry, convertResult.recordKeys, (value) => {
+          return interpretZodConvertResult(convertResult.recordValue, value);
+        });
       case 'ZodSet':
         return parseSetEntry(entry);
       case 'ZodString':
@@ -737,12 +843,23 @@ export namespace Zod3 {
 export namespace Zod4 {
   type TypeName = Extract<
     z4.core.$ZodTypeDef['type'],
-    'array' | 'boolean' | 'date' | 'enum' | 'literal' | 'number' | 'object' | 'optional' | 'set' | 'string' | 'union'
+    | 'array'
+    | 'boolean'
+    | 'date'
+    | 'enum'
+    | 'literal'
+    | 'number'
+    | 'object'
+    | 'optional'
+    | 'record'
+    | 'set'
+    | 'string'
+    | 'union'
   >;
 
   type BaseZodConvertResult = {
     isOptional: boolean;
-    typeName: Exclude<TypeName, 'array' | 'enum' | 'literal' | 'object' | 'set' | 'union'>;
+    typeName: Exclude<TypeName, 'array' | 'enum' | 'literal' | 'object' | 'record' | 'set' | 'union'>;
   };
 
   type ArrayZodConvertResult = Merge<
@@ -771,6 +888,15 @@ export namespace Zod4 {
     }
   >;
 
+  type RecordZodConvertResult = Merge<
+    BaseZodConvertResult,
+    {
+      keys: null | readonly string[];
+      typeName: 'record';
+      valueType: ZodConvertResult;
+    }
+  >;
+
   type SetZodConvertResult = Merge<
     BaseZodConvertResult,
     {
@@ -780,7 +906,31 @@ export namespace Zod4 {
   >;
 
   type ZodConvertResult =
-    ArrayZodConvertResult | BaseZodConvertResult | EnumZodConvertResult | ObjectZodConvertResult | SetZodConvertResult;
+    | ArrayZodConvertResult
+    | BaseZodConvertResult
+    | EnumZodConvertResult
+    | ObjectZodConvertResult
+    | RecordZodConvertResult
+    | SetZodConvertResult;
+
+  const RECORD_VALUE_TYPE_NAMES: readonly TypeName[] = ['enum', 'literal', 'number', 'union'];
+
+  function recordKeysOf(keyType: unknown): null | readonly string[] {
+    if (keyType instanceof z4.ZodEnum) {
+      return enumLikeValues(keyType.def.entries).map(String);
+    } else if (keyType instanceof z4.ZodString) {
+      return null;
+    }
+    throw unsupportedRecordKeyError();
+  }
+
+  function recordValueOf(valueType: unknown): ZodConvertResult {
+    const result = parseZodSchema(valueType);
+    if (!RECORD_VALUE_TYPE_NAMES.includes(result.typeName)) {
+      throw unsupportedRecordValueError(result.typeName);
+    }
+    return result;
+  }
 
   function literalValuesOfUnionOption(option: unknown): LiteralOption[] {
     if (!(option instanceof z4.ZodLiteral)) {
@@ -841,6 +991,13 @@ export namespace Zod4 {
           isOptional,
           typeName: schema.def.type
         };
+      case schema instanceof z4.ZodRecord:
+        return {
+          isOptional,
+          keys: recordKeysOf(schema.def.keyType),
+          typeName: schema.def.type,
+          valueType: recordValueOf(schema.def.valueType)
+        };
       case schema instanceof z4.ZodSet:
         return {
           innerType: parseZodSchema(schema.def.valueType),
@@ -889,6 +1046,10 @@ export namespace Zod4 {
         return parseOptionEntry(entry, convertResult.enumValues);
       case 'number':
         return parseNumberEntry(entry);
+      case 'record':
+        return parseRecordEntry(entry, convertResult.keys, (value) => {
+          return interpretZodConvertResult(convertResult.valueType, value);
+        });
       case 'set':
         return parseSetEntry(entry);
       case 'string':
@@ -924,6 +1085,11 @@ export namespace Zod4 {
         });
         return output;
       }
+      case 'record':
+        return formatOptionalEntry(
+          formatRecordSample(convertResult.keys, generateSampleData(convertResult.valueType)),
+          convertResult.isOptional
+        );
       case 'set': {
         const innerTypeSample = generateSampleData(convertResult.innerType);
         return formatOptionalEntry(`SET(${innerTypeSample})`, convertResult.isOptional);
