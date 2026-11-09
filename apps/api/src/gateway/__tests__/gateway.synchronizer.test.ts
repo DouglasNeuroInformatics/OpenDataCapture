@@ -294,6 +294,14 @@ describe('GatewaySynchronizer', () => {
       ]);
     });
 
+    it('should link every record of the series to the assignment it was submitted for', async () => {
+      await submit('$first$second', '$key1$key2');
+      expect(instrumentRecordsService.create.mock.calls.map(([record]) => record.assignmentId)).toEqual([
+        'assignment-1',
+        'assignment-1'
+      ]);
+    });
+
     it('should accept a series that ended early, with fewer items than the series has', async () => {
       await submit('$first', '$key1');
       expect(instrumentRecordsService.create).toHaveBeenCalledOnce();

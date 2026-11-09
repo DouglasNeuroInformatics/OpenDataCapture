@@ -183,9 +183,9 @@ test.describe('instrument completion', () => {
     await expect(page.getByTestId('data-table-body').getByTestId('data-table-row').first()).toBeVisible();
   });
 
-  // Records collected in person carry no assignmentId, and MongoDB indexes a missing field as null.
-  // The unique index the schema declares on that field therefore has to be sparse, or the second
-  // record here is rejected with a duplicate key error. See ensureDatabaseIndexes in the api's src/core/prisma.ts.
+  // Records collected in person carry no assignmentId, and MongoDB indexes a missing field as null,
+  // so a unique index on that field would reject the second record here as a duplicate key. See
+  // DATABASE_INDEXES in the api's src/core/prisma.ts.
   test('should administer the same instrument twice for one subject, neither record having an assignment', async ({
     getPageModel,
     page,

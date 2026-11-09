@@ -5,7 +5,13 @@ import { ConfigService } from '@douglasneuroinformatics/libnest';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { buildIndexName, DATABASE_INDEXES, ensureDatabaseIndexes, PrismaModuleOptionsFactory } from '../prisma';
+import {
+  buildIndexName,
+  DATABASE_INDEXES,
+  ensureDatabaseIndexes,
+  PrismaModuleOptionsFactory,
+  RETIRED_DATABASE_INDEXES
+} from '../prisma';
 
 /** Stands in for the extended client, recording the options each `new PrismaClient` received. */
 const prismaClient = vi.hoisted(() => {
@@ -114,15 +120,12 @@ describe('ensureDatabaseIndexes', () => {
     expect(collections).toHaveLength(new Set(collections).size);
   });
 
-  // MongoDB indexes a missing field as null, so a non-sparse unique index on the optional
-  // assignmentId rejects the second record collected outside a remote assignment.
-  it('should build the assignmentId unique index sparse, so records without an assignment do not collide', async () => {
+  it('should build the assignmentId index non-unique, so one assignment can hold every record of a series', async () => {
     const { client, commands } = mockClient();
     await ensureDatabaseIndexes(client);
-    expect(findIndex(commands, 'InstrumentRecordModel', 'InstrumentRecordModel_assignmentId_key')).toMatchObject({
-      sparse: true,
-      unique: true
-    });
+    expect(findIndex(commands, 'InstrumentRecordModel', 'InstrumentRecordModel_assignmentId_idx')).not.toHaveProperty(
+      'unique'
+    );
   });
 
   it('should order the fields of a compound index as declared, since a reordering serves other queries', async () => {
@@ -140,21 +143,28 @@ describe('ensureDatabaseIndexes', () => {
     expect(commands.filter((command) => command.dropIndexes === 'SessionModel')).toHaveLength(0);
   });
 
-  // This is the repair path for a database that prisma db push has already been run against.
-  it('should replace a non-sparse assignmentId index, which db push leaves behind and inserts fail on', async () => {
+  // The upgrade path: CI and the e2e suite start from an empty database and never hold this index.
+  it('should drop the unique assignmentId index an earlier release built before building its replacement', async () => {
     const { client, commands } = mockClient({
       InstrumentRecordModel: [
-        { key: orderedKey('assignmentId'), name: 'InstrumentRecordModel_assignmentId_key', unique: true }
+        { key: orderedKey('assignmentId'), name: 'InstrumentRecordModel_assignmentId_key', sparse: true, unique: true }
       ]
     });
     await ensureDatabaseIndexes(client);
-    expect(commands).toContainEqual({
-      dropIndexes: 'InstrumentRecordModel',
-      index: 'InstrumentRecordModel_assignmentId_key'
+    const dropped = commands.findIndex((command) => {
+      return (
+        command.dropIndexes === 'InstrumentRecordModel' && command.index === 'InstrumentRecordModel_assignmentId_key'
+      );
     });
-    expect(findIndex(commands, 'InstrumentRecordModel', 'InstrumentRecordModel_assignmentId_key')).toMatchObject({
-      sparse: true
-    });
+    const created = commands.findIndex((command) => command.createIndexes === 'InstrumentRecordModel');
+    expect(dropped).not.toBe(-1);
+    expect(dropped).toBeLessThan(created);
+  });
+
+  it('should drop nothing from a database that never held a retired index', async () => {
+    const { client, commands } = mockClient({ InstrumentRecordModel: [] });
+    await ensureDatabaseIndexes(client);
+    expect(commands.filter((command) => 'dropIndexes' in command)).toHaveLength(0);
   });
 
   it('should replace an index whose fields are in a different order', async () => {
@@ -288,6 +298,25 @@ describe('PrismaModuleOptionsFactory', () => {
     const factory = await createFactory(externalEnv);
     await factory.create();
     await expect(factory.onApplicationShutdown()).resolves.toBeUndefined();
+  });
+});
+
+describe('RETIRED_DATABASE_INDEXES', () => {
+  // Retiring an index ensureDatabaseIndexes still creates would rebuild it on every boot.
+  it('should name no index the application still creates', () => {
+    const created = DATABASE_INDEXES.map(buildIndexName);
+    for (const { name } of RETIRED_DATABASE_INDEXES) {
+      expect(created).not.toContain(name);
+    }
+  });
+
+  // ensureDatabaseIndexes lists only the collections it builds indexes on, so a retired index on any
+  // other collection would never be found.
+  it('should retire indexes only on collections the application builds indexes on', () => {
+    const collections = DATABASE_INDEXES.map(({ collection }) => collection);
+    for (const { collection } of RETIRED_DATABASE_INDEXES) {
+      expect(collections).toContain(collection);
+    }
   });
 });
 

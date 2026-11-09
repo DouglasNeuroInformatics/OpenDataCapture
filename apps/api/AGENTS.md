@@ -190,12 +190,10 @@ enforces none of the schema's unique constraints. Adding an index means editing 
 `src/core/__tests__/prisma.test.ts` asserts agree — `db push` drops any index the schema
 does not declare, and a runtime-only index would not survive one.
 
-**Do not point `prisma db push` at a database this application uses.** `InstrumentRecord.assignmentId`
-is optional but must carry `@unique`, because Prisma requires it on the defining side of the 1:1
-relation to `Assignment`. `db push` builds that index non-sparse, MongoDB indexes a missing field as
-null, and the second record collected outside a remote assignment is then rejected with a duplicate
-key error. `ensureDatabaseIndexes` creates it sparse and replaces a non-sparse one it finds, so an
-instance recovers on its next boot — but the push is still what broke it.
+**Removing an index, or changing its fields or uniqueness, means listing its old name in
+`RETIRED_DATABASE_INDEXES`** in the same file. Either changes the name `buildIndexName` gives it,
+and `ensureDatabaseIndexes` drops only the names it is given, so the old index lives on in every
+deployed database while CI and the e2e suite, which start from an empty one, pass regardless.
 
 `datasource db { url = env("_") }` in `apps/api/prisma/schema.prisma` is **deliberate**; the real
 connection string is built at runtime in `src/core/prisma.ts`. Do not "fix" it.

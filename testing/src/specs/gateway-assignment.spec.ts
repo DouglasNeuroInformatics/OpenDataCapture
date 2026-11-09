@@ -1,9 +1,11 @@
 import type { Assignment } from '@opendatacapture/schemas/assignment';
+import type { InstrumentRecord } from '@opendatacapture/schemas/instrument-records';
 import type { Session } from '@opendatacapture/schemas/session';
 import type { Page } from '@playwright/test';
 
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
 import { ApiClient } from '../support/api-client';
+import { HAPPINESS_RECORD } from '../support/constants';
 import { gatewayRefreshInterval, gatewayURL } from '../support/env';
 import { expect, test } from '../support/fixtures';
 
@@ -11,13 +13,21 @@ import type { GetPageModel } from '../support/fixtures';
 
 const INSTRUMENT_TITLE = 'Happiness Questionnaire';
 
+/** Administers the Happiness Questionnaire twice, so one assignment produces two records. */
+const SERIES_INSTRUMENT_TITLE = 'Happiness Questionnaire (Repeated)';
+
 /**
- * Starts a session and creates a remote assignment for the Happiness Questionnaire, returning the
- * gateway link. Shared by every test in this file that needs a real link to drive the gateway
- * origin against, so the expensive part (the Cap proof-of-work) is only ever solved where a test
- * actually needs a verified assignment.
+ * Starts a session and creates a remote assignment for the instrument titled `title` (by default
+ * the Happiness Questionnaire), returning the gateway link. Shared by every test in this file that
+ * needs a real link to drive the gateway origin against, so the expensive part (the Cap
+ * proof-of-work) is only ever solved where a test actually needs a verified assignment.
  */
-async function createRemoteAssignmentLink(getPageModel: GetPageModel, page: Page, uniqueId: string): Promise<string> {
+async function createRemoteAssignmentLink(
+  getPageModel: GetPageModel,
+  page: Page,
+  uniqueId: string,
+  title = INSTRUMENT_TITLE
+): Promise<string> {
   const startSessionPage = await getPageModel('/session/start-session');
   await startSessionPage.sessionForm.waitFor({ state: 'visible' });
   await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
@@ -28,7 +38,7 @@ async function createRemoteAssignmentLink(getPageModel: GetPageModel, page: Page
   await page.getByTestId('nav-button-/session/remote-assignment').click();
   await page.waitForURL('**/session/remote-assignment');
 
-  const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
+  const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: title }).first();
   await expect(card).toBeVisible();
   await card.click();
 
@@ -232,6 +242,81 @@ test.describe('gateway malformed submission', () => {
       data: { status: 'CANCELED' },
       headers: adminHeaders
     });
+  });
+});
+
+test.describe('gateway assignment records', () => {
+  test.describe.configure({ timeout: 180_000 });
+
+  test('should link every record of a remote series to its assignment', async ({
+    adminToken,
+    api,
+    apiRequestContext,
+    context,
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const assignmentUrl = await createRemoteAssignmentLink(getPageModel, page, uniqueId, SERIES_INSTRUMENT_TITLE);
+    const assignmentId = assignmentUrl.split('/').pop()!;
+
+    const gatewayPage = await context.newPage();
+    await gatewayPage.goto(assignmentUrl);
+    await gatewayPage.locator('cap-widget').click();
+
+    const gatewayInstrument = new RenderInstrumentPage(gatewayPage);
+    await expect(gatewayInstrument.beginButton).toBeEnabled({ timeout: 120_000 });
+    await gatewayInstrument.begin();
+    await gatewayInstrument.completeHappinessQuestionnaire();
+    await gatewayInstrument.submit();
+    // Waits out the first item, whose answers would otherwise take the second item's keystrokes.
+    await expect(gatewayInstrument.happinessSatisfiedRadio).not.toBeChecked();
+    await gatewayInstrument.completeHappinessQuestionnaire();
+    await gatewayInstrument.submit();
+    await expect(gatewayInstrument.seriesCompletionHeading).toBeVisible();
+    await gatewayPage.close();
+
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    const headers = { Authorization: `Bearer ${adminToken}` };
+    await expect(async () => {
+      const response = await apiRequestContext.get('/api/v1/instrument-records', { headers, params: { instrumentId } });
+      const records = (await response.json()) as InstrumentRecord[];
+      expect(records.filter((record) => record.assignmentId === assignmentId)).toHaveLength(2);
+    }).toPass({ timeout: 6 * gatewayRefreshInterval });
+  });
+
+  // Only the gateway synchronizer may link a record to an assignment, so the create route drops the
+  // key, but a client that still sends one must not be refused for it.
+  test('should accept a record that names an assignment, without linking the two', async ({
+    adminToken,
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup();
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    const session = await api.createSession(group.id, { id: `assigned-${uniqueId}` });
+    const assignment = await api.createAssignment({
+      expiresAt: new Date(Date.now() + 86_400_000),
+      groupId: group.id,
+      instrumentId,
+      subjectId: session.subjectId
+    });
+
+    const response = await apiRequestContext.post('/api/v1/instrument-records', {
+      data: {
+        assignmentId: assignment.id,
+        data: HAPPINESS_RECORD,
+        date: new Date(),
+        groupId: group.id,
+        instrumentId,
+        sessionId: session.id,
+        subjectId: session.subjectId
+      },
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    expect(response.status(), await response.text()).toBe(201);
+    expect(await response.json()).toMatchObject({ assignmentId: null });
   });
 });
 

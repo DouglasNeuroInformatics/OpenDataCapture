@@ -23,6 +23,20 @@ describe('$CreateInstrumentRecordData', () => {
       }).success
     ).toBe(true);
   });
+  // Only the gateway synchronizer may link a record to an assignment. A client that still sends the
+  // key is accepted as before, and the key never reaches the service.
+  it('should strip an assignmentId, so no client can attach a record to an assignment', () => {
+    const result = $CreateInstrumentRecordData.safeParse({
+      assignmentId: 'assignment-1',
+      data: { value: 1 },
+      date: '2024-01-01T00:00:00.000Z',
+      instrumentId: 'instrument-1',
+      sessionId: 'session-1',
+      subjectId: 'subject-1'
+    });
+    expect(result.success).toBe(true);
+    expect(result.data).not.toHaveProperty('assignmentId');
+  });
   it('should reject a value missing instrumentId', () => {
     expect(
       $CreateInstrumentRecordData.safeParse({

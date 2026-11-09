@@ -19,10 +19,15 @@ type DatabaseIndex = {
   [TModel in PrismaModelName]: {
     collection: `${TModel}Model`;
     fields: [ModelField<TModel>, ...ModelField<TModel>[]];
-    sparse?: boolean;
     unique?: boolean;
   };
 }[PrismaModelName];
+
+/** An index an earlier release created, which an upgraded instance still holds until it is dropped. */
+type RetiredDatabaseIndex = {
+  collection: `${PrismaModelName}Model`;
+  name: string;
+};
 
 /** Only `$runCommandRaw` is needed to reconcile indexes, and asking for less keeps this off the
  * inferred return type of `PrismaModuleOptionsFactory.create`, which `RuntimePrismaClient` derives from. */
@@ -34,7 +39,6 @@ const $IndexSpecification = z.object({
   // A direction is 1 or -1, but a special index (text, hashed, 2dsphere) names its kind as a string.
   key: z.record(z.string(), z.union([z.number(), z.string()])),
   name: z.string(),
-  sparse: z.boolean().optional(),
   unique: z.boolean().optional()
 });
 
@@ -60,11 +64,7 @@ const DATABASE_INDEXES: DatabaseIndex[] = [
   { collection: 'AuditLogModel', fields: ['userId', 'timestamp'] },
   { collection: 'GroupModel', fields: ['name'], unique: true },
   { collection: 'InstrumentRecordFileModel', fields: ['recordId'] },
-  // Sparse, unlike every other unique index here. The field is optional, MongoDB indexes a missing
-  // field as null, and only records completed through a remote assignment carry one — so a
-  // non-sparse index rejects the second record collected in person. `prisma db push` builds it
-  // non-sparse, which is why ensureDatabaseIndexes replaces one that it finds.
-  { collection: 'InstrumentRecordModel', fields: ['assignmentId'], sparse: true, unique: true },
+  { collection: 'InstrumentRecordModel', fields: ['assignmentId'] },
   { collection: 'InstrumentRecordModel', fields: ['subjectId', 'instrumentId', 'date'] },
   { collection: 'InstrumentRecordModel', fields: ['groupId', 'date'] },
   { collection: 'InstrumentRecordModel', fields: ['instrumentId'] },
@@ -79,6 +79,16 @@ const DATABASE_INDEXES: DatabaseIndex[] = [
   { collection: 'UserModel', fields: ['username'], unique: true }
 ];
 
+/**
+ * `ensureDatabaseIndexes` creates only what `DATABASE_INDEXES` names, so an index removed from that
+ * list lives on in every database built before the removal.
+ */
+const RETIRED_DATABASE_INDEXES: RetiredDatabaseIndex[] = [
+  // Sparse and unique, from when an assignment could hold one record. A series assignment holds one
+  // per item, and this index rejects the second.
+  { collection: 'InstrumentRecordModel', name: 'InstrumentRecordModel_assignmentId_key' }
+];
+
 /** Reproduces Prisma's own naming, so a later `db push` reads the index as already satisfied. */
 function buildIndexName({ collection, fields, unique }: DatabaseIndex): string {
   return `${collection}_${fields.join('_')}_${unique ? 'key' : 'idx'}`;
@@ -88,7 +98,6 @@ function buildIndexSpecification(index: DatabaseIndex): Prisma.InputJsonObject {
   return {
     key: Object.fromEntries(index.fields.map((field) => [field, 1])),
     name: buildIndexName(index),
-    ...(index.sparse ? { sparse: true } : {}),
     ...(index.unique ? { unique: true } : {})
   };
 }
@@ -99,11 +108,7 @@ function isStale(existing: z.infer<typeof $IndexSpecification>, required: Databa
   const existingKey = Object.entries(existing.key)
     .map(([field, direction]) => `${field}:${direction}`)
     .join(',');
-  return (
-    existingKey !== requiredKey ||
-    Boolean(existing.sparse) !== Boolean(required.sparse) ||
-    Boolean(existing.unique) !== Boolean(required.unique)
-  );
+  return existingKey !== requiredKey || Boolean(existing.unique) !== Boolean(required.unique);
 }
 
 async function listIndexes(
@@ -127,8 +132,8 @@ async function listIndexes(
 }
 
 /**
- * Creates every index the services' queries depend on, and replaces any that MongoDB already holds
- * under the same name with a different specification.
+ * Creates every index the services' queries depend on, replaces any that MongoDB already holds
+ * under the same name with a different specification, and drops every retired index it finds.
  *
  * MongoDB creates a collection on first insert with only its `_id_` index, and this application
  * never runs `prisma db push` against a deployed database, so without this an upgraded instance
@@ -139,6 +144,11 @@ async function ensureDatabaseIndexes(client: RawCommandRunner): Promise<void> {
   for (const collection of collections) {
     const required = DATABASE_INDEXES.filter((index) => index.collection === collection);
     const existing = await listIndexes(client, collection);
+    for (const { name } of RETIRED_DATABASE_INDEXES.filter((index) => index.collection === collection)) {
+      if (existing.has(name)) {
+        await client.$runCommandRaw({ dropIndexes: collection, index: name });
+      }
+    }
     for (const index of required) {
       const name = buildIndexName(index);
       const found = existing.get(name);
@@ -223,7 +233,7 @@ export class PrismaModuleOptionsFactory implements OnApplicationShutdown {
   }
 }
 
-export { buildIndexName, DATABASE_INDEXES, ensureDatabaseIndexes };
+export { buildIndexName, DATABASE_INDEXES, ensureDatabaseIndexes, RETIRED_DATABASE_INDEXES };
 
 export type RuntimePrismaClient = Awaited<
   ReturnType<(typeof PrismaModuleOptionsFactory)['prototype']['create']>

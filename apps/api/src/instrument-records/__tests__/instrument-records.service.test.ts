@@ -367,6 +367,20 @@ describe('InstrumentRecordsService', () => {
       ).rejects.toBeInstanceOf(UnprocessableEntityException);
       expect(instrumentRecordModel.create).not.toHaveBeenCalled();
     });
+
+    it('should link the record to the assignment it was collected for', async () => {
+      instrumentsService.findById.mockResolvedValue(mockFormInstrument as any);
+      await instrumentRecordsService.create({ ...baseCreateData, assignmentId: 'assignment-1' });
+      expect(instrumentRecordModel.create.mock.lastCall?.[0]).toMatchObject({
+        data: { assignment: { connect: { id: 'assignment-1' } } }
+      });
+    });
+
+    it('should link no assignment to a record collected outside one', async () => {
+      instrumentsService.findById.mockResolvedValue(mockFormInstrument as any);
+      await instrumentRecordsService.create(baseCreateData);
+      expect(instrumentRecordModel.create.mock.lastCall?.[0].data.assignment).toBeUndefined();
+    });
   });
 
   describe('upload', () => {
