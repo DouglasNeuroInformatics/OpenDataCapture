@@ -217,6 +217,11 @@ export class InstrumentsService {
     });
     const generatedBundle = await bundle({ inputs: [{ content: source, name: 'index.ts' }], minify: true });
     const created = await this.create({ bundle: generatedBundle }, { seriesGroupId: groupId });
+    await this.auditLogger.log('CREATE', 'INSTRUMENT', {
+      groupId,
+      metadata: { instrumentId: created.id, title: this.describeTitle(title) },
+      userId: currentUser.id
+    });
     return { instrumentId: created.id, outcome: 'created' };
   }
 
@@ -285,6 +290,11 @@ export class InstrumentsService {
     // evaluated to check the kind. Leaving it behind would keep a deleted instrument resident for the
     // lifetime of the process, and would shadow the bundle of any future instrument issued the same id.
     this.virtualizationService.context.instruments.delete(id);
+    await this.auditLogger.log('DELETE', 'INSTRUMENT', {
+      groupId: instrument.seriesGroupId,
+      metadata: { instrumentId: id, title: this.describeTitle(instance.details.title) },
+      userId: currentUser.id
+    });
     return { id };
   }
 

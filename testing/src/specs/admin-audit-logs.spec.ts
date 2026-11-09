@@ -195,4 +195,28 @@ test.describe('admin audit log coverage', () => {
       expect(entryNaming(entries, 'assignmentId', assignment.id)?.group?.name).toBe(group.name);
     });
   });
+
+  test.describe('series', () => {
+    test('should record who created a series, in the group that owns it', async ({ api, uniqueId }) => {
+      const group = await api.createGroup();
+      const seriesId = await api.createSeries(group.id, `Audited Series ${uniqueId}`);
+
+      const entry = entryNaming(
+        await api.findAuditLogs({ action: 'CREATE', entity: 'INSTRUMENT' }),
+        'instrumentId',
+        seriesId
+      );
+      expect(entry?.group?.name).toBe(group.name);
+      expect(entry?.metadata?.title).toBe(`Audited Series ${uniqueId}`);
+    });
+
+    test('should record who deleted a series', async ({ api, uniqueId }) => {
+      const group = await api.createGroup();
+      const seriesId = await api.createSeries(group.id, `Deleted Series ${uniqueId}`);
+      await api.deleteSeries(seriesId);
+
+      const entries = await api.findAuditLogs({ action: 'DELETE', entity: 'INSTRUMENT' });
+      expect(entryNaming(entries, 'instrumentId', seriesId)?.metadata?.title).toBe(`Deleted Series ${uniqueId}`);
+    });
+  });
 });

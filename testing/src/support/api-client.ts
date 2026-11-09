@@ -226,6 +226,14 @@ export class ApiClient {
     );
   }
 
+  /** Deletes a series through the route the web app's instrument management uses. */
+  async deleteSeries(id: string): Promise<void> {
+    await this.expectOk(
+      this.request.delete(`${API}/instruments/${id}`, { headers: this.authHeaders }),
+      `delete series '${id}'`
+    );
+  }
+
   /**
    * The languages the instance currently offers. Read rather than assumed because
    * `admin-settings.spec.ts` turns one on and off, in a worker of its own.
