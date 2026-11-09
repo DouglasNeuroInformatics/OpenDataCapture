@@ -63,7 +63,7 @@ declarations are rewritten; `export ... from 'pkg'` in a `.d.ts` passes through 
 cwd. The default export is validated by `$Config` in `src/schemas.ts`.
 
 **A bundle failure is logged and the process still exits 0.** A broken runtime build will not fail
-CI on its own — check the output, or the tests below.
+CI on its own — a run that never printed `Success!` failed. Check the output, or the tests below.
 
 ## Tests
 

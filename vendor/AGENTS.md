@@ -35,6 +35,9 @@ resolves the _wrapped_ package's peers knowing nothing of the `__` convention â€
 Drop the middle line and the runtime ships two copies of a library that must exist once. Verify with
 `pnpm exec vitest --project runtime-v1` after any `pnpm install` that touches this directory.
 
+**Wrappers pin literal versions, not `catalog:`**, an exception to the root rule, except
+`react`/`react-dom` 19, which use `catalog:react19` because the apps share that exact release.
+
 ## `src/index.d.ts` may only import other wrappers
 
 `dtsPlugin` in `packages/runtime-bundler/src/plugin.ts` rewrites every non-relative import in an

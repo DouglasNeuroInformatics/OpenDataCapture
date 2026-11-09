@@ -16,6 +16,18 @@ function requiredNumber(name: string): number {
   return value;
 }
 
+function optionalPositiveInteger(name: string): number | undefined {
+  const raw = process.env[name];
+  if (!raw) {
+    return undefined;
+  }
+  const value = parseNumber(raw);
+  if (!Number.isInteger(value) || value < 1) {
+    throw new Error(`Expected ${name} to be a positive integer, got ${raw}`);
+  }
+  return value;
+}
+
 // Read straight from the same `.env` apps/web builds `config.meta.contactEmail` from: a developer's
 // value differs from the `.env.template` one CI generates, so a literal here only passes locally.
 export const contactEmail = required('CONTACT_EMAIL');
@@ -24,6 +36,9 @@ export const apiPort = requiredNumber('API_DEV_SERVER_PORT');
 export const gatewayPort = requiredNumber('GATEWAY_DEV_SERVER_PORT');
 export const playgroundPort = requiredNumber('PLAYGROUND_DEV_SERVER_PORT');
 export const webPort = requiredNumber('WEB_DEV_SERVER_PORT');
+
+/** How many tests run at once, where `.env` says; `playwright.config.ts` holds the default. */
+export const workerCount = optionalPositiveInteger('E2E_WORKERS');
 
 /** How often, in milliseconds, the API pulls completed assignments from the gateway. */
 export const gatewayRefreshInterval = requiredNumber('GATEWAY_REFRESH_INTERVAL');

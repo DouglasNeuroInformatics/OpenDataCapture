@@ -1,244 +1,137 @@
 # Authorization in `apps/api`
 
 CASL (`@casl/ability` + `@casl/prisma`) over Prisma models, evaluated in two independent places.
-**Getting one right does not make the other right.** Everything below hangs off that split.
+Getting one right does not make the other right. The rules for writing code against this are in
+`apps/api/AGENTS.md` §Permissions; this file is the mechanism behind them and the inventory of
+exceptions.
 
-| Layer             | Where                                                                                       | What it can see                                                  | What it cannot see                                   |
-| ----------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------- |
-| `JwtAuthGuard`    | `src/auth/guards/jwt-auth.guard.ts`, registered as `APP_GUARD` in `src/auth/auth.module.ts` | The `@RouteAccess` metadata — an **action and a subject _type_** | Any row. It runs before the handler and has no data. |
-| The service query | every `*.service.ts`                                                                        | The actual rows, via `accessibleQuery` in the Prisma `where`     | Nothing enforces it is called                        |
+| Layer             | Where                                                                    | Sees                                                    | Cannot see                    |
+| ----------------- | ------------------------------------------------------------------------ | ------------------------------------------------------- | ----------------------------- |
+| `JwtAuthGuard`    | `src/auth/guards/jwt-auth.guard.ts`, the `APP_GUARD` in `auth.module.ts` | `@RouteAccess` metadata: an action and a subject _type_ | Any row                       |
+| The service query | every `*.service.ts`                                                     | The rows, via `accessibleQuery` in the Prisma `where`   | Nothing enforces it is called |
 
 A `GROUP_MANAGER` who passes `@RouteAccess({ action: 'read', subject: 'Subject' })` has proved only
-that they may read _some_ subject. Whether they may read _this_ subject is decided by the `where`
-clause, and only there.
+that they may read _some_ subject; the `where` decides whether they may read _this_ one.
 
-## Layer 1 — `@RouteAccess`
+## Layer 1: `@RouteAccess`
 
-Every controller handler needs one. The guard throws `InternalServerErrorException` when the
-metadata is absent, so a forgotten decorator is a 500, never an open route. It is also
-eslint-enforced: `REQUIRE_ROUTE_ACCESS` in the root `eslint.config.js` flags any
-`@Get`/`@Post`/`@Patch`/`@Put`/`@Delete` method in `apps/api/src/**/*.controller.ts` without it.
+`REQUIRE_ROUTE_ACCESS` in the root `eslint.config.js` flags a handler without one; the guard turns a
+missing one into a 500. Nothing checks the value. Routes whose declaration is not the ordinary
+`{ action, subject }` on the model they serve:
 
-The values it takes, and what each grants, are tabled in `apps/api/AGENTS.md` §Permissions.
-`ADMIN_ONLY`, exported from `src/core/decorators/route-access.decorator.ts`, is
-`{ action: 'manage', subject: 'all' }`.
+| Route                             | Declaration                                   | Why it is safe                                                                                                                   |
+| --------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /v1/auth/login`             | `'public'`                                    | `@ThrottleLoginRequest()`; credentials checked in `AuthService.login`.                                                           |
+| `GET /v1/setup`                   | `'public'`                                    | Returns only `SetupState`.                                                                                                       |
+| `POST /v1/setup`                  | `'public'`                                    | **`SetupService.initApp` drops the whole database.** It refuses only when `isSetup` is true and `NODE_ENV` is not `development`. |
+| `DELETE /v1/setup`                | `{ action: 'delete', subject: 'all' }`        | Also refuses unless `NODE_ENV === 'test'`.                                                                                       |
+| `GET /v1/gateway/healthcheck`     | `[]`                                          | Any login token. The module loads only when `GATEWAY_ENABLED`.                                                                   |
+| `POST /v1/instruments`            | `{ action: 'manage', subject: 'Instrument' }` | No base level grants it, so admin-only in practice. The one `@AcceptsInstrumentToken()` route (below).                           |
+| `PATCH /v1/users/self-update/:id` | `{ action: 'read', subject: 'User' }`         | Deliberately weak; `UsersService.updateSelfById` refuses unless `id === currentUser.id`.                                         |
+| `GET /v1/summary`                 | five `read` rules                             | The only multi-element array; all five must pass.                                                                                |
 
-Routes are URI-versioned (`version: '1'` in `src/main.ts`), so paths are `/v1/...`.
-
-The full inventory of non-ordinary access declarations, current as of writing:
-
-| Route                                                                                                   | Declaration                                                                                   | Why it is safe                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `POST /v1/auth/login`                                                                                   | `'public'`                                                                                    | `@ThrottleLoginRequest()`; credentials checked in `AuthService.login`.                                                                                                                                                                                                                                                                                                                                         |
-| `GET /v1/setup`                                                                                         | `'public'`                                                                                    | Returns only `SetupState` (branding, flags, release, uptime).                                                                                                                                                                                                                                                                                                                                                  |
-| `POST /v1/setup`                                                                                        | `'public'`                                                                                    | **`SetupService.initApp` drops the whole database.** Its only protection is `if (savedOptions?.isSetup && !isDev) throw new ForbiddenException()` — an initialised production instance refuses, a development instance never does.                                                                                                                                                                             |
-| `DELETE /v1/setup`                                                                                      | `{ action: 'delete', subject: 'all' }`                                                        | Also refuses unless `NODE_ENV === 'test'`.                                                                                                                                                                                                                                                                                                                                                                     |
-| `PATCH /v1/setup`                                                                                       | `ADMIN_ONLY`                                                                                  | Only `ADMIN` gets `manage all`.                                                                                                                                                                                                                                                                                                                                                                                |
-| `GET /v1/audit/logs`                                                                                    | `ADMIN_ONLY`                                                                                  | `AuditService.find` is deliberately unscoped; the guard is the whole check.                                                                                                                                                                                                                                                                                                                                    |
-| `GET /v1/gateway/healthcheck`                                                                           | `[]`                                                                                          | Any login token; an instrument token is refused. Module only loads when `GATEWAY_ENABLED`.                                                                                                                                                                                                                                                                                                                     |
-| `POST /v1/groups`                                                                                       | `ADMIN_ONLY`                                                                                  | `ADMIN` alone. `create Group` admitted every `GROUP_MANAGER`: their `manage Group` rule is conditioned on their own groups, and this check sees only the subject type (#1468).                                                                                                                                                                                                                                 |
-| `POST /v1/instruments`                                                                                  | `{ action: 'manage', subject: 'Instrument' }`                                                 | No base permission level grants `manage Instrument`, so this is `ADMIN`-only in practice. Also `@AcceptsInstrumentToken()`: the only route the playground's minted token reaches.                                                                                                                                                                                                                              |
-| `GET /v1/instruments/series`, `PATCH /v1/instruments/series/:id`                                        | `ADMIN_ONLY`                                                                                  | `ADMIN` alone. `InstrumentsService.findSeriesOverview` lists every group's series, deliberately not narrowed to the caller's groups (an administrator belongs to none), so the guard is what keeps it from a `GROUP_MANAGER`, who holds `read Instrument`. Archiving is likewise administrators' alone; group managers keep deleting their own unused series.                                                  |
-| `PATCH /v1/users/self-update/:id`                                                                       | `{ action: 'read', subject: 'User' }`                                                         | Deliberately weak; `UsersService.updateSelfById` throws `ForbiddenException` unless `id === currentUser.id`. The controller carries a comment saying so.                                                                                                                                                                                                                                                       |
-| `PUT /v1/users/:id/permissions`                                                                         | `ADMIN_ONLY`                                                                                  | `ADMIN` alone. An `update User` grant is one of the things this route hands out, so it must not be enough to reach it, or the holder could grant themselves `manage all`. `$UpdateUserData` no longer carries the field either.                                                                                                                                                                                |
-| `POST /v1/users`, `PATCH /v1/users/:id`, `PATCH /v1/users/:id/archive`, `PATCH /v1/users/:id/unarchive` | `ADMIN_ONLY`                                                                                  | `ADMIN` alone, whatever `User` action a grant names. Level, groups and password are what the rest of a user's access derives from, so a grantee could otherwise promote themselves, join every group, or log in as an admin whose password they set. `UsersService` also refuses an admin archiving, unarchiving, disabling or demoting their own account, so the last one cannot lock every admin-only route. |
-| `GET`, `POST /v1/permission-sets`, `GET`, `PATCH`, `DELETE /v1/permission-sets/:id`                     | `ADMIN_ONLY`                                                                                  | `ADMIN` alone, reads included. A set's rules are applied to every holder at sign-in, so editing one is a grant to each of them, and only an administrator may grant; holders and group managers have no use for reading it. `PermissionSet` is deliberately absent from `$AppSubjectName`, so no grant can name it either (see below).                                                                         |
-| `GET /v1/summary`                                                                                       | five-element array (`read` on `Instrument`, `InstrumentRecord`, `Session`, `Subject`, `User`) | The only use of the multi-element array form; all five must pass.                                                                                                                                                                                                                                                                                                                                              |
-
-Adding a fourth `'public'` route, or a second `[]`, is a security decision — raise it rather than
+Adding a fourth `'public'` route or a second `[]` is a security decision: raise it rather than
 deciding alone.
 
-## Layer 2 — row scoping in the service
+**`ADMIN_ONLY` (`manage all`) is the only way to confine a route to administrators**, because a
+conditional rule satisfies a subject-type check. It is used where any narrower grant would let its
+holder escalate (every route that writes a user or their permissions, every `/v1/permission-sets`
+route, `POST /v1/groups` per #1468), and where the data crosses groups with nothing to scope it by
+(audit logs, the instrument series overview, every repository's sync log, mail settings). Most
+handlers carry their reason in a comment; `grep -rn 'RouteAccess(ADMIN_ONLY)' apps/api/src` lists
+them. `UsersService` refuses an admin archiving, disabling or demoting their own account, so the last
+admin cannot lock every `ADMIN_ONLY` route.
 
-Convention: the service method takes `{ ability }: EntityOperationOptions = {}` (`src/core/types.ts`)
-as its last parameter, the controller forwards `@CurrentUser('ability')`, and the ability goes into
-the Prisma `where` through `accessibleQuery(ability, action, modelName)`. The dominant shape is
-`where: { AND: [accessibleQuery(...)], id }`; `src/groups/groups.service.ts` is the cleanest example.
+**Deliberately unscoped service paths:** `AuditService.find` and
+`InstrumentsService.findSeriesOverview` (an administrator belongs to no group), each behind an
+`ADMIN_ONLY` guard; and `InstrumentsService.findBundleById` called without a `currentUser`, which the
+API's gateway module does to resolve an assignment's bundle. That parameter is optional for this
+reason, so a new call site that omits it compiles and reads every group's instruments.
 
-```ts
-// src/auth/ability.utils.ts
-export function accessibleQuery<T extends Prisma.ModelName>(ability: AppAbility | undefined, ...) {
-  if (!ability) {
-    return {};
-  }
-  ...
-}
-```
+## Layer 2: row scoping
 
-**An omitted or `undefined` ability returns `{}`, which is an empty `where` — no restriction at
-all.** For clinical models that reads every group's data. Nothing catches it: not `tsc` (the
-parameter is optional), not eslint, not a passing test. This is the highest-severity mistake
-available in this codebase. Check the `where` clause of every query you add or touch, and check
-that the controller actually forwards `@CurrentUser('ability')` — `EntityOperationOptions.ability`
-is optional, so a controller that simply never passes it compiles and runs.
+`accessibleQuery(ability, action, modelName)` (`src/auth/ability.utils.ts`) has three outcomes:
 
-**A defined ability holding no rule for the queried subject does not produce a deny-all filter —
-`accessibleQuery` throws CASL's `ForbiddenError`.** That error is not an `HttpException`, so the
-global exception filter renders it as a 500. It is reachable whenever the route guard names a
-different subject than the service queries: a STANDARD user passes a `read Instrument` guard but
-holds no rule on `InstrumentRecord`, so a record query made on their behalf throws. The throw is
-deliberate — `accessibleQuery` is kept as-is rather than returning a deny-all filter — so where
-such a caller is legitimate, guard the query with `ability.can(action, subject)` and return the
-empty result instead; `findInstrumentIdsBySubject` in `src/instruments/instruments.service.ts` is
-the reference example. `ability.can` refuses in every case where the query would throw, so the
-guard always pre-empts it.
+- **`undefined` ability → `{}`**, no restriction at all. Nothing catches an omitted ability.
+- **An ability with no rule for the subject → it throws CASL's `ForbiddenError`**, which is not an
+  `HttpException` and so renders as a 500. Reachable when the guard names a different subject than
+  the service queries. Where such a caller is legitimate, short-circuit with
+  `ability.can(action, subject)` and return the empty result (`findInstrumentIdsBySubject` in
+  `src/instruments/instruments.service.ts`); `can` refuses in every case where the query would throw.
+- Otherwise, the Prisma filter.
 
-The throw is `accessibleQuery`'s own. `@casl/prisma` 2's `accessibleBy(...).ofType(...)` no longer
-throws: it returns `{ OR: [] }`, which Prisma ignores once it is nested in an `AND`
-(prisma/prisma#17367, reproducible on this MongoDB stack), so passed on it would lift the
-restriction rather than apply it. `accessibleQuery` throws on that marker instead, under exactly the
-condition `@casl/prisma` 1 threw. That is also why the client in `src/core/prisma.ts` carries no
-`createCaslExtension()`, which upstream offers to turn the marker into an empty result: the marker
-never reaches Prisma. Call `accessibleBy` only through `accessibleQuery`.
+Call `accessibleBy` only through `accessibleQuery`. `@casl/prisma` 2 signals "no rule" with
+`{ OR: [] }`, which Prisma ignores inside an `AND` (prisma/prisma#17367), so passing it on lifts the
+restriction. `accessibleQuery` throws on it instead, which is also why `src/core/prisma.ts` wires no
+`createCaslExtension()`.
 
-One call site uses `{ ...accessibleQuery(...), id: subjectId }` instead of `AND: [...]`
-(`src/subjects/subjects.service.ts`). Spreading merges keys and will silently lose a condition if
-the generated query and the literal share one. Prefer `AND`.
+Write `where: { AND: [accessibleQuery(...)], id }`, never `{ ...accessibleQuery(...), id }`: a
+spread silently drops a condition when the generated query and the literal share a key.
 
-### Object-level checks
-
-When you hold a plain object rather than a Prisma result, CASL cannot infer its subject type. Use
-`forcedAppSubject(name, partial)` from `src/auth/ability.utils.ts`, which stamps the `__modelName`
-field that `detectAppSubject` reads. Rows from `aggregateRaw` are plain objects too, which is why
-`queryRecordsRaw` in `src/instrument-records/instrument-records.service.ts` checks each one this way;
-without it every row resolves to `Object` and only `manage all` can read it.
-`src/instrument-records/files/files.service.ts` is the reference example:
-
-```ts
-currentUser.ability.can('create', forcedAppSubject('InstrumentRecordFile', { groupId: record.groupId }));
-```
-
-Prisma results already carry `__modelName` — it is a computed field added by
-`LibnestPrismaExtension`, wired up in `src/core/prisma.ts`.
+**Plain objects need `forcedAppSubject(name, partial)`** before `ability.can`, which stamps the
+`__modelName` that `detectAppSubject` reads; without it a plain object resolves to `Object` and only
+`manage all` passes. Prisma results already carry `__modelName` (`LibnestPrismaExtension`). Rows from
+`aggregateRaw` are plain objects, which is why `queryRecordsRaw` in
+`src/instrument-records/instrument-records.service.ts` checks each one this way.
 
 ## Where an ability comes from
 
-1. `AuthService.login` builds one with `AbilityFactory.createForPayload`, switching on
-   `basePermissionLevel` (`ADMIN` / `GROUP_MANAGER` / `STANDARD`) and then applying, on top, the
-   rules of the user's permission set and the user's `additionalPermissions`. A stored rule
-   carrying a `groupId` is applied with that model's group condition from `GROUP_SCOPED_CONDITIONS`
-   (`src/auth/ability.factory.ts`), so it reaches only that group's rows; a `null` `groupId` is an
-   unconditional rule, which is what every rule written before the field existed reads back as.
-   A permission set rule names no group: `HOLDER_GROUPS` gets the same condition over all of the
-   holder's groups, the way a group manager's own rules do, and `ALL_GROUPS` is unconditional.
-   `login` reads the set through `UsersService.findByUsername` and passes its rules as
-   `createForPayload`'s second, required, parameter; the set itself is not put on the payload.
-2. The **serialized rules** (`ability.rules`) are signed into the JWT alongside the payload,
-   `expiresIn: '1h'`.
-3. On every request `JwtStrategy.validate` rebuilds the ability from those rules with
-   `createForPermissions` and attaches it to `request.user`.
+1. `AuthService.login` builds it with `AbilityFactory.createForPayload`: the `basePermissionLevel`
+   switch, then the permission set's rules (`HOLDER_GROUPS` conditioned on the holder's groups,
+   `ALL_GROUPS` unconditional), then `additionalPermissions` (a `groupId` applies that model's
+   `GROUP_SCOPED_CONDITIONS` entry).
+2. The serialized rules are signed into the JWT with the payload, `expiresIn: '1h'`.
+3. On every request `JwtStrategy.validate` rebuilds the ability with `createForPermissions` and
+   attaches it to `request.user`.
 
-Consequences worth knowing:
+Consequences:
 
-- **Permissions are frozen into the token.** Changing a user's groups, base level, additional
-  permissions or permission set — or editing the set itself — has no effect until they obtain a new
-  token. There is no refresh endpoint.
-- **`basePermissionLevel` is nullable** and the `switch` has no `default`, so a user with `null` gets
-  only what their permission set or `additionalPermissions` grants — usually nothing.
-- **JWT expiry is ignored in development.** `ignoreExpiration: configService.getOrThrow('NODE_ENV') === 'development'`
-  in `src/auth/strategies/jwt.strategy.ts`. A dev token never expires; do not conclude from local
-  testing that expiry works.
-- Every token carries a `kind`. `AuthService.login` signs `'login'`;
-  `AuthService.getCreateInstrumentToken` mints a second, narrower token signed with **only**
-  `{ kind: 'instrument', permissions: [{ action: 'manage', subject: 'Instrument' }] }`, for the
-  playground to upload bundles with. `JwtAuthGuard` refuses an `'instrument'` token on every route
-  not marked `@AcceptsInstrumentToken()` (`src/core/decorators/accepts-instrument-token.decorator.ts`),
-  whatever its `@RouteAccess` — today only `POST /v1/instruments`, which takes no `@CurrentUser()`,
-  so the `id`, `username` and `groups` the token lacks are never read. The minting route is not
-  marked: it requires the very permission it hands out, so admitting the token there would let one
-  token renew itself forever.
+- **Permissions are frozen into the token.** A change to a user's groups, level, grants or permission
+  set, or to the set itself, takes effect only at their next login. There is no refresh endpoint.
+- **`basePermissionLevel` is nullable** and the switch has no `default`, so a `null` user gets only
+  what their set or grants give.
+- **JWT expiry is ignored in development** (`ignoreExpiration` in
+  `src/auth/strategies/jwt.strategy.ts`). Local testing proves nothing about expiry.
+- **Every token carries a `kind`.** `getCreateInstrumentToken` mints an `'instrument'` token holding
+  only `manage Instrument`, for the playground's uploads. `JwtAuthGuard` refuses it on any route not
+  marked `@AcceptsInstrumentToken()`; the one marked route takes no `@CurrentUser()`, so the `id`,
+  `username` and `groups` the token lacks are never read. The minting route is not marked, or one
+  token could renew itself forever.
 
-The `RequestUser` shape (`TokenPayload` plus `ability`) is declared in the `declare module`
-augmentation at the top of `apps/api/libnest.config.ts`.
+## Grantable subjects
 
-## Subject types: one derived list, two hand-maintained ones
+Every Prisma model is a CASL subject automatically (`src/auth/auth.types.ts`). What can be _stored_
+as a grant is narrower and hand-written: `enum AppSubject` (`prisma/schema.prisma`, which also types
+permission set rules) and `$AppSubjectName` (`packages/schemas/src/core/core.ts`, the wire format).
+Treat the models in neither as deliberate. `PermissionSet` must stay out: a grant on it would let its
+holder edit a set they hold, and so grant themselves anything.
 
-`src/auth/auth.types.ts` derives subjects from Prisma, so every model is automatically a CASL
-subject and `AppSubjectName` needs no maintenance:
+`$GroupScopableSubjectName` is `$AppSubjectName` minus `all` (a condition on it would apply to every
+model, each naming its group field differently) and `Instrument` (a shared asset with no owning
+group). `$UserPermission` refuses a `groupId` on any other subject, and the factory throws on one
+anyway.
 
-```ts
-type AppSubjectModels = {
-  [K in keyof Prisma.TypeMap['model']]: DefaultSelection<Prisma.TypeMap['model'][K]['payload']>;
-};
-type AppSubjects = 'all' | Subjects<AppSubjectModels>;
-```
+**Storable is not grantable.** Every route that writes a user is `ADMIN_ONLY`, so a `User` grant of
+anything but `read` reaches nothing. `isGrantablePermission` (`core.ts`) encodes that:
+`$UpdateUserPermissionsData` applies it and the web permissions editor offers only what it allows.
+`isPermissionSetGrantable` (`packages/schemas/src/permission-set/permission-set.ts`) also refuses
+`manage all`, since one edit to a set would make every holder an administrator. `$UserPermission`
+applies neither, because it is also the read model and grants stored before a rule still have to
+parse; the editor marks those "No effect" and drops them on its next save. A new admin-only route
+that a grantable pair used to reach belongs in the same predicate.
 
-Two other lists gate what can be _stored and transmitted_ as a user permission, and both are
-hand-written:
+## Adjacent, but not the permission system
 
-| List              | File                                | Constrains                                                 |
-| ----------------- | ----------------------------------- | ---------------------------------------------------------- |
-| `enum AppSubject` | `apps/api/prisma/schema.prisma`     | `type AuthRule.subject`, i.e. `User.additionalPermissions` |
-| `$AppSubjectName` | `packages/schemas/src/core/core.ts` | `$UserPermission`, the wire format for the same field      |
+- **Audit logging is not automatic.** Only explicit `AuditLogger.log` calls write one
+  (`grep -rn 'auditLogger.log' apps/api/src`); do not assume a new mutation is recorded.
+- **`user.hashedPassword` and `assignment.encryptionKeyPair` are globally omitted** by the client in
+  `src/core/prisma.ts`. `UsersService.findByUsername({ includeHashedPassword: true })` is how login
+  reads the hash; `AssignmentsService.findPrivateKeyById`, called only by the gateway synchronizer,
+  is the only read of the key.
+- **Password policy is `UsersService.validatePassword`**: strength via libpasswd, not equal to the
+  username, and a Have I Been Pwned check that **fails open** when the API is unreachable. Failures
+  carry a `code` from `PASSWORD_ERROR_CODES` (`packages/schemas/src/user/user.ts`); the web client
+  localizes it, the API does not.
 
-**These two currently agree with each other but not with the derived list.** They contain `all`,
-`Assignment`, `Group`, `Instrument`, `InstrumentRecord`, `InstrumentRepo`, `Session`, `Subject`,
-`User`. The Prisma schema also defines `AuditLog`, `InstrumentRecordFile`, `InstrumentRepoSyncLog`,
-`PermissionSet` and `SetupState`, which are therefore valid in `@RouteAccess` and in
-`AbilityFactory` rules (`InstrumentRecordFile` is used in both) but cannot be granted as an
-`additionalPermission` or as a permission set rule, whose `subject` uses the same enum. Treat that
-as the existing state, not as a licence to widen it silently. `PermissionSet` in particular must
-stay out: a grant on it would let its holder edit a set they hold, and so grant themselves anything
-a set may contain.
-
-A third list, `$GroupScopableSubjectName` in the same schemas file, says which of these a per-user
-permission may be confined to one group on. It is derived from `$AppSubjectName` by excluding `all`
-(a condition on it would apply to every model, each naming its group field differently) and
-`Instrument` (a shared platform asset with no single owning group), so it needs no maintenance of
-its own. What it drives is `GROUP_SCOPED_CONDITIONS` in `src/auth/ability.factory.ts`, which names
-each scopable model's group field and is typed over the list — a subject taken out of the exclusion
-fails `tsc` in `apps/api` until its field is added there. `$UserPermission` refuses a `groupId` on
-any other subject at the boundary, and the factory throws on one it meets anyway.
-
-**A pair can be storable and still do nothing.** Every route that writes a user is `ADMIN_ONLY`, so
-a grant of any `User` action but `read` reaches nothing. `isGrantablePermission`
-(`packages/schemas/src/core/core.ts`) is that rule: `$UpdateUserPermissionsData` refuses what it
-refuses, and the web permissions editor offers only what it allows. A permission set applies
-`isPermissionSetGrantable` (`packages/schemas/src/permission-set/permission-set.ts`) instead, which
-also refuses `manage all`: one edit to the set would otherwise make every holder an administrator. `$UserPermission` itself does
-not apply it, because it is also the read model and grants stored before the rule still have to
-parse; the editor marks those "No effect" and leaves them out of its next save. A new admin-only
-route that a grantable pair used to reach belongs in the same predicate.
-
-Adding a rule for a new model means editing `src/auth/ability.factory.ts` and adding tests for
-**both** the allow and the deny case. If it must also be assignable per-user, update the Prisma
-enum and `$AppSubjectName` together, and either add its group field to `GROUP_SCOPED_CONDITIONS` or
-add it to the `$GroupScopableSubjectName` exclusion.
-
-## Adjacent things that are not the permission system
-
-- **Audit logging is not automatic.** `AuditLogger` (`src/audit/audit.logger.ts`) is injected into
-  exactly two services and produces exactly three log calls: `CREATE`/`UPDATE` on `ASSIGNMENT`
-  (`src/assignments/assignments.service.ts`) and `LOGIN` on `USER` (`src/auth/auth.service.ts`).
-  Nothing else in the API writes an audit log. Do not assume a new mutation is recorded.
-- **`user.hashedPassword` is globally omitted** by the Prisma client constructed in
-  `src/core/prisma.ts`. `UsersService.findByUsername` re-enables it via
-  `{ includeHashedPassword: true }`, which is how login reads it. Individual `UsersService` methods
-  also pass `omit: { hashedPassword: true }` explicitly — redundant, but harmless.
-- **`assignment.encryptionKeyPair` is globally omitted** by the same client, so no query returns an
-  assignment's private key to a client or the gateway. `AssignmentsService.findPrivateKeyById` is
-  the only read of it, and only the gateway synchronizer calls it, to decrypt a submission.
-- **Password policy lives in `UsersService.validatePassword`** (private): strength via
-  `estimatePasswordStrength` from libpasswd, rejection when the password equals the username, and a
-  Have I Been Pwned breach check that **fails open** if the API is unreachable. It runs on `create`,
-  `updateById` and `updateSelfById`. Failures throw `BadRequestException` with a machine-readable
-  `code` from `PASSWORD_ERROR_CODES` (`packages/schemas/src/user/user.ts`) so the web client can
-  localize; the API does not localize.
-
-## Tests
-
-`pnpm exec vitest --project api`. Two suites define the contract and are the ones to extend:
-
-- `src/auth/__tests__/ability.factory.test.ts` — role-to-rule mapping. Each case asserts an allow
-  _and_ a deny.
-- `src/auth/__tests__/ability.utils.test.ts` — pins the `undefined` ability behavior, the
-  no-rule throw (including `cannot` rules) and `forcedAppSubject`, against the real CASL.
-- `src/auth/guards/__tests__/jwt-auth.guard.test.ts` — the guard's own branches.
-
-Service tests mock the Prisma layer, so they verify the arguments passed to the model, not the
-database's answer. Assert the `where` clause the same way the existing specs assert `data`:
-`model.<method>.mock.lastCall?.[0]` plus `toMatchObject` — see
-`src/groups/__tests__/groups.service.test.ts`.
-
-Row-level scoping is not observable in a unit test with a mocked model, which is why an end-to-end
-test in `testing/` is required for anything that changes who can see what.
+Row scoping is invisible to a unit test with a mocked model, so a change to who can see what needs an
+end-to-end test in `testing/`.

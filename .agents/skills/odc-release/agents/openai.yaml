@@ -1,3 +1,0 @@
-interface:
-  display_name: 'ODC Release'
-  short_description: 'Cut a release so the images, the npm packages and the tag all move together'
