@@ -2,7 +2,7 @@ import * as path from 'node:path';
 
 import { defineConfig, devices } from '@playwright/test';
 
-import { apiPort, baseURL, gatewayPort, playgroundPort, webPort } from './src/support/env';
+import { apiPort, baseURL, gatewayPort, playgroundPort, webPort, workerCount } from './src/support/env';
 
 const webServerDefaults = {
   gracefulShutdown: { signal: 'SIGINT', timeout: 1000 },
@@ -65,5 +65,7 @@ export default defineConfig({
       url: `http://localhost:${playgroundPort}`
     }
   ],
-  workers: process.env.CI ? 1 : undefined
+  // Playwright's own default is half the cores. That many workers log in faster than the API's login
+  // throttle allows partway through the suite, and leave a developer's machine little for anything else.
+  workers: workerCount ?? (process.env.CI ? 1 : 2)
 });

@@ -180,7 +180,8 @@ coverage is therefore a smoke subset, not the full suite.
 
 `webServer` boots `apps/api`, `apps/gateway` and `apps/web` by running each app's own `pnpm dev:test`
 with `NODE_ENV=test`, which is what gives the API an in-memory Mongo replica set instead of an
-external database. `workers: 1` on CI; `fullyParallel` otherwise. The default assertion timeout is
+external database. `workers: 1` on CI and 2 elsewhere, with `fullyParallel` on (`testing/AGENTS.md`
+§Running has why, and the override). The default assertion timeout is
 raised to 15s because a 2-core runner doing real DB work misses the 5s default.
 
 ## Known warts

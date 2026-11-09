@@ -112,6 +112,14 @@ preview is an iframe on the other loopback name, so the spec drives it through a
 is served from the root of the API, and its Redoc page requests `/spec.json`, which the web origin's
 `/api` proxy does not route.
 
+**The suite runs on two workers, and one on CI.** Playwright's own default of half the cores logs in
+faster than the API's login throttle allows (50 a minute), so tests partway through the suite fail
+with `Login failed … (429)`, and each failure restarts a worker that logs in again. Set `E2E_WORKERS`
+in the root `.env` to change the count; `src/support/env.ts` reads it and throws on anything but a
+positive integer. A shell export loses to `.env` wherever `.env` carries the key, blank included: the
+`test:*` scripts load it through `env-cmd`, whose values win, and `.env.template` carries the key
+blank. For one run, pass `--workers=<n>` after the script instead.
+
 Projects: `setup` (with `teardown` attached), `chromium` (every spec), and `firefox`, which greps
 `/@smoke/`. **Cross-browser coverage exists only for tests whose title contains `@smoke`** — add the
 tag to a critical flow, leave it off everything else.
