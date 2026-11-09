@@ -233,9 +233,10 @@ export class AssignmentsService {
   }
 
   /** used by the gateway internal system */
-  async updateStatusById(id: string, status: $UpdateAssignmentData['status']) {
+  async updateStatusById(id: string, { completedAt, status }: Pick<Assignment, 'completedAt' | 'status'>) {
     return this.assignmentModel.update({
       data: {
+        completedAt,
         status
       },
       where: {

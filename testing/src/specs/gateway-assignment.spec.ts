@@ -248,7 +248,7 @@ test.describe('gateway malformed submission', () => {
 test.describe('gateway assignment records', () => {
   test.describe.configure({ timeout: 180_000 });
 
-  test('should link every record of a remote series to its assignment', async ({
+  test('should link every record of a remote series to its assignment, and record when it was completed', async ({
     adminToken,
     api,
     apiRequestContext,
@@ -278,11 +278,20 @@ test.describe('gateway assignment records', () => {
 
     const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
     const headers = { Authorization: `Bearer ${adminToken}` };
+    let linkedRecords: InstrumentRecord[] = [];
     await expect(async () => {
       const response = await apiRequestContext.get('/api/v1/instrument-records', { headers, params: { instrumentId } });
       const records = (await response.json()) as InstrumentRecord[];
-      expect(records.filter((record) => record.assignmentId === assignmentId)).toHaveLength(2);
+      linkedRecords = records.filter((record) => record.assignmentId === assignmentId);
+      expect(linkedRecords).toHaveLength(2);
     }).toPass({ timeout: 6 * gatewayRefreshInterval });
+
+    // The status and completion date are written after the records, in the same pass.
+    const findCompletedAt = async () => {
+      const assignments = await api.findAssignments(linkedRecords[0]!.subjectId);
+      return assignments.find(({ id }) => id === assignmentId)?.completedAt;
+    };
+    await expect.poll(findCompletedAt, { timeout: 2 * gatewayRefreshInterval }).toEqual(expect.any(String));
   });
 
   // Only the gateway synchronizer may link a record to an assignment, so the create route drops the

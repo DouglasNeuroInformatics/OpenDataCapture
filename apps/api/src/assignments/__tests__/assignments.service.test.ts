@@ -685,10 +685,11 @@ describe('AssignmentsService', () => {
   });
 
   describe('updateStatusById', () => {
-    it('should set the status the gateway reports on the assignment with that id', async () => {
-      await assignmentsService.updateStatusById('assignment-1', 'COMPLETE');
+    it('should set the status and completion date the gateway reports on the assignment with that id', async () => {
+      const completedAt = new Date('2026-01-01T00:00:00.000Z');
+      await assignmentsService.updateStatusById('assignment-1', { completedAt, status: 'COMPLETE' });
       expect(assignmentModel.update).toHaveBeenCalledExactlyOnceWith({
-        data: { status: 'COMPLETE' },
+        data: { completedAt, status: 'COMPLETE' },
         where: { id: 'assignment-1' }
       });
     });
