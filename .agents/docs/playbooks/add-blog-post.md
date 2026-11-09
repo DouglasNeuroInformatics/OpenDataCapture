@@ -1,55 +1,32 @@
 # Add a blog post
 
-Posts published at `opendatacapture.org/<locale>/blog`.
-
-> This playbook exists instead of a `blog/AGENTS.md`. `apps/outreach/src/content/blog` is a symlink
-> to `/blog`, and the Astro `blog` collection loads **every** `.md` file it finds there and validates
-> it against the collection schema. A file without post frontmatter — including an `AGENTS.md` —
-> fails `astro check` with `InvalidContentEntryDataError`. Do not add one.
+Every post, in both languages, lives in one flat `/blog` directory at the repo root.
+`apps/outreach/src/content/blog` is a symlink to it (see `apps/outreach/AGENTS.md`). This guidance
+is a playbook rather than a `blog/AGENTS.md` because the `blog` collection loads every `.md` file in
+that directory as a post.
 
 ## Steps
 
-1. **Create the file in `/blog` at the repo root**, not under `apps/outreach`. The filename minus
-   its extension becomes the URL slug. Both languages live side by side in this one flat directory;
-   `language` in frontmatter is what routes a post to `/en/blog/…` or `/fr/blog/…`.
-
-2. **Write the frontmatter.** `apps/outreach/src/content/config.ts` is authoritative; read
-   `blog/open-data-capture-v2.md` for the current shape.
-
-   | Field           | Type                                                                                                  |
-   | --------------- | ----------------------------------------------------------------------------------------------------- |
-   | `title`         | non-empty string                                                                                      |
-   | `description`   | non-empty string; used as the meta description and the listing blurb                                  |
-   | `author`        | `reference('team')` — must equal a filename in `apps/outreach/src/content/team/`, e.g. `joshua-unrau` |
-   | `datePublished` | date, `YYYY-MM-DD`                                                                                    |
-   | `language`      | `'en'` or `'fr'`                                                                                      |
-   | `type`          | `'article'`, `'caseStudy'` or `'video'`                                                               |
-   | `isDraft`       | optional boolean                                                                                      |
-
-3. **Do not put reading time in frontmatter.** It is computed from the body by a remark plugin in
-   `apps/outreach/astro.config.ts`.
-
-4. **If you add a new `type` value**, edit the enum in `apps/outreach/src/content/config.ts` _and_
-   add the matching key to `apps/outreach/src/i18n/translations/blog.json` as an `{ en, fr }`
-   object (a bare string serves both languages, as `article` does). The badge renders
-   `t('blog.<type>')`, so a missing key renders the raw key.
+1. **Create `/blog/<slug>.md`.** The filename becomes the URL slug.
+2. **Copy the frontmatter of `blog/open-data-capture-v2.md`.** The `blog` collection in
+   `apps/outreach/src/content/config.ts` is the schema. `language` (`en` or `fr`) routes the post
+   to `/en/blog/…` or `/fr/blog/…`. `author` must match a filename, without its extension, in
+   `apps/outreach/src/content/team/`. A wrong `author` fails the whole build, not just that page.
+   Leave reading time out: a remark plugin in `apps/outreach/astro.config.ts` computes it.
+3. **To add a new `type` value**, extend the enum in `config.ts` _and_ add the matching key to
+   `apps/outreach/src/i18n/translations/blog.json`. The badge renders `t('blog.<type>')`, so
+   without the key it shows the raw key.
 
 ## Traps
 
-- **Read posts through `getPublishedPosts()`, never `getCollection('blog')`.** It lives in
-  `apps/outreach/src/lib/blog.ts` and drops every `isDraft: true` post, so a draft is neither built
-  at its URL, listed on the index, nor written to the sitemap. A page that calls `getCollection`
-  directly would publish drafts again. A draft is still public in the repository, so `isDraft` is
-  not a privacy mechanism.
-- **`author` is resolved at build time.** A value with no matching file in
-  `apps/outreach/src/content/team/` fails the whole build, not just that page.
+- **Pages read posts through `getPublishedPosts()` (`apps/outreach/src/lib/blog.ts`), never
+  `getCollection('blog')`.** The helper drops `isDraft: true` posts. A page that calls
+  `getCollection` directly publishes them again. A draft is still public in the repository, so
+  `isDraft` does not keep a post private.
 
 ## Verify
 
-No test suite covers this directory. A bad `author` reference, a missing required field and an
-invalid `type` all fail here:
-
 ```sh
-pnpm --filter @opendatacapture/outreach lint    # astro check
+pnpm --filter @opendatacapture/outreach lint    # astro check: bad author, missing field, invalid type
 pnpm --filter @opendatacapture/outreach build
 ```

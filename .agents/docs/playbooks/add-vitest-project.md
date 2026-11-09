@@ -1,35 +1,20 @@
 # Add a vitest project
 
 Give a workspace a unit-test tier it does not have yet. What is tested where lives in
-`.agents/docs/architecture/testing-strategy.md`; read it first. This file is only the ordering that
-matters.
+`.agents/docs/architecture/testing-strategy.md`. This file is only the ordering that matters.
 
-**Plan around this:** the failure this playbook prevents is silent. Root `vitest.config.ts` declares
-`projects: ['apps/*/vitest.config.ts', 'packages/*/vitest.config.ts', 'runtime/*/vitest.config.ts']`,
-so a workspace with no `vitest.config.ts` of its own contributes no project. A test file added to
-`apps/gateway` today is collected by nothing, reported by nothing, and passes CI green — the
-run never mentions it, and there is no error to search for.
-
-The opposite mistake is loud. Once a project exists, a `--project` filter that matches no `name` stops
-the run dead:
-
-```
-Error: No projects matched the filter "gateway".
-```
-
-That error means the config is absent or its `name` differs from what you typed. Green with no mention
-of your file means the config is absent.
+**Plan around this:** root `vitest.config.ts` collects only `apps/*/vitest.config.ts`,
+`packages/*/vitest.config.ts` and `runtime/*/vitest.config.ts`. A workspace without one contributes no
+project, so its test files are collected by nothing and CI stays green. The loud version is a
+`--project` filter matching no `name`: `Error: No projects matched the filter "<name>"`.
 
 ## Steps
 
-1. **Confirm the package really has no project.** `pnpm exec vitest list --filesOnly` prints every
-   collected file in the repo, each prefixed with its project name; the table in
-   `.agents/docs/architecture/testing-strategy.md` says the same thing in prose. The package must also
-   sit directly under one of those three roots — a `vitest.config.ts` in `storybook/` or `testing/`
-   never runs, pnpm workspace or not (`.agents/docs/workspace-map.md`).
+1. **Confirm the package has no project**: it is absent from `pnpm exec vitest list --filesOnly`, which
+   prefixes every collected file with `[<project>]`. The package must sit directly under `apps/`,
+   `packages/` or `runtime/`; a config in `storybook/` or `testing/` never runs.
 
-2. **Copy `packages/schemas/vitest.config.ts`.** It is the whole pattern, and every other project is
-   this file with a different `name`:
+2. **Copy `packages/schemas/vitest.config.ts`.** Every project is this file with a different `name`:
 
    ```ts
    import { defineProject, mergeConfig } from 'vitest/config';
@@ -47,86 +32,52 @@ of your file means the config is absent.
    );
    ```
 
-   Both halves are load-bearing. `mergeConfig(baseConfig, …)` is what inherits the root `include`
-   globs and `watch: false`; `root: import.meta.dirname` is what scopes those globs to this package
-   rather than the repo. Every project file uses `defineProject` — `defineConfig` belongs to the root
+   `mergeConfig(baseConfig, …)` inherits the root `include` glob and `watch: false`;
+   `root: import.meta.dirname` scopes that glob to this package. Merge the named `baseConfig`, never the
+   root's default export: its `projects` field is read as a nested project set and every run fails
+   with `Error: No projects were found in "<pkg>/vitest.config.ts"`. `defineConfig` belongs to the root
    config alone.
 
-   Merge the named `baseConfig`, never the root's default export. The default export adds `coverage`
-   and `projects`, and Vitest reads a `projects` field inside a project config as a nested set of
-   projects, re-resolved against the package directory, so every run stops before collecting a file:
+3. **Name the project after the directory**, kebab-case, no `@opendatacapture/` scope. `runtime/v1`
+   is the one exception: `runtime-v1`.
 
-   ```
-   Error: No projects were found in "packages/schemas/vitest.config.ts". Make sure your configuration is correct.
-   ```
+4. **Choose the environment.** Node is the default. A test that renders React needs
+   `environment: 'happy-dom'` (model: `apps/web/vitest.config.ts`) and a `"happy-dom": "catalog:"`
+   devDependency — ask first per the root rule, then `pnpm install`. Redeclare under `resolve.alias`
+   any alias the source imports; `vite.config.ts` is not loaded during tests.
 
-3. **Name the project after the directory.** The `name` field is the string `--project` takes, and it
-   is the directory basename everywhere except `runtime/v1`, whose project is `runtime-v1` because
-   `v1` names nothing on its own. Kebab-case, no `@opendatacapture/` scope.
+5. **Add `vitest.config.ts` to the package's `tsconfig.json` `include`.** Package eslint runs on `src`
+   only, so `tsc` is the config's only check. Tests in `test/` rather than `src/` need `test/**/*.ts`
+   there too (`packages/runtime-bundler`), or nothing type-checks them.
 
-4. **Choose the environment.** Node is the default and needs no key. A test that renders React needs
-   `environment: 'happy-dom'`, for which `apps/web/vitest.config.ts` is the model. Carry any alias
-   the package's source imports through into this file under `resolve.alias` — `vite.config.ts` is
-   not loaded during tests (`apps/web/AGENTS.md`).
+6. **Add the `test` script**: `"vitest"` under `packages/` and `runtime/`,
+   `"env-cmd -f ../../.env vitest"` for an app. Root `pnpm test` ignores it and runs the projects
+   directly.
 
-   `happy-dom` is pinned in the `catalog:` block of `pnpm-workspace.yaml`, so the devDependency is
-   `"happy-dom": "catalog:"` — confirm the addition in-conversation per the root rule, then run
-   `pnpm install`. pnpm links dependencies per package, so an uninstalled catalog entry fails when the
-   environment loads, not at type-check. The DOM caveats it brings are in `apps/web/AGENTS.md` and
-   `.agents/docs/architecture/testing-strategy.md`; read them before the first assertion.
+7. **Place the test file** in a `__tests__/` folder beside its subject (root `AGENTS.md` §Tests).
+   Reach for a project-level `include` only for a file outside the inherited glob; `mergeConfig`
+   concatenates arrays, so it adds to the root glob rather than replacing it.
 
-5. **Add `vitest.config.ts` to the package's `tsconfig.json` `include` array.** `eslint.config.js`
-   ignores `vitest.config.ts` globally, so `tsc` is the only thing that ever checks it — and only if
-   the tsconfig names it. Every package with a `lint` script does this; the exceptions are in
-   `.agents/docs/architecture/testing-strategy.md`.
+8. **Prove the file is collected, then that it can fail.** If the package imports
+   `instrument-library`, `runtime-core` or `runtime/v1`, run `pnpm build` first — those resolve only
+   from build output (`.agents/docs/workspace-map.md`) and `pnpm test` builds nothing.
+   `pnpm exec vitest list --filesOnly --project <name>` must list your file and no path outside the
+   package (one means `root` is missing). Then invert an assertion and watch it go red.
 
-   If the tests will live in `test/` rather than `src/`, add `test/**/*.ts` to `include` too, as
-   `packages/runtime-bundler` and `packages/runtime-meta` do — a `test/` directory outside the
-   tsconfig `include` is type-checked by nothing.
-
-6. **Add the `test` script.** `"test": "vitest"` under `packages/` and `runtime/`,
-   `"test": "env-cmd -f ../../.env vitest"` for an app, matching every project that already exists.
-   `pnpm --filter @opendatacapture/<pkg> test` runs this one project from the package directory. Root
-   `pnpm test` runs the projects directly and never reads this script; `vitest` is a root
-   devDependency, so the package declares nothing.
-
-7. **Place the test file inside the inherited glob.** That is `**/*.{test,spec}.?(c|m)[jt]s?(x)`,
-   relative to the package `root`; the house convention is a `__tests__/` folder beside the subject,
-   with the spec named after it (`src/__tests__/index.test.ts` tests `src/index.ts`). Only reach for
-   a project-level `include` when a file must live outside that glob — `mergeConfig` concatenates
-   arrays, so a project `include` _adds_ to the root glob rather than replacing it.
-
-8. **Prove the file is collected, then prove it can fail.** If the package imports
-   `instrument-library`, `runtime-core` or `runtime/v1`, run `pnpm build` once first — those three
-   resolve only from `dist`/`lib` (`.agents/docs/workspace-map.md`), and `pnpm test` builds nothing.
-
-   ```sh
-   pnpm exec vitest list --filesOnly --project <name>
-   ```
-
-   Every line must read `[<name>] <path>`, your file must be among them, and no path may point
-   outside the package — a path from elsewhere in the repo means `root` is missing from step 2. Then
-   invert one assertion and watch it go red before restoring it
-   (`.agents/skills/odc-testing/SKILL.md`).
-
-9. **Record the new tier in every doc that tracks it.** The set that moves together is one row in
-   `.agents/skills/odc-agent-docs/SKILL.md`. Other files also assert your package has no project —
-   `.agents/skills/odc-frontend/SKILL.md` says it of `apps/gateway` — and none of them contains the
-   new project name, so search by the package name instead:
+9. **Record the new tier**: `testing-strategy.md`'s Vitest projects table, the count above it and its
+   "Everything else has no unit tests" list; the `Vitest project` column in
+   `.agents/docs/workspace-map.md`; and the package's own `AGENTS.md` `## Tests`. Then search for any
+   other doc still saying the package has no unit tests:
    `grep -rn '<pkg>' --include=AGENTS.md . ; grep -rn '<pkg>' .agents`.
 
 ## Verify
 
 ```sh
 pnpm exec vitest list --filesOnly --project <name>   # your file, prefixed [<name>], nothing from outside
-pnpm exec vitest --project <name>                    # green, with the file count you expect
-pnpm lint                                            # from the root; tsc now type-checks vitest.config.ts
-pnpm test                                            # from the root: the repo-wide file count rises by yours
+pnpm exec vitest --project <name>
+pnpm lint                                            # from the root; tsc now checks vitest.config.ts
+pnpm test                                            # the repo-wide file count rises by yours
 ```
 
-Run `pnpm lint` from the root, with a clean tree: it rewrites files as it checks them
-(`.agents/docs/architecture/testing-strategy.md`), and a package-scoped `lint` skips turbo's `^build`
-ordering, failing on unbuilt dependencies rather than on your config. `No projects matched the filter`
-from either `vitest` command means the `name` you passed is not the `name` in the config; a root
-`pnpm test` whose file count is unchanged means the config is not where the globs look — check that
-the package sits directly under `apps/`, `packages/` or `runtime/`.
+Run `pnpm lint` from the root: a package-scoped `lint` skips turbo's `^build` ordering and fails on
+unbuilt dependencies rather than on your config.

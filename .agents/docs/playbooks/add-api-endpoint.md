@@ -1,77 +1,67 @@
 # Playbook: add an endpoint to `apps/api`
 
-Conventions are in `apps/api/AGENTS.md`; the permission model is
-`.agents/docs/architecture/auth-and-permissions.md`. Read both first — this file is only the order of
-operations, because most of these steps fail at request time rather than at compile time. Almost
-every step has a counterpart in `apps/api/src/groups/`, the canonical feature module (step 6's
-examples live in other controllers, as noted there).
+The order of operations only; the conventions and their reasons are in `apps/api/AGENTS.md`, the
+permission model in `.agents/docs/architecture/auth-and-permissions.md`. Most of these steps fail at
+request time rather than compile time. `apps/api/src/groups/` has a counterpart for almost every
+step.
 
 ## Checklist
 
-1. **Schema.** Put the request/response shape in `packages/schemas/src/<domain>/<domain>.ts`. A
-   **new** domain folder also needs an entry in the hand-maintained `exports` map of
-   `packages/schemas/package.json`, or the import will not resolve. See `packages/schemas/AGENTS.md`.
+1. **Schema** in `packages/schemas/src/<domain>/<domain>.ts`. A new domain folder also needs an entry
+   in the hand-maintained `exports` map of `packages/schemas/package.json`, or the import will not
+   resolve.
 
-2. **Prisma model**, only if the endpoint persists a new one. Add it to
+2. **Prisma model**, only if the endpoint persists a new one: add it to
    `apps/api/prisma/schema.prisma` with `@@map("<Name>Model")`, then run
-   `pnpm --filter @opendatacapture/api db:generate`. Provider is MongoDB, so there is no migration.
-   `AppSubjectName` in `apps/api/src/auth/auth.types.ts` is derived from the generated Prisma types,
-   so the model becomes a valid `@RouteAccess` subject with no edit — but only once regenerated.
+   `pnpm --filter @opendatacapture/api db:generate` (MongoDB, so no migration). The model becomes a
+   valid `@RouteAccess` subject only once the client is regenerated.
 
-3. **Service method** in `apps/api/src/<feature>/<feature>.service.ts`. Last parameter is
-   `{ ability }: EntityOperationOptions = {}` (`apps/api/src/core/types.ts`), and the ability must
-   reach the Prisma `where`:
+3. **Service method** in `src/<feature>/<feature>.service.ts`, with
+   `{ ability }: EntityOperationOptions = {}` as its last parameter and the ability in every Prisma
+   `where`:
 
    ```ts
-   const group = await this.groupModel.findFirst({
-     where: { AND: [accessibleQuery(ability, 'read', 'Group')], id }
-   });
+   where: {
+     AND: ([accessibleQuery(ability, 'read', 'Group')], id);
+   }
    ```
 
-   `accessibleQuery(undefined, ...)` returns `{}`, meaning **no restriction at all**. Nothing catches
-   an omitted ability: not tsc, not eslint, not a green test suite.
+   `accessibleQuery(undefined, …)` returns `{}`, an unrestricted query, and nothing catches it. Done
+   when every query in your diff either calls `accessibleQuery` or is unscoped for a reason you state.
 
-4. **Request body typing**, if the handler takes a body. Type the parameter as the schema
-   (`@Body() data: $CreateXData`), declared in `packages/schemas` as a `$`-prefixed type and const
-   sharing one name. It **must be a value import**: `import type` erases the runtime binding and the
-   pipe throws when the route is called. The same schema is what the API reference documents the body
-   from. See `apps/api/src/groups/groups.controller.ts`.
+4. **Body**: type the parameter as the schema, `@Body() data: $CreateXData`, imported as a **value**.
+   `import type` erases the binding and the pipe throws on the first request.
 
-5. **Controller handler** in `apps/api/src/<feature>/<feature>.controller.ts`. Every handler needs
-   `@RouteAccess` (eslint-enforced; missing it is a 500 at request time, not an open route), and any
-   handler whose service method takes an ability must forward `@CurrentUser('ability')`. The guard
-   checks the subject _type_ only — step 3 is the only thing that checks rows.
+5. **Controller handler** in `src/<feature>/<feature>.controller.ts`: a `@RouteAccess` on every
+   handler (state it if you chose `'public'` or `[]`), and the ability forwarded in the shape its
+   service takes (`apps/api/AGENTS.md` §Permissions). The guard checks the subject type only; nothing
+   checks the forwarding, so open each handler.
 
-6. **Params and query strings are not validated by the global pipe**, which covers bodies only.
-   Attach `new ParseSchemaPipe({ schema })` or `ValidObjectIdPipe` explicitly — see
-   `apps/api/src/audit/audit.controller.ts` and
-   `apps/api/src/instrument-records/instrument-records.controller.ts`.
+6. **Params and query strings** need an explicit `new ParseSchemaPipe({ schema })` or
+   `ValidObjectIdPipe`; the global pipe covers bodies only.
 
-7. **Module.** A new feature needs `apps/api/src/<feature>/<feature>.module.ts` (controller in
-   `controllers`, service in `providers` and, by convention here, `exports`) **and** an entry in the
-   `imports` array of `apps/api/src/main.ts`. There is no `AppModule`; omitting `main.ts` means the
-   route silently does not exist.
+7. **Module**: a new feature needs `src/<feature>/<feature>.module.ts` **and** an entry in the
+   `imports` array of `apps/api/src/main.ts`, or the route silently does not exist.
 
-8. **Permissions**, if the endpoint needs an action/subject pair no role currently grants. Edit
-   `apps/api/src/auth/ability.factory.ts` and add **both an allow and a deny** case to
-   `apps/api/src/auth/__tests__/ability.factory.test.ts`. To make the subject assignable as a
-   per-user `additionalPermission`, two hand-maintained lists must be updated together: `enum
-AppSubject` in `apps/api/prisma/schema.prisma` and `$AppSubjectName` in
-   `packages/schemas/src/core/core.ts`. They are narrower than the derived list on purpose. If such
-   a grant may be confined to one group, its group field also goes in `GROUP_SCOPED_CONDITIONS`
-   (`apps/api/src/auth/ability.factory.ts`); that table is typed over `$GroupScopableSubjectName`,
-   so `tsc` reports the omission.
+8. **Permissions**, if no role grants the action/subject pair yet: edit
+   `src/auth/ability.factory.ts` and add an allow **and** a deny case to
+   `src/auth/__tests__/ability.factory.test.ts`. To make the subject grantable per user, add it to
+   `enum AppSubject` (`schema.prisma`) and `$AppSubjectName` (`packages/schemas/src/core/core.ts`) in
+   the same commit, since nothing compares the two; `tsc` then asks for its group field in
+   `GROUP_SCOPED_CONDITIONS` unless `$GroupScopableSubjectName` excludes it.
 
-9. **Service spec** at `apps/api/src/<feature>/__tests__/<feature>.service.test.ts`. Copy the setup
-   from `apps/api/src/groups/__tests__/groups.service.test.ts`:
-   `MockFactory.createForModelToken(getModelToken('X'))` per injected model, then assert with
-   `model.<method>.mock.lastCall?.[0]` and `toMatchObject`. Assert the `where` clause, not only
-   `data`.
+9. **Service spec** at `src/<feature>/__tests__/<feature>.service.test.ts`, set up like
+   `src/groups/__tests__/groups.service.test.ts`. Assert the `where`, not only `data`.
 
-10. **End-to-end test** in `testing/` — row scoping is invisible to a unit test with a mocked Prisma
-    layer, so anything changing who can see what needs one. Follow
-    `.agents/docs/playbooks/add-e2e-test.md`. If the endpoint is useful for seeding preconditions,
-    add a method to `testing/src/support/api-client.ts`.
+10. **End-to-end test** (`.agents/docs/playbooks/add-e2e-test.md`): a mocked Prisma layer cannot see
+    row scoping. An endpoint useful for seeding preconditions also gets a method on
+    `testing/src/support/api-client.ts`.
+
+11. **Renamed a path, or changed a method or status code?** Three consumers hard-code them and no
+    compiler connects them: `apps/web/src/hooks/` (a 404 at runtime), `testing/src/support/api-client.ts`
+    (a red `pnpm test:e2e`) and `cli/odc-cli` (checked by nothing; `cli/AGENTS.md` lists its
+    endpoints). `api-client.ts` builds paths as `${API}/<segment>`, so grep the bare segment:
+    `grep -rn '<segment>' apps/web/src cli/odc-cli testing/src`.
 
 ## Verify
 

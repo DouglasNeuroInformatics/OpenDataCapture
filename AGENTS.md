@@ -59,6 +59,9 @@ not every tool loads nested files.
   workspace name without the prefix. A `commit-msg` hook and the `Commitlint` CI job enforce it, and
   `CHANGELOG.md` is generated from the `feat`, `fix`, `perf` and breaking commits: one commit is one
   entry.
+- **Pull requests and issues go to `DouglasNeuroInformatics/OpenDataCapture`, base `main`.**
+  `origin` is your fork (`CONTRIBUTING.md`), so pass `--repo DouglasNeuroInformatics/OpenDataCapture`
+  to `gh`.
 - **All frontend user-facing strings go through `useTranslation`.** Every language the frontend
   exposes gets an entry. In web, gateway and react-core, prefer inline
   `t({ en: '...', es: '...', fr: '...' })` unless the string is used more than once; each workspace
@@ -84,25 +87,25 @@ cover.
 ## Where to look
 
 Read the `AGENTS.md` in the directory you are editing. Each one covers only that workspace. New
-here? `.agents/skills/odc-orientation/SKILL.md` is the reading order.
+here? Bring the stack up (`.agents/docs/playbooks/run-locally.md`), then read
+`.agents/docs/workspace-map.md` and `.agents/docs/architecture/testing-strategy.md`.
 
-| Working on                                      | Read first                                |
-| ----------------------------------------------- | ----------------------------------------- |
-| Clinician-facing React SPA                      | `apps/web/AGENTS.md`                      |
-| NestJS backend                                  | `apps/api/AGENTS.md`                      |
-| Patient-facing SSR app for remote assignments   | `apps/gateway/AGENTS.md`                  |
-| In-browser instrument editor                    | `apps/playground/AGENTS.md`               |
-| Marketing site and user docs                    | `apps/outreach/AGENTS.md`                 |
-| Shared Zod schemas / cross-tier contracts       | `packages/schemas/AGENTS.md`              |
-| Compiling instrument source into bundles        | `packages/instrument-bundler/AGENTS.md`   |
-| Building the library catalog instruments import | `packages/runtime-bundler/AGENTS.md`      |
-| The `defineInstrument` public API               | `packages/runtime-core/AGENTS.md`         |
-| Adding or editing a built-in instrument         | `packages/instrument-library/AGENTS.md`   |
-| Pinned library wrappers instruments import      | `vendor/AGENTS.md`                        |
-| The published runtime artifact                  | `runtime/v1/AGENTS.md`                    |
-| End-to-end tests                                | `testing/AGENTS.md`                       |
-| User documentation                              | `docs/AGENTS.md`                          |
-| Blog posts                                      | `.agents/docs/playbooks/add-blog-post.md` |
+| Working on                                      | Read first                              |
+| ----------------------------------------------- | --------------------------------------- |
+| Clinician-facing React SPA                      | `apps/web/AGENTS.md`                    |
+| NestJS backend                                  | `apps/api/AGENTS.md`                    |
+| Patient-facing SSR app for remote assignments   | `apps/gateway/AGENTS.md`                |
+| In-browser instrument editor                    | `apps/playground/AGENTS.md`             |
+| Marketing site and user docs                    | `apps/outreach/AGENTS.md`               |
+| Shared Zod schemas / cross-tier contracts       | `packages/schemas/AGENTS.md`            |
+| Compiling instrument source into bundles        | `packages/instrument-bundler/AGENTS.md` |
+| Building the library catalog instruments import | `packages/runtime-bundler/AGENTS.md`    |
+| The `defineInstrument` public API               | `packages/runtime-core/AGENTS.md`       |
+| Adding or editing a built-in instrument         | `packages/instrument-library/AGENTS.md` |
+| Pinned library wrappers instruments import      | `vendor/AGENTS.md`                      |
+| The published runtime artifact                  | `runtime/v1/AGENTS.md`                  |
+| End-to-end tests                                | `testing/AGENTS.md`                     |
+| User documentation                              | `docs/AGENTS.md`                        |
 
 Every other workspace has its own `AGENTS.md` too — check the directory before assuming there
 isn't one.
@@ -117,7 +120,7 @@ isn't one.
 
 | Topic                                                           | Path                                                |
 | --------------------------------------------------------------- | --------------------------------------------------- |
-| What every workspace is and how they depend on each other       | `.agents/docs/workspace-map.md`                     |
+| Which workspace depends on which, what is built, what publishes | `.agents/docs/workspace-map.md`                     |
 | The 11 `@douglasneuroinformatics/*` packages this repo consumes | `.agents/docs/packages/index.md`                    |
 | Instrument source → bundle → store → interpret → render         | `.agents/docs/architecture/instrument-pipeline.md`  |
 | The six similarly-named `runtime-*` things, and `vendor/`       | `.agents/docs/architecture/runtime-and-vendor.md`   |

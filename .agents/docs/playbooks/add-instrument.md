@@ -1,78 +1,57 @@
 # Add a built-in instrument
 
 Adding a directory under `packages/instrument-library/src` builds a bundle that **nothing loads**.
-Step 6 is the one that actually puts it in a demo instance, and skipping it fails silently.
+Step 4 is the one that puts it in a demo instance, and skipping it fails silently.
 
-Conventions for the package: `packages/instrument-library/AGENTS.md`. The authoring specification is
-`packages/instrument-guidelines/AGENTS.md` — read the section for your kind. That file is a
-**published npm artifact** written for authors outside this repo, so its `lib/forms` file-layout
-advice does not apply here; everything it says about the definition object does.
+Conventions live in `packages/instrument-library/AGENTS.md`. The definition-object rules are in
+`packages/instrument-guidelines/AGENTS.md`; its `lib/` file layout does not apply here.
 
 ## Checklist
 
-1. **Create the directory.** `packages/instrument-library/src/<kind-dir>/<NAME>/`, `<NAME>` in
-   `SCREAMING_SNAKE_CASE`. Instruments authored by the DNP carry a `DNP_` prefix; the two generic
-   file instruments do not.
+1. **Create `packages/instrument-library/src/<kind-dir>/<NAME>/`**, `<NAME>` in
+   `SCREAMING_SNAKE_CASE` with a `DNP_` prefix for DNP-authored instruments. Make it equal
+   `internal.name`, which the API hashes into the instrument ID; nothing enforces the match. Copy
+   the example for your kind:
 
-   | `kind` in the definition | Directory                  | Read first                                                     |
-   | ------------------------ | -------------------------- | -------------------------------------------------------------- |
-   | `'FORM'`                 | `src/forms/` (plural)      | `src/forms/DNP_HAPPINESS_QUESTIONNAIRE/index.ts`               |
-   | `'INTERACTIVE'`          | `src/interactive/`         | `src/interactive/DNP_BREAKOUT_TASK/index.ts`                   |
-   | `'SERIES'`               | `src/series/`              | `src/series/DNP_HAPPINESS_QUESTIONNAIRE_WITH_CONSENT/index.ts` |
-   | `'FILE'`                 | `src/file/` (**singular**) | `src/file/MRI_SCAN_SESSION/index.ts`                           |
+   | `kind`          | Directory                  | Copy                                       |
+   | --------------- | -------------------------- | ------------------------------------------ |
+   | `'FORM'`        | `src/forms/` (plural)      | `DNP_HAPPINESS_QUESTIONNAIRE`              |
+   | `'INTERACTIVE'` | `src/interactive/`         | `DNP_BREAKOUT_TASK`                        |
+   | `'SERIES'`      | `src/series/`              | `DNP_HAPPINESS_QUESTIONNAIRE_WITH_CONSENT` |
+   | `'FILE'`        | `src/file/` (**singular**) | `MRI_SCAN_SESSION`                         |
 
-2. **Add `index.ts` (or `index.tsx` for JSX) with a default export.** The bundler globs
-   `src/**/*/index.{js,jsx,ts,tsx}`, so the directory is the unit of work and `index.*` is the only
-   fixed filename. **The directory must be flat**: the CLI then globs `<dir>/*` and reads every entry
-   as a file, so a subdirectory fails the build with a `Cannot infer loader` error. Relative imports
-   need their extension (`'./styles.css'`, `'./Component.tsx'`).
-
-3. **Import everything from `/runtime/v1/...`**, never from `node_modules` or a workspace package:
+2. **Default-export `defineInstrument(...)` from `index.ts`** (`index.tsx` for JSX;
+   `defineSeriesInstrument` for a series), keeping the directory flat and relative imports
+   extension-qualified (§Authoring rules in the package `AGENTS.md`). Import everything from
+   `/runtime/v1/...`, never a package name:
 
    ```ts
    import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
    import { z } from '/runtime/v1/zod@3.x/v4'; // omit `/v4` for the Zod v3 API
    ```
 
-   `defineSeriesInstrument` (not `defineInstrument`) for `kind: 'SERIES'`.
+   The type enforces the required fields; `packages/runtime-core/AGENTS.md` §`defineInstrument`
+   covers `language`, `__runtimeVersion` and the in-repo `details.license` narrowing; the catalog
+   mostly uses `'Apache-2.0'`.
 
-4. **Fill in the required fields.** For a scalar instrument: `kind`, `language`, `tags`, `internal`
-   (`{ name, edition }`), `content`, `details` (`description`, `license`, `title`), `measures` (`null`
-   is allowed) and `validationSchema`. A `SERIES` takes `kind`, `language`, `tags`, `details` and
-   `content`, and has **no** `internal`, `measures` or `validationSchema`.
-   - **Never write `__runtimeVersion`.** `defineInstrument` `Omit`s it from its argument type and
-     assigns it; writing it by hand is a type error.
-   - `language: 'en'` makes every UI string a plain string; `language: ['en', 'fr']` makes each one
-     `{ en, fr }`. It is all-or-nothing across `title`, `description`, `instructions`, `tags` and
-     every label.
-   - `details.license` narrows to `ApprovedLicense` inside this repo (see
-     `packages/licenses/src/index.d.ts`); `'Apache-2.0'` is what the existing catalog uses (except `DNP_BREAKOUT_TASK`, which is
-     `'CC0-1.0'`).
-   - `internal.name` is what the API hashes into the instrument ID, so make it match the directory
-     name. Nothing enforces that.
-   - **Do not alphabetise the keys.** `perfectionist/sort-objects` is switched off for this package in
-     `eslint.config.js` on purpose so definitions read in semantic order.
+3. **For a series, every item must already exist.** `content.items` are `{ name, edition }` pairs
+   matching other instruments' `internal`; `validateSeriesInstrument` in
+   `apps/api/src/instruments/instruments.service.ts` rejects a series with a missing item or fewer
+   than two.
 
-5. **For a `SERIES`, every item must already exist as an instrument.** `content.items` is
-   `{ name, edition }` pairs matching another instrument's `internal`, and `validateSeriesInstrument`
-   in `apps/api/src/instruments/instruments.service.ts` rejects the series at creation time if any
-   item is missing, or if there are fewer than two items.
-
-6. **Add the import and the `create` call to `apps/api/src/demo/demo.service.ts`.** There is no
-   registry file — the build globs the directory — but this file holds one hand-written named import
-   per instrument:
+4. **Import it in `apps/api/src/demo/demo.service.ts` and `create` it in `init`.** There is no
+   registry; this file holds one hand-written import per instrument:
 
    ```ts
    import myNewForm from '@opendatacapture/instrument-library/forms/MY_NEW_FORM.js';
+   // in init:
+   await this.instrumentsService.create({ bundle: myNewForm });
    ```
 
-   then `await this.instrumentsService.create({ bundle: myNewForm })` inside `init`. **Order in
-   `init` is load-bearing**: a series must be created after every instrument it references (step 5).
-   Skipping this step compiles, builds, and produces an instrument that is never in a demo instance.
+   **Order in `init` is load-bearing**: a series is created after every instrument it references.
 
-7. **Add a unit test and an end-to-end test.** The unit test goes in the top-level
-   `packages/instrument-library/src/__tests__/`, never inside the instrument directory (§Tests in
-   `packages/instrument-library/AGENTS.md`). The e2e test goes in `testing/` — see
+5. **Add a unit test** in the top-level `packages/instrument-library/src/__tests__/<NAME>.test.ts`
+   (one inside the instrument directory breaks the build), **and an e2e test** per
    `.agents/docs/playbooks/add-e2e-test.md`.
 
 ## Verify
@@ -85,5 +64,6 @@ pnpm test:coverage
 pnpm test:e2e
 ```
 
-`available` must list your title under the right kind. `pnpm lint` (`tsc`) needs `runtime/v1/dist` to
-exist, which is why the build comes first.
+`available` listing your title under the right kind proves only that it built; it reaches a demo
+instance only through step 4. `pnpm lint` (`tsc`) needs `runtime/v1/dist`, which is why the build
+comes first.

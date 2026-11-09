@@ -6,8 +6,6 @@ points at `src/index.js` with a hand-written `src/index.d.ts` beside it, under `
 `vite-plugin-runtime`, `packages/serve-instrument/src/server.tsx`, and
 `apps/outreach/src/pages/resources/runtime/[version].json.ts`.
 
-The export-by-export table is in `.agents/docs/architecture/runtime-and-vendor.md#packagesruntime-meta`.
-
 ## Traps
 
 **`parsePackages` drops any path whose first segment starts with `_`,** because npm forbids a leading
