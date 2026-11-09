@@ -20,6 +20,7 @@ import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 import { selectAdministrableInstruments } from '@/utils/administrable-instruments';
 import { getDefaultAssignmentExpiry } from '@/utils/assignment-duration';
+import { $RedirectUrl, omittedIfBlank } from '@/utils/validation';
 
 /** Slide-over panel shown after an assignment is created, displaying the URL, copy button, and QR code */
 const AssignmentResultSlider: React.FC<{
@@ -172,6 +173,20 @@ const RouteComponent = () => {
                   es: 'Vence el',
                   fr: "Date d'expiration"
                 })
+              },
+              redirectUrl: {
+                description: t({
+                  en: 'Where to send the subject once they finish. Must start with https://.',
+                  es: 'Adónde enviar al sujeto cuando termine. Debe comenzar con https://.',
+                  fr: 'Où envoyer le client une fois terminé. Doit commencer par https://.'
+                }),
+                kind: 'string',
+                label: t({
+                  en: 'Redirect URL (Optional)',
+                  es: 'URL de redirección (opcional)',
+                  fr: 'URL de redirection (facultatif)'
+                }),
+                variant: 'input'
               }
             }}
             initialValues={{
@@ -185,15 +200,17 @@ const RouteComponent = () => {
                     es: 'La fecha de vencimiento debe ser futura',
                     fr: "La date d'expiration doit être dans le futur"
                   })
-                })
-              }) satisfies z.ZodType<Pick<$CreateAssignmentData, 'expiresAt'>>
+                }),
+                redirectUrl: $RedirectUrl.optional()
+              }) satisfies z.ZodType<Pick<$CreateAssignmentData, 'expiresAt' | 'redirectUrl'>>
             }
-            onSubmit={async ({ expiresAt }) => {
+            onSubmit={async ({ expiresAt, redirectUrl }) => {
               const created = await createAssignmentMutation.mutateAsync({
                 data: {
                   expiresAt,
                   groupId: currentGroup?.id,
                   instrumentId: selectedInstrument!.id,
+                  redirectUrl: omittedIfBlank(redirectUrl),
                   subjectId: currentSession.subjectId
                 }
               });

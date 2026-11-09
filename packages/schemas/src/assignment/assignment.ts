@@ -11,6 +11,18 @@ type AssignmentStatus = z.infer<typeof $AssignmentStatus>;
 const DEFAULT_ASSIGNMENT_DURATION_DAYS = 365;
 
 /**
+ * Where the gateway sends a subject once they complete the assignment. It is stored and replayed to
+ * whoever finishes, so only https is accepted. `href` punycodes the host and percent-encodes the
+ * rest, which keeps the value latin1-safe for the gateway's `btoa`-encoded page props. The URL
+ * check aborts, because zod otherwise still runs the transform, and `new URL` throws on a non-URL.
+ */
+const $AssignmentRedirectUrl = z
+  .url({ abort: true })
+  .startsWith('https://')
+  .max(2000)
+  .transform((value) => new URL(value).href);
+
+/**
  * An self-contained object representing an assignment.
  */
 type Assignment = z.infer<typeof $Assignment>;
@@ -19,6 +31,7 @@ const $Assignment = $BaseModel.extend({
   expiresAt: $DateLike,
   groupId: z.string().min(1).nullish(),
   instrumentId: z.string().min(1),
+  redirectUrl: $AssignmentRedirectUrl.nullish(),
   status: $AssignmentStatus,
   subjectId: z.string().min(1),
   url: z.string().url()
@@ -55,6 +68,7 @@ const $CreateAssignmentData = z.object({
   expiresAt: $FutureDate,
   groupId: z.string().nullish(),
   instrumentId: z.string(),
+  redirectUrl: $AssignmentRedirectUrl.optional(),
   subjectId: z.string()
 });
 
@@ -76,6 +90,8 @@ const $BulkAssignmentTimepoint = z.object({
 const $BulkAssignmentRequestBase = z.object({
   allowDuplicates: z.boolean().default(false),
   groupId: z.string().min(1),
+  /** Applied to every assignment the operation creates. */
+  redirectUrl: $AssignmentRedirectUrl.optional(),
   subjectIds: $UniqueStrings.max(BULK_ASSIGNMENT_MAX_SUBJECTS),
   timepoints: z
     .array($BulkAssignmentTimepoint)
@@ -221,6 +237,7 @@ export type {
 
 export {
   $Assignment,
+  $AssignmentRedirectUrl,
   $BulkAssignmentFailure,
   $BulkAssignmentIssue,
   $BulkAssignmentPreflightData,

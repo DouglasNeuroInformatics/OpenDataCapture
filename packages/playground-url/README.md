@@ -43,4 +43,4 @@ The status line is written to stderr and the link to stdout, so it pipes cleanly
 | `-b, --base-url <url>` | Playground origin to link to (defaults to the hosted playground). |
 | `-o, --open`           | Open the generated link in your default browser.                  |
 
-Only text source files (`.css`, `.html`, `.js`, `.jsx`, `.json`, `.ts`, `.tsx`) are embedded; binary assets cannot be represented in a share URL and are skipped with a warning.
+Only text files (`.css`, `.html`, `.js`, `.jsx`, `.json`, `.svg`, `.ts`, `.tsx`) are embedded. Binary assets (`.jpeg`, `.jpg`, `.mp3`, `.mp4`, `.png`, `.webp`) are skipped with a warning to keep links short; the playground's own Share button does carry them, base64-encoded.

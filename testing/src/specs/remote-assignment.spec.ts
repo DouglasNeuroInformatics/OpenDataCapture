@@ -82,6 +82,36 @@ test.describe('remote assignment', () => {
     expect(await urlInput.inputValue()).toMatch(/^https?:\/\/.+/);
   });
 
+  test('should create a remote assignment that sends the subject on to the https redirect URL given', async ({
+    api,
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    await startSession(getPageModel, `Redirect${uniqueId}`, `User${uniqueId}`, 'Female');
+
+    await page.getByTestId('nav-button-/session/remote-assignment').click();
+    await page.waitForURL('**/session/remote-assignment');
+
+    const remoteAssignmentPage = new RemoteAssignmentPage(page);
+    await remoteAssignmentPage.selectInstrument('Happiness Questionnaire');
+    await remoteAssignmentPage.redirectUrlInput.fill('http://example.com/done');
+    await remoteAssignmentPage.submitAssignmentForm();
+    await expect(remoteAssignmentPage.validationError).toHaveText('Must start with "https://"');
+    await expect(remoteAssignmentPage.createDialog).toBeVisible();
+
+    const redirectUrl = `https://example.com/done/${uniqueId}`;
+    await remoteAssignmentPage.redirectUrlInput.fill(redirectUrl);
+    await remoteAssignmentPage.submitAssignmentForm();
+    await expect(remoteAssignmentPage.urlInput).toBeVisible();
+    await remoteAssignmentPage.closeResultButton.click();
+
+    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+    await page.waitForURL('**/datahub/subjects/**/table');
+    const subjectId = page.url().split('/datahub/subjects/')[1]!.split('/')[0]!;
+    expect(await api.findAssignments(subjectId)).toMatchObject([{ redirectUrl }]);
+  });
+
   test('should offer a copy-to-clipboard control and a QR code alongside the assignment link', async ({
     context,
     getPageModel,

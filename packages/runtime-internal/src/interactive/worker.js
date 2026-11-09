@@ -14,40 +14,24 @@ worker.addEventListener('activate', (event) => {
 });
 
 /**
- * Converts a data URL (base64 or plain) into a Fetch API Response object.
+ * Converts a data URL into a Fetch API Response object.
+ *
+ * Any `data:<mime>[;base64],<payload>` URL is accepted, so every form the instrument bundler emits
+ * (`data:image/png;base64,…`, esbuild's percent-encoded `data:image/svg+xml,<svg …>`,
+ * `data:audio/mpeg;base64,…`, `data:application/octet-stream;base64,…`) is served. Decoding is
+ * delegated to `fetch`, whose `data:` URL processor follows the Fetch spec: it percent-decodes
+ * leniently (a bare `%` is kept), handles `;base64` and MIME parameters, and gives the resulting
+ * blob its MIME type, which `new Response(blob)` uses as the `Content-Type`.
  *
  * @param {string} dataUrl - The data URL to convert. Example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..." or "data:text/plain,Hello%20World"
- * @returns {Response} A Response object representing the decoded data URL content.
+ * @returns {Promise<Response>} A Response object representing the decoded data URL content.
  */
-function dataUrlToResponse(dataUrl) {
-  // Try base64 image format first
-  const base64Match = /^data:(image\/[a-zA-Z+]+);base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl);
-  if (base64Match) {
-    const [, mimeType, base64Data] = /** @type {any[]} */ (base64Match);
-
-    // Decode base64 to Uint8Array
-    const binaryString = atob(base64Data);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-
-    return new Response(bytes, {
-      headers: { 'Content-Type': mimeType }
-    });
+async function dataUrlToResponse(dataUrl) {
+  if (!dataUrl.startsWith('data:')) {
+    throw new Error(`Static asset is not a data URL: '${dataUrl.slice(0, 64)}'`);
   }
-
-  // Try plain text format
-  const textMatch = /^data:(text\/[a-zA-Z+]+),(.*)$/.exec(dataUrl);
-  if (textMatch) {
-    const [, mimeType, textData] = /** @type {any[]} */ (textMatch);
-    const decodedText = decodeURIComponent(textData);
-    return new Response(decodedText, {
-      headers: { 'Content-Type': mimeType }
-    });
-  }
-
-  throw new Error('Invalid or unsupported data URL: must be a base64-encoded image or plain text');
+  const blob = await (await fetch(dataUrl)).blob();
+  return new Response(blob);
 }
 
 addEventListener('message', (event) => {

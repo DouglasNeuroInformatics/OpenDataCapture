@@ -11,6 +11,7 @@ import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrum
 import axios from 'axios';
 
 import CapWidget from './components/Cap';
+import CompletionRedirect from './components/CompletionRedirect';
 import Landing from './components/Landing';
 
 import './services/axios';
@@ -24,6 +25,7 @@ type BaseRootProps = {
 type AssignmentProps = {
   id: string;
   initialSeriesIndex?: number;
+  redirectUrl?: string;
   target: InstrumentBundleContainer;
   token: string;
 };
@@ -34,10 +36,11 @@ type LandingRootProps = BaseRootProps & { kind: 'landing' };
 
 type RootProps = AssignmentRootProps | LandingRootProps;
 
-const Assignment = ({ id, initialSeriesIndex, target, token }: AssignmentProps) => {
+const Assignment = ({ id, initialSeriesIndex, redirectUrl, target, token }: AssignmentProps) => {
   const notifications = useNotificationsStore();
 
   const [verified, setVerified] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
 
   // Solving the Cap challenge redeems a short-lived token; exchange it immediately for a
   // server-side verification flag so the form is not bound by the token's 20-minute lifetime.
@@ -77,18 +80,24 @@ const Assignment = ({ id, initialSeriesIndex, target, token }: AssignmentProps) 
       }
     });
     notifications.addNotification({ type: 'success' });
+    if (updateData.status === 'COMPLETE') {
+      setIsComplete(true);
+    }
   };
 
   return (
-    <InstrumentRenderer
-      disableSummaryActions
-      beforeBegin={<CapWidget onSolve={(token) => void handleSolve(token)} />}
-      className="min-h-full w-full"
-      disableBegin={!verified}
-      initialSeriesIndex={initialSeriesIndex}
-      target={target}
-      onSubmit={handleSubmit}
-    />
+    <>
+      <InstrumentRenderer
+        disableSummaryActions
+        beforeBegin={<CapWidget onSolve={(token) => void handleSolve(token)} />}
+        className="min-h-full w-full"
+        disableBegin={!verified}
+        initialSeriesIndex={initialSeriesIndex}
+        target={target}
+        onSubmit={handleSubmit}
+      />
+      {isComplete && redirectUrl && <CompletionRedirect url={redirectUrl} />}
+    </>
   );
 };
 

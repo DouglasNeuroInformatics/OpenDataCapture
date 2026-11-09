@@ -1,7 +1,10 @@
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { Page } from '@playwright/test';
 
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
 import { expect, test } from '../support/fixtures';
+
+import type { GetPageModel } from '../support/fixtures';
 
 const API = '/api/v1';
 
@@ -12,6 +15,33 @@ const API = '/api/v1';
 const SERIES_INSTRUMENT_TITLE = 'Happiness Questionnaire (Repeated)';
 
 const ITEM_INSTRUMENT_TITLE = 'Happiness Questionnaire';
+
+/** Starts a session for a new subject and opens the repeated series on its overview screen. */
+async function openSeries({
+  getPageModel,
+  page,
+  uniqueId
+}: {
+  getPageModel: GetPageModel;
+  page: Page;
+  uniqueId: string;
+}) {
+  const startSessionPage = await getPageModel('/session/start-session');
+  await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+  await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+  await startSessionPage.fillSessionForm(`Series${uniqueId}`, `Subject${uniqueId}`, 'Female');
+  await startSessionPage.submitForm();
+  await expect(startSessionPage.successMessage).toBeVisible();
+
+  await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+  await page.waitForURL('**/instruments/accessible-instruments');
+
+  const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: SERIES_INSTRUMENT_TITLE }).first();
+  await expect(card).toBeVisible();
+  await card.click();
+
+  return new RenderInstrumentPage(page);
+}
 
 test.describe('series instrument', () => {
   /**
@@ -64,21 +94,7 @@ test.describe('series instrument', () => {
     page,
     uniqueId
   }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-    await startSessionPage.fillSessionForm(`Series${uniqueId}`, `Subject${uniqueId}`, 'Female');
-    await startSessionPage.submitForm();
-    await expect(startSessionPage.successMessage).toBeVisible();
-
-    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-    await page.waitForURL('**/instruments/accessible-instruments');
-
-    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: SERIES_INSTRUMENT_TITLE }).first();
-    await expect(card).toBeVisible();
-    await card.click();
-
-    const instrumentPage = new RenderInstrumentPage(page);
+    const instrumentPage = await openSeries({ getPageModel, page, uniqueId });
     await instrumentPage.begin();
     await instrumentPage.completeHappinessQuestionnaire();
     await expect(instrumentPage.happinessSatisfiedRadio).toBeChecked();
@@ -102,5 +118,30 @@ test.describe('series instrument', () => {
     // Each item is stored under its own instrument, so one pass through the series leaves two
     // records rather than one.
     await expect(page.getByTestId('data-table-body').getByTestId('data-table-row')).toHaveCount(2);
+  });
+
+  // A skipProgress series has no interstitial screen, so the bar on each item's form is the only
+  // place the subject can see how far through the series they are.
+  test('should show the position in a skipProgress series on each item it administers', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const instrumentPage = await openSeries({ getPageModel, page, uniqueId });
+    await expect(instrumentPage.seriesProgress).toBeHidden();
+    await instrumentPage.begin();
+
+    await expect(instrumentPage.seriesProgress).toContainText('Instrument 1 of 2');
+    await expect(instrumentPage.seriesProgressBar).toHaveAttribute('aria-valuenow', '0');
+    await instrumentPage.completeHappinessQuestionnaire();
+    await instrumentPage.submit();
+
+    await expect(instrumentPage.seriesProgress).toContainText('Instrument 2 of 2');
+    await expect(instrumentPage.seriesProgressBar).toHaveAttribute('aria-valuenow', '1');
+    await instrumentPage.completeHappinessQuestionnaire();
+    await instrumentPage.submit();
+
+    await expect(instrumentPage.seriesCompletionHeading).toBeVisible();
+    await expect(instrumentPage.seriesProgress).toBeHidden();
   });
 });

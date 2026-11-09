@@ -205,6 +205,36 @@ describe('Route', () => {
       });
     });
 
+    it('should refuse a redirect URL that is not https, without creating the assignment', async () => {
+      selectInstrument();
+      fireEvent.change(screen.getByLabelText('Redirect URL (Optional)'), { target: { value: 'http://example.com' } });
+      submitForm();
+      await waitFor(() => expect(screen.getByTestId('error-message-text')).toBeTruthy());
+      expect(mocks.mutateAsync).not.toHaveBeenCalled();
+    });
+
+    it('should create the assignment with the redirect URL given', async () => {
+      selectInstrument();
+      fireEvent.change(screen.getByLabelText('Redirect URL (Optional)'), {
+        target: { value: 'https://example.com/done' }
+      });
+      submitForm();
+      await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
+      expect(mocks.mutateAsync).toHaveBeenCalledWith({
+        data: expect.objectContaining({ redirectUrl: 'https://example.com/done' })
+      });
+    });
+
+    it('should create the assignment with no redirect URL when the field is cleared', async () => {
+      selectInstrument();
+      const input = screen.getByLabelText('Redirect URL (Optional)');
+      fireEvent.change(input, { target: { value: 'https://example.com/done' } });
+      fireEvent.change(input, { target: { value: '' } });
+      submitForm();
+      await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
+      expect(mocks.mutateAsync.mock.lastCall?.[0].data.redirectUrl).toBeUndefined();
+    });
+
     it('should create the assignment without a group when none is selected', async () => {
       mocks.store.currentGroup = null;
       await createAssignment();

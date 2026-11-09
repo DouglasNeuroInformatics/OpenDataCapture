@@ -16,6 +16,7 @@ import {
   $UpdateUserPermissionsData
 } from '@opendatacapture/schemas/user';
 import type { PasswordErrorCode } from '@opendatacapture/schemas/user';
+import type { Prisma } from '@prisma/client';
 import { pwnedPassword } from 'hibp';
 
 import { AuditLogger } from '@/audit/audit.logger';
@@ -23,6 +24,9 @@ import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
 import { PermissionSetsService } from '@/permission-sets/permission-sets.service';
+
+/** Usernames are matched ignoring case, which the case-sensitive unique index cannot enforce. */
+const matchingUsername = (username: string): Prisma.StringFilter<'User'> => ({ equals: username, mode: 'insensitive' });
 
 @Injectable()
 export class UsersService {
@@ -61,7 +65,7 @@ export class UsersService {
       omit: {
         hashedPassword: true
       },
-      where: { AND: [accessibleQuery(ability, 'read', 'User'), { username }] }
+      where: { AND: [accessibleQuery(ability, 'read', 'User'), { username: matchingUsername(username) }] }
     });
     if (!user) {
       return { success: false };
@@ -97,7 +101,7 @@ export class UsersService {
     }: $CreateUserData,
     options?: EntityOperationOptions
   ) {
-    if (await this.userModel.exists({ username })) {
+    if (await this.userModel.exists({ username: matchingUsername(username) })) {
       throw new ConflictException(`User with username '${username}' already exists!`);
     }
 
@@ -166,13 +170,30 @@ export class UsersService {
     username: string,
     { ability, includeHashedPassword }: EntityOperationOptions & { includeHashedPassword?: boolean } = {}
   ) {
-    const user = await this.userModel.findFirst({
+    const query = {
       include: { groups: true, permissionSet: true },
       omit: {
         hashedPassword: !includeHashedPassword
-      },
-      where: { AND: [accessibleQuery(ability, 'read', 'User'), { username }] }
+      }
+    };
+    const readScope = accessibleQuery(ability, 'read', 'User');
+    // Users created before usernames ignored case may differ only by case, so the exact spelling
+    // wins and keeps each of them reachable.
+    const exactMatch = await this.userModel.findFirst({ ...query, where: { AND: [readScope, { username }] } });
+    if (exactMatch) {
+      return exactMatch;
+    }
+    const caseInsensitiveMatches = await this.userModel.findMany({
+      ...query,
+      take: 2,
+      where: { AND: [readScope, { username: matchingUsername(username) }] }
     });
+    if (caseInsensitiveMatches.length > 1) {
+      throw new ConflictException(
+        `Username '${username}' matches more than one user when case is ignored, so it must be entered with its exact case`
+      );
+    }
+    const [user] = caseInsensitiveMatches;
     if (!user) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
     }
@@ -205,6 +226,12 @@ export class UsersService {
     // no account able to reach it again, or any other admin-only route.
     if (id === currentUser.id && (data.disabled || isDemotion)) {
       throw new ForbiddenException('You may not remove your own administrator access');
+    }
+    if (
+      data.username &&
+      (await this.userModel.exists({ id: { not: id }, username: matchingUsername(data.username) }))
+    ) {
+      throw new ConflictException(`User with username '${data.username}' already exists!`);
     }
     let hashedPassword: string | undefined;
     if (password) {

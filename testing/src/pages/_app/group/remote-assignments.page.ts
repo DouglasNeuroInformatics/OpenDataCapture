@@ -26,6 +26,10 @@ export class RemoteAssignmentsPage extends AppPage {
   readonly mapStep: Locator;
   readonly parsePasted: Locator;
   readonly pasteInput: Locator;
+  readonly redirectUrlError: Locator;
+  readonly redirectUrlInput: Locator;
+  /** The review step's note of where the batch sends its subjects once they finish. */
+  readonly reviewRedirectUrl: Locator;
   readonly selectAllSubjects: Locator;
   readonly skipUnplaceable: Locator;
   readonly submitBatch: Locator;
@@ -49,6 +53,9 @@ export class RemoteAssignmentsPage extends AppPage {
     this.errorList = page.getByTestId('bulk-error-list');
     this.parsePasted = page.getByTestId('bulk-parse-pasted');
     this.pasteInput = page.getByTestId('bulk-paste-input');
+    this.redirectUrlError = page.getByTestId('bulk-redirect-url-error');
+    this.redirectUrlInput = page.getByTestId('bulk-redirect-url-input');
+    this.reviewRedirectUrl = page.getByTestId('bulk-review-redirect-url');
     this.skipUnplaceable = page.getByTestId('bulk-skip-unplaceable');
     this.addTimepoint = page.getByTestId('bulk-add-timepoint');
     this.confirmTimepoints = page.getByTestId('bulk-confirm-timepoints');
@@ -68,10 +75,15 @@ export class RemoteAssignmentsPage extends AppPage {
 
   /** Add the first offered instrument as a timepoint and continue to review. */
   async addFirstInstrument() {
+    await this.addFirstTimepoint();
+    await this.confirmTimepoints.click();
+  }
+
+  /** Add the first offered instrument as a timepoint, staying on the step. */
+  async addFirstTimepoint() {
     await this.instrumentSelect.click();
     await this.$ref.getByRole('option').first().click();
     await this.addTimepoint.click();
-    await this.confirmTimepoints.click();
   }
 
   breadcrumb(step: WizardStepName): Locator {

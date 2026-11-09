@@ -32,9 +32,9 @@ export const PermissionSetChoice = ({
     return (
       <p className="text-muted-foreground text-sm" data-testid="user-permission-set-none">
         {t({
-          en: 'No permission sets exist yet. An administrator can create one under Manage Permission Sets.',
-          es: 'Todavía no existe ningún conjunto de permisos. Un administrador puede crear uno en Gestionar conjuntos de permisos.',
-          fr: "Aucun ensemble d'autorisations n'existe encore. Un administrateur peut en créer un sous Gérer les ensembles d'autorisations."
+          en: 'No permission sets exist yet. An administrator can create one under Admin Panel > Access > Permission Sets.',
+          es: 'Todavía no existe ningún conjunto de permisos. Un administrador puede crear uno en Panel de administración > Acceso > Conjuntos de permisos.',
+          fr: "Aucun ensemble d'autorisations n'existe encore. Un administrateur peut en créer un sous Panneau d'administration > Accès > Ensembles d'autorisations."
         })}
       </p>
     );

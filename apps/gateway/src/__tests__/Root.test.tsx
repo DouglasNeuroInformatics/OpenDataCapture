@@ -52,18 +52,21 @@ function seriesResult(complete: boolean): InstrumentSubmitHandler.AnyContext {
   };
 }
 
-function renderAssignment(target: InstrumentBundleContainer = formTarget) {
+function renderAssignment(target: InstrumentBundleContainer = formTarget, redirectUrl?: string) {
   return render(
     <Root
       activeLanguages={['en', 'fr']}
       id="assignment-1"
       kind="assignment"
       language="en"
+      redirectUrl={redirectUrl}
       target={target}
       token="assignment-token"
     />
   );
 }
+
+const REDIRECT_URL = 'https://example.com/done';
 
 async function solveChallenge() {
   await act(async () => {
@@ -179,5 +182,41 @@ describe('Root', () => {
     await submit(formResult);
     expect(patch).not.toHaveBeenCalled();
     expect(notifications()).toMatchObject([{ message: 'Internal Server Error', type: 'error' }]);
+  });
+
+  it('should offer to send the subject on to the redirect URL once the assignment is complete', async () => {
+    renderAssignment(formTarget, REDIRECT_URL);
+    await solveChallenge();
+    await submit(formResult);
+    expect(screen.getByTestId('completion-redirect-link').getAttribute('href')).toBe(REDIRECT_URL);
+  });
+
+  it('should not send the subject on while items of a series remain', async () => {
+    renderAssignment(seriesTarget, REDIRECT_URL);
+    await solveChallenge();
+    await submit(seriesResult(false));
+    expect(screen.queryByTestId('completion-redirect')).toBeNull();
+  });
+
+  it('should send the subject on once the last item of a series is submitted', async () => {
+    renderAssignment(seriesTarget, REDIRECT_URL);
+    await solveChallenge();
+    await submit(seriesResult(true));
+    expect(screen.getByTestId('completion-redirect')).toBeTruthy();
+  });
+
+  it('should leave the subject on the completion screen when the assignment has no redirect URL', async () => {
+    renderAssignment(formTarget);
+    await solveChallenge();
+    await submit(formResult);
+    expect(screen.queryByTestId('completion-redirect')).toBeNull();
+  });
+
+  it('should not send the subject on when the gateway did not record the submission', async () => {
+    patch.mockRejectedValue(new Error('Network Error'));
+    renderAssignment(formTarget, REDIRECT_URL);
+    await solveChallenge();
+    await expect(submit(formResult)).rejects.toThrow('Network Error');
+    expect(screen.queryByTestId('completion-redirect')).toBeNull();
   });
 });

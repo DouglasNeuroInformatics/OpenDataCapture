@@ -303,7 +303,7 @@ describe('WalkthroughProvider', () => {
 
     it('should mark the walkthrough complete and close when the user asks not to see it again', () => {
       renderProvider();
-      fireEvent.click(screen.getByRole('button', { name: "Don't show again" }));
+      fireEvent.click(screen.getByRole('button', { name: "Don't Show Again" }));
       expect(mocks.store.setIsWalkthroughComplete).toHaveBeenCalledWith(true);
       expect(mocks.store.setIsWalkthroughOpen).toHaveBeenCalledWith(false);
     });
@@ -326,7 +326,7 @@ describe('WalkthroughProvider', () => {
     it('should hide the option not to show again on the last step, where done already completes it', () => {
       renderProvider();
       clickNext(STEP_COUNT_WITHOUT_GATEWAY - 1);
-      expect(screen.queryByRole('button', { name: "Don't show again" })).toBeNull();
+      expect(screen.queryByRole('button', { name: "Don't Show Again" })).toBeNull();
     });
 
     it('should mark the walkthrough complete and close when the user finishes the last step', () => {

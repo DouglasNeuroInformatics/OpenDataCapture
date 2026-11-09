@@ -75,7 +75,7 @@ export class AssignmentsService {
   }
 
   async create(
-    { expiresAt, groupId, instrumentId, subjectId }: $CreateAssignmentData,
+    { expiresAt, groupId, instrumentId, redirectUrl, subjectId }: $CreateAssignmentData,
     currentUser: RequestUser
   ): Promise<Assignment> {
     if (groupId) {
@@ -91,7 +91,13 @@ export class AssignmentsService {
         issues: [{ instrumentIds: [instrumentId], kind: 'INSTRUMENT_UNAVAILABLE' }]
       } satisfies BulkAssignmentFailure);
     }
-    const { assignment, publicKey } = await this.stageAssignment({ expiresAt, groupId, instrumentId, subjectId });
+    const { assignment, publicKey } = await this.stageAssignment({
+      expiresAt,
+      groupId,
+      instrumentId,
+      redirectUrl,
+      subjectId
+    });
     try {
       await this.gatewayService.createRemoteAssignment(assignment, publicKey);
     } catch (err) {
@@ -123,7 +129,11 @@ export class AssignmentsService {
         }),
         BULK_KEYPAIR_CONCURRENCY
       )) {
-        staged.push(...(await Promise.all(batch.map((row) => this.stageAssignment({ ...row, groupId })))));
+        staged.push(
+          ...(await Promise.all(
+            batch.map((row) => this.stageAssignment({ ...row, groupId, redirectUrl: data.redirectUrl }))
+          ))
+        );
       }
       await this.gatewayService.createRemoteAssignments(staged);
     } catch (err) {
@@ -347,11 +357,13 @@ export class AssignmentsService {
     expiresAt,
     groupId,
     instrumentId,
+    redirectUrl,
     subjectId
   }: {
     expiresAt: Date;
     groupId?: null | string;
     instrumentId: string;
+    redirectUrl?: string;
     subjectId: string;
   }): Promise<{ assignment: Assignment; publicKey: webcrypto.CryptoKey }> {
     const { privateKey, publicKey } = await HybridCrypto.generateKeyPair();
@@ -366,6 +378,7 @@ export class AssignmentsService {
         group: groupId ? { connect: { id: groupId } } : undefined,
         id,
         instrument: { connect: { id: instrumentId } },
+        redirectUrl,
         status: 'OUTSTANDING',
         subject: { connect: { id: subjectId } },
         url: `${this.assignmentBaseUrl}/assignments/${id}`

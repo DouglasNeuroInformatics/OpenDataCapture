@@ -137,10 +137,11 @@ test.describe('admin settings', () => {
 
       await settingsPage.selectLanguage('Español');
       const sidebar = page.getByTestId('sidebar');
-      // The group header is a `NavGroup`, not a `NavButton`, so it carries no testid and is matched
-      // by role; its submenu items are `NavButton`s and are matched by theirs.
+      // The group headers are `NavGroup`s, not `NavButton`s, so they carry no testid and are matched
+      // by role; their submenu items are `NavButton`s and are matched by theirs.
       await expect(sidebar.getByRole('button', { name: 'Panel de administración' })).toBeVisible();
-      await expect(sidebar.getByTestId('nav-button-/admin/settings')).toContainText('Configuración de la aplicación');
+      await expect(sidebar.getByRole('button', { exact: true, name: 'Instancia' })).toBeVisible();
+      await expect(sidebar.getByTestId('nav-button-/admin/settings')).toHaveText('Configuración');
 
       await settingsPage.selectLanguage('English');
       const removed = waitForSetupPatch(page);

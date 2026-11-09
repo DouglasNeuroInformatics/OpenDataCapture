@@ -17,6 +17,7 @@ import {
 } from '@/hooks/useBulkAssignments';
 import type { BulkParseResult, CanonicalField, SubjectEmails } from '@/utils/bulk-assignments';
 import { buildResultRows, toResultTsv, unavailableSubjectIds } from '@/utils/bulk-assignments';
+import { omittedIfBlank } from '@/utils/validation';
 
 type InstrumentOption = { id: string; title: string };
 
@@ -43,6 +44,7 @@ export function useBulkAssignmentWizard({
   const [parsed, setParsed] = useState<BulkParseResult | null>(null);
   const [subjectIds, setSubjectIds] = useState<string[]>([]);
   const [timepoints, setTimepoints] = useState<DraftTimepoint[]>([]);
+  const [redirectUrl, setRedirectUrl] = useState('');
   const [assignments, setAssignments] = useState<CreatedAssignment[]>([]);
   const [sourceRows, setSourceRows] = useState<undefined | { [subjectId: string]: { [column: string]: string } }>();
   const [columnMapping, setColumnMapping] = useState<Partial<{ [key: string]: CanonicalField }>>({});
@@ -65,6 +67,7 @@ export function useBulkAssignmentWizard({
   const toPayload = (allowDuplicates: boolean, ids: string[] = subjectIds) => ({
     allowDuplicates,
     groupId,
+    redirectUrl: omittedIfBlank(redirectUrl),
     subjectIds: ids,
     timepoints: timepoints.map(({ expiresAt, instrumentId }) => ({
       expiresAt: new Date(`${expiresAt}T23:59:59.999Z`),
@@ -153,6 +156,8 @@ export function useBulkAssignmentWizard({
     isSubmitting: createMutation.isPending,
     parsed,
     pastedText,
+    /** Where every assignment in the batch sends its subject once they finish; blank for nowhere. */
+    redirectUrl,
     /** Subject ids resolved from the mapped columns, in the row order they were supplied. */
     resolveMapping: (ids: string[], rows: BulkParseResult['rows'], mapping: BulkParseResult['mapping']) => {
       setSubjectIds(ids);
@@ -184,6 +189,7 @@ export function useBulkAssignmentWizard({
     },
     setEmails,
     setPastedText,
+    setRedirectUrl,
     setSelectedSubjectIds: setSubjectIds,
     setSourceMode,
     setTimepoints,
@@ -197,6 +203,7 @@ export function useBulkAssignmentWizard({
       setParsed(null);
       setSubjectIds([]);
       setTimepoints([]);
+      setRedirectUrl('');
       setAssignments([]);
       setSourceRows(undefined);
       setColumnMapping({});

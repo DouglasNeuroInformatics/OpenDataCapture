@@ -148,13 +148,25 @@ describe('Route', () => {
     await waitFor(() => expect(mocks.get).toHaveBeenCalledWith('/v1/users/check-username/j%2Fdoe'));
   });
 
-  it('should refuse a username that already exists without creating the user', async () => {
+  it('should lowercase the username, so new usernames never differ from one another only by case', async () => {
+    fillAndSubmit({ username: 'JDoe' });
+    await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
+    expect(mocks.get).toHaveBeenCalledWith('/v1/users/check-username/jdoe');
+    expect(mocks.mutateAsync.mock.lastCall?.[0].data.username).toBe('jdoe');
+  });
+
+  it('should show a taken username under the username field without creating the user', async () => {
     mocks.get.mockResolvedValue({ data: { success: true } });
     fillAndSubmit();
-    await waitFor(() => {
-      expect(lastNotification()).toMatchObject({ message: 'Username already exists', type: 'error' });
-    });
+    await waitFor(() => expect(errorMessages()).toContain('Username already exists'));
+    expect(lastNotification()).toBeUndefined();
     expect(mocks.mutateAsync).not.toHaveBeenCalled();
+  });
+
+  it('should focus the username field when it is the one found invalid, so the admin lands on what to fix', async () => {
+    mocks.get.mockResolvedValue({ data: { success: true } });
+    const form = fillAndSubmit();
+    await waitFor(() => expect(document.activeElement).toBe(field(form, 'username')));
   });
 
   it('should create the user with blank contact details omitted and no forced password reset', async () => {

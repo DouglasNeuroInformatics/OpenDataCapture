@@ -21,12 +21,17 @@ COPY tsconfig.json vitest.config.ts ./
 COPY --from=pruner /app/out/ .
 RUN pnpm install --frozen-lockfile 
 RUN turbo build --filter=@opendatacapture/gateway
-RUN turbo run db:push --filter=@opendatacapture/gateway
+RUN node -p "require('./apps/gateway/node_modules/prisma/package.json').version" > prisma-version
 
 # RUN SERVER
 FROM base AS runner
+ENV CHECKPOINT_DISABLE=1
+# run.sh applies the schema on every start, so the runner needs the Prisma CLI the lockfile resolved.
+# npm gives it a flat node_modules, which copying pnpm's symlinked one out of the installer would not.
+COPY --from=installer /app/prisma-version prisma-version
+RUN npm install --prefix /app/prisma-cli --no-audit --no-fund "prisma@$(cat prisma-version)"
+COPY apps/gateway/prisma/schema.prisma /app/prisma/schema.prisma
 COPY apps/gateway/scripts/run.sh run.sh
-COPY --from=installer /app/sqlite/gateway.db /app/gateway.tmpl.db
 COPY --from=installer /app/apps/gateway/dist/ /app/dist/
 COPY --from=installer /app/apps/gateway/public/ /app/public/
 COPY --from=installer /app/apps/gateway/dist/runtime/ /runtime/

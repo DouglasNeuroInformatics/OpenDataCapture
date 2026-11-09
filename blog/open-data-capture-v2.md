@@ -58,6 +58,6 @@ Because storage is opt-in, the rest of the application never depends on it. If a
 
 ## Getting started
 
-If you're running Open Data Capture, see the [v2.0.0 migration guide](https://opendatacapture.org/docs/updating/v2.0.0) for the exact upgrade steps, the new environment variables, and notes on backing up your storage volume.
+If you're running Open Data Capture, see the [v2.0.0 migration guide](/en/docs/changelog/#200) for the exact upgrade steps, the new environment variables, and notes on backing up your storage volume.
 
 File instruments close the gap between structured data capture and the files that real research produces. We're excited to see what you collect with them.

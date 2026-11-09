@@ -58,6 +58,31 @@ test.describe('bulk remote assignments', () => {
     return apiRequestContext.post(`${API}${path}`, { data, headers: { Authorization: `Bearer ${adminToken}` } });
   };
 
+  test('should send every subject of a batch on to its redirect URL, and refuse one that is not https', async ({
+    adminToken,
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const { group, subjectIds } = await seedGroup({ adminToken, api, apiRequestContext }, uniqueId, 2);
+    const [instrumentId] = await instrumentIdsFor(apiRequestContext, adminToken, 1);
+    const request = { groupId: group.id, subjectIds, timepoints: [{ expiresAt: futureIso(30), instrumentId }] };
+
+    const refused = await post(apiRequestContext, adminToken, '/assignments/bulk', {
+      ...request,
+      redirectUrl: 'http://example.com/done'
+    });
+    expect(refused.status()).toBe(400);
+
+    const redirectUrl = `https://example.com/done/${uniqueId}`;
+    const created = await post(apiRequestContext, adminToken, '/assignments/bulk', { ...request, redirectUrl });
+    expect(created.status(), await created.text()).toBe(201);
+    expect(((await created.json()) as Assignment[]).map((assignment) => assignment.redirectUrl)).toEqual([
+      redirectUrl,
+      redirectUrl
+    ]);
+  });
+
   test('should create one assignment per subject per timepoint, and refuse a repeat as a conflict', async ({
     adminToken,
     api,

@@ -77,6 +77,7 @@ model Assignment {
   instrument        Instrument        @relation(fields: [instrumentId], references: [id])
   instrumentId      String
   instrumentRecord  InstrumentRecord?
+  redirectUrl       String?
   status            AssignmentStatus
   subject           Subject           @relation(fields: [subjectId], references: [id])
   subjectId         String

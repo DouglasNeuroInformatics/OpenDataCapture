@@ -298,6 +298,16 @@ describe('AssignmentsService', () => {
       expect(assignmentModel.create.mock.lastCall?.[0].data.group).toStrictEqual({ connect: { id: GROUP_ID } });
     });
 
+    it('should store the redirect URL, so the gateway can send the subject there once they finish', async () => {
+      await assignmentsService.create({ ...data(), redirectUrl: 'https://example.com/done' }, permissiveUser());
+      expect(assignmentModel.create.mock.lastCall?.[0].data.redirectUrl).toBe('https://example.com/done');
+    });
+
+    it('should store no redirect URL when none is given, leaving the subject on the completion screen', async () => {
+      await assignmentsService.create(data(), permissiveUser());
+      expect(assignmentModel.create.mock.lastCall?.[0].data.redirectUrl).toBeUndefined();
+    });
+
     it('should allow a grouped assignment to a user granted only assignment creation in that group, which is less than managing it', async () => {
       const grantee = userAt('STANDARD', GROUP_ID, [{ action: 'create', groupId: GROUP_ID, subject: 'Assignment' }]);
       await assignmentsService.create(data(), grantee);
@@ -361,6 +371,14 @@ describe('AssignmentsService', () => {
       );
       expect(assignments).toHaveLength(4);
       expect(assignmentModel.create).toHaveBeenCalledTimes(4);
+    });
+
+    it('should store the redirect URL on every assignment the batch creates', async () => {
+      await assignmentsService.createBulk(request({ redirectUrl: 'https://example.com/done' }), permissiveUser());
+      expect(assignmentModel.create.mock.calls.map(([args]) => args.data.redirectUrl)).toEqual([
+        'https://example.com/done',
+        'https://example.com/done'
+      ]);
     });
 
     it('should send the whole batch to the gateway in a single call, so one bundle is fetched per instrument', async () => {

@@ -7,7 +7,9 @@ import {
   $Email,
   $OptionalPassword,
   $PhoneNumber,
+  $RedirectUrl,
   clearedIfBlank,
+  findRedirectUrlError,
   omittedIfBlank,
   omittedIfUnchanged,
   requiresGroup,
@@ -133,6 +135,26 @@ describe('$Email', () => {
     const { issues } = parseEmail('jane.doe@');
     expect(issues).toHaveLength(1);
     expect(issues[0]!.message).toBe('Invalid email address');
+  });
+});
+
+describe('findRedirectUrlError', () => {
+  it('should find nothing wrong with an https URL', () => {
+    expect(findRedirectUrlError('https://example.com/done')).toBeNull();
+  });
+
+  it('should explain that a redirect URL must be https', () => {
+    expect(findRedirectUrlError('http://example.com/done')).toContain('https://');
+  });
+});
+
+describe('$RedirectUrl', () => {
+  it('should accept a blank field, since an assignment need not redirect', () => {
+    expect($RedirectUrl.safeParse('').success).toBe(true);
+  });
+
+  it('should reject a filled field that is not an https URL', () => {
+    expect($RedirectUrl.safeParse('javascript:alert(1)').success).toBe(false);
   });
 });
 
