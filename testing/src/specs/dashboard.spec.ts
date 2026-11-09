@@ -145,7 +145,8 @@ test.describe('dashboard', () => {
         await expect(cell).toHaveCSS('border-right-width', '0px');
       }
       await expect(frame.getByTestId('data-table-head')).toHaveCSS('font-weight', '700');
-      await expect(frame.getByTestId('data-table-head')).toHaveCSS('font-size', '16px');
+      await expect(frame.getByTestId('data-table-head')).toHaveCSS('font-size', '18px');
+      await expect(dialog.getByTestId('data-table-row').first()).toHaveCSS('font-size', '16px');
       await page.keyboard.press('Escape');
     }
   });

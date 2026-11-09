@@ -26,7 +26,8 @@ import { useAppStore } from '@/store';
 // column headers are set larger and bold to stand apart from the rows without them.
 const TEXT_ONLY_TABLE = cn(
   '[&_[data-testid=data-table]>.border]:border-0 [&_[data-testid=data-table]>.border_*]:border-0',
-  '[&_[data-testid=data-table-head]]:text-base [&_[data-testid=data-table-head]]:font-bold'
+  '[&_[data-testid=data-table]>.border>div]:text-base',
+  '[&_[data-testid=data-table-head]]:text-lg [&_[data-testid=data-table-head]]:font-bold'
 );
 
 const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
