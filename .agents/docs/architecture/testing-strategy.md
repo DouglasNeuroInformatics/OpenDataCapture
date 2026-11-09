@@ -16,6 +16,14 @@ What is tested where, and what CI blocks a merge on. Writing an e2e test is
 is the only code path that touches a real database: a permissions or row-scoping change is untested
 until an e2e spec covers it.
 
+## Scoping a run
+
+Scope a package script with `pnpm --filter @opendatacapture/<pkg> <script>` or turbo's
+`--filter=<pkg>`. Scope vitest to one project with `pnpm exec vitest --project <name>` (names come
+from the `name` field in each package's `vitest.config.ts`, e.g. `api`, `web`, `schemas`), or run a
+single file with `pnpm exec vitest path/to/file.test.ts`. A scoped run with `--coverage` measures
+only what it ran against the whole coverage scope, so add `--coverage.thresholds.100=false` to it.
+
 ## A test nothing collects passes silently
 
 Root `vitest.config.ts` collects only `apps/*/vitest.config.ts`, `packages/*/vitest.config.ts` and

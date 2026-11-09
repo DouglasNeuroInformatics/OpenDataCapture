@@ -25,16 +25,10 @@ pnpm test:coverage          # vitest with coverage — fails below 100%, the gat
 pnpm test:e2e               # playwright, in testing/
 ```
 
-Scope a run to one package with `pnpm --filter @opendatacapture/<pkg> <script>` or turbo's
-`--filter=<pkg>`. Scope vitest to one project with `pnpm exec vitest --project <name>` (names come
-from the `name` field in each package's `vitest.config.ts`, e.g. `api`, `web`, `schemas`). Run a
-single file with `pnpm exec vitest path/to/file.test.ts`. A scoped run with `--coverage` measures
-only what it ran against the whole coverage scope, so add `--coverage.thresholds.100=false` to it.
-
-`pnpm lint`, `pnpm test` and `pnpm test:coverage` all need `.env` to exist. `pnpm lint` also needs a
-generated Prisma client, so a cold run is not fast. A fresh clone needs more than `pnpm install`
-before `pnpm dev` serves anything — `.agents/docs/playbooks/run-locally.md` is the order of
-operations.
+Everything after `pnpm generate:env` needs `.env` to exist, and a fresh clone needs more than
+`pnpm install` before `pnpm dev` serves anything: `.agents/docs/playbooks/run-locally.md` is the
+order of operations. Scoping a run to one package, project or file is in
+`.agents/docs/architecture/testing-strategy.md`.
 
 ## Hard rules
 
@@ -43,17 +37,18 @@ not every tool loads nested files.
 
 - **Ask before writing code if the task is ambiguous** or its stated scope cannot accomplish the
   goal.
-- **No new dependencies without asking in-conversation.** Versions are pinned in the `catalog:`
-  block of `pnpm-workspace.yaml` — reference `"catalog:"` in a `package.json`, never a literal
-  version. `minimumReleaseAge` is 7 days, so a freshly published package will be rejected.
+- **No new dependencies without asking in-conversation.** Check `.agents/docs/packages/index.md`
+  first: one of the `@douglasneuroinformatics/*` packages this repo already consumes probably solves
+  it. Versions are pinned in the `catalog:` block of `pnpm-workspace.yaml` — reference `"catalog:"`
+  in a `package.json`, never a literal version. `minimumReleaseAge` is 7 days, so a freshly published
+  package will be rejected.
 - **Every change needs a unit test _and_ an end-to-end test in `testing/`.** See
   `.agents/docs/playbooks/add-e2e-test.md`. Utility scripts under `scripts/` and the standalone
   `cli/odc-cli` script, which has no test harness, are the exceptions and need no tests.
 - **Unit test coverage stays at 100%.** `pnpm test:coverage` fails below 100% statements, branches,
   functions or lines, and CI runs it. Code no test can reach is dead code: prove it dead (the types,
-  the callers, the library contract) and delete it. Never add a coverage-ignore comment (eslint
-  rejects one) or widen `coverage.exclude` to get past the gate; that list is for non-code —
-  fixtures, generated files and bare entrypoints.
+  the callers, the library contract) and delete it. Never widen `coverage.exclude` to get past the
+  gate; that list is for non-code — fixtures, generated files and bare entrypoints.
 - **Commit messages follow Conventional Commits.** `type(scope): subject`, where `type` is one of the
   11 `@commitlint/config-conventional` types and `scope`, if present, is an `@opendatacapture/*`
   workspace name without the prefix. A `commit-msg` hook and the `Commitlint` CI job enforce it, and
@@ -62,12 +57,9 @@ not every tool loads nested files.
 - **Pull requests and issues go to `DouglasNeuroInformatics/OpenDataCapture`, base `main`.**
   `origin` is your fork (`CONTRIBUTING.md`), so pass `--repo DouglasNeuroInformatics/OpenDataCapture`
   to `gh`.
-- **All frontend user-facing strings go through `useTranslation`.** Every language the frontend
-  exposes gets an entry. In web, gateway and react-core, prefer inline
-  `t({ en: '...', es: '...', fr: '...' })` unless the string is used more than once; each workspace
-  enables `requireCompleteTranslations`, so omitting a language is a type error caught by `pnpm lint`.
-- **Never run the `apps/web` route-tree generator.** `src/route-tree.ts` is generated and
-  git-tracked, but the user regenerates it manually after route changes. Never hand-edit it either.
+- **All frontend user-facing strings go through `useTranslation`**, with an entry for every language
+  the frontend exposes. Prefer inline `t({ en: '...', es: '...', fr: '...' })` unless the string is
+  used more than once.
 - **If code needs a comment to be understood, the code is wrong** — rewrite it. Comments are for
   the non-obvious: a vendor bug, a protocol quirk, a deliberate version pin. Never restate the code.
 - **Make small, incremental, easily reviewable changes.** No sweeping refactors unless asked.
@@ -86,9 +78,8 @@ cover.
 
 ## Where to look
 
-Read the `AGENTS.md` in the directory you are editing. Each one covers only that workspace. New
-here? Bring the stack up (`.agents/docs/playbooks/run-locally.md`), then read
-`.agents/docs/workspace-map.md` and `.agents/docs/architecture/testing-strategy.md`.
+Read the `AGENTS.md` in the directory you are editing; each covers only that workspace. New here?
+`.agents/docs/playbooks/run-locally.md`, then `.agents/docs/workspace-map.md`.
 
 | Working on                                      | Read first                              |
 | ----------------------------------------------- | --------------------------------------- |
@@ -110,11 +101,10 @@ here? Bring the stack up (`.agents/docs/playbooks/run-locally.md`), then read
 Every other workspace has its own `AGENTS.md` too — check the directory before assuming there
 isn't one.
 
-> **`packages/instrument-guidelines/AGENTS.md` is the one exception.** It is not this repo's
-> conventions: it is a published npm artifact (`@opendatacapture/instrument-guidelines`) whose bin
-> installs it into _external_ instrument repositories as their `AGENTS.md`. Read it as the
-> specification for authoring an instrument. Editing it changes a published package, so treat any
-> change there as a release, and do not add Open Data Capture repo rules to it.
+> **`packages/instrument-guidelines/AGENTS.md` is not this repo's conventions.** Its bin installs it
+> into _external_ instrument repositories as their `AGENTS.md`, so it is the specification for
+> authoring an instrument and a published npm package: treat a change there as a release, and keep
+> Open Data Capture repo rules out of it.
 
 ### Deeper reference, read on demand
 
@@ -147,35 +137,12 @@ runtime**.
 | Add a vitest project to a package      | `.agents/docs/playbooks/add-vitest-project.md`    |
 | Promote a component to react-core      | `.agents/docs/playbooks/promote-to-react-core.md` |
 
-## Internal DNP packages
+## Conventions
 
-This repo depends on 11 `@douglasneuroinformatics/*` packages, maintained in separate repos and
-consumed from npm: `eslint-config`, `prettier-config`, `tsconfig`, `esbuild-plugin-prisma`, `libjs`,
-`libcrypto`, `libnest`, `libpasswd`, `libstats`, `libui-form-types`, `libui`.
-
-**Check `.agents/docs/packages/index.md` before writing utility, crypto, stats, form-typing or UI
-code from scratch, or before adding a third-party dependency** — one of these probably already
-solves it. Most publish their original TypeScript under `src/` in `node_modules`; read that instead
-of guessing at a signature.
-
-## What good code looks like here
-
-Each principle applies where its problem exists. Machinery without its justifying problem is
-ceremony, and ceremony is worse than plain code.
-
-- **Correctness is structural, not vigilant.** A correct system is one where the invalid state
-  cannot be written, not one where a careful person catches it. Anything a human must remember, the
-  compiler should remember instead.
-- **One source of truth; everything derived.** A contract exists once; types, variants and fixtures
-  flow from it. Two artifacts that must agree is a bug waiting for its trigger.
 - **Strict validation at the boundary, trust inside.** Data is distrusted exactly once — at the
   perimeter — then the interior runs clean, with no defensive re-checking cluttering the logic.
-- **Shape is never repeated.** Shared structure gets abstracted, with types before runtime
-  indirection, so change propagates instead of being replicated.
-- **Names and types carry all meaning.** Guards first, success path flat, reading top to bottom.
-- Prefer descriptive variable names over terse or cryptic ones.
-
-## Conventions
+- **One source of truth; everything derived.** A contract exists once; types, variants and fixtures
+  flow from it. Two artifacts that must agree is a bug waiting for its trigger.
 
 Define Zod schemas for data validation; derive types via `z.infer`. Convention: `$`-prefixed schema,
 same-named inferred type, type declared first:
@@ -189,44 +156,16 @@ Variants are composed from a base shape, never written from scratch. Schemas exi
 actually parsed at a perimeter; everything else is a plain type. See `packages/schemas/AGENTS.md`.
 
 **Types.** Strict mode; no casting at call sites. No loose records where a closed key set is known;
-if only a subset of keys is known, type those and add an index signature. Type safety takes
-precedence over convenience.
+if only a subset of keys is known, type those and add an index signature.
 
-Use conditional types, template literal types, inference extraction and mapped types as routine
-tools to keep call sites short and fully inferred. Concentrate the cost: complex type machinery
-belongs in a small number of utilities, never spread across ordinary code.
+**Formatting is not your problem.** `pnpm lint` runs `eslint --fix` and prettier, so write code in a
+sensible order and let the tooling sort objects and move exports. Where ordering is load-bearing,
+the existing code carries an `eslint-disable` comment with its reason after `--`; follow that pattern
+rather than fighting the rule.
 
-Name generics with a `T` prefix and a PascalCase noun describing the parameter's role — `TValue`,
-`TError`. The prefix distinguishes a type parameter from a concrete type at a glance; the noun
-explains it.
-
-**Formatting is not your problem.** `eslint --fix` and prettier run as part of `pnpm lint` and
-`pnpm format`. In particular `perfectionist/sort-objects` alphabetizes every object literal and
-`import/exports-last` moves exports to the bottom — write code in a sensible order and let the
-tooling rearrange it. Where ordering is load-bearing, the existing code carries an explicit
-`eslint-disable` comment; follow that pattern rather than fighting the rule. Every `eslint-disable`
-states why after `--`, as in `// eslint-disable-next-line <rule> -- <reason>`; eslint rejects one
-that does not.
-
-**Tests.** A unit test is `<file>.test.ts(x)` in a `__tests__/` folder beside the file it tests:
-`src/index.ts` is tested by `src/__tests__/index.test.ts`. A suite that drives a whole package, like
-`apps/api/test/`, lives in that package's `test/` folder instead. A unit test imports the file it
-tests and titles each top-level `describe` after a name it imports from it, or after the file's name
-when it imports the module itself (a side-effect import, `import * as`, or `await import()`) to test
-what loading it does. Three eslint rules
-enforce the layout: two in `eslint.config.js`, and `odc/unit-test-subject` in `.eslint/rules/`,
-where the repo's other custom rules live too. `packages/instrument-library` is the one exception, for
-the reason its `AGENTS.md` gives. Keep test bodies short; each verifies one behavior. Descriptions are concise, grammatical
-sentences stating the behavioral reason, e.g. `'should key the cache on every parameter, so paging
-does not serve a stale page'`.
-
-<!-- BEGIN:turborepo-agent-rules -->
-
-# This is NOT the Turborepo you know
-
-Turborepo configuration, task behavior, and CLI commands can vary between installed versions and may differ from your training data. Resolve the `turbo` package from this file's directory or relevant workspace; in monorepos, it may not be visible from the repository root. For example, run `node -p "require.resolve('turbo/package.json')"` from a workspace that depends on `turbo`.
-
-Read `docs/README.md` inside that installed package first, then read the relevant pages from its `docs/` directory before changing Turborepo configuration or commands. Heed deprecation notices. These bundled docs match the installed package version and are available without network access.
-
-This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": false` in the root `turbo.json` or `turbo.jsonc` to opt out; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
-<!-- END:turborepo-agent-rules -->
+**Tests.** A unit test is `<file>.test.ts(x)` in a `__tests__/` folder beside the file it tests, or
+in a package's `test/` folder when it drives the whole package; eslint enforces the layout
+(`odc/unit-test-subject` in `.eslint/rules/`, beside the repo's other custom rules). Keep test
+bodies short; each verifies one behavior. Descriptions are concise, grammatical sentences stating
+the behavioral reason, e.g. `'should key the cache on every parameter, so paging does not serve a
+stale page'`.
