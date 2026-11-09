@@ -24,7 +24,8 @@ testing a change anywhere else.
 | `build:dist` (2) | `api-extractor run -c config/api-extractor.json` | `dist/index.d.ts` (rollup) + `dist/tmp/api.json`               |
 
 `lib/` is an intermediate but not a private one. **The `./constants` subpath export resolves to
-`lib/constants.js`, not `dist/`** (`packages/schemas/src/instrument/instrument.file.ts` imports it),
+`lib/constants.js`, not `dist/`**, and is the only way to reach `FILE_TYPES`, which `src/index.ts`
+does not re-export (`packages/schemas/src/instrument/instrument.file.ts` imports it),
 and `apps/outreach` points typedoc at `lib/index.d.ts` in `astro.config.ts`. Do not delete `lib/`
 from the build, and do not assume a turbo cache hit restores it — `turbo.json` declares
 `outputs: ["dist/**"]` only.
@@ -76,6 +77,13 @@ Every type here has a Zod mirror in `packages/schemas/src/instrument/*`, tied ba
 `satisfies z.ZodType<TypeFromRuntimeCore>`. That assertion is not a full equivalence check — it
 catches a schema that can no longer produce the type, not one that has drifted looser. Change a type
 here and update its mirror in the same commit.
+
+**A new field `kind` or `variant` lands in two more packages, and only one of them errors.**
+`packages/instrument-utils/src/translate.ts` ends its matches in `.exhaustive()`, so its `pnpm lint`
+fails until the case is handled. `packages/schemas/src/instrument/instrument.form.ts` lists the kinds
+twice, in `$StaticFieldKind` and in the `kind`-discriminated union, and a union missing a member
+still passes `satisfies`, so the omission surfaces as a 422 from `InstrumentsService.create` the first
+time such an instrument is uploaded.
 
 Background on how a definition becomes a stored, runnable instrument:
 `.agents/docs/architecture/instrument-pipeline.md`. On how `runtime/v1` re-exports this package:

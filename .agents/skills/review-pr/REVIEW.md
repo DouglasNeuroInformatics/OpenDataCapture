@@ -5,7 +5,7 @@ You review one pull request against upstream `main` and write one document. Your
 ## 1. Set up
 
 ```sh
-git fetch origin refs/pull/<N>/merge:refs/pr/<N>/merge
+git fetch https://github.com/DouglasNeuroInformatics/OpenDataCapture.git refs/pull/<N>/merge:refs/pr/<N>/merge
 git worktree add --detach <worktree-path> refs/pr/<N>/merge
 # then, inside the worktree:
 pnpm install --frozen-lockfile
@@ -13,7 +13,7 @@ pnpm generate:env
 TURBO_CONCURRENCY=2 pnpm lint
 ```
 
-Review the merge result. If `refs/pull/<N>/merge` is missing, use `refs/pull/<N>/head` and say so in the evidence. Run `generate:env` inside the worktree and never copy the repo's `.env`, so `db:push` cannot touch the user's dev database. Keep `TURBO_CONCURRENCY=2`: three reviews share the user's machine.
+Review the merge result. PR refs exist only on the upstream repository, not on a fork, hence the URL rather than a remote name. If `refs/pull/<N>/merge` is missing, use `refs/pull/<N>/head` and say so in the evidence. Run `generate:env` inside the worktree and never copy the repo's `.env`, so `db:push` cannot touch the user's dev database. Keep `TURBO_CONCURRENCY=2`: three reviews share the user's machine.
 
 - `install` or `generate:env` fails → return BLOCKED (machine) and write nothing.
 - `lint` fails → return BLOCKED (PR) with the errors, and write a reply body to the scratchpad asking the author to update their branch against `main`, ending with `Reviewed at commit <headRefOid>.`
@@ -21,7 +21,7 @@ Review the merge result. If `refs/pull/<N>/merge` is missing, use `refs/pull/<N>
 ## 2. Read
 
 - **Intent** — the PR body, linked issues and commit messages.
-- **Conformance** — the hard rules in `CLAUDE.md` and the `AGENTS.md` of every workspace the diff touches.
+- **Conformance** — the hard rules in root `AGENTS.md` and the `AGENTS.md` of every workspace the diff touches.
 - **Correctness** — whole changed files in the merged tree, plus their callers, not just the hunks.
 - **Duplication** — reimplementations of a DNP package (`.agents/docs/packages/index.md`) or an existing repo utility.
 - **Tests** — whether the unit and e2e tests actually exercise the change.

@@ -151,7 +151,8 @@ Note this covers `apps/web`'s own forms too — every schema fed to a libui `For
 
 `react/jsx-no-literals` makes bare JSX text an **error**. Punctuation and proper nouns are
 allowlisted in `eslint.config.js` and `*.stories.tsx` is exempt; anything else it flags is a string
-that needs translating. Strings that are genuinely not copy — stack-frame syntax, for example —
+that needs translating. It is configured `ignoreProps: true`, so a `placeholder`, `aria-label` or
+`title` string lints clean: translate those too. Strings that are genuinely not copy — stack-frame syntax, for example —
 belong in a named variable outside the JSX with a comment saying why, not in the allowlist.
 
 ## Styling

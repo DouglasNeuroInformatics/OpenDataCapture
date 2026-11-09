@@ -1,19 +1,8 @@
 # Testing strategy
 
-What is tested where, and what CI actually blocks a merge on. Writing an e2e test is
-`.agents/docs/playbooks/add-e2e-test.md`; this file is the reference.
-
-## The failure that is silent
-
-The root `vitest.config.ts` declares
-`projects: ['apps/*/vitest.config.ts', 'packages/*/vitest.config.ts', 'runtime/*/vitest.config.ts']`.
-**A workspace with no `vitest.config.ts` of its own is invisible to `pnpm test`.** A test file added
-to `packages/licenses` today is collected by nothing, reported by nothing, and passes CI
-green.
-
-Check the table below before writing a unit test. If the package is not in it, add a
-`vitest.config.ts` in the same change — `.agents/docs/playbooks/add-vitest-project.md` is the order
-of operations.
+What is tested where, and what CI blocks a merge on. Writing an e2e test is
+`.agents/docs/playbooks/add-e2e-test.md`; adding a unit tier to a package is
+`.agents/docs/playbooks/add-vitest-project.md`.
 
 ## Tiers
 
@@ -21,178 +10,122 @@ of operations.
 | ---------- | ---------- | --------------------------------------------------------------------- | -------------------- |
 | Unit       | vitest     | `__tests__/<file>.test.ts` beside `<file>.ts`, or a package's `test/` | `pnpm test:coverage` |
 | End-to-end | Playwright | `testing/src/specs/`                                                  | `pnpm test:e2e`      |
-| Type-check | `tsc`      | —                                                                     | `pnpm lint`          |
+| Type-check | `tsc`      | code that fails to compile if the type breaks, e.g. `*.test-d.ts`     | `pnpm lint`          |
 
-There is no integration tier. `apps/api` unit tests mock the Prisma layer entirely; the only code
-path exercised against a real database is Playwright.
+**There is no integration tier.** `apps/api` unit tests mock the Prisma layer entirely, so Playwright
+is the only code path that touches a real database: a permissions or row-scoping change is untested
+until an e2e spec covers it.
+
+## A test nothing collects passes silently
+
+Root `vitest.config.ts` collects only `apps/*/vitest.config.ts`, `packages/*/vitest.config.ts` and
+`runtime/*/vitest.config.ts`. A test file in a workspace with no config of its own is collected by
+nothing, reported by nothing, and passes CI green. A green run prints counts, not file names;
+`pnpm exec vitest list --filesOnly [--project <name>]` prints every collected file prefixed with its
+project. Before trusting a new test, see it listed and watch it fail on purpose.
 
 ## Vitest projects
 
-Twenty-one. Scope a run with `pnpm exec vitest --project <name>`; the name is the `name` field in that
-package's config, which is **not** always the directory name.
+Twenty-one, each named after its directory except `runtime/v1` (`runtime-v1`). Quirks of each live in
+that package's `AGENTS.md` §Tests. Three run under happy-dom; the rest run in node, where one file
+opts into a DOM with a first-line `// @vitest-environment happy-dom` docblock.
 
-| Project                  | Package                           | Notable config                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------------------ | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `api`                    | `apps/api`                        | libnest SWC plugin, confined to `apps/api` sources; `globals: true`                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `web`                    | `apps/web`                        | `environment: 'happy-dom'`; redeclares the `@` alias                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `gateway`                | `apps/gateway`                    | node environment; redeclares the `@` alias. Request schemas, `resolveLanguage`, and the HTML `src/entry-server.tsx` renders — the routers and hydration are covered by `testing/src/specs/gateway-*.spec.ts`. A component test opts into happy-dom per file with a `// @vitest-environment happy-dom` docblock                                                                                                                                                                                                  |
-| `instrument-bundler`     | `packages/instrument-bundler`     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `instrument-library`     | `packages/instrument-library`     | `environment: 'happy-dom'`; `resolve.alias` maps `/runtime/v1/<name>@<range>[/<subpath>]` to `vendor/<name>@<range>/src/` and `/runtime/v1/@opendatacapture/runtime-core` to `packages/runtime-core/src`, so no `runtime/v1` build is needed. Tests go in top-level `src/__tests__/` only — see `packages/instrument-library/AGENTS.md`                                                                                                                                                                         |
-| `instrument-interpreter` | `packages/instrument-interpreter` |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `instrument-stubs`       | `packages/instrument-stubs`       | node environment; tests are `.test.js` (no tsconfig, so eslint cannot parse a `.ts` file here)                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `instrument-utils`       | `packages/instrument-utils`       |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `playground`             | `apps/playground`                 | node environment; redeclares the `@` alias. Pure code under `src/preview/`, plus components rendered to markup with `react-dom/server` (`src/components/Resizable/`) — the preview frame, its origin split, the message bridge and the editor/preview split are covered by `testing/src/specs/playground.spec.ts`. A component test opts into happy-dom per file with a `// @vitest-environment happy-dom` docblock (`src/components/Editor/__tests__/MonacoEditor.test.tsx`, against a mocked `monaco-editor`) |
-| `playground-url`         | `packages/playground-url`         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `react-core`             | `packages/react-core`             | `environment: 'happy-dom'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `release-info`           | `packages/release-info`           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `runtime-bundler`        | `packages/runtime-bundler`        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `runtime-core`           | `packages/runtime-core`           | node environment, `// @vitest-environment happy-dom` per file for the browser branches of `i18n.ts`; relative imports carry `.js` (Node16). `*.test-d.ts` are checked by `tsc` in `lint`, not vitest                                                                                                                                                                                                                                                                                                            |
-| `runtime-internal`       | `packages/runtime-internal`       | node environment; `bootstrap.js` and `worker.js` are tested against stubbed browser globals — see `packages/runtime-internal/AGENTS.md`                                                                                                                                                                                                                                                                                                                                                                         |
-| `runtime-meta`           | `packages/runtime-meta`           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `schemas`                | `packages/schemas`                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `serve-instrument`       | `packages/serve-instrument`       | node environment; `test/` mocks `fs.watch` (never closed by `Server.stop()`, see `packages/serve-instrument/AGENTS.md`) and stubs the built `client.js`/`__TAILWIND_STYLES__` that only exist post-build                                                                                                                                                                                                                                                                                                        |
-| `subject-utils`          | `packages/subject-utils`          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `vite-plugin-runtime`    | `packages/vite-plugin-runtime`    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `runtime-v1`             | `runtime/v1`                      | directory is `v1`, project is `runtime-v1`                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Project                  | Package                           | Notes                                                    |
+| ------------------------ | --------------------------------- | -------------------------------------------------------- |
+| `api`                    | `apps/api`                        | libnest SWC plugin, confined to `apps/api` sources       |
+| `gateway`                | `apps/gateway`                    |                                                          |
+| `playground`             | `apps/playground`                 |                                                          |
+| `web`                    | `apps/web`                        | happy-dom                                                |
+| `instrument-bundler`     | `packages/instrument-bundler`     |                                                          |
+| `instrument-interpreter` | `packages/instrument-interpreter` |                                                          |
+| `instrument-library`     | `packages/instrument-library`     | happy-dom; aliases `/runtime/v1/…` to sources, no build  |
+| `instrument-stubs`       | `packages/instrument-stubs`       | tests are `.test.js`                                     |
+| `instrument-utils`       | `packages/instrument-utils`       |                                                          |
+| `playground-url`         | `packages/playground-url`         |                                                          |
+| `react-core`             | `packages/react-core`             | happy-dom                                                |
+| `release-info`           | `packages/release-info`           |                                                          |
+| `runtime-bundler`        | `packages/runtime-bundler`        | tests in `test/`                                         |
+| `runtime-core`           | `packages/runtime-core`           | `*.test-d.ts` are checked by `tsc` in `lint`, not vitest |
+| `runtime-internal`       | `packages/runtime-internal`       |                                                          |
+| `runtime-meta`           | `packages/runtime-meta`           |                                                          |
+| `schemas`                | `packages/schemas`                |                                                          |
+| `serve-instrument`       | `packages/serve-instrument`       |                                                          |
+| `subject-utils`          | `packages/subject-utils`          |                                                          |
+| `vite-plugin-runtime`    | `packages/vite-plugin-runtime`    |                                                          |
+| `runtime-v1`             | `runtime/v1`                      | tests in `test/`; can fail on a stale install            |
 
 Everything else has no unit tests and no way to run them: `apps/outreach` and
-`packages/{demo, instrument-guidelines, licenses}`. `testing/`, `storybook/` and `vendor/**` fall outside the
-project globs by design — `testing/` is Playwright, not vitest.
+`packages/{demo, instrument-guidelines, licenses}`. `testing/`, `storybook/` and `vendor/**` fall
+outside the project globs by design.
 
 ## Test environment
 
-- **There are no setup files anywhere in the repo.** No `setupFiles`, no `globalSetup`. Whatever a
-  test needs, it arranges in its own body.
-- **Every mock's recorded calls are cleared before each test** — Vitest's `clearMocks` defaults to
-  `true`, and no config here overrides it. A call made at import time or in `beforeAll` is gone by
-  the time an `it` runs, so copy what the assertion reads into a variable at the end of `beforeAll`,
-  as `packages/serve-instrument/src/__tests__/client.test.tsx` does. Implementations survive the
-  clear.
-- **`@testing-library/jest-dom` is not installed.** `toBeInTheDocument()` does not exist; assert
-  `expect(screen.getByText(x)).toBeTruthy()`.
-- Workspace packages export TypeScript source from `exports` (`@opendatacapture/schemas` maps
-  `./core` to `./src/core/core.ts`), so unit tests never read a `dist/`. This is why `pnpm test`
-  needs no prior build.
+- **No setup files anywhere** — no `setupFiles`, no `globalSetup`. A test arranges what it needs.
+- **Mock call records are cleared before each test** (Vitest's `clearMocks` default, never
+  overridden). A call made at import time or in `beforeAll` is gone by the time an `it` runs, so copy
+  what the assertion reads into a variable at the end of `beforeAll`
+  (`packages/serve-instrument/src/__tests__/client.test.tsx`). Implementations survive the clear.
+- **`@testing-library/jest-dom` is not installed**; assert `expect(screen.getByText(x)).toBeTruthy()`.
+- Workspace packages export TypeScript source, so `pnpm test` needs no prior build — except an import
+  of `instrument-library`, `runtime-core` or `runtime/v1`, which export only build output.
 
-## Conventions by package
+## Canonical test per package
 
-Read the canonical file before writing a test in that tier.
+| Package                       | Read first                                                                      | Shape                                                                                                                                                                     |
+| ----------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apps/api`                    | `src/groups/__tests__/groups.service.test.ts`                                   | `Test.createTestingModule` + `MockFactory.createForModelToken(getModelToken('Group'))` from `@douglasneuroinformatics/libnest/testing`; a fresh module per test           |
+| `apps/web`                    | `src/hooks/__tests__/useInstrumentBundle.test.ts`                               | `vi.hoisted` + `vi.mock` for `axios` and `@/store`; a real `QueryClient` per test with `retry: false`                                                                     |
+| `packages/react-core`         | `src/components/InstrumentRenderer/__tests__/SeriesInstrumentRenderer.test.tsx` | hand-written bundles run by the real interpreter; `i18n.init({ translations: {} })` in `beforeAll`; `fireEvent`, since `userEvent` is not installed                       |
+| `packages/schemas`            | `src/instrument/__tests__/instrument.form.test.ts`                              | parses fixtures from `@opendatacapture/instrument-stubs/*`, never hand-written literals, so schema and fixture cannot drift                                               |
+| `packages/instrument-bundler` | `src/__tests__/build.test.ts`                                                   | real instrument sources under `src/__tests__/repositories/{form,interactive}/`, read into a `Map` at import time; a new file in the folder joins the fixture, no manifest |
+| `packages/runtime-bundler`    | `test/e2e.test.ts`                                                              | minimal npm packages from `test/fixtures/` copied into a temp `node_modules`, bundled by the real `Bundler`, then imported                                                |
 
-| Package                       | Canonical file                                                                  | Shape                                                                                                                                                                                                                                                                                                         |
-| ----------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/api`                    | `src/groups/__tests__/groups.service.test.ts`                                   | `Test.createTestingModule` + `MockFactory.createForModelToken(getModelToken('Group'))` from `@douglasneuroinformatics/libnest/testing`; mocks typed `MockedInstance<Model<'Group'>>`; assert with `model.create.mock.lastCall?.[0]` and `toMatchObject`. A fresh module per test, so no mock state to reset.  |
-| `apps/web`                    | `src/hooks/__tests__/useInstrumentBundle.test.ts`                               | `vi.hoisted` + `vi.mock` for `axios` and `@/store`; a **real** `QueryClient` per test with `retry: false`, wrapped in `QueryClientProvider`.                                                                                                                                                                  |
-| `packages/react-core`         | `src/components/InstrumentRenderer/__tests__/SeriesInstrumentRenderer.test.tsx` | Renders a component against hand-written bundles — an async IIFE per instrument, evaluated by the real interpreter. `i18n.init({ translations: {} })` in `beforeAll`, `afterEach(cleanup)`, and `fireEvent` rather than `userEvent`, which is not installed.                                                  |
-| `packages/schemas`            | `src/instrument/__tests__/instrument.form.test.ts`                              | Parse fixtures imported from `@opendatacapture/instrument-stubs/*`, never hand-written literals, so schema and fixture cannot drift.                                                                                                                                                                          |
-| `packages/instrument-bundler` | `src/__tests__/build.test.ts`                                                   | Fixtures are real instrument sources under `src/__tests__/repositories/{form,interactive}/`. `repositories/index.ts` reads each directory at import time into a `Map`; a test does `repositories.get('interactive')!`. Dropping a file in the folder adds it to the fixture — there is no manifest to update. |
-| `packages/runtime-bundler`    | `test/e2e.test.ts`                                                              | Fixtures under `test/fixtures/` are minimal real npm packages (`name`, `type`, `exports`). The test copies them into a temp dir _as `node_modules`_, writes a bare `package.json`, runs the real `Bundler`, then dynamically imports the emitted output.                                                      |
-| `runtime/v1`                  | `test/vendor-pairing.test.ts`                                                   | Resolves the `vendor/` wrappers from the installed `node_modules` layout. It can fail on a stale install rather than on a code change.                                                                                                                                                                        |
+## `pnpm lint` is the type-check, and it edits files
 
-`testing/` is page-object style: page objects under `testing/src/pages/` mirroring the web route
-tree, specs under `testing/src/specs/`, shared helpers under `testing/src/support/`. Selectors are
-the `data-testid` attributes in `apps/web` — do not remove them.
+Per-package `lint` is `tsc && eslint --fix src`; there is no separate `typecheck` script, so a type
+error surfaces as a lint failure and every run may rewrite the working tree. Exceptions:
 
-## `pnpm lint` is the type-check, and it edits your files
-
-Per-package `lint` is `tsc && eslint --fix src`. There is no separate `typecheck` script anywhere.
-Two consequences: a type error surfaces as a lint failure, and running lint **mutates the working
-tree** (`--fix` rewrites imports, object key order, and export placement).
-
-Exceptions worth knowing:
-
-| Package                                                       | `lint`                                                           |
-| ------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `apps/outreach`                                               | `astro check && eslint --fix src`                                |
-| `packages/runtime-core`                                       | `tsc --noEmit && eslint --fix src`                               |
-| `packages/instrument-stubs`, `packages/instrument-guidelines` | eslint only — **no `tsc`**                                       |
-| `testing`                                                     | `pnpm gen:routes && tsc && eslint --fix .`                       |
-| `runtime/v1`                                                  | **no `lint` script**, so it is never type-checked by `pnpm lint` |
+| Package                                                       | `lint`                                     |
+| ------------------------------------------------------------- | ------------------------------------------ |
+| `apps/outreach`                                               | `astro check && eslint --fix src`          |
+| `packages/runtime-core`                                       | `tsc --noEmit && eslint --fix src`         |
+| `packages/instrument-stubs`, `packages/instrument-guidelines` | eslint only — **no `tsc`**                 |
+| `testing`                                                     | `pnpm gen:routes && tsc && eslint --fix .` |
+| `runtime/v1`                                                  | **none**, so never type-checked            |
 
 ## Turbo task graph
 
-`lint`, `dev`, `dev:test` and `test:e2e` all depend on `["^build", "^db:generate", "db:push"]`
-(`build` itself depends on `^build` and `db:generate`). A cold `pnpm lint` therefore builds every
-dependency, generates both Prisma clients, and pushes the gateway SQLite schema — it is not fast.
+`lint`, `dev`, `dev:test` and `test:e2e` depend on `["^build", "^db:generate", "db:push"]`; `build`
+on `["^build", "db:generate"]`. `test:e2e` is `cache: false`. **`test` is not a turbo task**: root
+`pnpm test` is `env-cmd vitest`, with no build and no database. `globalDependencies` (`.env`,
+`eslint.config.js`, `tsconfig.json`, `prettier.config.js`) invalidate every cached task when touched.
 
-`test:e2e` additionally specifies `"cache": false` because it requires a live server and database.
+## Coverage scope
 
-**`test` is not a turbo task at all.** Root `pnpm test` is `env-cmd vitest`: plain vitest, no build,
-no database. Only `testing` owns a `test:e2e` script; only `apps/gateway` owns a `db:push`.
-
-`globalDependencies` are `.env`, `eslint.config.js`, `tsconfig.json` and `prettier.config.js`.
-Touching any of them invalidates the cache for every task in the repo.
-
-## Coverage
-
-`pnpm test:coverage` is the unit gate, locally and in CI. The root `vitest.config.ts` sets
-`coverage.thresholds: { 100: true }`, so the run fails when statements, branches, functions or lines
-drop below 100%. The scope is its `coverage.include` — `apps/{api,gateway,web}/src` and
-`packages/*/src`; `runtime/**` and `apps/playground` are outside it — minus `coverage.exclude`,
-which lists only non-code: test fixtures and helpers (`__tests__`, `apps/web/src/testing`), the
-generated `route-tree.ts`, and the bare entrypoints.
-
-- **A line no test can reach is dead code.** Prove it (the types, every caller, the library's
-  contract) and delete it, or restructure so the impossible state cannot be written — e.g. ts-pattern
-  `.exhaustive()` instead of `.otherwise(() => null)`. Never add an ignore comment or an exclude entry
-  to pass.
-- **A scoped run fails the threshold by construction**: `--project`, a file filter or a narrowed
-  `--coverage.include` measures a fraction of the scope. Add `--coverage.thresholds.100=false` to it
-  and read the per-file report.
-- `apps/api` confines its SWC transform to its own files (`apps/api/vitest.config.ts`); letting SWC
-  transform the workspace packages it imports makes the merged report count their functions twice.
+The 100% gate (root `AGENTS.md`) measures `coverage.include` in root `vitest.config.ts`:
+`apps/{api,gateway,web}/src` and `packages/*/src`. `runtime/**` and `apps/playground` are outside it.
+`apps/api` confines SWC to its own files because letting it transform imported workspace packages
+counts their functions twice in the merged report.
 
 ## What CI gates
 
-`.github/workflows/ci.yaml`, one job (`lint-and-test`, ubuntu-latest), triggered on
-`pull_request` to `main` and `workflow_dispatch` only.
+`.github/workflows/ci.yaml`, one job, on `pull_request` to `main` and `workflow_dispatch` only — a
+push alone runs nothing. In order: `./scripts/generate-env.sh`, `pnpm install --frozen-lockfile`,
+`pnpm lint`, `pnpm test:coverage`, Playwright install (chromium + firefox, capped at 10 minutes, after
+lint and unit tests so a hung download cannot hide them), `pnpm test:e2e`.
 
-| #   | Step                 | Command                                                |
-| --- | -------------------- | ------------------------------------------------------ |
-| 1   | Generate Environment | `./scripts/generate-env.sh`                            |
-| 2   | Install Dependencies | `pnpm install --frozen-lockfile`                       |
-| 3   | Lint                 | `pnpm lint`                                            |
-| 4   | Unit Tests           | `pnpm test:coverage`                                   |
-| 5   | Install Playwright   | chromium + firefox `--with-deps`, capped at 10 minutes |
-| 6   | End-to-End Tests     | `pnpm test:e2e`                                        |
+Not gated: knip (`pnpm knip` exists), and formatting — prettier runs only in the `.husky/pre-commit`
+hook, which formats rather than verifies.
 
-Lint and unit tests run **before** the Playwright install deliberately, so a hung browser download
-does not hide their results.
-
-Not gated, despite existing in the repo:
-
-- **No separate type-check step** — it is folded into step 3.
-- **No knip step**, although `knip.ts` and a `pnpm knip` script exist.
-- **No format check.** Prettier runs only in the `.husky/pre-commit` hook (`prettier-pre-commit`),
-  which formats rather than verifies; the hook does not run lint or tests.
-
-`.github/workflows/release.yaml` (push to `main`) has a `Validate` job that runs `pnpm lint` only —
-**no unit tests and no e2e before a release build.**
-
-`.github/workflows/commitlint.yaml` (`pull_request` to any branch, so forks included) runs
-`commitlint` over the commits the pull request adds — `base.sha..head.sha`, never the history — against
-`commitlint.config.ts`. An unknown type fails, and so does a scope outside the workspace names.
-
-## Playwright specifics
-
-`testing/playwright.config.ts` defines four projects: `setup` (with `teardown` attached),
-`teardown`, `chromium` (every spec), and `firefox` (only specs matching `@smoke`). Cross-browser
-coverage is therefore a smoke subset, not the full suite.
-
-`webServer` boots `apps/api`, `apps/gateway` and `apps/web` by running each app's own `pnpm dev:test`
-with `NODE_ENV=test`, which is what gives the API an in-memory Mongo replica set instead of an
-external database. `workers: 1` on CI and 2 elsewhere, with `fullyParallel` on (`testing/AGENTS.md`
-§Running has why, and the override). The default assertion timeout is
-raised to 15s because a 2-core runner doing real DB work misses the 5s default.
+`.github/workflows/release.yaml` (push to `main`) validates with `pnpm lint` only — **no unit or e2e
+tests before a release build.** `.github/workflows/commitlint.yaml` (`pull_request` to any branch)
+lints the commits the PR adds against `commitlint.config.ts`.
 
 ## Known warts
 
-Flag these rather than fixing them in passing — each one is load-bearing somewhere.
+Flag these rather than fixing them in passing; each is load-bearing somewhere.
 
-- `turbo.json` declares `db:generate` `outputs: ["node_modules/@prisma/generated-client/**"]`. That
-  is correct for `apps/gateway`, whose `schema.prisma` sets that `output`, but the equivalent line in
-  `apps/api/prisma/schema.prisma` is **commented out**, so the API client generates to the default
-  pnpm location; `@opendatacapture/api#db:generate` is therefore declared `cache: false` so a cache
-  hit never restores an empty output set. Changing either half changes what a `db:generate` run
-  produces.
-- Root `test` is `env-cmd vitest` but `test:coverage` is `vitest --coverage` with no `env-cmd`, so
-  the two do not run under the same environment.
+- `turbo.json` declares `db:generate` `outputs: ["node_modules/@prisma/generated-client/**"]`, which
+  matches only `apps/gateway`'s schema; `apps/api/prisma/schema.prisma` has its `output` commented
+  out, so `@opendatacapture/api#db:generate` is `cache: false` to stop a cache hit restoring nothing.
+  Changing either half changes what `db:generate` produces.

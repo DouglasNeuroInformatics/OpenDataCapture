@@ -15,30 +15,15 @@ runs, not data it stores, so a mistake anywhere shows up as a runtime failure ra
 | `SERIES`      | **no**  | an ordered list of `{ name, edition }` references | `SeriesInstrumentRenderer`             |
 
 "Scalar" means it produces data of its own. `isScalarInstrument` in
-`packages/instrument-utils/src/guards.ts` tests `Object.hasOwn(instrument, 'internal')`, **not** the
-`kind` field — only scalar instruments carry `internal: { name, edition }`, which is what the whole
-identity scheme is built on.
+`packages/instrument-utils/src/guards.ts` tests `Object.hasOwn(instrument, 'internal')`, **not**
+`kind`, because only scalar instruments carry `internal: { name, edition }`, which the whole identity
+scheme (§3) is built on.
 
 ## 1. Source
 
-An instrument is a **flat directory** — one level, no subdirectories — with an entry named `index`.
-`resolveIndexInput` (`packages/instrument-bundler/src/resolve.ts`) tries the extensions in the order
-`.tsx`, `.jsx`, `.ts`, `.js` and takes the first hit. The default export is the result of
-`defineInstrument` (or `defineSeriesInstrument`) from `@opendatacapture/runtime-core`.
-
-Shared libraries are imported by **URL**, not by package name:
-
-```ts
-import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { z } from '/runtime/v1/zod@3.x';
-import { createRoot } from '/runtime/v1/react-dom@19.x/client.js';
-```
-
-These resolve differently on each tier and are covered in
-`.agents/docs/architecture/runtime-and-vendor.md`. Sibling files use ordinary relative imports
-(`'./styles.css'`, `'./Component.tsx'`).
-
-Three places produce instrument source:
+An instrument is a flat directory whose `index.*` default-exports `defineInstrument(...)` (or
+`defineSeriesInstrument`), importing shared libraries by URL, `/runtime/v1/<pkg>`
+(`.agents/docs/architecture/runtime-and-vendor.md`). Three places produce it:
 
 | Source                             | Where                                                                     | Bundled by                                              |
 | ---------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------- |
@@ -46,148 +31,84 @@ Three places produce instrument source:
 | Playground examples and user edits | `apps/playground/src/instruments/{examples,templates}/`                   | `bundle()` in the browser, via `esbuild-wasm`           |
 | External GitHub repos              | `lib/{file,forms,interactive,series}/*` in the remote repo                | `InstrumentReposService` on the API at import/sync time |
 
-**Repo discovery returns `series` last, and callers must import in that order** (`discoverInstrumentDirs`
-in `apps/api/src/instrument-repos/instrument-repos.service.ts`). `InstrumentsService.create` rejects a
-series unless every instrument it references is already stored, so the scalars a repo provides have to
-be created before its series.
+**Repo discovery returns `series` last, and callers must import in that order**
+(`discoverInstrumentDirs` in `apps/api/src/instrument-repos/instrument-repos.service.ts`), because
+`InstrumentsService.create` rejects a series unless every instrument it references is already stored.
+The `lib/` layout it scans is the one `packages/instrument-guidelines/AGENTS.md` tells external authors
+to use; change one and you must change the other.
 
 **A series that references another repository still fails to import.** Nothing resolves dependencies
-across repositories or retries afterwards, so whether it works depends on the order the repos were
-added. Making this reliable needs a second resolution pass once every repo has been imported. Until
-then, the failure and its reason land in the repository's activity log (`InstrumentRepoSyncLog`, on
-the admin Instrument Repositories page), and syncing the repository again once its dependencies are
-stored imports the series.
+across repositories or retries, so it depends on the order the repos were added. The failure and its
+reason land in the repository's activity log (`InstrumentRepoSyncLog`, on the admin Instrument
+Repositories page); syncing the repository again once its dependencies are stored imports the series.
 
 ## 2. Bundling
 
-`bundle()` in `packages/instrument-bundler/src/bundle.ts` is the only entry point. Four stages:
+`bundle()` in `packages/instrument-bundler` (stages, resolution rules and traps: its `AGENTS.md`)
+returns **a JavaScript expression, not a module** — `(async () => { … })()` — so every consumer
+evaluates it with `new Function('return ' + bundle)()` rather than `import()`. CSS and `?legacy`
+scripts ride along base64-encoded on `content.__injectHead`, which the interactive iframe injects.
 
-| Stage              | File            | What it does that you would not guess                                                                                                                                                                                                                                  |
-| ------------------ | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `preprocess`       | `preprocess.ts` | Rejects any input whose `name` contains `/`. Names are bare filenames, never paths.                                                                                                                                                                                    |
-| `build`            | `build.ts`      | esbuild with `format: 'esm'` and **`treeShaking: false`**. Entry is a synthetic stdin module: `import instrument from './<index>'; var __exports = instrument;`. Asserts the metafile reports **exactly 0 exports** and exactly one output file (two if there is CSS). |
-| `transformImports` | `transform.ts`  | Rewrites the static imports esbuild left behind (the externals) into `const { … } = await __import('…')`, and `import(` into `__import(`.                                                                                                                              |
-| `createBundle`     | `bundle.ts`     | Wraps everything in an async IIFE that returns `__exports`, then runs a second esbuild `transform` — this one with `treeShaking: true` and minification per the `minify` option.                                                                                       |
-
-The two esbuild passes disagree on `treeShaking`, and the assertions in `build.ts` are what keep the
-whole scheme honest: the bundle must expose its instrument through the `__exports` variable and
-through nothing else. Do not "harmonize" the two settings, and do not relax the export assertion.
-
-The result is **a JavaScript expression, not a module** — `(async () => { … })()`. That is why every
-consumer evaluates it with `new Function('return ' + bundle)()` rather than `import()`.
-
-### The import shim
-
-`createBundle` prepends a `GLOBALS` preamble defining `globalThis.__import`, which delegates to
+The bundle's `GLOBALS` preamble defines `globalThis.__import`, which delegates to
 `globalThis.__resolveImport` **when the host defines one** and otherwise imports the specifier
-verbatim. This is the single seam that lets one bundle string run in a browser (where
-`/runtime/v1/...` is a real URL) and in a Node vm (where it is not).
-
-The same preamble shadows `document`, `self` and `window` with throwing proxies when the host has no
-real ones, and `plugin.ts` prepends `globalThis.__ODC_BUNDLER_ERROR_CONTEXT = "<filename>"` to every
-JS/TS input. So touching the DOM at module top level fails with the offending filename in the
-message, instead of a bare `document is not defined` from an unknown file.
-
-### Import rewriting rules in `plugin.ts`
-
-| Import                                        | Outcome                                                                                                 |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| CSS `@import` (`kind: 'import-rule'`)         | external, untouched                                                                                     |
-| dynamic `import(...)`                         | external if the specifier starts with `/`, `http://` or `https://`; otherwise a build error             |
-| `/runtime/v1/**.css`                          | loaded into the CSS bundle                                                                              |
-| `/runtime/v1/pkg` or `/runtime/v1/@scope/pkg` | external, `/index.js` appended                                                                          |
-| any other `/runtime/v1/...`                   | external, `.js` appended unless already present                                                         |
-| `<file>?raw`                                  | inlined as text                                                                                         |
-| `<file>?legacy`                               | collected into `legacyScripts`, emitted as an empty module                                              |
-| anything else                                 | resolved against the flat input list; unresolvable names are a build error listing every input filename |
-
-CSS and `?legacy` scripts do not end up in the JS. `createBundle` base64-encodes them onto a frozen
-`content.__injectHead` property (`{ scripts, style }`) which the interactive iframe reads at runtime.
+verbatim. That is the one seam letting the same bundle string run in a browser, where `/runtime/v1/...`
+is a real URL, and in the API's Node vm, where it is not.
 
 ## 3. Storing
 
 `InstrumentsService.create` (`apps/api/src/instruments/instruments.service.ts`):
 
 1. `virtualizationService.eval(bundle)` — libnest's `VirtualizationService`, configured in
-   `instruments.module.ts` with `codeGeneration: { strings: false, wasm: false }` and a context
-   `__resolveImport` that rewrites a leading `/runtime/` to `#runtime/` and calls
-   `import.meta.resolve`. Anything not starting with `/runtime/` throws.
+   `instruments.module.ts` with `codeGeneration: { strings: false, wasm: false }` and the
+   `__resolveImport` described in `runtime-and-vendor.md`.
 2. `$AnyInstrument.safeParseAsync` — the Zod perimeter (`packages/schemas/src/instrument/`). A
    failure is a `422`, not a `500`.
-3. Derive the id, which is **content-derived, not random**:
-   - scalar: `cryptoService.hash('<name>-<edition>')`
-   - series: `'__V2__' + hash(JSON.stringify({ content, seriesGroupId, title }))`
-
-   Re-uploading the same name and edition therefore collides and throws `ConflictException`.
-   `InstrumentReposService.importInstrumentFromDir` deliberately parses the id back out of that
-   conflict message to re-associate an already-present instrument with the repo.
-
-4. Persist. `Instrument.bundle` is a plain `String` column in `apps/api/prisma/schema.prisma`.
-
-`#runtime/v1/*` is declared in `apps/api/package.json` and mirrored in `apps/api/tsconfig.json`; both
-must agree. The `build.onComplete` hook in `apps/api/libnest.config.ts` copies
-`@opendatacapture/runtime-v1/dist` into `dist/runtime/v1` at build time; without it the resolution
-fails in production.
+3. Derive the id, which is **content-derived, not random**: scalar `hash('<name>-<edition>')`;
+   series `'__V2__' + hash(JSON.stringify({ content, seriesGroupId, title }))`. Re-uploading the same
+   name and edition throws `ConflictException`, and `InstrumentReposService` regex-parses the id back
+   out of that message to re-associate an existing instrument with a repo, so the message format is
+   load-bearing.
 
 **Evaluated instances are memoized** in `virtualizationService.context.instruments`, keyed by id, for
-the process lifetime. Any code path that removes or replaces an instrument must delete that entry —
-`deleteById` does. Forgetting it means a deleted instrument stays resident and shadows any future
-instrument issued the same id.
+the process lifetime. Any code path that removes or replaces an instrument must delete that entry, as
+`deleteById` does, or the stale instance shadows any future instrument issued the same id.
 
 ## 4. Serving
 
 `GET /v1/instruments/bundle/:id` returns an `InstrumentBundleContainer`
-(`packages/schemas/src/instrument/instrument.base.ts`), discriminated on `kind`. For `SERIES` the
-container additionally carries `items: ScalarInstrumentBundleContainer[]`, so the client receives the
-series bundle **and** every constituent bundle in one response.
+(`packages/schemas/src/instrument/instrument.base.ts`), discriminated on `kind`. For `SERIES` it also
+carries `items`, every constituent bundle, in the same response.
 
 ## 5. Evaluating in the browser
 
-`evaluateInstrument` in `packages/runtime-internal/src/index.js` is the whole implementation:
+`InstrumentInterpreter.interpret` (`packages/instrument-interpreter`) calls `evaluateInstrument`
+(`packages/runtime-internal`), a bare `new Function`. Validation against `$AnyInstrument` is opt-in
+(`validate: true`): the playground (`apps/playground/src/preview/PreviewApp.tsx`) always opts in,
+since its bundles never went through the API, and `apps/web` only in dev
+(`packages/instrument-interpreter/AGENTS.md`).
 
-```js
-return await new Function(`return ${bundle}`)();
-```
-
-It performs no validation, and its docstring is explicit that only trusted input may reach it.
-`InstrumentInterpreter.interpret` (`packages/instrument-interpreter/src/index.ts`) wraps it and
-re-validates against the Zod schemas only when `validate: true` is passed. It also rejects a
-non-interactive instrument whose bundle imports React, which is the one library a form may not use —
-`packages/instrument-interpreter/AGENTS.md` has the reasoning. It defaults to off; the
-playground is the one caller that opts in (`apps/playground/src/components/Viewer/Viewer.tsx`), since
-its bundles have never been through the API's `$AnyInstrument` check.
-
-`packages/react-core/src/hooks/useInterpretedInstrument.ts` drives this from React and additionally
-runs `translateInstrument` for the current locale, so components downstream see a unilingual
-instrument plus a `supportedLanguages` array.
-
-On the browser side the `/runtime/v1/...` URLs are served by `packages/vite-plugin-runtime` — dev
-middleware on `/runtime`, and a copy into `dist/runtime/<version>` at build.
+`useInterpretedInstrument` (`packages/react-core/src/hooks/`) drives this from React and runs
+`translateInstrument` for the current locale, so downstream components see a unilingual instrument
+plus a `supportedLanguages` array.
 
 ## 6. Rendering
 
-`packages/react-core/src/components/InstrumentRenderer/` — read `ScalarInstrumentRenderer.tsx` before
-changing any of this. `InstrumentRenderer` splits `SERIES` off to `SeriesInstrumentRenderer` and
-sends everything else to `ScalarInstrumentRenderer`, which is a three-step index (overview → content
-→ summary) with a `ts-pattern` match on `{ index, instrument }`.
+In `packages/react-core/src/components/InstrumentRenderer/`, `InstrumentRenderer` sends `SERIES` to
+`SeriesInstrumentRenderer` and everything else to `ScalarInstrumentRenderer` (overview → content →
+summary). Both validate the submission against the instrument's own `validationSchema` before calling
+`onSubmit`.
 
-Both renderers validate the submission against the instrument's own `validationSchema` before calling
-`onSubmit`, and show a notification instead of submitting on failure.
-
-**`SeriesInstrumentRenderer` handles only `FORM` and `INTERACTIVE` items.** A `FILE` item inside a
-series falls through to `.otherwise(() => null)` and renders nothing.
-
-`apps/web` and `apps/gateway` use `InstrumentRenderer`. `apps/playground` and
-`packages/serve-instrument` mount `ScalarInstrumentRenderer` directly — neither can render a series.
+**`SeriesInstrumentRenderer` handles only `FORM` and `INTERACTIVE` items.** A `FILE` item falls
+through to `.otherwise(() => null)` and renders nothing. `apps/web` and `apps/gateway` use
+`InstrumentRenderer`; `apps/playground` and `packages/serve-instrument` mount `ScalarInstrumentRenderer`
+directly, so neither can render a series.
 
 ## The interactive iframe contract
 
-An `INTERACTIVE` bundle is evaluated **twice**. The host page evaluates it via
-`useInterpretedInstrument` to read the details, flags and `validationSchema`; separately,
-`InteractiveContent` renders an iframe at
-`/runtime/v1/@opendatacapture/runtime-internal/interactive/iframe.html`, whose `bootstrap.js` reads
-the bundle out of the **`data-bundle` attribute on the frame element**, evaluates it again, and calls
-`content.render`. Only the second evaluation touches the DOM.
+An `INTERACTIVE` bundle is evaluated **twice**: by the host page (`useInterpretedInstrument`) for its
+details and `validationSchema`, and again inside the iframe `InteractiveContent` renders at
+`/runtime/v1/@opendatacapture/runtime-internal/interactive/iframe.html`, whose `bootstrap.js` reads it
+from the frame's `data-bundle` attribute and calls `content.render`. Only the second touches the DOM.
 
 Two attributes are load-bearing:
 
@@ -197,8 +118,8 @@ Two attributes are load-bearing:
   Renaming it breaks every multilingual interactive instrument at runtime and nothing catches it
   earlier.
 
-Communication across the boundary is `CustomEvent`s dispatched on `window.parent.document` and
-listened for on `document` in `InteractiveContent.tsx`. There is no `postMessage`.
+The two sides talk through `CustomEvent`s dispatched on `window.parent.document`, never `postMessage`,
+typed in `packages/react-core/src/types.ts`:
 
 | Event             | `detail`              | Dispatched by                                                                           |
 | ----------------- | --------------------- | --------------------------------------------------------------------------------------- |
@@ -207,23 +128,7 @@ listened for on `document` in `InteractiveContent.tsx`. There is no `postMessage
 | `addNotification` | `RuntimeNotification` | `addNotification` in `packages/runtime-core/src/notifications.ts`                       |
 | `changeTheme`     | `'dark' \| 'light'`   | nothing in this repo — the listener exists, but instrument code must dispatch it itself |
 
-The event names and payloads are declared by augmenting `GlobalEventHandlersEventMap` in
-`packages/react-core/src/types.ts`; adding an event means adding it there too or the listener will
-not type-check.
-
-`bootstrap.js` also mirrors the parent's `data-mode` attribute onto its own root and keeps it in sync
-with a `MutationObserver`, injects `content.meta`, `content.html` and the base64 `__injectHead`
-style/scripts, and — when `content.staticAssets` is set — registers `worker.js` as a service worker
-and waits for a `STATIC_ASSETS_READY` message before rendering.
-
-## `packages/instrument-guidelines/AGENTS.md` is not repo convention
-
-That file is the **content of a published npm package** (`@opendatacapture/instrument-guidelines`,
-`publishConfig.access: public`, released by the `publish-npm` job in `.github/workflows/release.yaml`
-via `scripts/list-publishable.sh`). Its `bin/cli.mjs` symlinks or copies it into an external
-instrument repository so an agent working _there_ can read it.
-
-Editing it changes a published package that third parties consume. It describes how to author an
-instrument in a standalone repo; it says nothing about working in this monorepo, and none of its
-rules apply to code outside an instrument directory. Its instruction on where to place instruments is
-coupled to `discoverInstrumentDirs` on the API — change one and you must change the other.
+`bootstrap.js` also mirrors the parent's `data-mode` attribute onto its own root, injects
+`content.meta`, `content.html` and the `__injectHead` assets, and, when `content.staticAssets` is set,
+registers `worker.js` as a service worker and waits for a `STATIC_ASSETS_READY` message before
+rendering.

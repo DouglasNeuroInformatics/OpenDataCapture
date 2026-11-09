@@ -92,6 +92,10 @@ async findById(id: string, { ability }: EntityOperationOptions = {}) {
 }
 ```
 
+A service that needs the whole user takes `currentUser: RequestUser` instead and reads `.ability`
+off it, and its controller forwards `@CurrentUser()` — `src/instruments/instruments.service.ts` and
+`src/instrument-records/files/files.service.ts` do.
+
 `accessibleQuery(undefined, ...)` returns `{}` — **an omitted or undefined ability means no
 restriction**, which reads clinical data across every group. Nothing catches this: not `tsc`, not
 eslint, not a passing test suite. It is the single highest-severity mistake available in this

@@ -17,8 +17,8 @@ being certain the bundle came from a trusted author.
 string means `runtime-bundler` copies the file byte-for-byte; a conditional object would bundle it and
 inject ESM chunk imports, which a classic `<script>` (`iframe.html` loads `bootstrap.js` that way) and
 a service worker (`worker.js`) cannot execute. The three files also reference each other by relative
-path, which only survives verbatim copying. See
-`.agents/docs/architecture/runtime-and-vendor.md#two-kinds-of-export`.
+path, which only survives verbatim copying. See "The two kinds of export" in
+`packages/runtime-bundler/AGENTS.md`.
 
 **Nothing checks `src/index.d.ts` against `src/index.js`.** The `.js` annotates each export with
 `/** @type {import('./index.d.ts').fn} */`, so a signature change means editing both files.
