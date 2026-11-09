@@ -9,6 +9,7 @@ export * from './components/LanguageToggle';
 export * from './components/LoadingPage';
 export * from './components/Logo';
 export * from './components/NavigationBlockerDialog';
+export * from './hooks/useFocusFirstInvalidField';
 export * from './types';
 export * from './utils/language';
 export * from './utils/zodErrorMap';

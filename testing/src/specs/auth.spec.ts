@@ -17,6 +17,15 @@ test.describe('authentication', () => {
     await expect(loginPage.$ref).toHaveURL('/dashboard');
   });
 
+  test('should log in with the username typed in a different case', async ({ api, getPageModel, uniqueId }) => {
+    const group = await api.createGroup();
+    const { credentials } = await api.createUser({ groupIds: [group.id], username: `casing_${uniqueId}` });
+
+    const loginPage = await getPageModel('/auth/login');
+    await loginPage.fillLoginForm({ ...credentials, username: credentials.username.toUpperCase() });
+    await expect(loginPage.$ref).toHaveURL('/dashboard');
+  });
+
   test.describe('demo instance', () => {
     test('should show the demo information over the login page as soon as it loads', async ({ getPageModel }) => {
       const loginPage = await getPageModel('/auth/login');
