@@ -18,6 +18,12 @@
       "sourceType": "github",
       "skillPath": "skills/interview/SKILL.md",
       "computedHash": "6cf86ca51424350f10880c3a2fd3dd018c6682c90dfb81baf66e91615df4a0fa"
+    },
+    "writing-skills-for-agents": {
+      "source": "joshunrau/skills",
+      "sourceType": "github",
+      "skillPath": "skills/writing-skills-for-agents/SKILL.md",
+      "computedHash": "692102f9ab7e6dc148240a3f6255aa9856b7bea177133d4241ca0906e67d7be6"
     }
   }
 }
