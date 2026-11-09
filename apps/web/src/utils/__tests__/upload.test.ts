@@ -118,20 +118,31 @@ describe('Zod3', () => {
       expect(Zod3.getZodTypeName(z3.array(z3.string()))).toStrictEqual({ isOptional: false, typeName: 'ZodArray' });
     });
 
-    it('should reject a schema type that cannot be represented in a CSV', () => {
-      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.literal('a')))).toMatchObject({ en: 'Unexpected Error' });
+    it('should name the type of a schema that cannot be represented in a CSV', () => {
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.tuple([z3.string()])))).toStrictEqual({
+        en: "Unsupported Zod type 'ZodTuple'",
+        es: "Tipo de Zod no compatible 'ZodTuple'",
+        fr: "Type Zod non pris en charge 'ZodTuple'"
+      });
+    });
+
+    it('should reject a field that is not a Zod schema without naming a type', () => {
+      const notASchema = Object.assign(z3.string(), { _def: {} });
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(notASchema))).toMatchObject({
+        en: "Unsupported Zod type 'undefined'"
+      });
     });
 
     it('should reject a set whose value type cannot be represented in a CSV', () => {
-      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.set(z3.literal('a'))))).toMatchObject({
+      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.set(z3.tuple([z3.string()]))))).toMatchObject({
         en: 'Invalid inner type: ZodSet value type must have a valid type definition'
       });
     });
 
-    it('should reject an array of objects with a field that cannot be represented in a CSV', () => {
-      expect(uploadErrorOf(() => Zod3.getZodTypeName(z3.array(z3.object({ a: z3.literal('x') }))))).toMatchObject({
-        en: 'Unhandled case!'
-      });
+    it('should name the type of a field in an array of objects that cannot be represented in a CSV', () => {
+      expect(
+        uploadErrorOf(() => Zod3.getZodTypeName(z3.array(z3.object({ a: z3.tuple([z3.string()]) }))))
+      ).toMatchObject({ en: "Unsupported Zod type 'ZodTuple'" });
     });
 
     it('should reject an array of objects without any fields', () => {
@@ -253,6 +264,33 @@ describe('Zod3', () => {
       expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(z3.string().refine(Boolean))))).toMatchObject({
         en: 'Validation schema for this instrument is invalid'
       });
+    });
+
+    it('should name the column and type of a field that cannot be represented in a CSV', () => {
+      const schema = z3.object({ pair: z3.tuple([z3.string()]), score: z3.number() });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toStrictEqual({
+        en: "Unsupported Zod type 'ZodTuple' at column name: 'pair'",
+        es: "Tipo de Zod no compatible 'ZodTuple' en la columna: 'pair'",
+        fr: "Type Zod non pris en charge 'ZodTuple' au nom de colonne : 'pair'"
+      });
+    });
+
+    it('should locate an error only in the languages it was written in', () => {
+      const schema = z3.object({ tags: z3.set(z3.tuple([z3.string()])) });
+      expect(uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(schema)))).toStrictEqual({
+        en: "Invalid inner type: ZodSet value type must have a valid type definition at column name: 'tags'",
+        fr: "Type interne invalide : le type de valeur ZodSet doit avoir une définition de type valide au nom de colonne : 'tags'"
+      });
+    });
+
+    it('should not present an unexpected failure as an upload error', () => {
+      const failure = new Error('def is unreadable');
+      const unreadable = Object.defineProperty(z3.string(), '_def', {
+        get(): never {
+          throw failure;
+        }
+      });
+      expect(() => createUploadTemplateCSV(instrumentWith(z3.object({ unreadable })))).toThrow(failure);
     });
   });
 
@@ -480,19 +518,32 @@ describe('Zod3', () => {
       ]);
       await expectRejection(
         processInstrumentCSV(file, instrumentWith(z3.object({ score: z3.number().refine(Boolean) }))),
-        "Unexpected Zod type name 'ZodEffects' at column name: 'score' and row number '1'"
+        "Unsupported Zod type 'ZodEffects' at column name: 'score' and row number '1'"
       );
     });
 
-    it('should fall back to a generic error when an unsupported field schema cannot be serialized for logging', async () => {
+    it('should name the type of an unsupported field whose schema cannot be serialized to JSON', async () => {
       const file = csvFile([
         ['subjectID', 'date', 'big'],
         ['subject1', '2024-01-01', '1']
       ]);
       await expectRejection(
         processInstrumentCSV(file, instrumentWith(z3.object({ big: z3.literal(1n) }))),
-        'Error parsing CSV'
+        "Unsupported Zod type 'ZodLiteral' at column name: 'big' and row number '1'"
       );
+    });
+
+    it('should fall back to a generic error when a value fails to convert for an unexpected reason', async () => {
+      const unreadable = Object.defineProperty(z3.string(), '_def', {
+        get(): never {
+          throw new Error('def is unreadable');
+        }
+      });
+      const file = csvFile([
+        ['subjectID', 'date', 'unreadable'],
+        ['subject1', '2024-01-01', '1']
+      ]);
+      await expectRejection(processInstrumentCSV(file, instrumentWith(z3.object({ unreadable }))), 'Error parsing CSV');
     });
 
     it('should reject a row the instrument schema does not accept', async () => {
@@ -641,8 +692,9 @@ describe('Zod4', () => {
 
     it('should reject a type name it has no sample for', () => {
       expect(uploadErrorOf(() => Zod4.generateSampleData({ isOptional: false, typeName: 'optional' }))).toEqual({
-        en: "Unexpected Zod type name 'optional'",
-        fr: "Nom de type Zod inattendu 'optional'"
+        en: "Unsupported Zod type 'optional'",
+        es: "Tipo de Zod no compatible 'optional'",
+        fr: "Type Zod non pris en charge 'optional'"
       });
     });
   });
@@ -691,10 +743,10 @@ describe('Zod4', () => {
       });
     });
 
-    it('should reject a field type that cannot be represented in a CSV', () => {
+    it('should name the column and type of a field that cannot be represented in a CSV', () => {
       expect(
-        uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(z4.object({ kind: z4.literal('a') }))))
-      ).toMatchObject({ en: "Unexpected Zod type name 'literal'" });
+        uploadErrorOf(() => createUploadTemplateCSV(instrumentWith(z4.object({ pair: z4.tuple([z4.string()]) }))))
+      ).toMatchObject({ en: "Unsupported Zod type 'tuple' at column name: 'pair'" });
     });
   });
 
@@ -911,7 +963,7 @@ describe('Zod4', () => {
         z4.array(z4.string()),
         "Unsupported type for innerType of array record 'string': must be 'object'"
       ],
-      ['nested', 'a', z4.object({ a: z4.string() }), "Unexpected Zod type name 'object'"],
+      ['nested', 'a', z4.object({ a: z4.string() }), "Unsupported Zod type 'object'"],
       ['items', 'items', z4.array(z4.object({ name: z4.string() })), 'Syntax error in RECORD_ARRAY declaration: items'],
       [
         'items',

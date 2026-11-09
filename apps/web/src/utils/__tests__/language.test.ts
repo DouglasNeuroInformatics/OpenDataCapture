@@ -51,9 +51,9 @@ describe('getValueForLanguage', () => {
     expect(getValueForLanguage({ en: 'Hello', es: '   ' }, 'es')).toBe('Hello');
   });
 
-  // Every `UploadError` in `../upload` is authored in English and French only, so the upload error
+  // Most `UploadError`s in `../upload` are authored in English and French only, so the upload error
   // page resolves through this rather than reading `description[resolvedLanguage]` directly.
-  it('should render an upload error in English for a Spanish reader, since none carry Spanish', () => {
+  it('should render an upload error in English for a Spanish reader when it carries no Spanish', () => {
     const { description } = new UploadError({
       en: 'Record in the record array was left undefined',
       fr: `L'enregistrement dans le tableau d'enregistrements n'est pas défini`

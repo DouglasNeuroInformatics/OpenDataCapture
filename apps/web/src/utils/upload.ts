@@ -13,6 +13,8 @@ import type { Merge } from 'type-fest';
 import { z as z3 } from 'zod/v3';
 import { z as z4 } from 'zod/v4';
 
+import { LANGUAGES } from './language';
+
 const INTERNAL_HEADERS = ['subjectID', 'date'];
 
 const INTERNAL_HEADERS_SAMPLE_DATA = ['string', 'yyyy-mm-dd'];
@@ -96,27 +98,59 @@ const ZOD_TYPE_NAMES = [
   'ZodEffects'
 ] as const;
 
-class UploadError extends Error {
-  description: {
-    [L in Language]?: string;
-  };
+type UploadErrorDescription = { [L in Language]?: string };
 
-  constructor(description: { [L in Language]?: string }) {
+class UploadError extends Error {
+  description: UploadErrorDescription;
+
+  constructor(description: UploadErrorDescription) {
     super();
     this.description = description;
   }
 }
 
 class UnexpectedZodTypeError extends UploadError {
-  private constructor(description: { [L in Language]?: string }) {
+  private constructor(description: UploadErrorDescription) {
     super(description);
   }
 
   static forTypeName(typeName: string | undefined) {
     return new this({
-      en: `Unexpected Zod type name '${typeName}'`,
-      fr: `Nom de type Zod inattendu '${typeName}'`
+      en: `Unsupported Zod type '${typeName}'`,
+      es: `Tipo de Zod no compatible '${typeName}'`,
+      fr: `Type Zod non pris en charge '${typeName}'`
     });
+  }
+}
+
+function locateUploadError(error: UploadError, { column, row }: { column: string; row?: number }): UploadError {
+  const location: { [L in Language]: string } =
+    row === undefined
+      ? {
+          en: `at column name: '${column}'`,
+          es: `en la columna: '${column}'`,
+          fr: `au nom de colonne : '${column}'`
+        }
+      : {
+          en: `at column name: '${column}' and row number '${row}'`,
+          es: `en la columna: '${column}' y el número de fila '${row}'`,
+          fr: `au nom de colonne : '${column}' et numéro de ligne '${row}'`
+        };
+  return new UploadError(
+    Object.fromEntries(
+      LANGUAGES.flatMap((language) => {
+        const text = error.description[language];
+        return text === undefined ? [] : [[language, `${text} ${location[language]}`]];
+      })
+    )
+  );
+}
+
+function sampleDataForColumn(column: string, generateSampleData: () => string): string {
+  try {
+    return generateSampleData();
+  } catch (error) {
+    throw error instanceof UploadError ? locateUploadError(error, { column }) : error;
   }
 }
 
@@ -218,6 +252,10 @@ export namespace Zod3 {
     return isObjectLike(value) && value.constructor.name === 'ZodObject';
   }
 
+  function hasTypeName(value: unknown): value is { typeName: string } {
+    return isPlainObject(value) && typeof value.typeName === 'string';
+  }
+
   function isZodTypeDef(value: unknown): value is AnyZodTypeDef {
     return isPlainObject(value) && ZOD_TYPE_NAMES.includes(value.typeName as ZodTypeName);
   }
@@ -253,18 +291,8 @@ export namespace Zod3 {
     const shape = def.type.shape as { [key: string]: z3.ZodTypeAny };
 
     for (const [key, insideType] of Object.entries(shape)) {
-      const def: unknown = insideType._def;
-      if (isZodTypeDef(def)) {
-        const innerTypeName = getZodTypeName(insideType);
-        listOfZodElements.push(innerTypeName);
-        listOfZodKeys.push(key);
-      } else {
-        console.error({ def });
-        throw new UploadError({
-          en: `Unhandled case!`,
-          fr: `Cas non géré !`
-        });
-      }
+      listOfZodElements.push(getZodTypeName(insideType));
+      listOfZodKeys.push(key);
     }
     if (listOfZodElements.length === 0) {
       throw new UploadError({
@@ -283,8 +311,7 @@ export namespace Zod3 {
   export function getZodTypeName(schema: z3.ZodTypeAny, isOptional?: boolean): ZodTypeNameResult {
     const def: unknown = schema._def;
     if (!isZodTypeDef(def)) {
-      console.error(`Cannot parse ZodType from schema: ${JSON.stringify(schema)}`);
-      throw new UploadError({ en: 'Unexpected Error', fr: 'Erreur inattendue' });
+      throw UnexpectedZodTypeError.forTypeName(hasTypeName(def) ? def.typeName : undefined);
     } else if (isZodOptionalDef(def)) {
       return getZodTypeName(def.innerType, true);
     } else if (isZodEnumDef(def)) {
@@ -463,8 +490,7 @@ export namespace Zod3 {
     const sampleData = [...INTERNAL_HEADERS_SAMPLE_DATA];
 
     for (const col of columnNames) {
-      const typeNameResult = getZodTypeName(shape[col]!);
-      sampleData.push(generateSampleData(typeNameResult));
+      sampleData.push(sampleDataForColumn(col, () => generateSampleData(getZodTypeName(shape[col]!))));
     }
 
     return {
@@ -592,12 +618,7 @@ export namespace Zod3 {
               jsonLine[headers[i]!] = result;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
-                reject(
-                  new UploadError({
-                    en: `${error.description.en} at column name: '${key}' and row number '${rowNumber}'`,
-                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}'`
-                  })
-                );
+                reject(locateUploadError(error, { column: key, row: rowNumber }));
                 return;
               }
               console.error(error);
@@ -832,7 +853,7 @@ export namespace Zod4 {
 
     Object.entries(instrumentSchema.shape).forEach(([key, subschema]) => {
       csvColumns.push(key);
-      sampleData.push(generateSampleData(parseZodSchema(subschema)));
+      sampleData.push(sampleDataForColumn(key, () => generateSampleData(parseZodSchema(subschema))));
     });
 
     return {
@@ -949,12 +970,7 @@ export namespace Zod4 {
               jsonLine[headers[i]!] = result;
             } catch (error: unknown) {
               if (error instanceof UploadError) {
-                reject(
-                  new UploadError({
-                    en: `${error.description.en} at column name: '${key}' and row number '${rowNumber}'`,
-                    fr: `${error.description.fr} au nom de colonne : '${key}' et numéro de ligne '${rowNumber}'`
-                  })
-                );
+                reject(locateUploadError(error, { column: key, row: rowNumber }));
                 return;
               }
               console.error(error);

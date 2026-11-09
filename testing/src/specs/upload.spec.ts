@@ -74,7 +74,23 @@ test.describe('upload', () => {
     uniqueId
   }) => {
     const title = `Record Array Upload ${uniqueId}`;
-    await api.createInstrument(recordArrayFormBundle({ name: `RECORD_ARRAY_UPLOAD_${uniqueId}`, title }));
+    await api.createInstrument(
+      formBundle({
+        content: `{
+          items: {
+            fieldset: {
+              name: { kind: 'string', label: 'Name', variant: 'input' },
+              quantity: { kind: 'number', label: 'Quantity', variant: 'input' }
+            },
+            kind: 'record-array',
+            label: 'Items'
+          }
+        }`,
+        name: `RECORD_ARRAY_UPLOAD_${uniqueId}`,
+        title,
+        validationSchema: 'z.object({ items: z.array(z.object({ name: z.string(), quantity: z.number() })) })'
+      })
+    );
     await isolatedGroupManager();
     const csv = [
       'subjectID,date,items',
@@ -97,6 +113,38 @@ test.describe('upload', () => {
         "Syntax error in RECORD_ARRAY declaration: RECORD_ARRAY(name:item1,quantity:12 at column name: 'items' and row number '1'"
       )
     ).toBeVisible();
+  });
+
+  // The template once failed with "Unexpected Error" for any field it could not describe, which named
+  // neither the field nor its type.
+  test('should name the column and Zod type of a field the template cannot describe', async ({
+    api,
+    isolatedGroupManager,
+    page,
+    uniqueId
+  }) => {
+    const title = `Unsupported Field Upload ${uniqueId}`;
+    await api.createInstrument(
+      formBundle({
+        content: `{ pair: { kind: 'string', label: 'Pair', variant: 'input' } }`,
+        name: `UNSUPPORTED_FIELD_UPLOAD_${uniqueId}`,
+        title,
+        validationSchema: 'z.object({ pair: z.tuple([z.string()]) })'
+      })
+    );
+    await isolatedGroupManager();
+
+    const uploadPage = new UploadPage(page);
+    await uploadPage.goto('/upload');
+    await uploadPage.selectInstrument(title);
+    await page.waitForURL('**/upload/**');
+
+    const uploadInstrumentPage = new UploadInstrumentPage(page);
+    await expect(uploadInstrumentPage.pageHeader).toContainText(title);
+    await uploadInstrumentPage.templateButton.click();
+
+    await expect(uploadInstrumentPage.templateErrorHeading).toBeVisible();
+    await expect(page.getByText("Unsupported Zod type 'ZodTuple' at column name: 'pair'")).toBeVisible();
   });
 
   // The response was previously every record in the group for the instrument, so a second upload
@@ -173,28 +221,30 @@ test.describe('upload instrument selection while loading', () => {
 });
 
 /**
- * A form with one record-array field, written as the bundle the api stores: an expression that
- * evaluates to the instrument. Its runtime import resolves through the `__resolveImport` the api's
- * sandbox provides, and against the web origin in the browser, as a bundled import would.
+ * A form written as the bundle the api stores: an expression that evaluates to the instrument. Its
+ * runtime import resolves through the `__resolveImport` the api's sandbox provides, and against the
+ * web origin in the browser, as a bundled import would. `content` and `validationSchema` are source
+ * text, the schema written against `z`.
  */
-function recordArrayFormBundle({ name, title }: { name: string; title: string }) {
+function formBundle({
+  content,
+  name,
+  title,
+  validationSchema
+}: {
+  content: string;
+  name: string;
+  title: string;
+  validationSchema: string;
+}) {
   return `(async () => {
     const runtimeImport = (specifier) => import(globalThis.__resolveImport?.(specifier) ?? specifier);
     const { z } = await runtimeImport('/runtime/v1/zod@3.x/index.js');
     return {
       __runtimeVersion: 1,
-      content: {
-        items: {
-          fieldset: {
-            name: { kind: 'string', label: 'Name', variant: 'input' },
-            quantity: { kind: 'number', label: 'Quantity', variant: 'input' }
-          },
-          kind: 'record-array',
-          label: 'Items'
-        }
-      },
+      content: ${content},
       details: {
-        description: 'A form with one record-array field',
+        description: 'A form seeded by the upload spec',
         license: 'Apache-2.0',
         title: ${JSON.stringify(title)}
       },
@@ -203,7 +253,7 @@ function recordArrayFormBundle({ name, title }: { name: string; title: string })
       language: 'en',
       measures: null,
       tags: [],
-      validationSchema: z.object({ items: z.array(z.object({ name: z.string(), quantity: z.number() })) })
+      validationSchema: ${validationSchema}
     };
   })()`;
 }
