@@ -207,6 +207,18 @@ export class AssignmentsService {
   }
 
   /**
+   * Which of the given ids still name an assignment. Unscoped, like `updateStatusById`: the gateway
+   * synchronizer asks with no user behind the request, to find the gateway copies whose row is gone.
+   */
+  async findExistingIds(ids: string[]): Promise<string[]> {
+    const assignments = await this.assignmentModel.findMany({
+      select: { id: true },
+      where: { id: { in: ids } }
+    });
+    return assignments.map(({ id }) => id);
+  }
+
+  /**
    * The private key a completed assignment's data is encrypted to. Every other query omits the keypair
    * (see `PrismaModuleOptionsFactory`), so this is the only way to read it: used by the gateway
    * synchronizer to decrypt a submission, and never to be returned to a client.

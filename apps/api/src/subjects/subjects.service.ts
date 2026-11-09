@@ -6,7 +6,7 @@ import { $CreateSubjectData } from '@opendatacapture/schemas/subject';
 import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import type { Prisma } from '@prisma/client';
 
-import { accessibleQuery } from '@/auth/ability.utils';
+import { accessibleQuery, forcedAppSubject } from '@/auth/ability.utils';
 import type { AppAbility } from '@/auth/auth.types';
 import type { RuntimePrismaClient } from '@/core/prisma';
 import type { EntityOperationOptions } from '@/core/types';
@@ -134,6 +134,13 @@ export class SubjectsService {
       await this.subjectModel.delete({ where });
       return { success: true };
     }
+    const assignments = await this.findAssignmentsBySubjectId(subject.id);
+    if (
+      ability &&
+      assignments.some((assignment) => ability.cannot('delete', forcedAppSubject('Assignment', assignment)))
+    ) {
+      throw new ConflictException(`Subject '${id}' has assignments you do not have permission to delete`);
+    }
     const recordWhere = { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], subjectId: subject.id };
     const records = await this.prismaClient.instrumentRecord.findMany({
       select: { id: true },
@@ -147,6 +154,9 @@ export class SubjectsService {
       this.prismaClient.instrumentRecordFile.deleteMany({ where: { id: { in: files.map((file) => file.id) } } }),
       this.prismaClient.instrumentRecord.deleteMany({
         where: { ...recordWhere, id: { in: recordIds } }
+      }),
+      this.prismaClient.assignment.deleteMany({
+        where: { id: { in: assignments.map((assignment) => assignment.id) } }
       }),
       this.prismaClient.session.deleteMany({
         where: { AND: [accessibleQuery(ability, 'delete', 'Session')], subjectId: subject.id }
@@ -237,6 +247,18 @@ export class SubjectsService {
       }
     });
     return subjects.map((subject) => subject.id);
+  }
+
+  /**
+   * The id and group of every assignment the subject has. Unscoped by the caller's ability: a force
+   * delete must see the assignments the caller cannot delete in order to refuse them, where a scoped
+   * read would hide them until the subject delete failed on them.
+   */
+  private async findAssignmentsBySubjectId(subjectId: string) {
+    return this.prismaClient.assignment.findMany({
+      select: { groupId: true, id: true },
+      where: { subjectId }
+    });
   }
 
   /**

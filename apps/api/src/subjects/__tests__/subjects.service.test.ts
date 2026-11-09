@@ -36,6 +36,10 @@ describe('SubjectsService', () => {
           provide: PRISMA_CLIENT_TOKEN,
           useValue: {
             $transaction: vi.fn(),
+            assignment: {
+              deleteMany: vi.fn(),
+              findMany: vi.fn().mockResolvedValue([])
+            },
             instrumentRecord: {
               deleteMany: vi.fn(),
               findMany: vi.fn().mockResolvedValue([]),
@@ -284,6 +288,16 @@ describe('SubjectsService', () => {
   });
 
   describe('deleteById', () => {
+    /** May delete a subject in group-1 along with its records, assignments and sessions there. */
+    const groupOneDeleter = () => {
+      return createAppAbility([
+        { action: 'delete', conditions: { groupIds: { has: 'group-1' } }, subject: 'Subject' },
+        { action: 'delete', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' },
+        { action: 'delete', conditions: { groupId: { in: ['group-1'] } }, subject: 'Assignment' },
+        { action: 'delete', conditions: { groupId: 'group-1' }, subject: 'Session' }
+      ]);
+    };
+
     it('should delete the subject via the subject model and not call $transaction, if force is falsy', async () => {
       subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
       await subjectsService.deleteById('123');
@@ -296,18 +310,84 @@ describe('SubjectsService', () => {
       expect(subjectModel.delete).not.toHaveBeenCalled();
       expect(prismaClient.$transaction).toHaveBeenCalledOnce();
     });
-    it('should pass operations to $transaction in order: files, instrumentRecord, session, subject', async () => {
+    it('should pass operations to $transaction in order: files, instrumentRecord, assignment, session, subject', async () => {
       subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
       const fileOp = 'file-op';
       prismaClient.instrumentRecordFile.deleteMany.mockReturnValueOnce(fileOp);
       const instrumentRecordOp = 'instrumentRecord-op';
+      const assignmentOp = 'assignment-op';
       const sessionOp = 'session-op';
       const subjectOp = 'subject-op';
       prismaClient.instrumentRecord.deleteMany.mockReturnValueOnce(instrumentRecordOp);
+      prismaClient.assignment.deleteMany.mockReturnValueOnce(assignmentOp);
       prismaClient.session.deleteMany.mockReturnValueOnce(sessionOp);
       prismaClient.subject.delete.mockReturnValueOnce(subjectOp);
       await subjectsService.deleteById('123', { force: true });
-      expect(prismaClient.$transaction).toHaveBeenCalledWith([fileOp, instrumentRecordOp, sessionOp, subjectOp]);
+      expect(prismaClient.$transaction).toHaveBeenCalledWith([
+        fileOp,
+        instrumentRecordOp,
+        assignmentOp,
+        sessionOp,
+        subjectOp
+      ]);
+    });
+
+    it("should delete the subject's assignments in the same transaction, so a subject who was sent a remote assignment can still be force-deleted", async () => {
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      prismaClient.assignment.findMany.mockResolvedValueOnce([
+        { groupId: 'group-1', id: 'assignment-1' },
+        { groupId: 'group-1', id: 'assignment-2' }
+      ]);
+      const assignmentOp = 'assignment-op';
+      prismaClient.assignment.deleteMany.mockReturnValueOnce(assignmentOp);
+      await expect(subjectsService.deleteById('123', { ability: groupOneDeleter(), force: true })).resolves.toEqual({
+        success: true
+      });
+      expect(prismaClient.assignment.deleteMany).toHaveBeenCalledWith({
+        where: { id: { in: ['assignment-1', 'assignment-2'] } }
+      });
+      expect(prismaClient.$transaction.mock.lastCall?.[0]).toContain(assignmentOp);
+    });
+
+    // A scoped read would hide such an assignment until the subject delete failed on it.
+    it('should read every assignment of the subject regardless of scope, so none the caller cannot delete goes unseen', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      await subjectsService.deleteById('123', { ability: groupOneDeleter(), force: true });
+      expect(prismaClient.assignment.findMany).toHaveBeenCalledExactlyOnceWith({
+        select: { groupId: true, id: true },
+        where: { subjectId: '123' }
+      });
+    });
+
+    it('should refuse with a conflict and write nothing when any assignment is outside what the caller may delete', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      prismaClient.assignment.findMany.mockResolvedValueOnce([
+        { groupId: 'group-1', id: 'assignment-1' },
+        { groupId: 'group-2', id: 'assignment-2' }
+      ]);
+      await expect(subjectsService.deleteById('123', { ability: groupOneDeleter(), force: true })).rejects.toThrow(
+        ConflictException
+      );
+      expect(prismaClient.$transaction).not.toHaveBeenCalled();
+      expect(prismaClient.assignment.deleteMany).not.toHaveBeenCalled();
+      expect(prismaClient.instrumentRecord.deleteMany).not.toHaveBeenCalled();
+      expect(prismaClient.session.deleteMany).not.toHaveBeenCalled();
+      expect(prismaClient.subject.delete).not.toHaveBeenCalled();
+      expect(storageService.deleteObjects).not.toHaveBeenCalled();
+    });
+
+    // Below ADMIN, this route is reached through an extra `delete Subject` grant, which carries no
+    // Assignment rule; `accessibleQuery` would throw on such an ability rather than match nothing.
+    it('should force-delete a subject who has no assignments for a caller holding no Assignment rule', async () => {
+      const ability = createAppAbility([
+        { action: 'delete', conditions: { groupIds: { has: 'group-1' } }, subject: 'Subject' },
+        { action: 'delete', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' },
+        { action: 'delete', conditions: { groupId: 'group-1' }, subject: 'Session' }
+      ]);
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      await expect(subjectsService.deleteById('123', { ability, force: true })).resolves.toEqual({ success: true });
+      expect(prismaClient.assignment.deleteMany).toHaveBeenCalledWith({ where: { id: { in: [] } } });
+      expect(prismaClient.$transaction).toHaveBeenCalledOnce();
     });
     it('should scope the subject and its dependent records and sessions to delete permissions', async () => {
       const ability = createAppAbility([

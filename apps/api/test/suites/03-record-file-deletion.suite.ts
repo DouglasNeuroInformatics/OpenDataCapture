@@ -45,6 +45,22 @@ export default defineSuite('record file deletion', function () {
     return { records, subject };
   };
 
+  const seedAssignment = async (subjectId: string) => {
+    const id = randomUUID();
+    return prisma.assignment.create({
+      data: {
+        encryptionKeyPair: { privateKey: Buffer.from([1]), publicKey: Buffer.from([2]) },
+        expiresAt: new Date(Date.now() + 86_400_000),
+        groupId,
+        id,
+        instrumentId,
+        status: 'OUTSTANDING',
+        subjectId,
+        url: `http://localhost/assignments/${id}`
+      }
+    });
+  };
+
   beforeAll(async () => {
     prisma = this.app.get(PRISMA_CLIENT_TOKEN);
     const password = 'DataCapture2025_Test';
@@ -173,6 +189,36 @@ export default defineSuite('record file deletion', function () {
         recordId: record.id
       }))
     );
+  });
+
+  it('should force-delete a subject who has an assignment', async () => {
+    const { subject } = await seed([groupId]);
+    await seedAssignment(subject.id);
+    const response = await this.app.inject({
+      headers: adminHeaders,
+      method: 'DELETE',
+      url: `/v1/subjects/${subject.id}?force=true`
+    });
+    expect(response.statusCode).toBe(200);
+    expect(await prisma.subject.findUnique({ where: { id: subject.id } })).toBeNull();
+    expect(await prisma.assignment.count({ where: { subjectId: subject.id } })).toBe(0);
+  });
+
+  // The scoped user holds no Assignment rule at all, so every assignment is outside what they may delete.
+  it('should refuse to force-delete a subject who has an assignment the caller cannot delete, and delete nothing', async () => {
+    const { records, subject } = await seed([groupId]);
+    await seedAssignment(subject.id);
+    const response = await this.app.inject({
+      headers: scopedHeaders,
+      method: 'DELETE',
+      url: `/v1/subjects/${subject.id}?force=true`
+    });
+    expect(response.statusCode).toBe(409);
+    expect(await prisma.subject.findUnique({ where: { id: subject.id } })).not.toBeNull();
+    expect(await prisma.assignment.count({ where: { subjectId: subject.id } })).toBe(1);
+    expect(await prisma.instrumentRecord.count({ where: { subjectId: subject.id } })).toBe(records.length);
+    expect(await prisma.session.count({ where: { subjectId: subject.id } })).toBe(records.length);
+    expect(cleanup).not.toHaveBeenCalled();
   });
 
   it('should roll back force deletion when some records are outside the caller scope', async () => {
