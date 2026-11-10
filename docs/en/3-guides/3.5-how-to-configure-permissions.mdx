@@ -1,0 +1,143 @@
+---
+title: How to Configure Permissions
+slug: en/docs/guides/how-to-configure-permissions
+sidebar:
+  order: 5
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+This guide is for admins. It explains how to give users access beyond their role, and lists the permissions each page needs, with the Data Hub in detail. For the security model behind it, see the [Security reference](/en/docs/reference/security/).
+
+## How a User's Permissions Are Made Up
+
+A user's permissions come from two layers:
+
+1. Their **base permission level** (Admin, Group Manager or Standard), chosen when the user is created. Each level grants a fixed set of permissions, listed under [Default Permissions](#default-permissions).
+2. Either a **permission set** or **custom permissions**, added on top of the base level. A permission set is a named list of rules that several users can share. Custom permissions belong to one user. A user has one or the other, never both.
+
+Permissions only add access. Nothing you configure removes what the base level grants. Only an admin can change permissions, and a change takes effect the next time the user signs in.
+
+Admins already hold every permission, so there is nothing to add for them.
+
+## Permissions
+
+A permission is an **action** on a **resource**, within a **scope**.
+
+- **Action:** Read, Create, Update, Delete, or Manage (All), which allows every action on the resource.
+- **Resource:** Assignment, Group, Instrument, Instrument Record, Instrument Repository, Session, Subject, User, or All.
+- **Scope:** the groups the permission applies to. A custom permission applies to one of the user's groups or to **All Groups**. A permission set rule applies to **Every group** or to the **Holder's groups**, meaning the groups each user holding the set belongs to when they sign in.
+
+Some combinations are restricted:
+
+- An Instrument permission has no scope. It always applies to every group.
+- On User, only Read has any effect, since only an admin can create, modify or delete users.
+- Manage (All) on All makes the user an admin. A permission set cannot contain it.
+- A custom permission scoped to a group is removed when the user leaves that group.
+
+Choose the narrowest scope that works. The Data Hub shows one group at a time, the one selected in the group switcher, and a user who is not an admin can only select groups they belong to. A permission scoped to the user's own group is therefore usually enough for the Data Hub.
+
+## Give a User Custom Permissions
+
+<Steps>
+
+1.  **Open the user**
+
+    Go to **Admin Panel** > **Access** > **Users** and select the user.
+
+2.  **Choose Custom**
+
+    In the **Permissions** card, select the **Custom** tab. If the user holds a permission set, saving custom permissions removes it.
+
+3.  **Add each permission**
+
+    In the empty row at the bottom of the table, choose the **Action**, **Resource** and **Scope**. Select **+** to add another row.
+
+4.  **Save**
+
+    Select **Save Changes**. The user gets the new permissions the next time they sign in.
+
+</Steps>
+
+## Share Permissions with a Permission Set
+
+Use a permission set when several users need the same additional permissions. Editing the set later changes the permissions of every user who holds it.
+
+<Steps>
+
+1.  **Create the set**
+
+    Go to **Admin Panel** > **Access** > **Permission Sets** and select **Add Permission Set**. Give it a **Name**, then add its **Rules**, choosing the action, resource and scope for each. Select **Create**.
+
+2.  **Give it to users**
+
+    Open each user under **Admin Panel** > **Access** > **Users**. In the **Permissions** card, select the **Permission set** tab, choose the set, and select **Save Changes**. You can also choose a set when creating a user.
+
+</Steps>
+
+## What Each Page Needs
+
+### Navigation
+
+Each item appears in the navigation only when the user has the permissions listed. Some items also depend on how the instance is configured.
+
+| Item                                       | Permissions                                                         | Also requires                                                                                                            |
+| ------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Dashboard**                              | Read Instrument, Read Instrument Record, Read Subject and Read User | Its figures also need Read Session                                                                                       |
+| **Data Hub** > **Subjects**                | Read Subject and Read Instrument Record                             |                                                                                                                          |
+| **Data Hub** > **Instruments**             | Read Subject, Read Instrument Record and Read Instrument            |                                                                                                                          |
+| **Upload Data**                            | Read Subject and Create Instrument Record                           | **Enable Uploader** under **Admin Panel** > **Instance** > **Settings**                                                  |
+| **Manage Group**                           | Manage (All) on Group                                               | A group selected in the group switcher                                                                                   |
+| **Email Templates**                        | Manage (All) on Group                                               | A configured mail server, gateway support, and a group selected                                                          |
+| **Remote Assignments** (create and delete) | Create Assignment, Read Assignment and Read Subject                 | **Enable Remote Assignments** under **Admin Panel** > **Instance** > **Settings**, gateway support, and a group selected |
+| **Admin Panel**                            | Manage (All) on All, which only admins hold                         |                                                                                                                          |
+| **Start Session**                          | Create Session                                                      |                                                                                                                          |
+| **Administer Instrument**                  | Create Instrument Record                                            | An active session                                                                                                        |
+| **Remote Assignment**                      | Create Assignment                                                   | Gateway support and an active session                                                                                    |
+| **View Current Subject**                   | Read Subject and Read Instrument Record                             | An active session                                                                                                        |
+
+### Data Hub
+
+The Data Hub navigation item only checks the permissions listed above, but each page loads its own data, and a page the user lacks a permission for shows an error. To give someone working access to the Data Hub, make sure they have everything in this table.
+
+| Page or action                               | Permissions                                                                     |
+| -------------------------------------------- | ------------------------------------------------------------------------------- |
+| Subjects list, subject lookup and **Export** | Read Subject and Read Instrument Record                                         |
+| A subject's **Table** and **Graph** tabs     | Read Subject, Read Instrument Record and Read Instrument                        |
+| A single record                              | Read Subject, Read Instrument Record and Read Instrument                        |
+| The files attached to a file record          | Group Manager or Admin base level (cannot be granted)                           |
+| A subject's **Assignments** tab              | Read Assignment and Read Instrument (the tab appears only with gateway support) |
+| Cancelling or emailing an assignment         | Update Assignment                                                               |
+| Instruments list                             | Read Instrument and Read Instrument Record                                      |
+| An instrument's **Table** and **Graph** tabs | Read Instrument and Read Instrument Record                                      |
+
+Every page shows only data from the group selected in the group switcher, and only for groups the user's permissions cover.
+
+### Example: Data Hub Access for a Standard User
+
+A Standard user can already read subjects and instruments in their groups, but not instrument records, so they do not see the Data Hub. To give them read-only access to their group's data:
+
+1. Add **Read** on **Instrument Record**, scoped to their group. This shows **Data Hub** and the **Dashboard**, and makes the subject and instrument pages work.
+2. If gateway support is enabled, also add **Read** on **Assignment**, scoped to their group, so the **Assignments** tab works.
+
+They still cannot see files attached to file records, which requires the Group Manager or Admin base level.
+
+## Default Permissions
+
+Except on Instrument, the Read, Manage (All) and Delete permissions below apply only within the user's groups. Instruments are shared, so Read Instrument covers every instrument.
+
+| Resource                | Group Manager                                   | Standard               |
+| ----------------------- | ----------------------------------------------- | ---------------------- |
+| Assignment              | Manage (All)                                    | None                   |
+| Group                   | Manage (All)                                    | Read                   |
+| Instrument              | Read, Create, Delete series made in their group | Read                   |
+| Instrument Record       | Read, Create                                    | Create                 |
+| Instrument record files | Read, Create                                    | Create                 |
+| Instrument Repository   | Read                                            | None                   |
+| Session                 | Read, Create                                    | Read, Create           |
+| Subject                 | Read, Create                                    | Read, Create           |
+| User                    | Read                                            | Read their own account |
+
+Instrument record files are not a resource you can choose in a permission; only the base level grants them.
+
+Admins hold Manage (All) on All. A user with no base permission level starts with nothing and has only what their permission set or custom permissions give them.
