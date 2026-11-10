@@ -289,7 +289,9 @@ export class AssignmentsService {
     // still administer in person.
     const accessibleInstrumentIds = new Set(group.accessibleInstrumentIds);
     const instrumentIds = timepoints.map(({ instrumentId }) => instrumentId);
-    const unassignableInstrumentIds = new Set(await this.instrumentsService.findUnassignableIds(instrumentIds));
+    const unassignableInstrumentIds = new Set(
+      await this.instrumentsService.findUnassignableIds(instrumentIds.filter((id) => accessibleInstrumentIds.has(id)))
+    );
     const unavailableInstrumentIds = [
       ...new Set(instrumentIds.filter((id) => !accessibleInstrumentIds.has(id) || unassignableInstrumentIds.has(id)))
     ];

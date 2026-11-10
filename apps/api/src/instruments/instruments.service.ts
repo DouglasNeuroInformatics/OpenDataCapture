@@ -322,18 +322,8 @@ export class InstrumentsService {
         ]
       }
     });
-    const cache = this.virtualizationService.context.instruments;
-    const uncachedIds = rows.map(({ id }) => id).filter((id) => !cache.has(id));
-    if (uncachedIds.length > 0) {
-      // Scoped by the ids, which the query above already filtered for this caller.
-      const uncached = await this.instrumentModel.findMany({
-        select: { bundle: true, id: true },
-        where: { id: { in: uncachedIds } }
-      });
-      await this.instantiate(uncached);
-    }
-    // A row deleted between the two queries has no bundle to evaluate, so it has no instance either.
-    const instances = rows.flatMap(({ id }) => cache.get(id) ?? []);
+    // Scoped by the ids, which the query above already filtered for this caller.
+    const instances = await this.findInstancesByIds(rows.map(({ id }) => id));
     if (!query.kind) {
       return instances as WithID<SomeInstrument<TKind>>[];
     }
@@ -437,13 +427,15 @@ export class InstrumentsService {
    */
   async findUnassignableIds(ids: string[]): Promise<string[]> {
     const instruments = await this.instrumentModel.findMany({
-      select: { archivedAt: true, bundle: true, id: true },
+      select: { archivedAt: true, id: true },
       where: { id: { in: ids } }
     });
-    const isUnassignable = await Promise.all(
-      instruments.map(async (instrument) => Boolean(instrument.archivedAt) || (await this.collectsFiles(instrument)))
+    const archivedIds = instruments.filter(({ archivedAt }) => archivedAt).map(({ id }) => id);
+    const instances = await this.findInstancesByIds(
+      instruments.filter(({ archivedAt }) => !archivedAt).map(({ id }) => id)
     );
-    return instruments.filter((_, index) => isUnassignable[index]).map(({ id }) => id);
+    const collectingFiles = await Promise.all(instances.map((instance) => this.collectsFiles(instance)));
+    return [...archivedIds, ...instances.filter((_, index) => collectingFiles[index]).map(({ id }) => id)];
   }
 
   generateInstrumentId(instrument: AnyInstrument, seriesGroupId?: string) {
@@ -576,19 +568,14 @@ export class InstrumentsService {
    * A series bundle does not say what kind its items are, so each item is evaluated. An item that
    * no longer exists is left to `findBundleById`, which refuses it when the assignment is sent.
    */
-  private async collectsFiles(instrument: Pick<InstrumentBundleContainer, 'bundle' | 'id'>): Promise<boolean> {
-    const instance = await this.getInstrumentInstance(instrument);
+  private async collectsFiles(instance: AnyInstrument): Promise<boolean> {
     if (!isSeriesInstrument(instance)) {
       return isFileInstrument(instance);
     }
     const itemIds = getSeriesInstrumentItems(instance.content).map((internal) => {
       return this.generateScalarInstrumentId({ internal });
     });
-    const items = await this.instrumentModel.findMany({
-      select: { bundle: true, id: true },
-      where: { id: { in: itemIds } }
-    });
-    return (await this.instantiate(items)).some(isFileInstrument);
+    return (await this.findInstancesByIds(itemIds)).some(isFileInstrument);
   }
 
   /**
@@ -685,6 +672,24 @@ export class InstrumentsService {
   }
 
   /**
+   * Reads the bundle only of an instrument not yet evaluated. Unscoped: callers pass ids they have
+   * already scoped or that the caller named.
+   */
+  private async findInstancesByIds(ids: string[]) {
+    const cache = this.virtualizationService.context.instruments;
+    const uncachedIds = ids.filter((id) => !cache.has(id));
+    if (uncachedIds.length > 0) {
+      const uncached = await this.instrumentModel.findMany({
+        select: { bundle: true, id: true },
+        where: { id: { in: uncachedIds } }
+      });
+      await Promise.all(uncached.map((instrument) => this.getInstrumentInstance(instrument)));
+    }
+    // An id with no stored row, such as one deleted since it was read, has no instance either.
+    return ids.flatMap((id) => cache.get(id) ?? []);
+  }
+
+  /**
    * The ids of the instruments the subject has at least one record for.
    *
    * Scoped to the records the caller may read, so the filter cannot be resolved from records outside
@@ -767,14 +772,6 @@ export class InstrumentsService {
    */
   private getSeriesItemSequenceKey(items: ScalarInstrumentInternal[]): string {
     return JSON.stringify(items.map(({ edition, name }) => ({ edition, name })));
-  }
-
-  private async instantiate(instruments: Pick<InstrumentBundleContainer, 'bundle' | 'id'>[]) {
-    return Promise.all(
-      instruments.map((instrument) => {
-        return this.getInstrumentInstance(instrument);
-      })
-    );
   }
 
   private instrumentExistsConflict(id: string): ConflictException {

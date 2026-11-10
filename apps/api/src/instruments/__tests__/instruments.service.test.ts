@@ -1176,7 +1176,6 @@ describe('InstrumentsService', () => {
     beforeEach(() => {
       instrumentModel.findMany.mockResolvedValue([]);
       instrumentRecordModel.findMany.mockResolvedValue([]);
-      vi.spyOn(instrumentsService as any, 'instantiate').mockResolvedValue([]);
     });
 
     it('should not query records when no subject is given, so the unfiltered listing costs one query', async () => {
@@ -1478,10 +1477,14 @@ describe('InstrumentsService', () => {
       ]);
     });
 
-    it('should read only the requested instruments, and only what it needs of them', async () => {
+    it('should read no bundle of an instrument it has already evaluated, as find does not', async () => {
       await instrumentsService.findUnassignableIds(['hash:FORM_A-1']);
+      instrumentModel.findMany.mockClear();
+
+      await instrumentsService.findUnassignableIds(['hash:FORM_A-1']);
+
       expect(instrumentModel.findMany).toHaveBeenCalledExactlyOnceWith({
-        select: { archivedAt: true, bundle: true, id: true },
+        select: { archivedAt: true, id: true },
         where: { id: { in: ['hash:FORM_A-1'] } }
       });
     });

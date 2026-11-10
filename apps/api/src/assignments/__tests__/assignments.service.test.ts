@@ -2,7 +2,12 @@ import { ConfigService, getModelToken, LoggingService } from '@douglasneuroinfor
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
-import { ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { BulkAssignmentFailure } from '@opendatacapture/schemas/assignment';
 import type { Permissions } from '@opendatacapture/schemas/core';
@@ -181,8 +186,13 @@ describe('AssignmentsService', () => {
       expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-1'], kind: 'INSTRUMENT_UNAVAILABLE' });
     });
 
-    it('should ask which of every requested instrument cannot be assigned remotely, whatever the group opted into', async () => {
-      await failureOf(
+    it('should refuse an instrument the group has not opted into without evaluating it, so a broken bundle cannot turn the refusal into a 500', async () => {
+      instrumentsService.findUnassignableIds.mockImplementation((ids: string[]) => {
+        return ids.includes('instrument-other')
+          ? Promise.reject(new InternalServerErrorException('Failed to evaluate instrument'))
+          : Promise.resolve([]);
+      });
+      const failure = await failureOf(
         assignmentsService.bulkPreflight(
           request({
             timepoints: [
@@ -193,10 +203,7 @@ describe('AssignmentsService', () => {
           permissiveUser()
         )
       );
-      expect(instrumentsService.findUnassignableIds).toHaveBeenCalledExactlyOnceWith([
-        'instrument-1',
-        'instrument-other'
-      ]);
+      expect(failure.issues).toContainEqual({ instrumentIds: ['instrument-other'], kind: 'INSTRUMENT_UNAVAILABLE' });
     });
 
     it('should restrict subjects to the selected group and the caller ability', async () => {
