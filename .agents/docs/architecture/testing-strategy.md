@@ -26,20 +26,21 @@ only what it ran against the whole coverage scope, so add `--coverage.thresholds
 
 ## A test nothing collects passes silently
 
-Root `vitest.config.ts` collects only `apps/*/vitest.config.ts`, `packages/*/vitest.config.ts` and
-`runtime/*/vitest.config.ts`. A test file in a workspace with no config of its own is collected by
+Root `vitest.config.ts` collects only `.github/vitest.config.ts`, `apps/*/vitest.config.ts`,
+`packages/*/vitest.config.ts` and `runtime/*/vitest.config.ts`. A test file in a workspace with no config of its own is collected by
 nothing, reported by nothing, and passes CI green. A green run prints counts, not file names;
 `pnpm exec vitest list --filesOnly [--project <name>]` prints every collected file prefixed with its
 project. Before trusting a new test, see it listed and watch it fail on purpose.
 
 ## Vitest projects
 
-Twenty-one, each named after its directory except `runtime/v1` (`runtime-v1`). Quirks of each live in
+Twenty-two, each named after its directory except `runtime/v1` (`runtime-v1`) and `.github` (`github`). Quirks of each live in
 that package's `AGENTS.md` §Tests. Three run under happy-dom; the rest run in node, where one file
 opts into a DOM with a first-line `// @vitest-environment happy-dom` docblock.
 
 | Project                  | Package                           | Notes                                                    |
 | ------------------------ | --------------------------------- | -------------------------------------------------------- |
+| `github`                 | `.github`                         | not a workspace; tests `scripts/release.cjs`             |
 | `api`                    | `apps/api`                        | libnest SWC plugin, confined to `apps/api` sources       |
 | `gateway`                | `apps/gateway`                    |                                                          |
 | `playground`             | `apps/playground`                 |                                                          |
@@ -117,15 +118,15 @@ counts their functions twice in the merged report.
 
 ## What CI gates
 
-`.github/workflows/ci.yaml`, one job, on `pull_request` to `main` and `workflow_dispatch` only — a
-push alone runs nothing. In order: `./scripts/generate-env.sh`, `pnpm install --frozen-lockfile`,
+`.github/workflows/ci.yaml`, one job, on `pull_request` to `main` or a `release/**` branch and
+`workflow_dispatch` only — a push alone runs nothing. In order: `./scripts/generate-env.sh`, `pnpm install --frozen-lockfile`,
 `pnpm lint`, `pnpm test:coverage`, Playwright install (chromium + firefox, capped at 10 minutes, after
 lint and unit tests so a hung download cannot hide them), `pnpm test:e2e`.
 
 Not gated: knip (`pnpm knip` exists), and formatting — prettier runs only in the `.husky/pre-commit`
 hook, which formats rather than verifies.
 
-`.github/workflows/release.yaml` (push to `main`) validates with `pnpm lint` only — **no unit or e2e
+`.github/workflows/release.yaml` (push to `main`, dispatch on `release/<major>`) validates with `pnpm lint` only — **no unit or e2e
 tests before a release build.** `.github/workflows/commitlint.yaml` (`pull_request` to any branch)
 lints the commits the PR adds against `commitlint.config.ts`.
 
