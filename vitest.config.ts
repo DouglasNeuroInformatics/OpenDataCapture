@@ -33,7 +33,7 @@ export default mergeConfig(
           'apps/web/src/testing/**'
         ],
         include: [
-          '.github/scripts/release.cjs',
+          '.github/scripts/*.?(c|m)[jt]s',
           'apps/{api,gateway,web}/src/**/*.?(c|m)[jt]s?(x)',
           'packages/*/src/**/*.?(c|m)[jt]s?(x)'
         ],

@@ -52,7 +52,7 @@ Reviewed at commit <full head sha>. pnpm check: green.
 
 ### Findings
 
-<the review's reply verbatim: CLEAN, or its numbered lines>
+<the review's reply verbatim and alone: CLEAN, NO REVIEWABLE FILES, or its numbered lines>
 
 ### Fixed
 
@@ -74,8 +74,8 @@ named, with every finding it returned.
 - **Changes lists every behaviour a reviewer must know, however many.** A migration, an environment variable
   or a config change is always one. Effect terms: what now happens, not which file or function changed; the
   diff shows files. Length scales with the diff, and nothing is there for length.
-- **Decisions, Risks, `Filed:` and Notes are omitted when empty.** With `CLEAN`, so are Fixed and Declined;
-  the attestation never is.
+- **Decisions, Risks, `Filed:` and Notes are omitted when empty.** With `CLEAN` or `NO REVIEWABLE FILES`, so
+  are Fixed and Declined; the attestation never is.
 - **Notes holds critical context only**: what a reviewer needs to judge whether the change works, such as a
   behaviour you verified that `pnpm check` does not prove, and what it showed. Nothing pending and no open
   question belongs there. It sits before the review block; the workflow refuses a Notes heading anywhere

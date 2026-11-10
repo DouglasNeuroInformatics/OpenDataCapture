@@ -40,7 +40,7 @@ opts into a DOM with a first-line `// @vitest-environment happy-dom` docblock.
 
 | Project                  | Package                           | Notes                                                    |
 | ------------------------ | --------------------------------- | -------------------------------------------------------- |
-| `github`                 | `.github`                         | not a workspace; tests `scripts/release.cjs`             |
+| `github`                 | `.github`                         | not a workspace; tests every file in `scripts/`          |
 | `api`                    | `apps/api`                        | libnest SWC plugin, confined to `apps/api` sources       |
 | `gateway`                | `apps/gateway`                    |                                                          |
 | `playground`             | `apps/playground`                 |                                                          |
@@ -112,7 +112,8 @@ on `["^build", "db:generate"]`. `test:e2e` is `cache: false`. **`test` is not a 
 ## Coverage scope
 
 The 100% gate (root `AGENTS.md`) measures `coverage.include` in root `vitest.config.ts`:
-`apps/{api,gateway,web}/src` and `packages/*/src`. `runtime/**` and `apps/playground` are outside it.
+`.github/scripts`, `apps/{api,gateway,web}/src` and `packages/*/src`. `runtime/**` and `apps/playground`
+are outside it.
 `apps/api` confines SWC to its own files because letting it transform imported workspace packages
 counts their functions twice in the merged report.
 

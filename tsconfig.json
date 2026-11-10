@@ -9,10 +9,12 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
+    "rewriteRelativeImportExtensions": true,
     "types": ["node"]
   },
   "include": [
     ".github/scripts/__tests__/*.ts",
+    ".github/scripts/pr-body.ts",
     ".github/scripts/release.cjs",
     ".github/vitest.config.ts",
     "commitlint.config.ts",
