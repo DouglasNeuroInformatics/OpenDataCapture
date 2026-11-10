@@ -1,5 +1,5 @@
 ---
-name: odc-debugging
+name: troubleshooting
 description: Symptom index for what actually breaks in Open Data Capture — a failing build, lint, unit test or e2e run; a change with no visible effect; a suite that stays green after you broke the code on purpose; an error naming runtime/v1, btoa, turbo or .env. Each row names the doc that owns the fix.
 ---
 
@@ -48,5 +48,5 @@ The last row is usually the database: `NODE_ENV=test` gives the API an in-memory
 `testing/src/global/setup.spec.ts`, while development uses a real Mongo that nothing resets, and JWT expiry is
 ignored in development.
 
-When no row matches and you find the cause, land the missing fact where `.agents/skills/odc-agent-docs/SKILL.md`
+When no row matches and you find the cause, land the missing fact where `.agents/skills/writing-agent-docs/SKILL.md`
 says it belongs — this table is a candidate.

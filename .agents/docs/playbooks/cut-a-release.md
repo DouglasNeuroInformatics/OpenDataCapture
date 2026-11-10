@@ -15,9 +15,10 @@ them. Never hand-edit a version field.
 ## Steps
 
 1. **Get the branch green before you bump.** Nothing after the PR runs a test against this code: the
-   release's `validate` job runs `pnpm lint` only. Run the root `AGENTS.md` "Before you are done"
-   checks; root `pnpm test` has no turbo `^build` behind it, so run `pnpm build` once first. `pnpm lint`
-   rewrites files, so commit any churn on its own before the bump. Also confirm
+   release's `validate` job runs `pnpm lint` only. Run `pnpm check`
+   (`.agents/skills/finishing-changes/SKILL.md`); root `pnpm test` has no turbo `^build` behind it, so
+   run `pnpm build` once first. `pnpm lint` rewrites files, so commit any churn on its own before the
+   bump. Also confirm
    `gh run list --workflow=Release --limit 1` is green on `main`: nothing local builds the Docker
    images, and `build` gates both publishes.
 

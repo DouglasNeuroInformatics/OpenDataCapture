@@ -1,0 +1,3 @@
+interface:
+  display_name: 'Adversarial Review'
+  short_description: 'Prosecute and defend a branch against upstream main before a PR'

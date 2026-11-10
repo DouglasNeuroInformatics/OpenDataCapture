@@ -19,7 +19,7 @@ only labels that already exist.
 | Area       | one or more — where the fix lands            | `Area: API`, `Area: Web`, `Area: Gateway`, `Area: Playground`, `Area: Instruments`, `Area: Shared`, `Area: Outreach`, `Area: Infrastructure` |
 | Flags      | every one that is true                       | `Performance`, `Security`, `Good First Issue`, `Needs Info`, `Needs Decision`, `Upstream`                                                    |
 
-Estimate difficulty against the current code, counting the unit and e2e test every change needs.
+Estimate difficulty against the current code, counting the unit tests that keep coverage at 100%.
 
 ## Create
 

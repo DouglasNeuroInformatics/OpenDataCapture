@@ -1,0 +1,3 @@
+interface:
+  display_name: 'Adding Dependencies'
+  short_description: 'Add an npm package through the catalog, after asking'

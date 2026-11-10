@@ -1,0 +1,32 @@
+name: PR Body
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # pull_request_target runs with a write token, so this job checks out main and reads only the
+      # event payload; it never checks out or runs the pull request's code.
+      - name: Checkout Code
+        uses: actions/checkout@v7
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Check the Body
+        id: check
+        # the explicit shell adds pipefail, so tee cannot hide the script's exit code
+        shell: bash
+        run: node scripts/check-pr-body.ts "$GITHUB_EVENT_PATH" | tee "$RUNNER_TEMP/pr-body-report.md"
+      - name: Close the Pull Request
+        if: failure() && steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/pr-body-report.md"
+          gh pr close "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"
