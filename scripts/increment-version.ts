@@ -6,6 +6,10 @@ import path from 'node:path';
 import readline from 'node:readline/promises';
 import { parseArgs, styleText } from 'node:util';
 
+import { format } from 'prettier';
+
+import release from '../.github/scripts/release.cjs';
+
 // The menu offers the bumps in this order, so they live in a tuple: perfectionist/sort-objects
 // alphabetizes object literals and would silently reorder the prompt.
 const BUMPS = ['major', 'minor', 'patch'] as const;
@@ -24,7 +28,15 @@ type PackageFile = {
   relativePath: string;
 };
 
+type FileEdit = {
+  contents: string;
+  relativePath: string;
+  summary: string;
+};
+
 type Plan = {
+  base: string;
+  bump: Bump;
   commit: boolean;
   newVersion: string;
 };
@@ -41,6 +53,16 @@ type Streams = {
 
 // scripts/changelog.ts writes these; they are committed alongside the version files.
 const CHANGELOG_FILES = ['CHANGELOG.md', 'docs/en/6-changelog/changelog.md'];
+
+// A major bump rewrites these too: the channel a fresh .env tracks, and the end-of-support table.
+const ENV_TEMPLATE_FILE = '.env.template';
+const SUPPORT_POLICY_FILE = 'docs/en/5-reference/5.10-versioning.md';
+
+const SUPPORT_TABLE_START = '<!-- support-table:start -->';
+const SUPPORT_TABLE_END = '<!-- support-table:end -->';
+
+// A superseded major stays supported for this long after its successor's release.
+const SUPPORT_WINDOW_MONTHS = 18;
 
 const USAGE = `Usage: ./scripts/increment-version.ts [options]
 
@@ -130,12 +152,16 @@ function collectPackageFiles(): PackageFile[] {
   }));
 }
 
-function bumpVersion(current: string, bump: Bump): string {
-  const parsed = /^(\d+)\.(\d+)\.(\d+)$/.exec(current);
+function parseVersion(version: string): readonly [number, number, number] {
+  const parsed = release.parseVersion(version);
   if (!parsed) {
-    throw new Error(`Expected a version such as 2.3.0 in package.json, got '${current}'`);
+    throw new Error(`Expected a version such as 2.3.0 in package.json, got '${version}'`);
   }
-  const [major, minor, patch] = parsed.slice(1).map(Number) as [number, number, number];
+  return parsed;
+}
+
+function bumpVersion(current: string, bump: Bump): string {
+  const [major, minor, patch] = parseVersion(current);
   switch (bump) {
     case 'major':
       return `${major + 1}.0.0`;
@@ -168,11 +194,40 @@ function recommendBump(): Bump {
   return recommended;
 }
 
-function renderMenu(currentVersion: string, recommended: Bump): void {
+// A breaking commit makes the next release from main a major. A superseded major, released from its
+// release/<major> branch, takes fixes only (docs/en/5-reference/5.10-versioning.md), so its next
+// version is a patch and a breaking or feat commit in range is refused outright.
+function allowBumps(
+  currentVersion: string,
+  recommended: Bump,
+  requested: Bump | null
+): { base: string; bumps: readonly Bump[] } {
+  const [major] = parseVersion(currentVersion);
+  const restrict = (base: string, bump: Bump, rule: string) => {
+    if (requested && requested !== bump) {
+      throw new Error(`Refusing --bump ${requested}: ${rule}`);
+    }
+    return { base, bumps: [bump] };
+  };
+  const tags = run('git', ['tag', '--list', 'v*'], { stderr: 'inherit', stdout: 'capture' });
+  if (release.isSupersededMajor(major, tags.split('\n').filter(Boolean))) {
+    if (recommended !== 'patch') {
+      const commit = recommended === 'major' ? 'breaking' : 'feat';
+      throw new Error(`A ${commit} commit is in range, but ${major}.x is a superseded major, which takes fixes only`);
+    }
+    return restrict(`release/${major}`, 'patch', `${major}.x is a superseded major, which takes fixes only`);
+  }
+  if (recommended === 'major') {
+    return restrict('main', 'major', 'a breaking commit is in range, so the bump must be major');
+  }
+  return { base: 'main', bumps: BUMPS };
+}
+
+function renderMenu(currentVersion: string, bumps: readonly Bump[], recommended: Bump): void {
   print();
   print(styleText('bold', 'Select a version bump'));
   print();
-  BUMPS.forEach((bump, index) => {
+  bumps.forEach((bump, index) => {
     const isRecommended = bump === recommended;
     const marker = isRecommended ? styleText('green', '❯') : ' ';
     const suffix = isRecommended ? styleText('green', ' recommended') : '';
@@ -180,7 +235,7 @@ function renderMenu(currentVersion: string, recommended: Bump): void {
     const version = styleText('cyan', bumpVersion(currentVersion, bump).padEnd(9));
     print(`${marker} ${index + 1}  ${bump.padEnd(7)}${version}${suffix}`);
   });
-  print(`  ${BUMPS.length + 1}  quit`);
+  print(`  ${bumps.length + 1}  quit`);
   print();
 }
 
@@ -211,10 +266,15 @@ function createPrompt(): Prompt {
   };
 }
 
-async function askBump(prompt: Prompt, currentVersion: string, recommended: Bump): Promise<Bump | null> {
-  renderMenu(currentVersion, recommended);
-  const choices: ('quit' | Bump)[] = [...BUMPS, 'quit'];
-  const defaultChoice = String(BUMPS.indexOf(recommended) + 1);
+async function askBump(
+  prompt: Prompt,
+  currentVersion: string,
+  bumps: readonly Bump[],
+  recommended: Bump
+): Promise<Bump | null> {
+  renderMenu(currentVersion, bumps, recommended);
+  const choices: ('quit' | Bump)[] = [...bumps, 'quit'];
+  const defaultChoice = String(bumps.indexOf(recommended) + 1);
   for (;;) {
     const input = await prompt.ask(`Selection [${defaultChoice}]: `);
     if (input === null) {
@@ -234,6 +294,72 @@ async function askBump(prompt: Prompt, currentVersion: string, recommended: Bump
 async function askConfirmation(prompt: Prompt, question: string): Promise<boolean> {
   const answer = await prompt.ask(`${question} ${styleText('dim', '[y/N]')} `);
   return answer !== null && /^y(es)?$/i.test(answer);
+}
+
+function editReleaseChannel(major: number): FileEdit {
+  const channel = /^RELEASE_CHANNEL=.*$/m;
+  const contents = fs.readFileSync(path.join(projectRoot, ENV_TEMPLATE_FILE), 'utf8');
+  if (!channel.test(contents)) {
+    throw new Error(`No RELEASE_CHANNEL to update in ${ENV_TEMPLATE_FILE}`);
+  }
+  return {
+    contents: contents.replace(channel, `RELEASE_CHANNEL=${major}`),
+    relativePath: ENV_TEMPLATE_FILE,
+    summary: `RELEASE_CHANNEL=${major}`
+  };
+}
+
+// Date normalizes an out-of-range month index, which is what carries the window across years.
+function formatMonth(year: number, monthIndex: number): string {
+  const date = new Date(year, monthIndex);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function cellsOf(row: string): string[] {
+  return row
+    .split('|')
+    .slice(1, -1)
+    .map((cell) => cell.trim());
+}
+
+// The bump month stands in for the release month: the release ships when the bump's PR merges.
+async function editSupportTable(previousMajor: number, newMajor: number): Promise<FileEdit> {
+  const absolutePath = path.join(projectRoot, SUPPORT_POLICY_FILE);
+  const contents = fs.readFileSync(absolutePath, 'utf8');
+  const start = contents.indexOf(SUPPORT_TABLE_START);
+  const end = contents.indexOf(SUPPORT_TABLE_END);
+  if (start === -1 || end < start) {
+    throw new Error(`No table between ${SUPPORT_TABLE_START} and ${SUPPORT_TABLE_END} in ${SUPPORT_POLICY_FILE}`);
+  }
+  const [header, separator, ...rows] = contents
+    .slice(start + SUPPORT_TABLE_START.length, end)
+    .trim()
+    .split('\n');
+  const index = rows.findIndex((row) => cellsOf(row)[0] === String(previousMajor));
+  const previousRow = rows[index];
+  const previousReleased = previousRow && cellsOf(previousRow)[1];
+  if (!header || !separator || !previousReleased) {
+    throw new Error(`The support table in ${SUPPORT_POLICY_FILE} has no row for ${previousMajor}`);
+  }
+  const now = new Date();
+  const released = formatMonth(now.getFullYear(), now.getMonth());
+  const supportedUntil = formatMonth(now.getFullYear(), now.getMonth() + SUPPORT_WINDOW_MONTHS);
+  rows[index] = `| ${previousMajor} | ${previousReleased} | ${released} | ${supportedUntil} |`;
+  const table = [header, separator, `| ${newMajor} | ${released} | — | — |`, ...rows].join('\n');
+  const updated = `${contents.slice(0, start + SUPPORT_TABLE_START.length)}\n\n${table}\n\n${contents.slice(end)}`;
+  return {
+    contents: await format(updated, { filepath: absolutePath }),
+    relativePath: SUPPORT_POLICY_FILE,
+    summary: `${previousMajor}.x supported until ${supportedUntil}`
+  };
+}
+
+// Computed before any version field is written, so a missing RELEASE_CHANNEL line or table row
+// fails the run with the tree untouched rather than half-bumped.
+async function editsForNewMajor(currentVersion: string, newVersion: string): Promise<FileEdit[]> {
+  const [previousMajor] = parseVersion(currentVersion);
+  const [newMajor] = parseVersion(newVersion);
+  return [editReleaseChannel(newMajor), await editSupportTable(previousMajor, newMajor)];
 }
 
 function commitRelease(files: string[], version: string): void {
@@ -290,9 +416,11 @@ function requireTty(flag: string): void {
 // Both answers can arrive as flags, which is what makes a run without a terminal possible: --commit
 // answers the commit prompt, --yes answers the rest with their defaults, and the commit default is no.
 async function planRelease(options: Options, currentVersion: string): Promise<null | Plan> {
+  const recommended = recommendBump();
+  const { base, bumps } = allowBumps(currentVersion, recommended, options.bump);
   const prompt = createPrompt();
   try {
-    const bump = options.bump ?? (await askBump(prompt, currentVersion, recommendBump()));
+    const bump = options.bump ?? (await askBump(prompt, currentVersion, bumps, recommended));
     if (!bump) {
       return null;
     }
@@ -306,7 +434,7 @@ async function planRelease(options: Options, currentVersion: string): Promise<nu
     if (!options.yes && !(await askConfirmation(prompt, action))) {
       return null;
     }
-    return { commit, newVersion };
+    return { base, bump, commit, newVersion };
   } finally {
     prompt.close();
   }
@@ -341,7 +469,8 @@ async function main(argv: string[]): Promise<void> {
     print(styleText('dim', 'Aborted.'));
     return;
   }
-  const { commit, newVersion } = plan;
+  const { base, bump, commit, newVersion } = plan;
+  const majorEdits = bump === 'major' ? await editsForNewMajor(currentVersion, newVersion) : [];
 
   print();
   for (const file of packageFiles) {
@@ -364,14 +493,21 @@ async function main(argv: string[]): Promise<void> {
   print();
   print(`${styleText('green', '✓')} All ${packageFiles.length} packages report ${styleText('cyan', newVersion)}`);
 
+  for (const edit of majorEdits) {
+    fs.writeFileSync(path.join(projectRoot, edit.relativePath), edit.contents);
+    print(`${styleText('green', '✓')} ${edit.relativePath} ${styleText('dim', `→ ${edit.summary}`)}`);
+  }
+
   if (commit) {
-    commitRelease([...packageFiles.map((file) => file.relativePath), ...CHANGELOG_FILES], newVersion);
+    const majorFiles = majorEdits.map((edit) => edit.relativePath);
+    commitRelease([...packageFiles.map((file) => file.relativePath), ...CHANGELOG_FILES, ...majorFiles], newVersion);
     print(`${styleText('green', '✓')} Committed as ${styleText('bold', `chore: release v${newVersion}`)}`);
     print();
-    print(styleText('dim', 'Next: review the commit, then open a pull request against main.'));
+    print(styleText('dim', `Next: review the commit, then open a pull request against ${base}.`));
   } else {
     print();
     print(`Next: review CHANGELOG.md, then commit as: ${styleText('bold', `chore: release v${newVersion}`)}`);
+    print(styleText('dim', `Then open a pull request against ${base}.`));
     print(styleText('dim', 'Pass --commit to have this script make that commit for you.'));
   }
   print();

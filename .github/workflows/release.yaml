@@ -2,13 +2,16 @@ name: Release
 on:
   push:
     branches: ['main']
+  # A release/<major> branch releases on dispatch only; release.cjs refuses any other ref.
   workflow_dispatch:
 permissions:
   contents: write
   packages: write
+# One Release at a time across every ref: release.cjs plans from a tag snapshot, so a run on another
+# ref must not overlap it (.agents/docs/architecture/release-channels.md).
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 defaults:
   run:
     shell: bash
@@ -16,20 +19,25 @@ jobs:
   configure:
     runs-on: ubuntu-latest
     outputs:
-      should_release: ${{ steps.version.outputs.should_release }}
-      version: ${{ steps.version.outputs.version }}
+      edge: ${{ steps.plan.outputs.edge }}
+      latest: ${{ steps.plan.outputs.latest }}
+      major: ${{ steps.plan.outputs.major }}
       matrix: ${{ steps.matrix.outputs.matrix }}
+      release: ${{ steps.plan.outputs.release }}
+      version: ${{ steps.plan.outputs.version }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # release.cjs reads every v* tag
       - name: Derive Build Matrix
         id: matrix
         run: |
           matrix=$(docker compose config --no-interpolate --format json \
             | jq -c '{include:[.services|to_entries[]|select(.value.build and .value.image)|{image:(.value.image|split(":")[0]),dockerfile:.value.build.dockerfile}]}')
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
-      - name: Determine Release Version
-        id: version
+      - name: Plan Release
+        id: plan
         uses: actions/github-script@v9
         with:
           script: |
@@ -53,7 +61,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: [configure, validate]
-    if: ${{ needs.configure.outputs.should_release == 'true' }}
     strategy:
       fail-fast: true
       matrix: ${{ fromJSON(needs.configure.outputs.matrix) }}
@@ -75,9 +82,13 @@ jobs:
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ${{ matrix.image }}
+          flavor: latest=false
           tags: |
-            type=raw,value=latest
-            type=raw,value=${{ needs.configure.outputs.version }}
+            type=raw,value=edge,enable=${{ needs.configure.outputs.edge }}
+            type=sha,prefix=sha-,format=short,enable=${{ needs.configure.outputs.edge }}
+            type=raw,value=${{ needs.configure.outputs.version }},enable=${{ needs.configure.outputs.release }}
+            type=raw,value=${{ needs.configure.outputs.major }},enable=${{ needs.configure.outputs.release }}
+            type=raw,value=latest,enable=${{ needs.configure.outputs.latest }}
       - name: Build and Push Docker Images
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
@@ -99,7 +110,9 @@ jobs:
     needs:
       - build
       - configure
-    if: ${{ needs.configure.outputs.should_release == 'true' }}
+    # npm publishes from main only, so every publish is a latest publish; a release of a superseded
+    # major skips this job, and configure says so.
+    if: ${{ needs.configure.outputs.latest == 'true' }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -145,6 +158,11 @@ jobs:
       - build
       - configure
       - publish-npm
+    # publish-npm is skipped, not failed, on a release of a superseded major; the default success()
+    # gate would skip this job with it.
+    if: >-
+      ${{ !cancelled() && needs.configure.outputs.release == 'true' && needs.build.result == 'success'
+      && (needs.publish-npm.result == 'success' || needs.configure.outputs.latest == 'false') }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -165,4 +183,7 @@ jobs:
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           body_path: ${{ runner.temp }}/release-notes.md
+          make_latest: ${{ needs.configure.outputs.latest }}
           tag_name: v${{ needs.configure.outputs.version }}
+          # The action otherwise creates a new tag on the default branch, not on the commit this run built.
+          target_commitish: ${{ github.sha }}
