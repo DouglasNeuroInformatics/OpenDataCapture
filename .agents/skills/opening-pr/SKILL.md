@@ -13,8 +13,10 @@ head, drops a finding, or when a forbidden section is present.
 `pnpm check` is green on the branch, and `.agents/skills/adversarial-review/SKILL.md` has run on the
 branch's content, or on content that differs from it only by fixes to the review's own findings, with every
 confirmed finding fixed or declined (`.agents/skills/finishing-changes/SKILL.md` is the order). The stamp
-names the head you push, since the review reads the working tree and the commit comes after. Either missing: stop, open nothing, and say which. There is no exception path; a check that cannot
-pass is reported to the user, never written into a body.
+names the head you push, since the review reads the working tree and the commit comes after. A `pnpm check`
+that is not green has no exception: stop, open nothing, and say so. A review that did not run on this
+content, or whose result was altered, is never claimed either: the body says so with the `cannot attest`
+line below, and the reviewer decides.
 
 ## Body
 
@@ -37,6 +39,11 @@ Write the body to a file and pass it with `--body-file`:
 
 Filed: #N, #M
 
+## Notes
+
+<critical context for judging whether this works: what you verified that `pnpm check` does not prove, and
+what it showed>
+
 ## Adversarial review
 
 Reviewed at commit <full head sha>. pnpm check: green.
@@ -53,6 +60,11 @@ Reviewed at commit <full head sha>. pnpm check: green.
 
 - <n>. <what the prosecutor missed, in code terms: a guard upstream, a type that excludes the case, a rule
   quoted out of context>
+
+### Attestation
+
+I, <model name>, attest that the review block above reports the adversarial review as it ran on the commit
+named, with every finding it returned.
 ```
 
 - **The opening paragraph is a ceiling, not a floor.** A one-line change gets one or two sentences; one
@@ -60,13 +72,23 @@ Reviewed at commit <full head sha>. pnpm check: green.
 - **Changes lists every behaviour a reviewer must know, however many.** A migration, an environment variable
   or a config change is always one. Effect terms: what now happens, not which file or function changed; the
   diff shows files. Length scales with the diff, and nothing is there for length.
-- **Decisions, Risks and `Filed:` are omitted when empty.** With `CLEAN`, so are Fixed and Declined.
-- **No Verification, Validation, Notes or Implementation notes section**; the workflow refuses them.
+- **Decisions, Risks, `Filed:` and Notes are omitted when empty.** With `CLEAN`, so are Fixed and Declined;
+  the attestation never is.
+- **Notes holds critical context only**: what a reviewer needs to judge whether the change works, such as a
+  behaviour you verified that `pnpm check` does not prove, and what it showed. Nothing pending and no open
+  question belongs there. It sits before the review block; the workflow refuses a Notes heading anywhere
+  after.
+- **No Verification, Validation or Implementation notes section**; the workflow refuses them.
   `pnpm check: green` is the only verification statement. Test names, pass counts and what was not run belong
   nowhere. An observation that is not a Change, a Decision or a Risk is an issue
   (`.agents/skills/opening-issues/SKILL.md`), linked under `Filed:`, or deleted.
 - **Every number under Findings appears under exactly one of Fixed or Declined.** A decline reading "out of
   scope" or "pre-existing" carries the issue number it was filed under.
+- **The attestation is written only when it is true.** Skipping the review, running it on other content, or
+  editing what it returned makes it false. Then write `I, <model name>, cannot attest: <what happened>` in
+  its place, say what happened under Findings, and replace the stamp line with `pnpm check: green.` alone. The workflow
+  accepts both lines and leaves a PR that cannot attest open; a reviewer reads it as a reason to look closer,
+  and a false attestation as grounds to close the PR.
 
 ## Open
 

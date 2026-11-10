@@ -10,11 +10,17 @@ type PullRequestEvent = {
 
 const SKILL_PATH = '.agents/skills/opening-pr/SKILL.md';
 
-const FORBIDDEN_HEADING = /^#{1,6} +(verification|validation|notes|implementation notes)\b/i;
+const FORBIDDEN_HEADING = /^#{1,6} +(verification|validation|implementation notes)\b/i;
+
+const NOTES_HEADING = /^#{1,6} +notes\b/i;
+
+const REVIEW_HEADING = /^## +adversarial review\b/i;
 
 const FENCE = /^(```|~~~)/;
 
 const STAMP = /^(?:Reviewed at commit|Follow-up) ([0-9a-f]{40})\b/gm;
+
+const ATTESTATION = /^I, [^,\n]+, (attest that .+|cannot attest: .+)$/m;
 
 function isRecord(value: unknown): value is { [key: string]: unknown } {
   return typeof value === 'object' && value !== null;
@@ -66,25 +72,22 @@ function listNumbers(text: null | string): Set<number> {
   return new Set(Array.from((text ?? '').matchAll(/^\s*(?:-\s*)?(\d+)\./gm), (match) => Number(match[1])));
 }
 
-function checkReview(review: string, event: PullRequestEvent): string[] {
-  const failures: string[] = [];
+function checkStamp(review: string, event: PullRequestEvent): string[] {
   const stamps = Array.from(review.matchAll(STAMP), (match) => match[1]);
   const headSha = event.pull_request.head.sha;
   if (stamps.length === 0) {
-    failures.push('The review block names no reviewed commit.');
-  } else if (event.action !== 'edited' && !stamps.includes(headSha)) {
+    return ['The review block names no reviewed commit.'];
+  }
+  if (event.action !== 'edited' && !stamps.includes(headSha)) {
     // The body is edited for a new head before that head is pushed, so an edit is checked against
     // the head only once the push that follows it arrives.
-    failures.push(`The review block names no commit matching the head \`${headSha}\`.`);
+    return [`The review block names no commit matching the head \`${headSha}\`.`];
   }
-  if (!/\bpnpm check: green\b/.test(review)) {
-    failures.push('The review block does not state `pnpm check: green`.');
-  }
-  const findings = findSection(review, 'findings', 3);
-  if (findings === null) {
-    failures.push('The review block has no `### Findings` section.');
-    return failures;
-  }
+  return [];
+}
+
+function checkFindings(review: string, findings: string): string[] {
+  const failures: string[] = [];
   const fixed = listNumbers(findSection(review, 'fixed', 3));
   const declined = listNumbers(findSection(review, 'declined', 3));
   if (findings.trim() === 'CLEAN') {
@@ -112,14 +115,45 @@ function checkReview(review: string, event: PullRequestEvent): string[] {
   return failures;
 }
 
+function checkReview(review: string, event: PullRequestEvent): string[] {
+  const failures: string[] = [];
+  if (!/\bpnpm check: green\b/.test(review)) {
+    failures.push('The review block does not state `pnpm check: green`.');
+  }
+  const attestation = findSection(review, 'attestation', 3)?.match(ATTESTATION);
+  if (!attestation) {
+    failures.push(
+      'The review block has no `### Attestation` with an `I, <model name>, attest that …` or `cannot attest: …` line.'
+    );
+  }
+  const findings = findSection(review, 'findings', 3);
+  if (findings === null) {
+    failures.push('The review block has no `### Findings` section.');
+    return failures;
+  }
+  const cannotAttest = attestation?.[1]?.startsWith('cannot attest') ?? false;
+  if (cannotAttest) {
+    if (findings.trim() === '') {
+      failures.push('A review that cannot attest says what happened under `### Findings`.');
+    }
+    return failures;
+  }
+  return [...failures, ...checkStamp(review, event), ...checkFindings(review, findings)];
+}
+
 function checkBody(event: PullRequestEvent): string[] {
   const { body } = event.pull_request;
   if (!body?.trim()) {
     return ['The body is empty.'];
   }
-  const failures = outsideFences(body.split(/\r?\n/))
+  const lines = outsideFences(body.split(/\r?\n/));
+  const failures = lines
     .filter((line) => FORBIDDEN_HEADING.test(line))
     .map((line) => `Remove the \`${line.trim()}\` section; the body carries effects, decisions and risks only.`);
+  const reviewIndex = lines.findIndex((line) => REVIEW_HEADING.test(line));
+  if (lines.some((line, index) => index > reviewIndex && NOTES_HEADING.test(line))) {
+    failures.push('A Notes section goes before `## Adversarial review`, and nowhere after it.');
+  }
   const review = findSection(body, 'adversarial review', 2);
   if (review === null) {
     failures.push('The body has no `## Adversarial review` section.');
