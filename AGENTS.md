@@ -39,7 +39,7 @@ not every tool loads nested files.
 - **Ask before writing code if the task is ambiguous** or its stated scope cannot accomplish the
   goal.
 - **A change is not done until `.agents/skills/finishing-changes/SKILL.md` has run green.** It runs
-  `pnpm check` and the checks a green run does not prove.
+  `pnpm check` and the checks a green run does not prove, unless otherwise specified in that file.
 - **Adding a dependency follows `.agents/skills/adding-dependencies/SKILL.md`**, which starts with
   asking in-conversation.
 - **Unit test coverage stays at 100%.** `pnpm test:coverage` fails below 100% statements, branches,
