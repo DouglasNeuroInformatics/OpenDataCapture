@@ -102,6 +102,13 @@ export default defineSuite('re-adding a registered instrument repository', funct
     return fetchSpy;
   };
 
+  const expectSyncedWithNewToken = async (repoId: string, fetchSpy: Awaited<ReturnType<typeof stubGitHub>>) => {
+    expect(fetchSpy).toHaveBeenCalledOnce();
+    expect(fetchSpy.mock.lastCall?.[1]?.headers).toMatchObject({ Authorization: 'Bearer new-token' });
+    const token = await storedToken(repoId);
+    expect(token && decryptSecret(token, secretKey())).toBe('new-token');
+  };
+
   const reAdd = (headers: AuthHeaders, url: string) => {
     return this.app.inject({
       headers,
@@ -151,11 +158,12 @@ export default defineSuite('re-adding a registered instrument repository', funct
       { action: 'update', groupId: ownGroup.id, subject: 'InstrumentRepo' }
     ]);
     const repo = await registerRepo('own-group-target', [ownGroup.id]);
-    await stubGitHub();
+    const fetchSpy = await stubGitHub();
 
     const response = await reAdd(headers, repo.url);
 
     expect(response.statusCode).toBe(201);
+    await expectSyncedWithNewToken(repo.id, fetchSpy);
   });
 
   it('should let an administrator replace the token and re-sync, which is how an expired one is refreshed', async () => {
@@ -165,8 +173,6 @@ export default defineSuite('re-adding a registered instrument repository', funct
     const response = await reAdd(adminHeaders, repo.url);
 
     expect(response.statusCode).toBe(201);
-    expect(fetchSpy).toHaveBeenCalled();
-    const token = await storedToken(repo.id);
-    expect(token && decryptSecret(token, secretKey())).toBe('new-token');
+    await expectSyncedWithNewToken(repo.id, fetchSpy);
   });
 });
