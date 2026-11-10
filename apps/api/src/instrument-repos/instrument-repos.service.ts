@@ -26,7 +26,7 @@ import type {
 import JSZip from 'jszip';
 import { z } from 'zod/v4';
 
-import { accessibleQuery } from '@/auth/ability.utils';
+import { accessibleQuery, forcedAppSubject } from '@/auth/ability.utils';
 import { decryptSecret, encryptSecret } from '@/core/secret-cipher';
 import type { EntityOperationOptions } from '@/core/types';
 import { InstrumentsService } from '@/instruments/instruments.service';
@@ -96,15 +96,21 @@ export class InstrumentReposService implements OnModuleInit {
     private readonly loggingService: LoggingService
   ) {}
 
-  async create({ accessToken, url }: $CreateInstrumentRepoData) {
+  async create({ accessToken, url }: $CreateInstrumentRepoData, { ability }: EntityOperationOptions = {}) {
     const { owner, repoName } = this.parseGitHubUrl(url);
     const normalizedUrl = this.normalizeUrl(url);
 
-    // Re-adding an already-registered repo is treated as a re-sync rather than an error. If a new
-    // access token was supplied (e.g. the previous one expired), persist it first so the sync — and
-    // all future syncs — use the updated credentials.
+    // Re-adding a registered repo re-syncs it after persisting any new token, which is how an expired
+    // token is replaced. Only a caller who may update the repo gets that, so the lookup is by URL alone
+    // (it is unique) and anyone else is refused before the token is touched. `ability.can`, because
+    // `accessibleQuery` throws a 500 for a caller holding no `update` rule at all.
     const existing = await this.instrumentRepoModel.findFirst({ where: { url: normalizedUrl } });
     if (existing) {
+      if (ability && !ability.can('update', forcedAppSubject('InstrumentRepo', { groupIds: existing.groupIds }))) {
+        throw new ConflictException(
+          `Repository '${normalizedUrl}' is already registered, and you do not have permission to update it`
+        );
+      }
       if (accessToken) {
         await this.instrumentRepoModel.update({
           data: { accessToken: this.encrypt(accessToken) },

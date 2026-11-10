@@ -18,8 +18,8 @@ export class InstrumentReposController {
   @ApiOperation({ summary: 'Create Instrument Repo' })
   @Post()
   @RouteAccess({ action: 'create', subject: 'InstrumentRepo' })
-  create(@Body() dto: $CreateInstrumentRepoData) {
-    return this.instrumentReposService.create(dto);
+  create(@Body() dto: $CreateInstrumentRepoData, @CurrentUser('ability') ability: AppAbility) {
+    return this.instrumentReposService.create(dto, { ability });
   }
 
   @ApiOperation({ summary: 'Delete Instrument Repo' })
