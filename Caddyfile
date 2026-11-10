@@ -8,6 +8,16 @@
 	}
 
 	handle_path /api/* {
+		# The api does not compress its responses. A match is given because the default list of encode
+		# omits application/x-msgpack, the type of the largest response (the instrument records list).
+		encode {
+			zstd
+			gzip
+			match {
+				header Content-Type application/json*
+				header Content-Type application/x-msgpack*
+			}
+		}
 		reverse_proxy api
 	}
 
