@@ -21,7 +21,8 @@ git ls-files --others --exclude-standard
 what upstream has changed underneath. A clone without the `upstream` remote adds it first:
 `git remote add upstream https://github.com/DouglasNeuroInformatics/OpenDataCapture.git`.
 Keep only `.ts`, `.tsx`, `.js`, `.jsx`, `.css` and `.prisma` files, and drop `apps/web/src/route-tree.ts`,
-`testing/src/generated/` and `*.stories.*`. An empty list ends the review: reply `CLEAN`.
+`testing/src/generated/` and `*.stories.*`. An empty list ends the review: reply `NO REVIEWABLE FILES`, which
+tells the reader nothing was reviewed, where `CLEAN` would claim nothing was found.
 
 ## 2. Prosecute
 
