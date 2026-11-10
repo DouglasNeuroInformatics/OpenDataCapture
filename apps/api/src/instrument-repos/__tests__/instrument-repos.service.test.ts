@@ -291,6 +291,17 @@ describe('InstrumentReposService', () => {
       );
     });
 
+    it('should re-sync with the updated token, so the sync re-adding starts does not download with the expired one', async () => {
+      const updated = { accessToken: 'new-ciphertext', id: 'existing' };
+      instrumentRepoModel.findFirst.mockResolvedValueOnce({ accessToken: 'old-ciphertext', id: 'existing' });
+      instrumentRepoModel.update.mockResolvedValueOnce(updated);
+      const syncSpy = vi.spyOn(internal, 'syncRepo').mockResolvedValue({ ok: true, repo: updated });
+
+      await service.create({ accessToken: 'new-token', url: 'https://github.com/owner/repo' });
+
+      expect(syncSpy).toHaveBeenCalledWith(updated);
+    });
+
     it('does not touch the stored token when re-adding without one', async () => {
       instrumentRepoModel.findFirst.mockResolvedValueOnce({ id: 'existing' });
       vi.spyOn(internal, 'syncRepo').mockResolvedValue({ ok: true, repo: { id: 'existing' } });

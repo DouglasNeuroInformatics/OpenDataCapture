@@ -111,13 +111,13 @@ export class InstrumentReposService implements OnModuleInit {
           `Repository '${normalizedUrl}' is already registered, and you do not have permission to update it`
         );
       }
-      if (accessToken) {
-        await this.instrumentRepoModel.update({
-          data: { accessToken: this.encrypt(accessToken) },
-          where: { id: existing.id }
-        });
-      }
-      const result = await this.syncRepo(existing);
+      const repo = accessToken
+        ? await this.instrumentRepoModel.update({
+            data: { accessToken: this.encrypt(accessToken) },
+            where: { id: existing.id }
+          })
+        : existing;
+      const result = await this.syncRepo(repo);
       if (!result.ok) {
         throw result.error;
       }
