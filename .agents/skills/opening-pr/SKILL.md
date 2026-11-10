@@ -1,12 +1,14 @@
 ---
 name: opening-pr
-description: Open a pull request against DouglasNeuroInformatics/OpenDataCapture, or push a follow-up to one — the body a reviewer reads in seconds, and the adversarial-review block without which `.github/workflows/pr-body.yaml` closes the PR. Use whenever a change is ready for a PR; it refuses a branch whose `pnpm check` is not green or whose review has not run on the current head.
+description: Open a pull request against DouglasNeuroInformatics/OpenDataCapture, or push a follow-up to one — the body a reviewer reads in seconds, and the adversarial-review block without which `.github/workflows/pr-body.yaml` closes an agent-authored PR. Use whenever a change is ready for a PR; it refuses a branch whose `pnpm check` is not green or whose review has not run on the current head.
 ---
 
 The reviewer reads dozens of these a week. The body says what changed in effect terms and what they might
 disagree with, and nothing a green CI run already proves. `.github/workflows/pr-body.yaml` reads the body on
-every open, edit and push, and closes the PR when the review block is missing, names a commit other than the
-head, drops a finding, or when a forbidden section is present.
+every open, edit and push of a PR that shows agent authorship (a bot author other than Dependabot, a
+`Co-Authored-By` trailer naming Claude, GPT, Codex or Copilot in the author's commits or the body, the
+`🤖 Generated with` footer, or any part of the review block), and closes the PR when the review block is
+missing, names a commit other than the head, drops a finding, or when a forbidden section is present.
 
 ## Preconditions
 

@@ -17,11 +17,19 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
+      # the event payload carries no commits, and their trailers are one sign of agent authorship; only
+      # the author's own commits count, so carrying someone else's agent commits does not bind a person
+      - name: List the Commit Messages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/commits" --jq '.[] | select(.author.login == env.PR_AUTHOR) | .commit.message' > "$RUNNER_TEMP/commit-messages.txt"
       - name: Check the Body
         id: check
         # the explicit shell adds pipefail, so tee cannot hide the script's exit code
         shell: bash
-        run: node scripts/check-pr-body.ts "$GITHUB_EVENT_PATH" | tee "$RUNNER_TEMP/pr-body-report.md"
+        run: node scripts/check-pr-body.ts "$GITHUB_EVENT_PATH" "$RUNNER_TEMP/commit-messages.txt" | tee "$RUNNER_TEMP/pr-body-report.md"
       - name: Close the Pull Request
         if: failure() && steps.check.outcome == 'failure'
         env:

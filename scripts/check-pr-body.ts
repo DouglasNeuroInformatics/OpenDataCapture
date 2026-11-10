@@ -4,8 +4,14 @@ type PullRequestEvent = {
   action: string;
   pull_request: {
     body: null | string;
-    head: { sha: string };
+    head: { ref: string; sha: string };
+    user: { login: string; type: string };
   };
+};
+
+type PullRequest = {
+  commitMessages: string;
+  event: PullRequestEvent;
 };
 
 const SKILL_PATH = '.agents/skills/opening-pr/SKILL.md';
@@ -22,6 +28,15 @@ const STAMP = /^(?:Reviewed at commit|Follow-up) ([0-9a-f]{40})\b/gm;
 
 const ATTESTATION = /^I, [^,\n]+, (attest that .+|cannot attest: .+)$/m;
 
+const AGENT_TRAILER = /^Co-Authored-By: *(?:Claude|GPT|Codex|Copilot)\b/im;
+
+const AGENT_FOOTER = /^🤖 Generated with /m;
+
+const EXEMPT_BOTS = new Set(['dependabot[bot]']);
+
+// A merge-back carries commits whose own pull requests already passed this check into the release branch.
+const EXEMPT_HEAD_REF = /^release\/\d+$/;
+
 function isRecord(value: unknown): value is { [key: string]: unknown } {
   return typeof value === 'object' && value !== null;
 }
@@ -30,19 +45,52 @@ function parseEvent(contents: unknown): PullRequestEvent {
   if (!isRecord(contents) || typeof contents.action !== 'string' || !isRecord(contents.pull_request)) {
     throw new Error('Expected a pull_request event payload with an action and a pull_request');
   }
-  const { body, head } = contents.pull_request;
-  if ((body !== null && typeof body !== 'string') || !isRecord(head) || typeof head.sha !== 'string') {
-    throw new Error('Expected pull_request.body to be a string or null and pull_request.head.sha a string');
+  const { body, head, user } = contents.pull_request;
+  if (
+    (body !== null && typeof body !== 'string') ||
+    !isRecord(head) ||
+    typeof head.ref !== 'string' ||
+    typeof head.sha !== 'string'
+  ) {
+    throw new Error('Expected pull_request.body to be a string or null and pull_request.head.ref and sha strings');
   }
-  return { action: contents.action, pull_request: { body, head: { sha: head.sha } } };
+  if (!isRecord(user) || typeof user.login !== 'string' || typeof user.type !== 'string') {
+    throw new Error('Expected pull_request.user to have a string login and type');
+  }
+  return {
+    action: contents.action,
+    pull_request: { body, head: { ref: head.ref, sha: head.sha }, user: { login: user.login, type: user.type } }
+  };
 }
 
-function readEvent(): PullRequestEvent {
-  const [eventPath] = process.argv.slice(2);
-  if (!eventPath) {
-    throw new Error('Usage: node scripts/check-pr-body.ts <event.json>');
+function readPullRequest(): PullRequest {
+  const [eventPath, commitMessagesPath] = process.argv.slice(2);
+  if (!eventPath || !commitMessagesPath) {
+    throw new Error('Usage: node scripts/check-pr-body.ts <event.json> <commit-messages.txt>');
   }
-  return parseEvent(JSON.parse(fs.readFileSync(eventPath, 'utf8')));
+  return {
+    commitMessages: fs.readFileSync(commitMessagesPath, 'utf8'),
+    event: parseEvent(JSON.parse(fs.readFileSync(eventPath, 'utf8')))
+  };
+}
+
+// The template binds agents, not people. An agent that leaves no trace cannot be told apart from a
+// person, so a review block is a trace too: a body that carries one is checked whatever else it says.
+function isAgentAuthored({ commitMessages, event }: PullRequest): boolean {
+  const { body, head, user } = event.pull_request;
+  if (EXEMPT_HEAD_REF.test(head.ref)) {
+    return false;
+  }
+  const lines = outsideFences((body ?? '').split(/\r?\n/));
+  const text = lines.join('\n');
+  return (
+    (user.type === 'Bot' && !EXEMPT_BOTS.has(user.login)) ||
+    AGENT_TRAILER.test(commitMessages) ||
+    AGENT_TRAILER.test(text) ||
+    AGENT_FOOTER.test(text) ||
+    ATTESTATION.test(text) ||
+    lines.some((line) => REVIEW_HEADING.test(line))
+  );
 }
 
 function outsideFences(lines: string[]): string[] {
@@ -178,7 +226,12 @@ function report(failures: string[]): never {
 function main(): void {
   let failures: string[];
   try {
-    failures = checkBody(readEvent());
+    const pullRequest = readPullRequest();
+    if (!isAgentAuthored(pullRequest)) {
+      process.stdout.write('The pull request shows no agent authorship, so the template does not apply.\n');
+      return;
+    }
+    failures = checkBody(pullRequest.event);
   } catch (error) {
     report([`The check itself failed: ${error instanceof Error ? error.message : String(error)}`]);
   }
