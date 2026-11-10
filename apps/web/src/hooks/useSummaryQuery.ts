@@ -1,9 +1,12 @@
 import { $Summary } from '@opendatacapture/schemas/summary';
+import type { SummaryTrendWindow } from '@opendatacapture/schemas/summary';
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 type SummaryQueryParams = {
   groupId?: string;
+  recordTrendWindow?: SummaryTrendWindow;
+  subjectTrendWindow?: SummaryTrendWindow;
 };
 
 export const summaryQueryOptions = ({ params }: { params?: SummaryQueryParams } = {}) => {
@@ -15,7 +18,13 @@ export const summaryQueryOptions = ({ params }: { params?: SummaryQueryParams } 
       });
       return $Summary.parse(response.data);
     },
-    queryKey: ['summary', params?.groupId]
+    // An omitted window is the default one, so the loader's prefetch and the page share a cache entry.
+    queryKey: [
+      'summary',
+      params?.groupId,
+      params?.recordTrendWindow ?? 'default',
+      params?.subjectTrendWindow ?? 'default'
+    ]
   });
 };
 

@@ -7,6 +7,27 @@ const $Trend = z.array(
   })
 );
 
+/** How far back a dashboard trend reaches; `default` is the original five points thirty days apart. */
+export type SummaryTrendWindow = z.infer<typeof $SummaryTrendWindow>;
+export const $SummaryTrendWindow = z.enum([
+  'default',
+  'pastMonth',
+  'past3Months',
+  'past6Months',
+  'pastYear',
+  'past2Years',
+  'past5Years',
+  'all'
+]);
+
+export type SummaryQueryParams = z.infer<typeof $SummaryQueryParams>;
+export const $SummaryQueryParams = z.object({
+  groupId: z.string().optional(),
+  /** The window of the records and sessions trends, which share a chart */
+  recordTrendWindow: $SummaryTrendWindow.default('default'),
+  subjectTrendWindow: $SummaryTrendWindow.default('default')
+});
+
 export type Summary = z.infer<typeof $Summary>;
 export const $Summary = z.object({
   counts: z.object({

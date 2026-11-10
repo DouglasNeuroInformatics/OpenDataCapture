@@ -1,3 +1,4 @@
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { Test } from '@nestjs/testing';
@@ -22,11 +23,21 @@ describe('SummaryController', () => {
   });
 
   it('should summarize the requested group within what the caller may read', async () => {
-    const ability = createAppAbility([{ action: 'read', subject: 'all' }]);
+    const currentUser = { ability: createAppAbility([{ action: 'read', subject: 'all' }]) } as RequestUser;
     const summary = { counts: { instruments: 1, records: 2, sessions: 3, subjects: 4, users: 5 } };
     summaryService.getSummary.mockResolvedValue(summary);
 
-    await expect(summaryController.getSummary(ability, 'group-1')).resolves.toBe(summary);
-    expect(summaryService.getSummary).toHaveBeenCalledWith('group-1', { ability });
+    await expect(
+      summaryController.getSummary(currentUser, {
+        groupId: 'group-1',
+        recordTrendWindow: 'pastYear',
+        subjectTrendWindow: 'default'
+      })
+    ).resolves.toBe(summary);
+    expect(summaryService.getSummary).toHaveBeenCalledWith(currentUser, {
+      groupId: 'group-1',
+      recordTrendWindow: 'pastYear',
+      subjectTrendWindow: 'default'
+    });
   });
 });

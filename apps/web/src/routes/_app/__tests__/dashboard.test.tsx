@@ -40,13 +40,20 @@ const SUMMARY: Summary = {
 };
 
 const INSTRUMENTS = [
-  { details: { title: 'Alpha Scale' }, id: 'alpha', kind: 'FORM' },
-  { details: { title: 'Beta Task' }, id: 'beta', kind: 'INTERACTIVE' }
+  { details: { title: 'Alpha Scale' }, id: 'alpha', internal: { edition: 2, name: 'ALPHA' }, kind: 'FORM' },
+  { details: { title: 'Beta Task' }, id: 'beta', internal: { edition: 1, name: 'BETA' }, kind: 'INTERACTIVE' }
+];
+
+const ALL_EDITIONS = [
+  { details: { title: 'Alpha Scale' }, id: 'alpha-1', internal: { edition: 1, name: 'ALPHA' }, kind: 'FORM' },
+  ...INSTRUMENTS,
+  { details: { title: 'Gamma Series' }, id: 'gamma', kind: 'SERIES' }
 ];
 
 const RESEARCH_GROUP: CurrentGroup = { accessibleInstrumentIds: ['alpha'], id: 'group-1', type: 'RESEARCH' };
 
 type DashboardMocks = {
+  allEditions: QueryResult<typeof ALL_EDITIONS>;
   ensureQueryData: Mock<(options: unknown) => Promise<unknown>>;
   instruments: QueryResult<typeof INSTRUMENTS>;
   navigate: Mock<(options: unknown) => void>;
@@ -64,6 +71,7 @@ type DashboardMocks = {
 };
 
 const mocks = vi.hoisted((): DashboardMocks => ({
+  allEditions: {},
   ensureQueryData: vi.fn(),
   instruments: {},
   navigate: vi.fn(),
@@ -93,13 +101,18 @@ vi.mock('@/hooks/useSummaryQuery', async (importOriginal) => ({
     return mocks.summary;
   }
 }));
-vi.mock('@/hooks/useInstrumentInfoQuery', () => ({ useInstrumentInfoQuery: () => mocks.instruments }));
+vi.mock('@/hooks/useInstrumentInfoQuery', () => ({
+  useInstrumentInfoQuery: (options?: { params?: { allEditions?: boolean } }) => {
+    return options?.params?.allEditions ? mocks.allEditions : mocks.instruments;
+  }
+}));
 vi.mock('@/hooks/useInstrumentRecords', () => ({
   useInstrumentRecords: (options: unknown) => {
     mocks.useInstrumentRecords(options);
     return mocks.records;
   }
 }));
+vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
 vi.mock('@/hooks/useUsersQuery', () => ({
   useUsersQuery: (options: unknown) => {
     mocks.useUsersQuery(options);
@@ -137,7 +150,14 @@ vi.mock('recharts', () => ({
     </svg>
   ),
   CartesianGrid: ({ stroke }: { stroke: string }) => <g data-stroke={stroke} data-testid="grid" />,
-  Legend: () => <g data-testid="chart-legend" />,
+  Legend: ({ wrapperStyle }: { wrapperStyle?: { left?: number; paddingTop?: number; width?: string } }) => (
+    <g
+      data-left={wrapperStyle?.left}
+      data-padding-top={wrapperStyle?.paddingTop}
+      data-testid="chart-legend"
+      data-width={wrapperStyle?.width}
+    />
+  ),
   ResponsiveContainer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   Tooltip: ({ content }: { content: (props: TooltipProps) => ReactNode }) => (
     <foreignObject data-testid="chart-tooltip">{content(mocks.tooltipProps)}</foreignObject>
@@ -164,10 +184,19 @@ const openDialog = (statisticTestId: string, dialogTestId: string) => {
   return screen.getByTestId(dialogTestId);
 };
 
-const listItems = (dialog: HTMLElement) => {
+const tableRows = (dialog: HTMLElement) => {
   return within(dialog)
-    .getAllByRole('listitem')
-    .map((item) => item.textContent);
+    .getAllByTestId('data-table-row')
+    .map((row) => Array.from(row.children, (cell) => cell.textContent));
+};
+
+const searchDialogTable = (dialog: HTMLElement, value: string) => {
+  const search = within(within(dialog).getByTestId('data-table-search-bar')).getByRole('searchbox');
+  fireEvent.change(search, { target: { value } });
+};
+
+const tableHeader = (dialog: HTMLElement, label: string) => {
+  return within(within(dialog).getByTestId('data-table-head')).getByText(label).closest('button')!;
 };
 
 const runLoader = async () => {
@@ -188,6 +217,7 @@ describe('Route', () => {
       mocks.store.currentGroup = null;
       mocks.summary = { data: SUMMARY };
       mocks.instruments = { data: INSTRUMENTS };
+      mocks.allEditions = { data: ALL_EDITIONS };
       mocks.records = { data: [{ instrumentId: 'alpha' }, { instrumentId: 'alpha' }, { instrumentId: 'beta' }] };
       mocks.users = { data: [{ username: 'alice' }, { username: 'bob' }] };
       mocks.tooltipProps = { active: false };
@@ -207,7 +237,9 @@ describe('Route', () => {
     it('should scope every query to the current group', () => {
       mocks.store.currentGroup = RESEARCH_GROUP;
       renderPage();
-      expect(mocks.useSummaryQuery).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
+      expect(mocks.useSummaryQuery).toHaveBeenCalledWith({
+        params: { groupId: 'group-1', recordTrendWindow: 'default', subjectTrendWindow: 'default' }
+      });
       expect(mocks.useUsersQuery).toHaveBeenCalledWith({ params: { groupId: 'group-1' } });
       expect(mocks.useInstrumentRecords).toHaveBeenCalledWith({ enabled: true, params: { groupId: 'group-1' } });
     });
@@ -235,7 +267,22 @@ describe('Route', () => {
     it('should list every user of the group in the users dialog', () => {
       renderPage();
       const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['alice', 'bob']);
+      expect(tableRows(dialog)).toEqual([['alice'], ['bob']]);
+    });
+
+    it('should narrow the users dialog to the usernames matching its search', () => {
+      renderPage();
+      const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
+      searchDialogTable(dialog, 'bo');
+      expect(tableRows(dialog)).toEqual([['bob']]);
+    });
+
+    it('should sort the users dialog by username when its header is clicked', () => {
+      renderPage();
+      const dialog = openDialog('statistic-users', 'dashboard-users-Modal-dialog');
+      fireEvent.click(tableHeader(dialog, 'Username'));
+      fireEvent.click(tableHeader(dialog, 'Username'));
+      expect(tableRows(dialog)).toEqual([['bob'], ['alice']]);
     });
 
     it('should show a spinner in the users dialog while users are loading', () => {
@@ -256,13 +303,41 @@ describe('Route', () => {
       mocks.store.currentGroup = RESEARCH_GROUP;
       renderPage();
       const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['Alpha Scale FORM']);
+      expect(tableRows(dialog)).toEqual([['Alpha Scale', 'Form']]);
     });
 
     it('should list every instrument when no group is selected', () => {
       renderPage();
       const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['Alpha Scale FORM', 'Beta Task INTERACTIVE']);
+      expect(tableRows(dialog)).toEqual([
+        ['Alpha Scale', 'Form'],
+        ['Beta Task', 'Interactive']
+      ]);
+    });
+
+    it('should tag each instrument kind with the badge the instrument tables use', () => {
+      renderPage();
+      const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
+      expect(
+        within(dialog)
+          .getAllByTestId('instrument-cell-kind')
+          .map((tag) => tag.textContent)
+      ).toEqual(['Form', 'Interactive']);
+    });
+
+    it('should narrow the instruments dialog to the titles matching its search', () => {
+      renderPage();
+      const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
+      searchDialogTable(dialog, 'Beta');
+      expect(tableRows(dialog)).toEqual([['Beta Task', 'Interactive']]);
+    });
+
+    it('should sort the instruments dialog by kind when its header is clicked', () => {
+      renderPage();
+      const dialog = openDialog('statistic-instruments', 'dashboard-instruments-Modal-dialog');
+      fireEvent.click(tableHeader(dialog, 'Kind'));
+      fireEvent.click(tableHeader(dialog, 'Kind'));
+      expect(tableRows(dialog).map(([title]) => title)).toEqual(['Beta Task', 'Alpha Scale']);
     });
 
     it('should report a failure to load instruments in the instruments dialog', () => {
@@ -275,14 +350,69 @@ describe('Route', () => {
     it('should count the records of each instrument in the records dialog', () => {
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['Alpha Scale 2', 'Beta Task 1']);
+      expect(tableRows(dialog)).toEqual([
+        ['Alpha Scale', '2'],
+        ['Beta Task', '1']
+      ]);
+    });
+
+    it('should list the instrument with the most records first, so the busiest are seen without sorting', () => {
+      mocks.records = { data: [{ instrumentId: 'beta' }, { instrumentId: 'beta' }, { instrumentId: 'alpha' }] };
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      expect(tableRows(dialog).map(([title]) => title)).toEqual(['Beta Task', 'Alpha Scale']);
+    });
+
+    it('should sort the records dialog by title when its header is clicked', () => {
+      mocks.records = { data: [{ instrumentId: 'beta' }, { instrumentId: 'beta' }, { instrumentId: 'alpha' }] };
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      fireEvent.click(tableHeader(dialog, 'Title'));
+      expect(tableRows(dialog).map(([title]) => title)).toEqual(['Alpha Scale', 'Beta Task']);
+    });
+
+    it('should reverse the record count order when the number header is clicked', () => {
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      fireEvent.click(tableHeader(dialog, 'Number'));
+      expect(tableRows(dialog).map(([title]) => title)).toEqual(['Beta Task', 'Alpha Scale']);
+    });
+
+    it('should narrow the records dialog to the instruments matching its search', () => {
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      searchDialogTable(dialog, 'Beta');
+      expect(tableRows(dialog)).toEqual([['Beta Task', '1']]);
+    });
+
+    it('should count the records of every edition, so older editions are not dropped from the dialog', () => {
+      mocks.records = { data: [{ instrumentId: 'alpha-1' }, { instrumentId: 'alpha-1' }, { instrumentId: 'alpha' }] };
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      expect(tableRows(dialog)).toEqual([
+        ['Alpha Scale', '3'],
+        ['Beta Task', '0']
+      ]);
+    });
+
+    it('should count each record under its own edition while the other editions are unavailable', () => {
+      mocks.allEditions = { data: undefined };
+      renderPage();
+      const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
+      expect(tableRows(dialog)).toEqual([
+        ['Alpha Scale', '2'],
+        ['Beta Task', '1']
+      ]);
     });
 
     it('should count zero records for each instrument while records are unavailable', () => {
       mocks.records = { data: undefined };
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
-      expect(listItems(dialog)).toEqual(['Alpha Scale 0', 'Beta Task 0']);
+      expect(tableRows(dialog)).toEqual([
+        ['Alpha Scale', '0'],
+        ['Beta Task', '0']
+      ]);
     });
 
     it('should report a failure to load instruments in the records dialog, since records are counted per instrument', () => {
@@ -290,6 +420,18 @@ describe('Route', () => {
       renderPage();
       const dialog = openDialog('statistic-records', 'dashboard-record-Modal-dialog');
       expect(within(dialog).getByText('Error finding records')).toBeTruthy();
+    });
+
+    it('should leave a line of space between the chart and its legend', () => {
+      renderPage();
+      expect(recordsChart().getByTestId('chart-legend').dataset.paddingTop).toBe('16');
+    });
+
+    it('should span the legend across the whole chart, so it centres on the card rather than the plot area', () => {
+      renderPage();
+      const legend = recordsChart().getByTestId('chart-legend');
+      expect(legend.dataset.left).toBe('0');
+      expect(legend.dataset.width).toBe('100%');
     });
 
     it.each([
@@ -335,6 +477,35 @@ describe('Route', () => {
       renderPage();
       expect(recordsChart().getByTestId('x-axis').textContent).toBe('Mar 2');
       expect(subjectsChart().getByTestId('x-axis').textContent).toBe('Mar 2');
+    });
+
+    it('should label the x axis ticks with month and year once a trend reaches back more than a year', () => {
+      const twoYearsEarlier = new Date(2023, 2, 2, 12).getTime();
+      mocks.summary = {
+        data: {
+          ...SUMMARY,
+          trends: {
+            ...SUMMARY.trends,
+            records: [
+              { timestamp: DAY_3, value: 3 },
+              { timestamp: twoYearsEarlier, value: 0 }
+            ]
+          }
+        }
+      };
+      renderPage();
+      expect(recordsChart().getByTestId('x-axis').textContent).toBe('Mar 2025');
+      expect(subjectsChart().getByTestId('x-axis').textContent).toBe('Mar 2');
+    });
+
+    it.each([
+      ['dashboard-records-trend-window', { recordTrendWindow: 'pastYear', subjectTrendWindow: 'default' }],
+      ['dashboard-subjects-trend-window', { recordTrendWindow: 'default', subjectTrendWindow: 'pastYear' }]
+    ] as const)('should request the window chosen in %s for its own chart only', (testId, windows) => {
+      renderPage();
+      fireEvent.keyDown(screen.getByTestId(testId), { key: 'Enter' });
+      fireEvent.click(screen.getByRole('option', { name: 'Last Year' }));
+      expect(mocks.useSummaryQuery).toHaveBeenLastCalledWith({ params: { groupId: undefined, ...windows } });
     });
 
     it('should show nothing in the tooltips while no point is hovered, even if recharts still holds a payload', () => {
@@ -446,14 +617,18 @@ describe('Route', () => {
     it('should prefetch the summary of the current group for a user who can read everything', async () => {
       grantRead(READABLE_SUBJECTS);
       expect(await runLoader()).toBeNull();
-      expect(mocks.ensureQueryData).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['summary', 'group-1'] }));
+      expect(mocks.ensureQueryData).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['summary', 'group-1', 'default', 'default'] })
+      );
     });
 
     it('should prefetch the application-wide summary when no group is selected', async () => {
       grantRead(READABLE_SUBJECTS);
       mocks.store.currentGroup = null;
       await runLoader();
-      expect(mocks.ensureQueryData).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['summary', undefined] }));
+      expect(mocks.ensureQueryData).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['summary', undefined, 'default', 'default'] })
+      );
     });
   });
 });

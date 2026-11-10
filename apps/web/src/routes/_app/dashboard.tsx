@@ -1,31 +1,61 @@
 import React, { useState } from 'react';
 
-import { Dialog, Heading, Spinner, StatisticCard } from '@douglasneuroinformatics/libui/components';
+import { DataTable, Dialog, Heading, Spinner, StatisticCard } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
+import { cn } from '@douglasneuroinformatics/libui/utils';
 import { ClipboardDocumentIcon, DocumentTextIcon, UserIcon, UsersIcon } from '@heroicons/react/24/solid';
+import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import type { AppSubjectName } from '@opendatacapture/schemas/core';
+import type { Summary, SummaryTrendWindow } from '@opendatacapture/schemas/summary';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
-import { AnimatePresence, motion } from 'motion/react';
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
+import { InstrumentKindCell } from '@/components/InstrumentKindCell';
 import { PageHeader } from '@/components/PageHeader';
+import { SortableHeader } from '@/components/SortableHeader';
+import { TrendWindowSelect } from '@/components/TrendWindowSelect';
+import { TruncatedCell } from '@/components/TruncatedCell';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { summaryQueryOptions, useSummaryQuery } from '@/hooks/useSummaryQuery';
 import { useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
 
+// A dialog's table is shown as plain text: libui's frame, row and cell borders are removed, and the
+// column headers are set larger and bold to stand apart from the rows without them.
+const TEXT_ONLY_TABLE = cn(
+  '[&_[data-testid=data-table]>.border]:border-0 [&_[data-testid=data-table]>.border_*]:border-0',
+  '[&_[data-testid=data-table]>.border>div]:text-base',
+  '[&_[data-testid=data-table-head]]:text-lg [&_[data-testid=data-table-head]]:font-bold'
+);
+
+const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+
+/** A chart axis label: day and month within a year, month and year for a trend reaching further back. */
+const formatTrendTick = (timestamp: number, trend: Summary['trends']['records']) => {
+  const spansYears = trend[0]!.timestamp - trend.at(-1)!.timestamp > ONE_YEAR_MS;
+  return new Date(timestamp).toLocaleDateString(
+    undefined,
+    spansYears ? { month: 'short', year: 'numeric' } : { day: 'numeric', month: 'short' }
+  );
+};
+
 const RouteComponent = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const { t } = useTranslation();
   const [theme] = useTheme();
-  const summaryQuery = useSummaryQuery({ params: { groupId: currentGroup?.id } });
+  const [recordTrendWindow, setRecordTrendWindow] = useState<SummaryTrendWindow>('default');
+  const [subjectTrendWindow, setSubjectTrendWindow] = useState<SummaryTrendWindow>('default');
+  const summaryQuery = useSummaryQuery({
+    params: { groupId: currentGroup?.id, recordTrendWindow, subjectTrendWindow }
+  });
   const navigate = useNavigate();
   const [isInstrumentModalOpen, setIsInstrumentModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const instrumentInfoQuery = useInstrumentInfoQuery();
+  const allEditionsQuery = useInstrumentInfoQuery({ params: { allEditions: true } });
   const userInfoQuery = useUsersQuery({
     params: {
       groupId: currentGroup?.id
@@ -53,12 +83,21 @@ const RouteComponent = () => {
     };
   });
 
-  const recordIds = recordsQuery.data?.map((record) => record.instrumentId);
+  // A record keeps the id of the edition it was collected with, so records are counted under the
+  // instrument's name to include every edition in the row for its latest one.
+  const instrumentKeyById = new Map(
+    allEditionsQuery.data?.map((instrument) => {
+      return [instrument.id, instrument.kind === 'SERIES' ? instrument.id : instrument.internal.name];
+    })
+  );
+  const instrumentKey = (instrumentId: string) => instrumentKeyById.get(instrumentId) ?? instrumentId;
+
+  const recordKeys = recordsQuery.data?.map((record) => instrumentKey(record.instrumentId));
 
   const recordCounter =
     instrumentInfo?.map((title) => {
       return {
-        count: recordIds?.filter((val) => val === title.id).length ?? 0,
+        count: recordKeys?.filter((key) => key === instrumentKey(title.id)).length ?? 0,
         id: title.id,
         instrumentTitle: title.title
       };
@@ -192,39 +231,38 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <hr />
-                  <ul className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
-                    {userInfoQuery.isLoading && <Spinner />}
-                    {userInfoQuery.isError && (
-                      <p>
-                        {t({
-                          en: 'Error finding users',
-                          es: 'Error al buscar los usuarios',
-                          fr: "Erreur lors de la recherche d'utilisateurs"
-                        })}
-                      </p>
-                    )}
-                    {userInfoQuery.data && (
-                      <AnimatePresence mode="popLayout">
-                        {userInfoQuery.data.map((user, i) => {
-                          return (
-                            <motion.li
-                              layout
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0 }}
-                              initial={{ opacity: 0 }}
-                              key={user.username}
-                              transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
-                            >
-                              <div className="flex justify-between gap-4">
-                                <p>{user.username}</p>
-                              </div>
-                            </motion.li>
-                          );
-                        })}
-                      </AnimatePresence>
-                    )}
-                  </ul>
+                  {userInfoQuery.isLoading && <Spinner />}
+                  {userInfoQuery.isError && (
+                    <p>
+                      {t({
+                        en: 'Error finding users',
+                        es: 'Error al buscar los usuarios',
+                        fr: "Erreur lors de la recherche d'utilisateurs"
+                      })}
+                    </p>
+                  )}
+                  {userInfoQuery.data && (
+                    <div className={TEXT_ONLY_TABLE}>
+                      <DataTable
+                        columns={[
+                          {
+                            accessorKey: 'username',
+                            cell: ({ getValue }) => (
+                              <TruncatedCell title={getValue<string>()} value={getValue<string>()} />
+                            ),
+                            header: ({ column }) => (
+                              <SortableHeader
+                                column={column}
+                                label={t({ en: 'Username', es: 'Nombre de usuario', fr: "Nom d'utilisateur" })}
+                              />
+                            ),
+                            id: 'username'
+                          }
+                        ]}
+                        data={userInfoQuery.data}
+                      />
+                    </div>
+                  )}
                 </Dialog.Content>
               </Dialog>
             </div>
@@ -282,48 +320,43 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <ul className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
-                    {!instrumentInfo && (
-                      <p>
-                        {t({
-                          en: 'Error finding instruments',
-                          es: 'Error al buscar los instrumentos',
-                          fr: 'Erreur lors de la recherche des instruments'
-                        })}
-                      </p>
-                    )}
-                    {instrumentInfo && (
-                      <AnimatePresence mode="popLayout">
-                        <div className="flex justify-between gap-4 font-bold">
-                          <p>
-                            {t({
-                              en: 'Title',
-                              es: 'Título',
-                              fr: 'Titre'
-                            })}
-                          </p>{' '}
-                          <p>{t({ en: 'Kind', es: 'Tipo', fr: 'Type' })}</p>
-                        </div>
-                        <hr />
-                        {instrumentInfo.map((instrument, i) => {
-                          return (
-                            <motion.li
-                              layout
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0 }}
-                              initial={{ opacity: 0 }}
-                              key={instrument.id}
-                              transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
-                            >
-                              <div className="flex justify-between gap-4">
-                                <p>{instrument.title}</p> <p>{instrument.kind}</p>
-                              </div>
-                            </motion.li>
-                          );
-                        })}
-                      </AnimatePresence>
-                    )}
-                  </ul>
+                  {instrumentInfo ? (
+                    <div className={TEXT_ONLY_TABLE}>
+                      <DataTable
+                        columns={[
+                          {
+                            accessorKey: 'title',
+                            cell: ({ getValue }) => (
+                              <TruncatedCell title={getValue<string>()} value={getValue<string>()} />
+                            ),
+                            header: ({ column }) => (
+                              <SortableHeader column={column} label={t({ en: 'Title', es: 'Título', fr: 'Titre' })} />
+                            ),
+                            id: 'title'
+                          },
+                          {
+                            accessorKey: 'kind',
+                            cell: ({ getValue }) => <InstrumentKindCell kind={getValue<InstrumentKind>()} />,
+                            header: ({ column }) => (
+                              <SortableHeader column={column} label={t({ en: 'Kind', es: 'Tipo', fr: 'Type' })} />
+                            ),
+                            id: 'kind',
+                            size: 140
+                          }
+                        ]}
+                        data={instrumentInfo}
+                        initialState={{ columnPinning: { right: ['kind'] } }}
+                      />
+                    </div>
+                  ) : (
+                    <p>
+                      {t({
+                        en: 'Error finding instruments',
+                        es: 'Error al buscar los instrumentos',
+                        fr: 'Erreur lors de la recherche des instruments'
+                      })}
+                    </p>
+                  )}
                 </Dialog.Content>
               </Dialog>
             </div>
@@ -355,48 +388,42 @@ const RouteComponent = () => {
                       })}
                     </Dialog.Title>
                   </Dialog.Header>
-                  <ul className="flex max-h-[60vh] flex-col gap-5 overflow-auto pr-3">
-                    {!instrumentInfo && (
-                      <p>
-                        {t({
-                          en: 'Error finding records',
-                          es: 'Error al buscar los registros',
-                          fr: "Erreur lors de la recherche d'enregistrements"
-                        })}
-                      </p>
-                    )}
-                    {instrumentInfo && (
-                      <AnimatePresence mode="popLayout">
-                        <div className="flex justify-between gap-4 font-bold">
-                          <p>
-                            {t({
-                              en: 'Title',
-                              es: 'Título',
-                              fr: 'Titre'
-                            })}
-                          </p>{' '}
-                          <p>{t({ en: 'Number', es: 'Número', fr: 'Nombre' })}</p>
-                        </div>
-                        <hr />
-                        {recordCounter.map((instrument, i) => {
-                          return (
-                            <motion.li
-                              layout
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0 }}
-                              initial={{ opacity: 0 }}
-                              key={instrument.id}
-                              transition={{ bounce: 0.2, delay: 0.15 * i, duration: 1.5, type: 'spring' }}
-                            >
-                              <div className="flex justify-between gap-4">
-                                <p>{instrument.instrumentTitle}</p> <p>{instrument.count}</p>
-                              </div>
-                            </motion.li>
-                          );
-                        })}
-                      </AnimatePresence>
-                    )}
-                  </ul>
+                  {instrumentInfo ? (
+                    <div className={TEXT_ONLY_TABLE}>
+                      <DataTable
+                        columns={[
+                          {
+                            accessorKey: 'instrumentTitle',
+                            cell: ({ getValue }) => (
+                              <TruncatedCell title={getValue<string>()} value={getValue<string>()} />
+                            ),
+                            header: ({ column }) => (
+                              <SortableHeader column={column} label={t({ en: 'Title', es: 'Título', fr: 'Titre' })} />
+                            ),
+                            id: 'instrumentTitle'
+                          },
+                          {
+                            accessorKey: 'count',
+                            header: ({ column }) => (
+                              <SortableHeader column={column} label={t({ en: 'Number', es: 'Número', fr: 'Nombre' })} />
+                            ),
+                            id: 'count',
+                            size: 110
+                          }
+                        ]}
+                        data={recordCounter}
+                        initialState={{ columnPinning: { right: ['count'] }, sorting: [{ desc: true, id: 'count' }] }}
+                      />
+                    </div>
+                  ) : (
+                    <p>
+                      {t({
+                        en: 'Error finding records',
+                        es: 'Error al buscar los registros',
+                        fr: "Erreur lors de la recherche d'enregistrements"
+                      })}
+                    </p>
+                  )}
                 </Dialog.Content>
               </Dialog>
             </div>
@@ -412,14 +439,24 @@ const RouteComponent = () => {
                 <div className="rounded-xl bg-linear-to-br from-blue-500/20 to-indigo-600/20 p-3 transition-all duration-300 group-hover:from-blue-500/30 group-hover:to-indigo-600/30">
                   <DocumentTextIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <div>
-                  <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
-                    {t({
-                      en: 'Records & Sessions Trend',
-                      es: 'Evolución de registros y sesiones',
-                      fr: 'Tendance des enregistrements et des sessions'
-                    })}
-                  </Heading>
+                <div className="grow">
+                  {/* The window picker shares the title row so its label lines up with the title. */}
+                  <div className="-mr-4 flex items-center justify-between gap-4">
+                    <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
+                      {t({
+                        en: 'Records & Sessions Trend',
+                        es: 'Evolución de registros y sesiones',
+                        fr: 'Tendance des enregistrements et des sessions'
+                      })}
+                    </Heading>
+                    <div className="-my-1 shrink-0">
+                      <TrendWindowSelect
+                        data-testid="dashboard-records-trend-window"
+                        value={recordTrendWindow}
+                        onChange={setRecordTrendWindow}
+                      />
+                    </div>
+                  </div>
                   <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                     {t({
                       en: 'Activity over time',
@@ -430,7 +467,9 @@ const RouteComponent = () => {
                 </div>
               </div>
             </div>
-            <div className="p-8 pt-2">
+            {/* recharts spaces legend items with an inline right margin, which also pushes the legend off
+                centre; only an important class can replace it with an even margin on both sides. */}
+            <div className="p-8 pt-2 [&_.recharts-legend-item]:mx-4!">
               <ResponsiveContainer height={320} width="100%">
                 <AreaChart data={combinedTrendsData} margin={{ bottom: 0, left: 0, right: 30, top: 10 }}>
                   <defs>
@@ -454,10 +493,7 @@ const RouteComponent = () => {
                     domain={['auto', 'auto']}
                     stroke={strokeColors[theme]}
                     tick={{ fontSize: 12 }}
-                    tickFormatter={(timestamp: number) => {
-                      const date = new Date(timestamp);
-                      return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-                    }}
+                    tickFormatter={(timestamp: number) => formatTrendTick(timestamp, summaryQuery.data.trends.records)}
                     tickLine={false}
                     type="number"
                   />
@@ -495,7 +531,8 @@ const RouteComponent = () => {
                       return null;
                     }}
                   />
-                  <Legend />
+                  {/* recharts sizes the legend to the plot area, which the chart's right margin shifts off the card's centre. */}
+                  <Legend wrapperStyle={{ left: 0, paddingTop: 16, width: '100%' }} />
                   <Area
                     activeDot={{ fill: chartColors.records.stroke, r: 6, stroke: '#fff', strokeWidth: 2 }}
                     dataKey="records"
@@ -532,14 +569,24 @@ const RouteComponent = () => {
                 <div className="rounded-xl bg-linear-to-br from-amber-500/20 to-orange-600/20 p-3 transition-all duration-300 group-hover:from-amber-500/30 group-hover:to-orange-600/30">
                   <UserIcon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                 </div>
-                <div>
-                  <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
-                    {t({
-                      en: 'Subjects Growth',
-                      es: 'Crecimiento de sujetos',
-                      fr: 'Croissance des sujets'
-                    })}
-                  </Heading>
+                <div className="grow">
+                  {/* The window picker shares the title row so its label lines up with the title. */}
+                  <div className="-mr-4 flex items-center justify-between gap-4">
+                    <Heading className="text-slate-800 dark:text-slate-200" variant="h4">
+                      {t({
+                        en: 'Subjects Growth',
+                        es: 'Crecimiento de sujetos',
+                        fr: 'Croissance des sujets'
+                      })}
+                    </Heading>
+                    <div className="-my-1 shrink-0">
+                      <TrendWindowSelect
+                        data-testid="dashboard-subjects-trend-window"
+                        value={subjectTrendWindow}
+                        onChange={setSubjectTrendWindow}
+                      />
+                    </div>
+                  </div>
                   <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                     {t({
                       en: 'Growth trajectory',
@@ -573,10 +620,7 @@ const RouteComponent = () => {
                     domain={['auto', 'auto']}
                     stroke={strokeColors[theme]}
                     tick={{ fontSize: 12 }}
-                    tickFormatter={(timestamp: number) => {
-                      const date = new Date(timestamp);
-                      return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-                    }}
+                    tickFormatter={(timestamp: number) => formatTrendTick(timestamp, summaryQuery.data.trends.subjects)}
                     tickLine={false}
                     type="number"
                   />

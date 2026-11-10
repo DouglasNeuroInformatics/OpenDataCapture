@@ -1,8 +1,10 @@
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { createAppAbility } from '@/auth/ability.utils';
 import { InstrumentRecordsService } from '@/instrument-records/instrument-records.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 import { SessionsService } from '@/sessions/sessions.service';
@@ -12,6 +14,8 @@ import { UsersService } from '@/users/users.service';
 import { SummaryService } from '../summary.service';
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
+const currentUser = { ability: createAppAbility([{ action: 'read', subject: 'all' }]) } as RequestUser;
 
 describe('SummaryService', () => {
   let summaryService: SummaryService;
@@ -58,12 +62,12 @@ describe('SummaryService', () => {
       sessionsService.count.mockResolvedValue(3);
       subjectsService.count.mockResolvedValue(4);
       usersService.count.mockResolvedValue(5);
-      const { counts } = await summaryService.getSummary();
+      const { counts } = await summaryService.getSummary(currentUser);
       expect(counts).toStrictEqual({ instruments: 1, records: 2, sessions: 3, subjects: 4, users: 5 });
     });
 
     it('should return five trend points per metric, spaced thirty days apart and ordered most recent first', async () => {
-      const { trends } = await summaryService.getSummary();
+      const { trends } = await summaryService.getSummary(currentUser);
       for (const trend of [trends.records, trends.sessions, trends.subjects]) {
         expect(trend).toHaveLength(5);
         for (let i = 1; i < trend.length; i++) {
@@ -78,14 +82,14 @@ describe('SummaryService', () => {
       sessionsService.count.mockImplementation((where: { date?: { lte: Date } }) => {
         return Promise.resolve(where.date ? where.date.lte.getTime() : 0);
       });
-      const { trends } = await summaryService.getSummary();
+      const { trends } = await summaryService.getSummary(currentUser);
       for (const point of trends.sessions) {
         expect(point.value).toBe(point.timestamp);
       }
     });
 
     it('should use a single clock reading for every metric', async () => {
-      const { trends } = await summaryService.getSummary();
+      const { trends } = await summaryService.getSummary(currentUser);
       expect(trends.sessions.map((point) => point.timestamp)).toStrictEqual(
         trends.records.map((point) => point.timestamp)
       );
@@ -95,7 +99,7 @@ describe('SummaryService', () => {
     });
 
     it('should scope every query to the group when a groupId is provided', async () => {
-      await summaryService.getSummary('group-1');
+      await summaryService.getSummary(currentUser, { groupId: 'group-1' });
       expect(instrumentRecordsService.count).toHaveBeenCalledWith(
         expect.objectContaining({ groupId: 'group-1' }),
         expect.anything()
@@ -110,6 +114,78 @@ describe('SummaryService', () => {
           expect.anything()
         );
       }
+    });
+
+    it('should count instruments with the same edition rule and group scope as the instruments dialog', async () => {
+      await summaryService.getSummary(currentUser, { groupId: 'group-1' });
+      expect(instrumentsService.count).toHaveBeenCalledWith(currentUser, 'group-1');
+    });
+
+    it.each([
+      ['pastMonth', 5, { days: 7 }],
+      ['past3Months', 4, { months: 1 }],
+      ['past6Months', 7, { months: 1 }],
+      ['pastYear', 13, { months: 1 }],
+      ['past2Years', 9, { months: 3 }],
+      ['past5Years', 6, { years: 1 }]
+    ] as const)('should space a %s trend into %i points by its own calendar step', async (window, count, step) => {
+      const { trends } = await summaryService.getSummary(currentUser, {
+        recordTrendWindow: window,
+        subjectTrendWindow: window
+      });
+      for (const trend of [trends.records, trends.sessions, trends.subjects]) {
+        expect(trend).toHaveLength(count);
+        const expected = new Date(trend[0]!.timestamp - ('days' in step ? step.days * 24 * 60 * 60 * 1000 : 0));
+        expected.setFullYear(
+          expected.getFullYear() - ('years' in step ? step.years : 0),
+          expected.getMonth() - ('months' in step ? step.months : 0)
+        );
+        expect(trend[1]!.timestamp).toBe(expected.getTime());
+      }
+    });
+
+    it('should window the records chart and the subjects chart independently', async () => {
+      const { trends } = await summaryService.getSummary(currentUser, {
+        recordTrendWindow: 'pastYear',
+        subjectTrendWindow: 'pastMonth'
+      });
+      expect(trends.records).toHaveLength(13);
+      expect(trends.sessions).toHaveLength(13);
+      expect(trends.subjects).toHaveLength(5);
+    });
+
+    it('should draw all time over the shortest window reaching back past every record and session', async () => {
+      const SIX_MONTHS_MS = 183 * 24 * 60 * 60 * 1000;
+      const oldest = Date.now() - SIX_MONTHS_MS + THIRTY_DAYS_MS;
+      instrumentRecordsService.count.mockImplementation((where: { date?: { lte: Date } }) => {
+        return Promise.resolve(where.date && where.date.lte.getTime() < oldest ? 0 : 1);
+      });
+      sessionsService.count.mockResolvedValue(0);
+      const { trends } = await summaryService.getSummary(currentUser, { recordTrendWindow: 'all' });
+      expect(trends.records).toHaveLength(7);
+      expect(trends.sessions).toHaveLength(7);
+    });
+
+    it('should draw all time over the shortest window reaching back past every subject', async () => {
+      subjectsService.count.mockImplementation((where: { createdAt?: { lte: Date } }) => {
+        return Promise.resolve(
+          where.createdAt && where.createdAt.lte.getTime() < Date.now() - 20 * 24 * 60 * 60 * 1000 ? 0 : 1
+        );
+      });
+      const { trends } = await summaryService.getSummary(currentUser, { subjectTrendWindow: 'all' });
+      expect(trends.subjects).toHaveLength(5);
+    });
+
+    it('should widen all time past five years until it reaches the oldest record, in a fixed number of points', async () => {
+      const oldest = new Date(Date.now()).setFullYear(new Date().getFullYear() - 30);
+      instrumentRecordsService.count.mockImplementation((where: { date?: { lte: Date } }) => {
+        return Promise.resolve(where.date && where.date.lte.getTime() < oldest ? 0 : 1);
+      });
+      const { trends } = await summaryService.getSummary(currentUser, { recordTrendWindow: 'all' });
+      expect(trends.records).toHaveLength(6);
+      const spanYears =
+        new Date(trends.records[0]!.timestamp).getFullYear() - new Date(trends.records.at(-1)!.timestamp).getFullYear();
+      expect(spanYears).toBe(40);
     });
 
     it('should issue every query concurrently rather than awaiting them in sequence', async () => {
@@ -136,7 +212,7 @@ describe('SummaryService', () => {
           return 0;
         });
       }
-      await summaryService.getSummary();
+      await summaryService.getSummary(currentUser);
       expect(started).toBe(EXPECTED_QUERIES);
     });
   });

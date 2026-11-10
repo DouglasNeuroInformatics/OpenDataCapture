@@ -53,6 +53,9 @@ test.describe('instrument hub', () => {
 
     const hubPage = new InstrumentHubPage(page);
     await hubPage.goto('/datahub/instruments');
+    // The list is paginated and every spec's instruments are in the shared catalog, so the new
+    // series is not guaranteed a place on the first page.
+    await hubPage.searchInput.fill(seriesTitle);
 
     const row = hubPage.row(seriesTitle).first();
     await expect(row).toBeVisible();
