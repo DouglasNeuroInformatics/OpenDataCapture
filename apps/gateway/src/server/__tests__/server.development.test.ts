@@ -46,7 +46,7 @@ class TestDevelopmentServer extends DevelopmentServer {
   }
 
   listenOnRandomPort() {
-    return this.app.listen(0);
+    return this.app.listen(0, '127.0.0.1');
   }
 
   render() {
@@ -97,7 +97,7 @@ describe('DevelopmentServer', () => {
     if (typeof address !== 'object' || address === null) {
       throw new Error(`Expected the server to listen on a port, got: ${address}`);
     }
-    const response = await fetch(`http://localhost:${address.port}/src/entry-client.tsx`);
+    const response = await fetch(`http://127.0.0.1:${address.port}/src/entry-client.tsx`);
     expect(await response.text()).toBe('served by vite');
   });
 

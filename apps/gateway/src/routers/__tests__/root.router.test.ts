@@ -54,7 +54,7 @@ describe('rootRouter', () => {
     });
     app.use('/', rootRouter);
     server = await new Promise<Server>((resolve) => {
-      const listening = app.listen(0, () => resolve(listening));
+      const listening = app.listen(0, '127.0.0.1', () => resolve(listening));
     });
     const address = server.address();
     if (typeof address !== 'object' || address === null) {
