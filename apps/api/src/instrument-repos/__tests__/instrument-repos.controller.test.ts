@@ -26,11 +26,11 @@ describe('InstrumentReposController', () => {
     service = moduleRef.get(InstrumentReposService);
   });
 
-  it('should pass the submitted repository to the service when creating one', async () => {
+  it("should pass the submitted repository to the service with the current user's ability, which decides a re-add", async () => {
     const data = { accessToken: 'token', url: 'https://github.com/owner/repo' };
     service.create.mockResolvedValueOnce(repo);
-    await expect(controller.create(data)).resolves.toBe(repo);
-    expect(service.create).toHaveBeenCalledWith(data);
+    await expect(controller.create(data, ability)).resolves.toBe(repo);
+    expect(service.create).toHaveBeenCalledWith(data, { ability });
   });
 
   it("should scope the deletion to the current user's ability", async () => {

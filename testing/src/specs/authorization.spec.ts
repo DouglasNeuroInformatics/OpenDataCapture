@@ -6,6 +6,7 @@ import type { User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
 import { ApiClient } from '../support/api-client';
+import { HAPPINESS_RECORD } from '../support/constants';
 import { expect, test } from '../support/fixtures';
 
 import type { Role } from '../support/types';
@@ -319,6 +320,31 @@ function happinessRecord(subjectId: string): UploadInstrumentRecordsData['record
 /** `POST /instrument-records/upload` as the holder of the given token, with the raw response. */
 function uploadRecord(request: APIRequestContext, token: string, data: UploadInstrumentRecordsData) {
   return request.post(`${API}/instrument-records/upload`, { data, headers: { Authorization: `Bearer ${token}` } });
+}
+
+/**
+ * Signs in a STANDARD member of the group granted `update InstrumentRecord` there and nothing else on
+ * records, since no base level below admin holds `update` or `delete` on them.
+ */
+async function loginRecordEditor(api: ApiClient, request: APIRequestContext, groupId: string): Promise<string> {
+  const { credentials, user } = await api.createUser({ basePermissionLevel: 'STANDARD', groupIds: [groupId] });
+  await api.setUserPermissions(user.id, [{ action: 'update', groupId, subject: 'InstrumentRecord' }]);
+  return ApiClient.login(request, credentials);
+}
+
+/** A happiness questionnaire record for a new subject in the group, seeded as admin. */
+async function seedHappinessRecord(api: ApiClient, groupId: string, subjectId: string): Promise<InstrumentRecord> {
+  const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+  const session = await api.createSession(groupId, { id: subjectId });
+  return api.createRecord(groupId, instrumentId, session, HAPPINESS_RECORD);
+}
+
+/** `PATCH /instrument-records/:id` as the holder of the given token, with the raw response. */
+function patchRecord(request: APIRequestContext, token: string, id: string, data: { [key: string]: unknown }) {
+  return request.patch(`${API}/instrument-records/${id}`, {
+    data: { data },
+    headers: { Authorization: `Bearer ${token}` }
+  });
 }
 
 /** `POST /assignments` as the holder of the given token, expiring tomorrow, with the raw response. */
@@ -758,6 +784,49 @@ test.describe('server-side authorization', () => {
     const updated = await api.updateUser(user.id, { groupIds: [stayingGroup.id] });
 
     expect(updated.additionalPermissions).toStrictEqual([{ action: 'create', groupId: null, subject: 'Instrument' }]);
+  });
+
+  // A grant is the only way a non-admin reaches `PATCH /instrument-records/:id`. The write used to be
+  // scoped by the caller's `delete` rules rather than the `update` rules the route is gated on, so a
+  // holder of `update` alone passed the guard and then had every write refused.
+  test('should let a user granted update on records, without delete, edit one in the group the grant names', async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup({ name: `Editing Group ${uniqueId}` });
+    const token = await loginRecordEditor(api, apiRequestContext, group.id);
+    const record = await seedHappinessRecord(api, group.id, `Edited${uniqueId}`);
+
+    const response = await patchRecord(apiRequestContext, token, record.id, { personalLifeSatisfaction: 3 });
+
+    expect(response.status()).toBe(200);
+    expect((await api.findRecordById(record.id)).data).toStrictEqual({
+      ...HAPPINESS_RECORD,
+      personalLifeSatisfaction: 3
+    });
+  });
+
+  // The lookup the payload is merged into is scoped as well. Before it was, an invalid payload for
+  // another group's record answered 400 where an unknown id answers 404, which reported the id real.
+  test('should answer an edit to a record outside the update grant exactly as for one that does not exist', async ({
+    api,
+    apiRequestContext,
+    uniqueId
+  }) => {
+    const group = await api.createGroup({ name: `Editing Group ${uniqueId}` });
+    const foreignGroup = await api.createGroup({ name: `Foreign Editing Group ${uniqueId}` });
+    const token = await loginRecordEditor(api, apiRequestContext, group.id);
+    const record = await seedHappinessRecord(api, foreignGroup.id, `Foreign${uniqueId}`);
+    const invalid = { personalLifeSatisfaction: 'not a number' };
+
+    const foreign = await patchRecord(apiRequestContext, token, record.id, invalid);
+    const absent = await patchRecord(apiRequestContext, token, '0'.repeat(24), invalid);
+
+    expect(foreign.status(), 'a record outside the grant must not be distinguishable from an absent one').toBe(
+      absent.status()
+    );
+    expect(foreign.status()).toBe(404);
   });
 
   // The import route answers with the rows it wrote, and used to find them by re-querying the

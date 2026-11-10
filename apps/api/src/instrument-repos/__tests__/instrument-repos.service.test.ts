@@ -18,6 +18,8 @@ import { bundle } from '@opendatacapture/instrument-bundler';
 import JSZip from 'jszip';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { createAppAbility } from '@/auth/ability.utils';
+
 import { InstrumentsService } from '../../instruments/instruments.service';
 import { InstrumentReposService } from '../instrument-repos.service';
 
@@ -289,6 +291,17 @@ describe('InstrumentReposService', () => {
       );
     });
 
+    it('should re-sync with the updated token, so the sync re-adding starts does not download with the expired one', async () => {
+      const updated = { accessToken: 'new-ciphertext', id: 'existing' };
+      instrumentRepoModel.findFirst.mockResolvedValueOnce({ accessToken: 'old-ciphertext', id: 'existing' });
+      instrumentRepoModel.update.mockResolvedValueOnce(updated);
+      const syncSpy = vi.spyOn(internal, 'syncRepo').mockResolvedValue({ ok: true, repo: updated });
+
+      await service.create({ accessToken: 'new-token', url: 'https://github.com/owner/repo' });
+
+      expect(syncSpy).toHaveBeenCalledWith(updated);
+    });
+
     it('does not touch the stored token when re-adding without one', async () => {
       instrumentRepoModel.findFirst.mockResolvedValueOnce({ id: 'existing' });
       vi.spyOn(internal, 'syncRepo').mockResolvedValue({ ok: true, repo: { id: 'existing' } });
@@ -296,6 +309,62 @@ describe('InstrumentReposService', () => {
       await service.create({ url: 'https://github.com/owner/repo' });
 
       expect(instrumentRepoModel.update).not.toHaveBeenCalled();
+    });
+
+    describe('re-adding a registered repo as a caller', () => {
+      const url = 'https://github.com/owner/repo';
+      const confinedTo = (groupId: string) => ({ groupIds: { hasSome: [groupId] } });
+
+      it('should refuse one whose update grant is confined to other groups, leaving the token untouched', async () => {
+        const ability = createAppAbility([
+          { action: 'create', conditions: confinedTo('group-a'), subject: 'InstrumentRepo' },
+          { action: 'update', conditions: confinedTo('group-a'), subject: 'InstrumentRepo' }
+        ]);
+        instrumentRepoModel.findFirst.mockResolvedValueOnce({ groupIds: ['group-b'], id: 'existing' });
+        const syncSpy = vi.spyOn(internal, 'syncRepo').mockResolvedValue({ ok: true, repo: { id: 'existing' } });
+
+        await expect(service.create({ accessToken: 'invalid', url }, { ability })).rejects.toBeInstanceOf(
+          ConflictException
+        );
+        expect(instrumentRepoModel.update).not.toHaveBeenCalled();
+        expect(syncSpy).not.toHaveBeenCalled();
+      });
+
+      it('should refuse one holding only create as a conflict, rather than the 500 of a query it has no rule for', async () => {
+        const ability = createAppAbility([{ action: 'create', subject: 'InstrumentRepo' }]);
+        instrumentRepoModel.findFirst.mockResolvedValueOnce({ groupIds: [], id: 'existing' });
+        vi.spyOn(internal, 'syncRepo').mockResolvedValue({ ok: true, repo: { id: 'existing' } });
+
+        await expect(service.create({ accessToken: 'invalid', url }, { ability })).rejects.toBeInstanceOf(
+          ConflictException
+        );
+        expect(instrumentRepoModel.update).not.toHaveBeenCalled();
+      });
+
+      it("should re-sync for one whose update grant covers one of the repo's groups", async () => {
+        const ability = createAppAbility([
+          { action: 'update', conditions: confinedTo('group-b'), subject: 'InstrumentRepo' }
+        ]);
+        instrumentRepoModel.findFirst.mockResolvedValueOnce({ groupIds: ['group-b', 'group-c'], id: 'existing' });
+        const syncSpy = vi.spyOn(internal, 'syncRepo').mockResolvedValue({ ok: true, repo: { id: 'existing' } });
+
+        await service.create({ url }, { ability });
+
+        expect(syncSpy).toHaveBeenCalledOnce();
+      });
+
+      it('should let an administrator replace the token, which is how an expired one is refreshed', async () => {
+        const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+        instrumentRepoModel.findFirst.mockResolvedValueOnce({ groupIds: [], id: 'existing' });
+        const syncSpy = vi.spyOn(internal, 'syncRepo').mockResolvedValue({ ok: true, repo: { id: 'existing' } });
+
+        await service.create({ accessToken: 'new-token', url }, { ability });
+
+        const accessToken = instrumentRepoModel.update.mock.lastCall?.[0].data.accessToken;
+        expect(typeof accessToken === 'string' && internal.decrypt(accessToken)).toBe('new-token');
+        expect(instrumentRepoModel.update.mock.lastCall?.[0].where).toStrictEqual({ id: 'existing' });
+        expect(syncSpy).toHaveBeenCalledOnce();
+      });
     });
   });
 

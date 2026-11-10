@@ -9,7 +9,12 @@ import { Route } from '@/routes/_app/session/remote-assignment';
 
 import '@/services/i18n';
 
-type InstrumentInfoStub = { details: { title: string }; id: string; kind: 'FORM'; supportedLanguages: string[] };
+type InstrumentInfoStub = {
+  details: { title: string };
+  id: string;
+  kind: 'FILE' | 'FORM';
+  supportedLanguages: string[];
+};
 
 type MockState = {
   config: { setup: { isGatewayEnabled: boolean } };
@@ -153,6 +158,17 @@ describe('Route', () => {
       render(<RemoteAssignmentPage />);
       expect(screen.getByRole('button', { name: 'Allowed' })).toBeTruthy();
       expect(screen.queryByRole('button', { name: 'Excluded' })).toBeNull();
+    });
+
+    it('should not offer a file instrument the group may administer, since the gateway cannot deliver its uploads', () => {
+      mocks.instrumentInfo = [
+        allowed,
+        { ...allowed, details: { title: 'File Upload' }, id: 'instrument-3', kind: 'FILE' }
+      ];
+      mocks.store.currentGroup = { accessibleInstrumentIds: ['instrument-1', 'instrument-3'], id: 'group-1' };
+      render(<RemoteAssignmentPage />);
+      expect(screen.getByRole('button', { name: 'Allowed' })).toBeTruthy();
+      expect(screen.queryByRole('button', { name: 'File Upload' })).toBeNull();
     });
 
     it('should show a loading fallback instead of the showcase while the instruments load', () => {

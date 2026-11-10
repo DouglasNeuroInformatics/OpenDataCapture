@@ -767,6 +767,7 @@ describe('InstrumentsService', () => {
       await instrumentsService.find({}, {}, ['group-1']);
 
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
+        select: { id: true },
         where: {
           AND: [
             { records: undefined },
@@ -1088,6 +1089,12 @@ describe('InstrumentsService', () => {
         where: { AND: [accessibleQuery(ability, 'read', 'Instrument'), ownedSeriesFilter(['group-1'])] }
       });
     });
+
+    it('should evaluate a bundle once however often it is requested, serving repeats from the cache', async () => {
+      await instrumentsService.findBundleById('form');
+      await instrumentsService.findBundleById('form');
+      expect(virtualizationService.eval).toHaveBeenCalledOnce();
+    });
   });
 
   describe('updateSeriesArchive', () => {
@@ -1169,7 +1176,6 @@ describe('InstrumentsService', () => {
     beforeEach(() => {
       instrumentModel.findMany.mockResolvedValue([]);
       instrumentRecordModel.findMany.mockResolvedValue([]);
-      vi.spyOn(instrumentsService as any, 'instantiate').mockResolvedValue([]);
     });
 
     it('should not query records when no subject is given, so the unfiltered listing costs one query', async () => {
@@ -1282,14 +1288,50 @@ describe('InstrumentsService', () => {
   });
 
   describe('find (evaluation)', () => {
+    const storedRows = [
+      { bundle: 'FORM_BUNDLE', id: 'hash:FORM_A-1' },
+      { bundle: 'SERIES_BUNDLE', id: 'series-1' }
+    ];
+
     beforeEach(() => {
-      instrumentModel.findMany.mockResolvedValue([
-        { bundle: 'FORM_BUNDLE', id: 'hash:FORM_A-1' },
-        { bundle: 'SERIES_BUNDLE', id: 'series-1' }
-      ]);
+      instrumentModel.findMany.mockImplementation(({ where }: any) => {
+        return Promise.resolve(where.id ? storedRows.filter(({ id }) => where.id.in.includes(id)) : storedRows);
+      });
       virtualizationService.eval.mockImplementation((code) => {
         return okAsync(code === 'FORM_BUNDLE' ? formInstance('FORM_A', 1) : existingSeries);
       });
+    });
+
+    it('should read the bundle only of an instrument it has not evaluated yet', async () => {
+      instanceCache.set('series-1', { ...existingSeries, id: 'series-1' });
+
+      const result = await instrumentsService.find();
+
+      expect(instrumentModel.findMany).toHaveBeenLastCalledWith({
+        select: { bundle: true, id: true },
+        where: { id: { in: ['hash:FORM_A-1'] } }
+      });
+      expect(result.map(({ id }) => id)).toEqual(['hash:FORM_A-1', 'series-1']);
+    });
+
+    it('should not read any bundle when every instrument is already evaluated', async () => {
+      await instrumentsService.find();
+      instrumentModel.findMany.mockClear();
+
+      await instrumentsService.find();
+
+      expect(instrumentModel.findMany).toHaveBeenCalledOnce();
+      expect(instrumentModel.findMany).toHaveBeenCalledWith(expect.objectContaining({ select: { id: true } }));
+    });
+
+    it('should drop an instrument deleted before its bundle was read, rather than return an undefined instance', async () => {
+      instrumentModel.findMany
+        .mockResolvedValueOnce(storedRows.map(({ id }) => ({ id })))
+        .mockResolvedValueOnce([storedRows[0]!]);
+
+      const result = await instrumentsService.find();
+
+      expect(result.map(({ id }) => id)).toEqual(['hash:FORM_A-1']);
     });
 
     it('should return only instruments of the requested kind', async () => {
@@ -1310,7 +1352,7 @@ describe('InstrumentsService', () => {
 
     it('should scope owned series to the named series group in preference to the caller groups', async () => {
       await instrumentsService.find({ seriesGroupId: 'group-2' }, {}, ['group-1']);
-      expect(instrumentModel.findMany.mock.lastCall?.[0]).toMatchObject({
+      expect(instrumentModel.findMany.mock.calls[0]?.[0]).toMatchObject({
         where: {
           AND: [
             {},
@@ -1370,6 +1412,81 @@ describe('InstrumentsService', () => {
       await expect(instrumentsService.findBundleById('odd')).rejects.toThrowError(
         new InternalServerErrorException('Unexpected instance kind: UNKNOWN')
       );
+    });
+  });
+
+  describe('findUnassignableIds', () => {
+    const fileInstance = { ...formInstance('FILE_A', 1), kind: 'FILE' as const };
+    const instancesByBundle: { [bundle: string]: unknown } = {
+      'hash:FILE_A-1:bundle': fileInstance,
+      'hash:FORM_A-1:bundle': formInstance('FORM_A', 1),
+      'hash:FORM_B-1:bundle': formInstance('FORM_B', 1),
+      'series-1:bundle': existingSeries,
+      'series-with-file:bundle': {
+        ...existingSeries,
+        content: { items: [{ edition: 1, name: 'FORM_A' }, fileInstance.internal] }
+      }
+    };
+
+    /** Stored rows, keyed by id, that both the requested lookup and the series item lookup read. */
+    const storeInstruments = (archivedIds: string[] = []) => {
+      instrumentModel.findMany.mockImplementation(({ where }: any) => {
+        return Promise.resolve(
+          (where.id.in as string[])
+            .filter((id) => `${id}:bundle` in instancesByBundle)
+            .map((id) => ({ archivedAt: archivedIds.includes(id) ? new Date() : null, bundle: `${id}:bundle`, id }))
+        );
+      });
+    };
+
+    beforeEach(() => {
+      vi.spyOn(cryptoService, 'hash').mockImplementation((value) => `hash:${value}`);
+      virtualizationService.eval.mockImplementation((code) => okAsync(instancesByBundle[code]));
+      storeInstruments();
+    });
+
+    it('should report a file instrument, since the gateway has no way to upload its files', async () => {
+      await expect(instrumentsService.findUnassignableIds(['hash:FILE_A-1', 'hash:FORM_A-1'])).resolves.toEqual([
+        'hash:FILE_A-1'
+      ]);
+    });
+
+    it('should report a series with a file item, which the series renderer cannot show either', async () => {
+      await expect(instrumentsService.findUnassignableIds(['series-with-file', 'series-1'])).resolves.toEqual([
+        'series-with-file'
+      ]);
+    });
+
+    it('should look up the items of a series by their generated ids, since its bundle does not say their kind', async () => {
+      await instrumentsService.findUnassignableIds(['series-with-file']);
+      expect(instrumentModel.findMany.mock.lastCall?.[0]).toEqual({
+        select: { bundle: true, id: true },
+        where: { id: { in: ['hash:FORM_A-1', 'hash:FILE_A-1'] } }
+      });
+    });
+
+    it('should report an archived instrument without evaluating its bundle', async () => {
+      storeInstruments(['series-1']);
+      await expect(instrumentsService.findUnassignableIds(['series-1'])).resolves.toEqual(['series-1']);
+      expect(virtualizationService.eval).not.toHaveBeenCalled();
+    });
+
+    it('should skip an unknown id rather than throwing, so the caller refuses it under its own rule', async () => {
+      await expect(instrumentsService.findUnassignableIds(['not-an-instrument', 'hash:FILE_A-1'])).resolves.toEqual([
+        'hash:FILE_A-1'
+      ]);
+    });
+
+    it('should read no bundle of an instrument it has already evaluated, as find does not', async () => {
+      await instrumentsService.findUnassignableIds(['hash:FORM_A-1']);
+      instrumentModel.findMany.mockClear();
+
+      await instrumentsService.findUnassignableIds(['hash:FORM_A-1']);
+
+      expect(instrumentModel.findMany).toHaveBeenCalledExactlyOnceWith({
+        select: { archivedAt: true, id: true },
+        where: { id: { in: ['hash:FORM_A-1'] } }
+      });
     });
   });
 

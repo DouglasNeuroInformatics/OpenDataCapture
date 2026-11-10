@@ -20,7 +20,7 @@ type CapturedRouteOptions = {
 
 type MockState = {
   config: { setup: { isGatewayEnabled: boolean } };
-  instrumentInfo: undefined | { details: { title: string }; id: string; kind: 'FORM' }[];
+  instrumentInfo: undefined | { details: { title: string }; id: string; kind: 'FILE' | 'FORM' }[];
   search: { mode?: string };
   store: { currentGroup: Group | null };
 };
@@ -173,6 +173,17 @@ describe('Route', () => {
       mocks.instrumentInfo = [
         { details: { title: 'Allowed' }, id: 'instrument-1', kind: 'FORM' },
         { details: { title: 'Not in group' }, id: 'instrument-2', kind: 'FORM' }
+      ];
+      render(<RemoteAssignmentsPage />);
+      expect(wizardProps()).toMatchObject({ instruments: [{ id: 'instrument-1', title: 'Allowed' }] });
+    });
+
+    it('should not offer the wizard a file instrument the group may administer, since the gateway cannot deliver its uploads', () => {
+      mocks.search = { mode: 'create' };
+      mocks.store.currentGroup = { ...createGroup(), accessibleInstrumentIds: ['instrument-1', 'instrument-2'] };
+      mocks.instrumentInfo = [
+        { details: { title: 'Allowed' }, id: 'instrument-1', kind: 'FORM' },
+        { details: { title: 'File Upload' }, id: 'instrument-2', kind: 'FILE' }
       ];
       render(<RemoteAssignmentsPage />);
       expect(wizardProps()).toMatchObject({ instruments: [{ id: 'instrument-1', title: 'Allowed' }] });

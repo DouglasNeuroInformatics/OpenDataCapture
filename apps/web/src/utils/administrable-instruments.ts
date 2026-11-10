@@ -24,4 +24,17 @@ function selectAdministrableInstruments<TInstrument extends AdministrableCandida
   });
 }
 
-export { selectAdministrableInstruments };
+/**
+ * The administrable instruments that may also be assigned remotely: the gateway has no way to
+ * deliver a patient's uploads, so a file instrument is administered in person only. A series with a
+ * file item is left for the API to refuse, because an item pinned to an older edition is absent from
+ * the instrument list, so its kind cannot be known here.
+ */
+function selectRemotelyAssignableInstruments<TInstrument extends AdministrableCandidate>(
+  instruments: TInstrument[],
+  currentGroup: null | { accessibleInstrumentIds: string[] }
+): TInstrument[] {
+  return selectAdministrableInstruments(instruments, currentGroup).filter(({ kind }) => kind !== 'FILE');
+}
+
+export { selectAdministrableInstruments, selectRemotelyAssignableInstruments };

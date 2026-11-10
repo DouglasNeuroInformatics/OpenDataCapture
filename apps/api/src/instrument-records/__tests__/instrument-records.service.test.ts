@@ -1199,6 +1199,8 @@ describe('InstrumentRecordsService', () => {
   });
 
   describe('updateById', () => {
+    const ability = createAppAbility([{ action: 'update', subject: 'InstrumentRecord' }]);
+
     const useRecord = (data: unknown) => {
       instrumentRecordModel.findFirst.mockResolvedValueOnce({ data, id: 'record-1', instrumentId: 'instrument-1' });
     };
@@ -1219,7 +1221,9 @@ describe('InstrumentRecordsService', () => {
     it('should throw a NotFoundException when the record does not exist', async () => {
       instrumentRecordModel.findFirst.mockResolvedValueOnce(null);
 
-      await expect(instrumentRecordsService.updateById('record-1', {})).rejects.toBeInstanceOf(NotFoundException);
+      await expect(instrumentRecordsService.updateById('record-1', {}, { ability })).rejects.toBeInstanceOf(
+        NotFoundException
+      );
 
       expect(instrumentRecordModel.update).not.toHaveBeenCalled();
     });
@@ -1227,7 +1231,7 @@ describe('InstrumentRecordsService', () => {
     it('should reject an object update to a record whose data is an array', async () => {
       useRecord([{ answer: 1 }]);
 
-      await expect(instrumentRecordsService.updateById('record-1', { answer: 2 })).rejects.toBeInstanceOf(
+      await expect(instrumentRecordsService.updateById('record-1', { answer: 2 }, { ability })).rejects.toBeInstanceOf(
         BadRequestException
       );
 
@@ -1238,7 +1242,7 @@ describe('InstrumentRecordsService', () => {
       useRecord({ answer: 1, comment: 'kept' });
       useInstrument();
 
-      await instrumentRecordsService.updateById('record-1', { answer: 2 });
+      await instrumentRecordsService.updateById('record-1', { answer: 2 }, { ability });
 
       expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({
         data: { computedMeasures: null, data: { answer: 2, comment: 'kept' } }
@@ -1250,7 +1254,7 @@ describe('InstrumentRecordsService', () => {
       useRecord({ answers: [1, 2, 3] });
       useInstrument();
 
-      await instrumentRecordsService.updateById('record-1', { answers: [9] });
+      await instrumentRecordsService.updateById('record-1', { answers: [9] }, { ability });
 
       expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({ data: { data: { answers: [1, 2, 3] } } });
     });
@@ -1259,7 +1263,7 @@ describe('InstrumentRecordsService', () => {
       useRecord([{ answer: 1, comment: 'kept' }]);
       useInstrument();
 
-      await instrumentRecordsService.updateById('record-1', [{ answer: 2 }]);
+      await instrumentRecordsService.updateById('record-1', [{ answer: 2 }], { ability });
 
       expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({
         data: { data: [{ answer: 2, comment: 'kept' }] }
@@ -1273,9 +1277,11 @@ describe('InstrumentRecordsService', () => {
         validationSchema: { safeParseAsync: () => Promise.resolve({ error: { issues }, success: false }) }
       });
 
-      await expect(instrumentRecordsService.updateById('record-1', { answer: 'x' })).rejects.toMatchObject({
-        response: { issues, message: 'Merged data does not match validation schema' }
-      });
+      await expect(instrumentRecordsService.updateById('record-1', { answer: 'x' }, { ability })).rejects.toMatchObject(
+        {
+          response: { issues, message: 'Merged data does not match validation schema' }
+        }
+      );
       expect(instrumentRecordModel.update).not.toHaveBeenCalled();
     });
 
@@ -1285,7 +1291,7 @@ describe('InstrumentRecordsService', () => {
       useInstrument({ measures });
       instrumentMeasuresService.computeMeasures.mockReturnValueOnce({ score: 2 });
 
-      await instrumentRecordsService.updateById('record-1', { answer: 2 });
+      await instrumentRecordsService.updateById('record-1', { answer: 2 }, { ability });
 
       expect(instrumentMeasuresService.computeMeasures).toHaveBeenCalledWith(measures, { answer: 2 });
       expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({
@@ -1293,11 +1299,10 @@ describe('InstrumentRecordsService', () => {
       });
     });
 
-    // Pins a reported defect: the PATCH route is gated on update, but the write is scoped by delete rules.
-    // Expected to change when the source is fixed.
-    it("should scope the write by the caller's delete rules", async () => {
+    it("should scope the write by the caller's update rules, which the route is gated on, not their delete rules", async () => {
       const ability = createAppAbility([
-        { action: 'delete', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' }
+        { action: 'update', conditions: { groupId: 'group-1' }, subject: 'InstrumentRecord' },
+        { action: 'delete', conditions: { groupId: 'group-2' }, subject: 'InstrumentRecord' }
       ]);
       useRecord({ answer: 1 });
       useInstrument();
@@ -1305,9 +1310,35 @@ describe('InstrumentRecordsService', () => {
       await instrumentRecordsService.updateById('record-1', { answer: 2 }, { ability });
 
       expect(instrumentRecordModel.update.mock.lastCall?.[0].where).toStrictEqual({
-        AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')],
+        AND: [accessibleQuery(ability, 'update', 'InstrumentRecord')],
         id: 'record-1'
       });
+    });
+
+    it('should let a caller holding an update rule but no delete rule write the record', async () => {
+      useRecord({ answer: 1 });
+      useInstrument();
+
+      await expect(instrumentRecordsService.updateById('record-1', { answer: 2 }, { ability })).resolves.toStrictEqual({
+        id: 'record-1'
+      });
+    });
+
+    it("should look the record up within the caller's update scope, so one outside it is not found before the payload is merged or validated", async () => {
+      instrumentRecordModel.findFirst.mockResolvedValueOnce(null);
+      const ability = createAppAbility([
+        { action: 'update', conditions: { groupId: 'other-group' }, subject: 'InstrumentRecord' }
+      ]);
+
+      await expect(
+        instrumentRecordsService.updateById('record-1', { answer: 'x' }, { ability })
+      ).rejects.toBeInstanceOf(NotFoundException);
+
+      expect(instrumentRecordModel.findFirst).toHaveBeenCalledWith({
+        where: { AND: [accessibleQuery(ability, 'update', 'InstrumentRecord')], id: 'record-1' }
+      });
+      expect(instrumentsService.findById).not.toHaveBeenCalled();
+      expect(instrumentRecordModel.update).not.toHaveBeenCalled();
     });
   });
 

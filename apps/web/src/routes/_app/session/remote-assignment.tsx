@@ -18,7 +18,7 @@ import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
-import { selectAdministrableInstruments } from '@/utils/administrable-instruments';
+import { selectRemotelyAssignableInstruments } from '@/utils/administrable-instruments';
 import { getDefaultAssignmentExpiry } from '@/utils/assignment-duration';
 import { $RedirectUrl, omittedIfBlank } from '@/utils/validation';
 
@@ -129,7 +129,7 @@ const RouteComponent = () => {
       <WithFallback
         Component={InstrumentShowcase}
         props={{
-          data: instrumentInfoQuery.data && selectAdministrableInstruments(instrumentInfoQuery.data, currentGroup),
+          data: instrumentInfoQuery.data && selectRemotelyAssignableInstruments(instrumentInfoQuery.data, currentGroup),
           onSelect: (instrument) => {
             setSelectedInstrument(instrument);
             setIsCreateModalOpen(true);

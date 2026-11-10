@@ -68,6 +68,10 @@ class TestServer extends BaseServer {
     super();
   }
 
+  listenOnRandomPort() {
+    return this.app.listen(0, '127.0.0.1');
+  }
+
   protected loadRender() {
     return this.renderLoader();
   }
@@ -88,15 +92,15 @@ class StacktraceFixingServer extends TestServer {
 
 const openServers: Server[] = [];
 
-async function request(server: BaseServer, path: string, init?: RequestInit) {
-  const httpServer = server.listen();
+async function request(server: TestServer, path: string, init?: RequestInit) {
+  const httpServer = server.listenOnRandomPort();
   openServers.push(httpServer);
   await once(httpServer, 'listening');
   const address = httpServer.address();
   if (typeof address !== 'object' || address === null) {
     throw new Error(`Expected the server to listen on a port, got: ${address}`);
   }
-  return fetch(`http://localhost:${address.port}${path}`, init);
+  return fetch(`http://127.0.0.1:${address.port}${path}`, init);
 }
 
 function readLogEntries(): LogEntry[] {

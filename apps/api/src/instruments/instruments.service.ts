@@ -9,7 +9,12 @@ import {
   UnprocessableEntityException
 } from '@nestjs/common';
 import { bundle } from '@opendatacapture/instrument-bundler';
-import { getSeriesInstrumentItems, isScalarInstrument, isSeriesInstrument } from '@opendatacapture/instrument-utils';
+import {
+  getSeriesInstrumentItems,
+  isFileInstrument,
+  isScalarInstrument,
+  isSeriesInstrument
+} from '@opendatacapture/instrument-utils';
 import type {
   AnyInstrument,
   AnyScalarInstrument,
@@ -305,7 +310,8 @@ export class InstrumentsService {
       requestedSeriesGroup = { seriesGroupId: { in: groupIds } };
     }
 
-    const instruments = await this.instrumentModel.findMany({
+    const rows = await this.instrumentModel.findMany({
+      select: { id: true },
       where: {
         AND: [
           subjectInstrumentIds ? { id: { in: subjectInstrumentIds } } : {},
@@ -316,7 +322,8 @@ export class InstrumentsService {
         ]
       }
     });
-    const instances = await this.instantiate(instruments);
+    // Scoped by the ids, which the query above already filtered for this caller.
+    const instances = await this.findInstancesByIds(rows.map(({ id }) => id));
     if (!query.kind) {
       return instances as WithID<SomeInstrument<TKind>>[];
     }
@@ -409,6 +416,26 @@ export class InstrumentsService {
       ...info,
       seriesGroup: info.seriesGroupId ? (groupsById.get(info.seriesGroupId) ?? null) : null
     }));
+  }
+
+  /**
+   * Which of the given instruments cannot be assigned remotely: an archived series, a file
+   * instrument, whose uploads the gateway has no way to deliver, and a series with a file item, which
+   * the series renderer cannot show either. An unknown id is skipped, so the caller's own rule decides
+   * it. Unscoped by the caller's ability: it only narrows ids the caller already named, and every
+   * other check on them is made separately.
+   */
+  async findUnassignableIds(ids: string[]): Promise<string[]> {
+    const instruments = await this.instrumentModel.findMany({
+      select: { archivedAt: true, id: true },
+      where: { id: { in: ids } }
+    });
+    const archivedIds = instruments.filter(({ archivedAt }) => archivedAt).map(({ id }) => id);
+    const instances = await this.findInstancesByIds(
+      instruments.filter(({ archivedAt }) => !archivedAt).map(({ id }) => id)
+    );
+    const collectingFiles = await Promise.all(instances.map((instance) => this.collectsFiles(instance)));
+    return [...archivedIds, ...instances.filter((_, index) => collectingFiles[index]).map(({ id }) => id)];
   }
 
   generateInstrumentId(instrument: AnyInstrument, seriesGroupId?: string) {
@@ -538,6 +565,20 @@ export class InstrumentsService {
   }
 
   /**
+   * A series bundle does not say what kind its items are, so each item is evaluated. An item that
+   * no longer exists is left to `findBundleById`, which refuses it when the assignment is sent.
+   */
+  private async collectsFiles(instance: AnyInstrument): Promise<boolean> {
+    if (!isSeriesInstrument(instance)) {
+      return isFileInstrument(instance);
+    }
+    const itemIds = getSeriesInstrumentItems(instance.content).map((internal) => {
+      return this.generateScalarInstrumentId({ internal });
+    });
+    return (await this.findInstancesByIds(itemIds)).some(isFileInstrument);
+  }
+
+  /**
    * The single source of this message. `InstrumentReposService.importInstrumentFromDir` reads the id
    * back out of it to associate an already-stored instrument with the repository that provides it, so
    * the id must stay quoted and the two throw sites must stay identical.
@@ -631,6 +672,24 @@ export class InstrumentsService {
   }
 
   /**
+   * Reads the bundle only of an instrument not yet evaluated. Unscoped: callers pass ids they have
+   * already scoped or that the caller named.
+   */
+  private async findInstancesByIds(ids: string[]) {
+    const cache = this.virtualizationService.context.instruments;
+    const uncachedIds = ids.filter((id) => !cache.has(id));
+    if (uncachedIds.length > 0) {
+      const uncached = await this.instrumentModel.findMany({
+        select: { bundle: true, id: true },
+        where: { id: { in: uncachedIds } }
+      });
+      await Promise.all(uncached.map((instrument) => this.getInstrumentInstance(instrument)));
+    }
+    // An id with no stored row, such as one deleted since it was read, has no instance either.
+    return ids.flatMap((id) => cache.get(id) ?? []);
+  }
+
+  /**
    * The ids of the instruments the subject has at least one record for.
    *
    * Scoped to the records the caller may read, so the filter cannot be resolved from records outside
@@ -713,14 +772,6 @@ export class InstrumentsService {
    */
   private getSeriesItemSequenceKey(items: ScalarInstrumentInternal[]): string {
     return JSON.stringify(items.map(({ edition, name }) => ({ edition, name })));
-  }
-
-  private async instantiate(instruments: Pick<InstrumentBundleContainer, 'bundle' | 'id'>[]) {
-    return Promise.all(
-      instruments.map((instrument) => {
-        return this.getInstrumentInstance(instrument);
-      })
-    );
   }
 
   private instrumentExistsConflict(id: string): ConflictException {

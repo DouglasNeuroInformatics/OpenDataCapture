@@ -40,7 +40,7 @@ vi.mock('../server.base', async () => {
 
 class TestProductionServer extends ProductionServer {
   listenOnRandomPort() {
-    return this.app.listen(0);
+    return this.app.listen(0, '127.0.0.1');
   }
 
   render() {
@@ -62,7 +62,7 @@ async function request(path: string, init?: RequestInit) {
   if (typeof address !== 'object' || address === null) {
     throw new Error(`Expected the server to listen on a port, got: ${address}`);
   }
-  return fetch(`http://localhost:${address.port}${path}`, init);
+  return fetch(`http://127.0.0.1:${address.port}${path}`, init);
 }
 
 describe('ProductionServer', () => {
