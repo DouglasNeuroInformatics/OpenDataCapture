@@ -69,7 +69,8 @@ const $$FormInstrumentNumberField = <TLanguage extends InstrumentLanguage>(langu
 
 const $$FormInstrumentDateField = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return $$FormInstrumentBaseField(language).extend({
-    kind: z.literal('date')
+    kind: z.literal('date'),
+    variant: z.enum(['date', 'datetime']).optional()
   }) satisfies z.ZodType<FormInstrument.DateField<TLanguage>>;
 };
 
@@ -95,6 +96,7 @@ const $$FormInstrumentBooleanField = <TLanguage extends InstrumentLanguage>(lang
 
 const $$FormInstrumentSetField = <TLanguage extends InstrumentLanguage>(language?: TLanguage) => {
   return $$FormInstrumentBaseField(language).extend({
+    exclusiveOptions: z.array(z.string()).optional(),
     kind: z.literal('set'),
     options: $$InstrumentUIOption(z.record(z.string(), z.string().min(1)), language),
     variant: z.enum(['listbox', 'select'])

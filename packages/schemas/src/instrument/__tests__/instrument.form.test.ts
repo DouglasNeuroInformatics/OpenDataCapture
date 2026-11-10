@@ -97,6 +97,47 @@ describe('$$FormInstrument', () => {
     expect(measure?.visibility).toBeUndefined();
   });
 
+  describe('fields that libui-form-types added after the schema was written', () => {
+    const parseWithField = (field: { [key: string]: unknown }) => {
+      return $$FormInstrument().safeParse({
+        ...unilingualFormInstrument.instance,
+        content: [{ fields: { answer: { label: 'Answer', ...field } } }]
+      });
+    };
+
+    // Stripped for the same reason as resetButton above, the field would render as a date-only picker
+    // in the playground and as a date-time picker in production.
+    it.each(['date', 'datetime'])('should preserve a date field variant of %s rather than stripping it', (variant) => {
+      const result = parseWithField({ kind: 'date', variant });
+      expect(result.success).toBe(true);
+      expect(result.data?.content).toMatchObject([{ fields: { answer: { variant } } }]);
+    });
+
+    it('should parse a date field that omits variant, since it is optional', () => {
+      expect(parseWithField({ kind: 'date' }).success).toBe(true);
+    });
+
+    it('should reject a date field variant that is neither date nor datetime', () => {
+      expect(parseWithField({ kind: 'date', variant: 'time' }).success).toBe(false);
+    });
+
+    const setField = { kind: 'set', options: { none: 'None', some: 'Some' }, variant: 'listbox' };
+
+    it('should preserve the exclusive options of a set field rather than stripping them', () => {
+      const result = parseWithField({ ...setField, exclusiveOptions: ['none'] });
+      expect(result.success).toBe(true);
+      expect(result.data?.content).toMatchObject([{ fields: { answer: { exclusiveOptions: ['none'] } } }]);
+    });
+
+    it('should parse a set field that omits exclusiveOptions, since it is optional', () => {
+      expect(parseWithField(setField).success).toBe(true);
+    });
+
+    it('should reject exclusive options that are not a list of option keys', () => {
+      expect(parseWithField({ ...setField, exclusiveOptions: 'none' }).success).toBe(false);
+    });
+  });
+
   describe('number-record options', () => {
     const parseWithOptions = (options: { [key: string]: string }) => {
       return $$FormInstrument().safeParse({
