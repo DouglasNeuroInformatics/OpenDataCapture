@@ -48,7 +48,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
       - name: Setup PNPM
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
@@ -72,7 +72,7 @@ jobs:
       - name: Set Up Docker Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - name: Login to Container Registry
-        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -117,7 +117,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
       - name: Setup PNPM
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
@@ -167,7 +167,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
       - name: Setup PNPM
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
@@ -180,7 +180,7 @@ jobs:
         # must not publish a release with an empty body.
         run: pnpm exec tsx scripts/changelog.ts section "${{ needs.configure.outputs.version }}" > "$RUNNER_TEMP/release-notes.md"
       - name: Create Release
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           body_path: ${{ runner.temp }}/release-notes.md
           make_latest: ${{ needs.configure.outputs.latest }}
