@@ -79,39 +79,41 @@ Use a permission set when several users need the same additional permissions. Ed
 
 ### Navigation
 
-Each item appears in the navigation only when the user has the permissions listed. Some items also depend on how the instance is configured.
+Each item appears in the navigation only when the user has the permissions in **Shown with** and meets the conditions in **Shown only with**. The navigation checks no more than that, but the page behind the item loads its own data, and using it also takes the permissions in **Page also needs**. Read Group there means the group selected in the group switcher, and is needed only while one is selected.
 
-| Item                                       | Permissions                                                         | Also requires                                                                                                            |
-| ------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Dashboard**                              | Read Instrument, Read Instrument Record, Read Subject and Read User | Its figures also need Read Session                                                                                       |
-| **Data Hub** > **Subjects**                | Read Subject and Read Instrument Record                             |                                                                                                                          |
-| **Data Hub** > **Instruments**             | Read Subject, Read Instrument Record and Read Instrument            |                                                                                                                          |
-| **Upload Data**                            | Read Subject and Create Instrument Record                           | **Enable Uploader** under **Admin Panel** > **Instance** > **Settings**                                                  |
-| **Manage Group**                           | Manage (All) on Group                                               | A group selected in the group switcher                                                                                   |
-| **Email Templates**                        | Manage (All) on Group                                               | A configured mail server, gateway support, and a group selected                                                          |
-| **Remote Assignments** (create and delete) | Create Assignment, Read Assignment and Read Subject                 | **Enable Remote Assignments** under **Admin Panel** > **Instance** > **Settings**, gateway support, and a group selected |
-| **Admin Panel**                            | Manage (All) on All, which only admins hold                         |                                                                                                                          |
-| **Start Session**                          | Create Session                                                      |                                                                                                                          |
-| **Administer Instrument**                  | Create Instrument Record                                            | An active session                                                                                                        |
-| **Remote Assignment**                      | Create Assignment                                                   | Gateway support and an active session                                                                                    |
-| **View Current Subject**                   | Read Subject and Read Instrument Record                             | An active session                                                                                                        |
+| Item                                       | Shown with                                                          | Shown only with                                                                                                          | Page also needs                                                                                                   |
+| ------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| **Dashboard**                              | Read Instrument, Read Instrument Record, Read Subject and Read User |                                                                                                                          | Read Session, without which the item opens **Start Session** instead, and Read Group                              |
+| **Data Hub** > **Subjects**                | Read Subject and Read Instrument Record                             |                                                                                                                          | See [Data Hub](#data-hub)                                                                                         |
+| **Data Hub** > **Instruments**             | Read Subject, Read Instrument Record and Read Instrument            |                                                                                                                          | See [Data Hub](#data-hub)                                                                                         |
+| **Upload Data**                            | Read Subject and Create Instrument Record                           | **Enable Uploader** under **Admin Panel** > **Instance** > **Settings**                                                  | Read Instrument, Read User and Read Group                                                                         |
+| **Manage Group**                           | Manage (All) on Group                                               | A group selected in the group switcher                                                                                   | Read Instrument, and Create or Delete Instrument to create or delete a series                                     |
+| **Email Templates**                        | Manage (All) on Group                                               | A configured mail server, gateway support, and a group selected                                                          |                                                                                                                   |
+| **Remote Assignments** (create and delete) | Create Assignment, Read Assignment and Read Subject                 | **Enable Remote Assignments** under **Admin Panel** > **Instance** > **Settings**, gateway support, and a group selected | Read Instrument, plus Read Group to create, Delete Assignment to delete, and Update Assignment to email the links |
+| **Admin Panel**                            | Manage (All) on All, which only admins hold                         |                                                                                                                          |                                                                                                                   |
+| **Start Session**                          | Create Session                                                      |                                                                                                                          | Read Subject, Read User and Read Group                                                                            |
+| **Administer Instrument**                  | Create Instrument Record                                            | An active session                                                                                                        | Read Instrument and Read Group, and a base permission level for a file instrument                                 |
+| **Remote Assignment**                      | Create Assignment                                                   | Gateway support and an active session                                                                                    | Read Instrument, Read Subject and Read Group, plus Read Assignment and Update Assignment to email the link        |
+| **View Current Subject**                   | Read Subject and Read Instrument Record                             | An active session                                                                                                        | Read Instrument and Read Session                                                                                  |
 
 ### Data Hub
 
 The Data Hub navigation item only checks the permissions listed above, but each page loads its own data, and a page the user lacks a permission for shows an error. To give someone working access to the Data Hub, make sure they have everything in this table.
 
-| Page or action                               | Permissions                                                                     |
-| -------------------------------------------- | ------------------------------------------------------------------------------- |
-| Subjects list, subject lookup and **Export** | Read Subject and Read Instrument Record                                         |
-| A subject's **Table** and **Graph** tabs     | Read Subject, Read Instrument Record and Read Instrument                        |
-| A single record                              | Read Subject, Read Instrument Record and Read Instrument                        |
-| The files attached to a file record          | Group Manager or Admin base level (cannot be granted)                           |
-| A subject's **Assignments** tab              | Read Assignment and Read Instrument (the tab appears only with gateway support) |
-| Cancelling or emailing an assignment         | Update Assignment                                                               |
-| Instruments list                             | Read Instrument and Read Instrument Record                                      |
-| An instrument's **Table** and **Graph** tabs | Read Instrument and Read Instrument Record                                      |
+| Page or action                               | Permissions                                                                                                  |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Subjects list and subject lookup             | Read Subject and Read Instrument Record                                                                      |
+| **Download** on the subjects list            | Read Subject and Read Instrument Record, plus Read Instrument if the group has records collected by a series |
+| A subject's **Table** and **Graph** tabs     | Read Subject, Read Instrument Record, Read Instrument and Read Session                                       |
+| A single record                              | Read Subject, Read Instrument Record and Read Instrument                                                     |
+| The files attached to a file record          | Group Manager or Admin base level (cannot be granted)                                                        |
+| A subject's **Assignments** tab              | Read Assignment and Read Instrument (the tab appears only with gateway support)                              |
+| Cancelling an assignment                     | Update Assignment                                                                                            |
+| Emailing an assignment                       | Update Assignment, Read Assignment and Read Group (the form appears only with a configured mail server)      |
+| Instruments list                             | Read Instrument and Read Instrument Record                                                                   |
+| An instrument's **Table** and **Graph** tabs | Read Instrument, Read Instrument Record and Read Session                                                     |
 
-Every page shows only data from the group selected in the group switcher, and only for groups the user's permissions cover.
+Every page shows only data the user's permissions cover, and, except a subject's **Assignments** tab, only from the group selected in the group switcher.
 
 ### Example: Data Hub Access for a Standard User
 
