@@ -31,6 +31,8 @@ one.
    exits during boot; turbo kills its sibling dev servers, so `pnpm dev` ends in `ERROR run failed`
    over a nested `connect ECONNREFUSED ::1:9000` that never says storage. With it false, file
    instruments answer `503 File storage is not configured` and everything else works.
+   `pnpm test:e2e` ignores this setting: the api's `dev:test` sets `STORAGE_ENABLED=true` after it
+   loads `.env`, and in `NODE_ENV=test` the api never contacts storage at boot.
 
    Done when `grep STORAGE_ENABLED .env` reads `false`.
 
