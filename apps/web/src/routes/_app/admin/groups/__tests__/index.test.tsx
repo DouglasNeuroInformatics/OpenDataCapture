@@ -150,6 +150,18 @@ describe('Route', () => {
     expect(rows()[0]!.textContent).toContain('Alpha');
   });
 
+  it('should list archived groups first on the first sort by status, and active ones first on the second', () => {
+    mocks.groups = [
+      groupFixture({ id: 'a', name: 'Alpha' }),
+      groupFixture({ archivedAt: new Date('2026-03-04T12:00:00.000Z'), id: 'b', name: 'Beta' })
+    ];
+    renderPage();
+    fireEvent.click(headerButton('Status'));
+    expect(rows()[0]!.textContent).toContain('Beta');
+    fireEvent.click(headerButton('Status'));
+    expect(rows()[0]!.textContent).toContain('Alpha');
+  });
+
   it('should prefetch the groups and the instrument repositories, so the sheet never suspends', async () => {
     const queryClient = new QueryClient();
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);

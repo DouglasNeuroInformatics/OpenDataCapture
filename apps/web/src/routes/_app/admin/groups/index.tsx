@@ -159,7 +159,9 @@ const RouteComponent = () => {
             header: ({ column }) => <SortableHeader column={column} label={t('common.groupType')} />
           },
           {
-            accessorKey: 'archivedAt',
+            // `archivedAt` is nullish, and TanStack sorts `undefined` to the opposite end from `null`, so
+            // without one value for every active group, active groups could land on both sides of the archived.
+            accessorFn: (group) => group.archivedAt ?? null,
             cell: (ctx) => {
               const { archivedAt } = ctx.row.original;
               if (archivedAt) {
@@ -180,7 +182,9 @@ const RouteComponent = () => {
                 />
               );
             },
-            header: t({ en: 'Status', es: 'Estado', fr: 'Statut' }),
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Status', es: 'Estado', fr: 'Statut' })} />
+            ),
             id: 'status'
           }
         ]}
