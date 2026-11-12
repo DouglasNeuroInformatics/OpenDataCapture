@@ -39,6 +39,21 @@ export const $UploadInstrumentRecordsData = z.object({
   username: z.string().optional()
 });
 
+/** Number of records fetched per MongoDB batch during a streaming export. */
+export const INSTRUMENT_RECORDS_EXPORT_PAGE_SIZE = 1000;
+
+/** Maximum number of expanded measure rows packed into a single export stream frame. */
+export const INSTRUMENT_RECORDS_EXPORT_MAX_FRAME_ROWS = 1000;
+
+/** Upper bound on the records a single synchronous export will stream before asking to narrow filters. */
+export const INSTRUMENT_RECORDS_EXPORT_MAX_RECORDS = 250_000;
+
+export type $ExportInstrumentRecordsData = z.infer<typeof $ExportInstrumentRecordsData>;
+export const $ExportInstrumentRecordsData = z.object({
+  groupId: z.string().optional(),
+  subjectIds: z.array(z.string()).min(1).optional()
+});
+
 export type CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecordData>;
 
 export type UploadInstrumentRecordsData = z.infer<typeof $UploadInstrumentRecordsData>;
@@ -81,9 +96,9 @@ export type InstrumentRecordsExport = {
   seriesId: null | string;
   /** The title of that series instrument, or null if collected individually */
   seriesName: null | string;
-  sessionDate: string;
+  sessionDate: null | string;
   sessionId: string;
-  sessionType: SessionType;
+  sessionType: null | SessionType;
   subjectAge: null | number;
   subjectId: string;
   subjectSex: null | string;
@@ -91,6 +106,9 @@ export type InstrumentRecordsExport = {
   username: string;
   value: InstrumentMeasureValue;
 }[];
+
+export type InstrumentRecordsExportFrame =
+  { done: false; rows: InstrumentRecordsExport } | { done: true; rowCount: number };
 
 export const $LinearRegressionResults = z.record(
   z.string(),

@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { createAppAbility } from '@/auth/ability.utils';
 
+import { InstrumentRecordsExportService } from '../instrument-records-export.service';
 import { InstrumentRecordsController } from '../instrument-records.controller';
 import { InstrumentRecordsService } from '../instrument-records.service';
 
@@ -23,14 +24,19 @@ function getMinDatePipe(): ParseSchemaPipe<Date> {
 
 describe('InstrumentRecordsController', () => {
   let instrumentRecordsController: InstrumentRecordsController;
+  let instrumentRecordsExportService: MockedInstance<InstrumentRecordsExportService>;
   let instrumentRecordsService: MockedInstance<InstrumentRecordsService>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [InstrumentRecordsController],
-      providers: [MockFactory.createForService(InstrumentRecordsService)]
+      providers: [
+        MockFactory.createForService(InstrumentRecordsExportService),
+        MockFactory.createForService(InstrumentRecordsService)
+      ]
     }).compile();
     instrumentRecordsController = moduleRef.get(InstrumentRecordsController);
+    instrumentRecordsExportService = moduleRef.get(InstrumentRecordsExportService);
     instrumentRecordsService = moduleRef.get(InstrumentRecordsService);
   });
 
@@ -103,9 +109,13 @@ describe('InstrumentRecordsController', () => {
     expect(instrumentRecordsService.deleteById).toHaveBeenCalledWith('record-1', { ability });
   });
 
-  it('should export the records of the requested group, scoped to the caller ability', async () => {
-    await instrumentRecordsController.exportRecords(ability, 'group-1');
-    expect(instrumentRecordsService.exportRecords).toHaveBeenCalledWith({ groupId: 'group-1' }, { ability });
+  it('should export the records matching the request body, scoped to the caller ability and groups', async () => {
+    const data = { groupId: 'group-1', subjectIds: ['Group_1$subject-1'] };
+    await instrumentRecordsController.exportRecords(data, ability, [{ id: 'group-1' }]);
+    expect(instrumentRecordsExportService.exportRecords).toHaveBeenCalledWith(data, {
+      ability,
+      callerGroupIds: ['group-1']
+    });
   });
 
   it('should return the linear model computed for the instrument and group', async () => {

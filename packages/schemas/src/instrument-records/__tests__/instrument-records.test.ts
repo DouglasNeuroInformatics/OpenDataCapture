@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   $CreateInstrumentRecordData,
+  $ExportInstrumentRecordsData,
   $InstrumentRecord,
   $InstrumentRecordFile,
   $InstrumentRecordFiles,
@@ -63,6 +64,23 @@ describe('$UploadInstrumentRecordsData', () => {
         records: [{ data: { value: 1 }, date: '2024-01-01T00:00:00.000Z', subjectId: 'subject-1' }]
       }).success
     ).toBe(true);
+  });
+});
+
+describe('$ExportInstrumentRecordsData', () => {
+  it('should accept an empty filter object so API callers can export all accessible records', () => {
+    expect($ExportInstrumentRecordsData.safeParse({}).success).toBe(true);
+  });
+  it('should accept a group and non-empty list of subject ids', () => {
+    expect(
+      $ExportInstrumentRecordsData.safeParse({
+        groupId: 'group-1',
+        subjectIds: ['Group_A$subject-1']
+      }).success
+    ).toBe(true);
+  });
+  it('should reject an empty subjectIds array rather than silently exporting nothing', () => {
+    expect($ExportInstrumentRecordsData.safeParse({ subjectIds: [] }).success).toBe(false);
   });
 });
 

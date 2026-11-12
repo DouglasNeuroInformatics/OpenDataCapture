@@ -588,11 +588,11 @@ test.describe('server-side authorization', () => {
     });
   });
 
-  // The web client exports only the current group and then keeps only the subjects its table lists,
-  // so no screen can show whether the api itself leaves another group's records out. Both records
-  // belong to one subject enrolled in both groups, so only each record's own group separates them.
-  // The body is msgpack, whose entries carry their record's group id as a plain string and never the
-  // subject's groups, so its bytes are searched.
+  // The web client always passes the current group and listed subject ids in its export POST body, so
+  // no screen can show whether an unscoped POST to the API itself leaves another group's records out.
+  // Both records belong to one subject enrolled in both groups, so only each record's own group
+  // separates them. The body is a stream of msgpack frames whose entries carry their record's group id
+  // as a plain string and never the subject's groups, so its bytes are searched.
   test("should leave another group's records out of a group manager's export, even of a subject enrolled in both groups", async ({
     api,
     apiRequestContext,
@@ -606,7 +606,8 @@ test.describe('server-side authorization', () => {
     await api.uploadRecords(ownGroup.id, instrumentId, [happinessRecord(sharedSubjectId)]);
     await api.uploadRecords(foreignGroup.id, instrumentId, [happinessRecord(sharedSubjectId)]);
 
-    const response = await apiRequestContext.get(`${API}/instrument-records/export`, {
+    const response = await apiRequestContext.post(`${API}/instrument-records/export`, {
+      data: {},
       headers: { Authorization: `Bearer ${await ApiClient.login(apiRequestContext, credentials)}` }
     });
 

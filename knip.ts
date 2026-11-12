@@ -26,8 +26,6 @@ const config: KnipConfig = {
     'apps/api': {
       entry: [
         'libnest.config.ts!',
-        // spawned as a worker thread by path
-        'src/instrument-records/export-worker.js!',
         // test/app.test.ts imports the suites by reading the directory
         'test/**/*.ts'
       ],

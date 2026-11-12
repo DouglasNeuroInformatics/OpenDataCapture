@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
+import { INSTRUMENT_RECORDS_EXPORT_PAGE_SIZE } from '@opendatacapture/schemas/instrument-records';
 import type { Page } from '@playwright/test';
 
 import { DatahubPage } from '../pages/_app/datahub/subjects/index.page';
@@ -172,9 +173,9 @@ test.describe('data hub', () => {
     await expect(page).toHaveURL(/\/datahub\/subjects\/.+\/table$/);
   });
 
-  // The export endpoint returns every record in the group; which of them reach the file is decided
-  // client-side from the rows the table is currently listing. Nothing else covers that scoping, and
-  // getting it wrong hands the user another subject's data.
+  // The client sends the scoped ids of the rows the table is currently listing in its export POST
+  // body, and the server queries only those subjects' records. Asserting both the wire body and the
+  // saved file proves the filtered-out subject never leaves the server.
   test('should export only the subjects the table is listing', async ({
     api,
     isolatedGroupManager,
@@ -198,11 +199,47 @@ test.describe('data hub', () => {
     await datahubPage.searchInput.fill(listed);
     await expect(datahubPage.rows).toHaveCount(1);
 
+    const exportResponsePromise = page.waitForResponse(
+      (response) => response.url().endsWith('/v1/instrument-records/export') && response.request().method() === 'POST'
+    );
     const download = await datahubPage.exportAs('JSON');
+    const exportResponse = await exportResponsePromise;
+    expect((await exportResponse.body()).includes(filteredOut)).toBe(false);
+
     const payload = JSON.parse(await readFile(await download.path(), 'utf8')) as { subjectId: string }[];
 
     expect(payload.length).toBeGreaterThan(0);
     expect([...new Set(payload.map((row) => row.subjectId))]).toStrictEqual([listed]);
+  });
+
+  test('should stream an export spanning multiple pages without dropping records', async ({
+    api,
+    isolatedGroupManager,
+    page,
+    uniqueId
+  }) => {
+    const group = await isolatedGroupManager();
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    const subjectId = `paged-${uniqueId}`;
+    const totalRecords = INSTRUMENT_RECORDS_EXPORT_PAGE_SIZE + 5;
+    const batchSize = 350;
+    for (let offset = 0; offset < totalRecords; offset += batchSize) {
+      const count = Math.min(batchSize, totalRecords - offset);
+      await api.uploadRecords(
+        group.id,
+        instrumentId,
+        Array.from({ length: count }, () => ({ data: HAPPINESS_RECORD, date: new Date(), subjectId }))
+      );
+    }
+
+    const datahubPage = new DatahubPage(page);
+    await datahubPage.goto('/datahub/subjects');
+    await expect(datahubPage.rows).toHaveCount(1);
+
+    const download = await datahubPage.exportAs('JSON');
+    const payload = JSON.parse(await readFile(await download.path(), 'utf8')) as { sessionId: string }[];
+
+    expect(new Set(payload.map((row) => row.sessionId)).size).toBe(totalRecords);
   });
 
   test('should list only subjects holding records once a minimum record count is applied', async ({

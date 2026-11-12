@@ -68,10 +68,10 @@ describe('getListedSubjectIds', () => {
     expect([...getListedSubjectIds(table)]).toStrictEqual(['subject-a', 'subject-b', 'subject-c']);
   });
 
-  it('should strip the group scope, so the ids match the unscoped subject ids an export carries', () => {
+  it('should preserve the group scope, so the ids match the scoped subject ids stored on records', () => {
     const table = renderMasterTableLike(['Group_A$subject-a', 'Group_A$subject-b']);
 
-    expect([...getListedSubjectIds(table)]).toStrictEqual(['subject-a', 'subject-b']);
+    expect([...getListedSubjectIds(table)]).toStrictEqual(['Group_A$subject-a', 'Group_A$subject-b']);
   });
 
   it('should return an empty set when the table lists no subjects, so nothing is exported', () => {

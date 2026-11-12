@@ -1,7 +1,3 @@
-import { cpus } from 'node:os';
-import { join } from 'node:path';
-import { Worker } from 'node:worker_threads';
-
 import { replacer, reviver } from '@douglasneuroinformatics/libjs';
 import { InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroinformatics/libnest';
 import type { Model } from '@douglasneuroinformatics/libnest';
@@ -14,13 +10,11 @@ import {
   ServiceUnavailableException,
   UnprocessableEntityException
 } from '@nestjs/common';
-import { translateInstrument } from '@opendatacapture/instrument-utils';
 import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
   InstrumentRecordQueryParams,
-  InstrumentRecordsExport,
   InstrumentRecordSummary,
   LinearRegressionResults,
   SubjectRecordSummary,
@@ -42,14 +36,6 @@ import { SubjectsService } from '@/subjects/subjects.service';
 import { UsersService } from '@/users/users.service';
 
 import { InstrumentMeasuresService } from './instrument-measures.service';
-
-import type {
-  BeginChunkProcessingMessage,
-  InitInstruments,
-  InitMessage,
-  RecordType,
-  WorkerMessage
-} from './thread-types';
 
 type RecordSummaryFold = Map<string, { lastCollectedAt: Date | null; recordCount: number; subjectIds: Set<string> }>;
 
@@ -209,75 +195,6 @@ export class InstrumentRecordsService {
       });
     }
     return deletedRecord;
-  }
-
-  async exportRecords(
-    { groupId }: { groupId?: string } = {},
-    { ability }: Required<Pick<EntityOperationOptions, 'ability'>>
-  ): Promise<InstrumentRecordsExport> {
-    const records = await this.queryRecordsRaw(ability, groupId);
-
-    const instrumentIds = new Set(records.map((r) => r.instrumentId));
-
-    const instrumentsArray = await Promise.all(
-      instrumentIds.values().map((id) => this.instrumentsService.findById(id) as Promise<ScalarInstrument>)
-    );
-
-    const instruments = new Map(instrumentsArray.map((instrument) => [instrument.id, instrument]));
-
-    const seriesNames = await this.resolveSeriesNames(records, { ability });
-
-    const numWorkers = Math.min(cpus().length, Math.ceil(records.length / 100)); // Use up to CPU count, chunk size 100
-    const chunkSize = Math.ceil(records.length / numWorkers);
-    const chunks = [];
-
-    for (let i = 0; i < records.length; i += chunkSize) {
-      chunks.push(records.slice(i, i + chunkSize));
-    }
-
-    const availableInstrumentArray: InitInstruments = instruments
-      .values()
-      .toArray()
-      .map((item) => {
-        return {
-          edition: item.internal.edition,
-          id: item.id!,
-          name: item.internal.name
-        };
-      });
-
-    const workerPromises = chunks.map((chunk) => {
-      return new Promise<InstrumentRecordsExport>((resolve, reject) => {
-        const worker = new Worker(join(import.meta.dirname, 'export-worker.js'));
-        worker.postMessage({
-          data: { instruments: availableInstrumentArray, seriesNames },
-          type: 'INIT'
-        } satisfies InitMessage);
-
-        // The worker only ever acknowledges INIT with `{ success: true }`; a failure inside it arrives
-        // as an `error` event instead, handled below.
-        worker.on('message', () => {
-          worker.postMessage({ data: chunk, type: 'BEGIN_CHUNK_PROCESSING' } satisfies BeginChunkProcessingMessage);
-          worker.on('message', (message: WorkerMessage) => {
-            if (message.success) {
-              resolve(message.data);
-            } else {
-              reject(new Error(message.error));
-            }
-            void worker.terminate();
-          });
-        });
-
-        worker.on('error', (error) => {
-          reject(error as Error);
-          void worker.terminate();
-        });
-      });
-    });
-
-    const results = await Promise.all(workerPromises);
-
-    return results.flat();
   }
 
   async find(
@@ -581,145 +498,6 @@ export class InstrumentRecordsService {
 
   private parseJson(data: unknown) {
     return JSON.parse(JSON.stringify(data), reviver) as unknown;
-  }
-
-  private async queryRecordsRaw(appAbility: AppAbility, groupId?: string) {
-    const pipeline = [
-      {
-        // Join with Session collection
-        $lookup: {
-          as: 'session',
-          foreignField: '_id',
-          from: 'SessionModel',
-          localField: 'sessionId' // Ensure this matches your @map or field name in Prisma
-        }
-      },
-      { $unwind: { path: '$session', preserveNullAndEmptyArrays: true } },
-      {
-        // session.userId is an ObjectId reference to UserModel, but a small number of legacy
-        // sessions have it stored as a plain string; $convert normalizes both to a real ObjectId
-        // (or null, if the session has no user) so the following $lookup can match on it.
-        $addFields: {
-          'session.userObjectId': {
-            $convert: { input: '$session.userId', onError: null, onNull: null, to: 'objectId' }
-          }
-        }
-      },
-      {
-        // Join with User collection, to resolve the username of whoever ran the session
-        $lookup: {
-          as: 'sessionUser',
-          foreignField: '_id',
-          from: 'UserModel',
-          localField: 'session.userObjectId'
-        }
-      },
-      { $unwind: { path: '$sessionUser', preserveNullAndEmptyArrays: true } },
-      {
-        // Join with Subject collection
-        $lookup: {
-          as: 'subject',
-          foreignField: '_id',
-          from: 'SubjectModel',
-          localField: 'subjectId'
-        }
-      },
-      { $unwind: { path: '$subject', preserveNullAndEmptyArrays: true } },
-      {
-        $match: {
-          $expr: groupId
-            ? {
-                $eq: ['$groupId', { $toObjectId: groupId }]
-              }
-            : {}
-        }
-      },
-      {
-        $project: {
-          computedMeasures: 1,
-          date: {
-            $dateToString: {
-              date: '$createdAt',
-              format: '%Y-%m-%d'
-            }
-          },
-          // `$ifNull` for the same reason as in `summarizeRecords`: `$toString` of a missing field is
-          // itself missing, so a record belonging to no group would drop `groupId` from the row
-          // entirely and arrive as undefined behind a type that says it is a string.
-          groupId: { $toString: { $ifNull: ['$groupId', null] } },
-          id: {
-            $toString: '$_id'
-          },
-          instrumentId: 1,
-          seriesInstrumentId: { $ifNull: ['$seriesInstrumentId', null] },
-          session: {
-            date: {
-              $dateToString: {
-                date: '$session.date',
-                format: '%Y-%m-%d'
-              }
-            },
-            id: {
-              $toString: '$session._id'
-            },
-            type: '$session.type',
-            user: { username: '$sessionUser.username' }
-          },
-          // sessionId: 1,
-          subject: {
-            age: {
-              $dateDiff: {
-                endDate: '$$NOW',
-                startDate: '$subject.dateOfBirth',
-                unit: 'year'
-              }
-            },
-            dateOfBirth: '$subject.dateOfBirth',
-            groupIds: '$subject.groupIds', // TBD make sure groupIds is string array
-            id: {
-              $toString: '$subject._id'
-            },
-            sex: '$subject.sex'
-          }
-        }
-      }
-    ];
-
-    const records = (await this.instrumentRecordModel.aggregateRaw({ pipeline })) as unknown as RecordType[];
-
-    /**
-     * We need to create a shallow copy of all records here, as the aggregateRaw method returns objects
-     * with the Symbol(nodejs.util.inspect.custom) property defined, which is not serializable.
-     */
-
-    // Raw rows carry no model name, so CASL would resolve them as `Object` and match only `manage all`
-    return records
-      .filter((record) => appAbility.can('read', forcedAppSubject('InstrumentRecord', { groupId: record.groupId })))
-      .map((record) => ({ ...record }));
-  }
-
-  /**
-   * Map every series instrument referenced by these records to its title.
-   *
-   * A series instrument has no `internal.name`, so unlike the scalar instruments beside it in the
-   * export there is no language-independent identifier to use — the title is translated here, to
-   * `en`, because a background worker has no request language. The stable identifier an analysis
-   * should key on is the accompanying `seriesId`.
-   */
-  private async resolveSeriesNames(
-    records: RecordType[],
-    { ability }: EntityOperationOptions = {}
-  ): Promise<{ [id: string]: string }> {
-    const seriesIds = new Set(
-      records.flatMap((record) => (record.seriesInstrumentId ? [record.seriesInstrumentId] : []))
-    );
-    const entries = await Promise.all(
-      seriesIds.values().map(async (id) => {
-        const instrument = await this.instrumentsService.findById(id, { ability });
-        return [id, translateInstrument(instrument, 'en').details.title] as const;
-      })
-    );
-    return Object.fromEntries(entries);
   }
 
   private serializeData(data: unknown) {

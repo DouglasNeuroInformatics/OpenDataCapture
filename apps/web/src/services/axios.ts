@@ -17,6 +17,8 @@ declare module 'axios' {
       // message (e.g. a mutation onError) without the user seeing two notifications.
       disableDefaultErrorNotification?: boolean;
       disableDefaultTimeout?: boolean;
+      // Opt a read-only non-GET request (such as POST /v1/instrument-records/export) into transient retries.
+      idempotent?: boolean;
     };
     // Internal: number of transient-failure retries already attempted for this request.
     retryCount?: number;
@@ -54,10 +56,10 @@ function isTransientError(error: unknown): boolean {
   return RETRYABLE_STATUS_CODES.has(error.response.status);
 }
 
-/** Only idempotent methods are safe to retry automatically — retrying a write risks duplicate submissions. */
+/** Only idempotent requests are safe to retry automatically — retrying a write risks duplicate submissions. */
 function isRetryable(requestConfig: InternalAxiosRequestConfig, error: unknown): boolean {
   const method = requestConfig.method?.toLowerCase();
-  if (!method || !IDEMPOTENT_METHODS.has(method)) {
+  if (!method || (!IDEMPOTENT_METHODS.has(method) && !requestConfig.meta?.idempotent)) {
     return false;
   }
   return isTransientError(error);

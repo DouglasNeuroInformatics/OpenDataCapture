@@ -71,7 +71,7 @@ spread silently drops a condition when the generated query and the literal share
 **Plain objects need `forcedAppSubject(name, partial)`** before `ability.can`, which stamps the
 `__modelName` that `detectAppSubject` reads; without it a plain object resolves to `Object` and only
 `manage all` passes. Prisma results already carry `__modelName` (`LibnestPrismaExtension`). Rows from
-`aggregateRaw` are plain objects, which is why `queryRecordsRaw` in
+`aggregateRaw` are plain objects, which is why `summarizeRecords` in
 `src/instrument-records/instrument-records.service.ts` checks each one this way.
 
 ## Where an ability comes from
