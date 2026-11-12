@@ -1,6 +1,5 @@
 import { isEqual } from 'lodash-es';
 
-/** A model row, which carries the ids in each named field as a list whose order means nothing. */
 type RowWithIdLists<TIdListField extends string> = { [field: string]: unknown; updatedAt: Date } & {
   [TField in TIdListField]: string[];
 };
@@ -18,18 +17,13 @@ const namesOfChangedFields = (before: Map<string, unknown>, after: Map<string, u
     .sort();
 };
 
-/**
- * The names of the fields that differ between a record's data before and after an update, sorted.
- * Every value is compared as it is, order included, because the data is what the instrument
- * collected.
- */
+/** Every value is compared as it is, order included, because the data is what the instrument collected. */
 export function changedDataFields(before: unknown, after: unknown): string[] {
   return namesOfChangedFields(fieldValues(before), fieldValues(after));
 }
 
 /**
- * The names of the fields that differ between a model row before and after an update, sorted. The
- * web forms resubmit every field and rebuild each id list in their own order, so an id list that
+ * The web forms resubmit every field and rebuild each id list in their own order, so an id list that
  * holds the same ids is unchanged; `updatedAt` is left out, since every write sets it.
  */
 export function changedRowFields<TIdListField extends string>(
