@@ -388,6 +388,20 @@ describe('Route', () => {
     }
   });
 
+  it('should close the confirmation of an archive it ignores, so the next sheet does not open on it', () => {
+    const removeStyle = animateSheetExit();
+    try {
+      renderPage();
+      fireEvent.keyDown(openSheet(), { key: 'Escape' });
+      fireEvent.click(screen.getByRole('button', { name: 'Archive' }));
+      fireEvent.click(screen.getByTestId('confirm-archive-group'));
+      const confirmation = screen.getByText('Are you absolutely sure?').closest('[role="dialog"]')!;
+      expect(confirmation.getAttribute('data-state')).toBe('closed');
+    } finally {
+      removeStyle();
+    }
+  });
+
   it('should ignore an archive confirmed from a sheet that is already closing, rather than crash on the cleared selection', () => {
     const removeStyle = animateSheetExit();
     const uncaughtErrors: unknown[] = [];

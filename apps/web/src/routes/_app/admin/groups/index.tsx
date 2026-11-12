@@ -101,6 +101,8 @@ const RouteComponent = () => {
 
   const handleArchive = () => {
     if (!selectedGroup) {
+      // The confirmation lives inside the sheet, so left open it would greet the next group's sheet.
+      setIsConfirmArchiveOpen(false);
       return;
     }
     archiveGroupMutation.mutate(
