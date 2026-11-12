@@ -1,15 +1,8 @@
-import { isEqual, isEqualWith } from 'lodash-es';
+import { isEqual } from 'lodash-es';
 
-const isStringList = (value: unknown): value is string[] => {
-  return Array.isArray(value) && value.every((item) => typeof item === 'string');
-};
-
-/** A list of strings is a list of ids here, and one that is only reordered has not changed. */
-const compareStringListsAsSets = (value: unknown, other: unknown): boolean | undefined => {
-  if (isStringList(value) && isStringList(other)) {
-    return isEqual(value.toSorted(), other.toSorted());
-  }
-  return undefined;
+/** A model row, which carries the ids in each named field as a list whose order means nothing. */
+type RowWithIdLists<TIdListField extends string> = { [field: string]: unknown; updatedAt: Date } & {
+  [TField in TIdListField]: string[];
 };
 
 const fieldValues = (value: unknown): Map<string, unknown> => {
@@ -19,17 +12,36 @@ const fieldValues = (value: unknown): Map<string, unknown> => {
   return new Map(Object.entries(value));
 };
 
-/**
- * The names of the fields that differ between a row, or a record's data, before and after an
- * update, sorted.
- */
-export function changedFields(before: unknown, after: unknown): string[] {
-  const beforeValues = fieldValues(before);
-  const afterValues = fieldValues(after);
-  const fields = new Set([...beforeValues.keys(), ...afterValues.keys()]);
-  // Every write sets it, so it would name every update as a change.
-  fields.delete('updatedAt');
-  return [...fields]
-    .filter((field) => !isEqualWith(beforeValues.get(field), afterValues.get(field), compareStringListsAsSets))
+const namesOfChangedFields = (before: Map<string, unknown>, after: Map<string, unknown>): string[] => {
+  return [...new Set([...before.keys(), ...after.keys()])]
+    .filter((field) => !isEqual(before.get(field), after.get(field)))
     .sort();
+};
+
+/**
+ * The names of the fields that differ between a record's data before and after an update, sorted.
+ * Every value is compared as it is, order included, because the data is what the instrument
+ * collected.
+ */
+export function changedDataFields(before: unknown, after: unknown): string[] {
+  return namesOfChangedFields(fieldValues(before), fieldValues(after));
+}
+
+/**
+ * The names of the fields that differ between a model row before and after an update, sorted. The
+ * web forms resubmit every field and rebuild each id list in their own order, so an id list that
+ * holds the same ids is unchanged; `updatedAt` is left out, since every write sets it.
+ */
+export function changedRowFields<TIdListField extends string>(
+  before: RowWithIdLists<TIdListField>,
+  after: RowWithIdLists<TIdListField>,
+  idListFields: readonly TIdListField[]
+): string[] {
+  const rowValues = (row: RowWithIdLists<TIdListField>) => {
+    const values = fieldValues(row);
+    values.delete('updatedAt');
+    idListFields.forEach((field) => values.set(field, row[field].toSorted()));
+    return values;
+  };
+  return namesOfChangedFields(rowValues(before), rowValues(after));
 }

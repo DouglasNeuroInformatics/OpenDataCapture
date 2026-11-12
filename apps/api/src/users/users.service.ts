@@ -20,7 +20,7 @@ import type { Prisma } from '@prisma/client';
 import { pwnedPassword } from 'hibp';
 
 import { AuditLogger } from '@/audit/audit.logger';
-import { changedFields } from '@/audit/audit.utils';
+import { changedRowFields } from '@/audit/audit.utils';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -349,7 +349,7 @@ export class UsersService {
     after: UserRow,
     { password, userId }: { password?: string; userId: string }
   ): Promise<void> {
-    const fields = changedFields(before, after);
+    const fields = changedRowFields(before, after, ['groupIds']);
     await this.auditLogger.logUpdate('USER', password ? [...fields, 'password'] : fields, {
       groupId: null,
       metadata: { targetUserId: after.id },

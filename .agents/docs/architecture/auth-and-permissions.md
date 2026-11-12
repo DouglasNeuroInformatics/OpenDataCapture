@@ -128,9 +128,10 @@ that a grantable pair used to reach belongs in the same predicate.
   the web audit log page derives its filters from it. The Prisma enums are wider. An entry is
   written where the signed-in user is known, so in the controller when setup, demo seeding, repository
   sync or the gateway also call the service method. An update goes through `AuditLogger.logUpdate`,
-  which records the names of the fields `changedFields` (`src/audit/audit.utils.ts`) finds changed,
-  never their values, since every admin reads the log; an update that changed nothing writes no
-  entry. Entries are written after the change, not in its transaction.
+  which records the names of the changed fields, never their values, since every admin reads the
+  log; an update that changed nothing writes no entry. `src/audit/audit.utils.ts` names them:
+  `changedRowFields` for a model row, `changedDataFields` for a record's data. Entries are written
+  after the change, not in its transaction.
 - **`user.hashedPassword` and `assignment.encryptionKeyPair` are globally omitted** by the client in
   `src/core/prisma.ts`. `UsersService.findByUsername({ includeHashedPassword: true })` is how login
   reads the hash; `AssignmentsService.findPrivateKeyById`, called only by the gateway synchronizer,

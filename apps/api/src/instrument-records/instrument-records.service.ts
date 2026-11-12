@@ -31,7 +31,7 @@ import type { InstrumentRecord as PrismaInstrumentRecord } from '@prisma/client'
 import { cloneDeep, isNumber, mergeWith, pickBy } from 'lodash-es';
 
 import { AuditLogger } from '@/audit/audit.logger';
-import { changedFields } from '@/audit/audit.utils';
+import { changedDataFields } from '@/audit/audit.utils';
 import { accessibleQuery, forcedAppSubject } from '@/auth/ability.utils';
 import type { AppAbility } from '@/auth/auth.types';
 import type { RuntimePrismaClient } from '@/core/prisma';
@@ -469,6 +469,9 @@ export class InstrumentRecordsService {
       });
     }
 
+    // Named before the write: data whose changes cannot be named fails here, with nothing written
+    // that the log would miss.
+    const fields = changedDataFields(storedData, parseResult.data);
     const updated = await this.instrumentRecordModel.update({
       data: {
         computedMeasures: instrument.measures
@@ -478,7 +481,7 @@ export class InstrumentRecordsService {
       },
       where
     });
-    await this.auditLogger.logUpdate('INSTRUMENT_RECORD', changedFields(storedData, parseResult.data), {
+    await this.auditLogger.logUpdate('INSTRUMENT_RECORD', fields, {
       groupId: instrumentRecord.groupId,
       metadata: { recordId: id },
       userId: currentUser.id

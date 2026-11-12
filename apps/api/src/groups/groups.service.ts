@@ -7,7 +7,7 @@ import type { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { AuditLogger } from '@/audit/audit.logger';
-import { changedFields } from '@/audit/audit.utils';
+import { changedRowFields } from '@/audit/audit.utils';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 
@@ -157,7 +157,13 @@ export class GroupsService {
         }
         throw err;
       });
-    await this.auditLogger.logUpdate('GROUP', changedFields(group, updated), { groupId: id, userId: currentUser.id });
+    const fields = changedRowFields(group, updated, [
+      'accessibleInstrumentIds',
+      'instrumentRepoIds',
+      'subjectIds',
+      'userIds'
+    ]);
+    await this.auditLogger.logUpdate('GROUP', fields, { groupId: id, userId: currentUser.id });
     return updated;
   }
 

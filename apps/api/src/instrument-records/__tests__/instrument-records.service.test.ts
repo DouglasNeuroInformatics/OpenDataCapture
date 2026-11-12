@@ -1366,6 +1366,16 @@ describe('InstrumentRecordsService', () => {
       });
     });
 
+    it('should refuse to write data whose changes it cannot name, so no update goes unrecorded', async () => {
+      useRecord(null);
+      useInstrument();
+
+      await expect(instrumentRecordsService.updateById('record-1', { answer: 2 }, currentUser)).rejects.toThrow(
+        TypeError
+      );
+      expect(instrumentRecordModel.update).not.toHaveBeenCalled();
+    });
+
     it('should record no update the schema rejected', async () => {
       useRecord({ answer: 1 });
       useInstrument({

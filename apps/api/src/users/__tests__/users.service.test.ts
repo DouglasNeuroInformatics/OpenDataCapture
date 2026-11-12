@@ -312,7 +312,7 @@ describe('UsersService', () => {
 
     beforeEach(() => {
       userModel.findFirst.mockResolvedValue(storedUser);
-      userModel.update.mockResolvedValue({});
+      userModel.update.mockResolvedValue(storedUser);
     });
 
     it('should drop the grants confined to a group the user is leaving, and keep every other one', async () => {
@@ -480,9 +480,11 @@ describe('UsersService', () => {
   });
 
   describe('updatePermissions', () => {
+    const storedUser = { basePermissionLevel: 'STANDARD', groupIds: ['group-1'], id: 'user-1' };
+
     beforeEach(() => {
-      userModel.findFirst.mockResolvedValue({ basePermissionLevel: 'STANDARD', groupIds: ['group-1'], id: 'user-1' });
-      userModel.update.mockResolvedValue({});
+      userModel.findFirst.mockResolvedValue(storedUser);
+      userModel.update.mockResolvedValue(storedUser);
     });
 
     describe('custom grants', () => {
@@ -594,8 +596,8 @@ describe('UsersService', () => {
     const currentUser = { id: 'user-1', username: 'jane.doe' } as any;
 
     beforeEach(() => {
-      userModel.findFirst.mockResolvedValue({ hashedPassword: 'hashed-current', id: 'user-1' });
-      userModel.update.mockResolvedValue({});
+      userModel.findFirst.mockResolvedValue({ groupIds: [], hashedPassword: 'hashed-current', id: 'user-1' });
+      userModel.update.mockResolvedValue({ groupIds: [], id: 'user-1' });
       cryptoService.comparePassword.mockResolvedValue(false);
     });
 
@@ -625,8 +627,8 @@ describe('UsersService', () => {
     });
 
     it('should record the fields the user changed on their own account, never their values', async () => {
-      userModel.findFirst.mockResolvedValue({ firstName: 'Jane', id: 'user-1', mustResetPassword: true });
-      userModel.update.mockResolvedValue({ firstName: 'Janet', id: 'user-1', mustResetPassword: false });
+      userModel.findFirst.mockResolvedValue({ firstName: 'Jane', groupIds: [], id: 'user-1', mustResetPassword: true });
+      userModel.update.mockResolvedValue({ firstName: 'Janet', groupIds: [], id: 'user-1', mustResetPassword: false });
       await usersService.updateSelfById('user-1', { firstName: 'Janet', password: 'jf8&Kd0!mZq2wLx' }, currentUser);
       expect(auditLogger.logUpdate).toHaveBeenCalledWith('USER', ['firstName', 'mustResetPassword', 'password'], {
         groupId: null,
