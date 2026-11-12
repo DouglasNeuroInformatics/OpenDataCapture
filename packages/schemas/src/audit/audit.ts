@@ -18,6 +18,24 @@ export const $AuditLogEntity = z.enum([
   'USER'
 ]);
 
+export type AuditedEntity = keyof typeof AUDITED_ACTIONS;
+
+export type AuditedAction<TEntity extends AuditedEntity = AuditedEntity> = (typeof AUDITED_ACTIONS)[TEntity][number];
+
+/**
+ * The (entity, action) pairs the API writes. `AuditLogger.log` accepts no other pair, and the audit
+ * log page offers no other filter. The two enums above are wider, because they also parse what the
+ * stored rows hold.
+ */
+export const AUDITED_ACTIONS = {
+  ASSIGNMENT: ['CREATE', 'DELETE', 'SEND_EMAIL', 'UPDATE'],
+  GROUP: ['CREATE', 'UPDATE'],
+  INSTRUMENT: ['ARCHIVE', 'CREATE', 'DELETE', 'UNARCHIVE'],
+  INSTRUMENT_RECORD: ['DELETE', 'UPDATE'],
+  SUBJECT: ['DELETE'],
+  USER: ['ARCHIVE', 'CREATE', 'LOGIN', 'UNARCHIVE', 'UPDATE']
+} as const satisfies { [TEntity in $AuditLogEntity]?: readonly $AuditLogAction[] };
+
 /** The number of audit logs shown per page, matching the page size used by the client's data table. */
 export const AUDIT_LOGS_PAGE_SIZE = 10;
 

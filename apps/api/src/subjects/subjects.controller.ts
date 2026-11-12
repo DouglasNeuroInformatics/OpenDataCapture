@@ -1,8 +1,10 @@
 import { $BooleanLike } from '@douglasneuroinformatics/libjs';
 import { ApiOperation, CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
 import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import z from 'zod/v4';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
 
@@ -10,18 +12,28 @@ import { SubjectsService } from './subjects.service';
 
 @Controller('subjects')
 export class SubjectsController {
-  constructor(private readonly subjectsService: SubjectsService) {}
+  constructor(
+    private readonly subjectsService: SubjectsService,
+    private readonly auditLogger: AuditLogger
+  ) {}
 
   @ApiOperation({ summary: 'Delete Subject' })
   @Delete(':id')
   @RouteAccess({ action: 'delete', subject: 'Subject' })
-  deleteById(
+  async deleteById(
     @Param('id', new ParseSchemaPipe({ schema: z.string().transform((value) => decodeURIComponent(value)) }))
     id: string,
     @Query('force', new ParseSchemaPipe({ isOptional: true, schema: $BooleanLike })) force: boolean | undefined,
-    @CurrentUser('ability') ability: AppAbility
+    @CurrentUser() currentUser: RequestUser
   ) {
-    return this.subjectsService.deleteById(id, { ability, force });
+    const { deletedRecordCount } = await this.subjectsService.deleteById(id, { ability: currentUser.ability, force });
+    // A subject can belong to several groups and the route names none, so the entry names no group.
+    await this.auditLogger.log('DELETE', 'SUBJECT', {
+      groupId: null,
+      metadata: { force: String(force === true), recordCount: String(deletedRecordCount), subjectId: id },
+      userId: currentUser.id
+    });
+    return { success: true };
   }
 
   @ApiOperation({ summary: 'Get All Subjects' })

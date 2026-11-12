@@ -356,7 +356,7 @@ test.describe('mail delivery', () => {
       const result = await api.sendAssignmentEmail(assignment.id, { language: 'en', recipient });
       expect(result.status).toBe('FAILED');
 
-      const entries = await api.findAuditLogs('SEND_EMAIL');
+      const entries = await api.findAuditLogs({ action: 'SEND_EMAIL', entity: 'ASSIGNMENT' });
       const entry = entries.find(({ metadata }) => metadata?.assignmentId === assignment.id);
       expect(entry?.metadata?.recipient).toBe('p***@example.org');
       expect(JSON.stringify(entries)).not.toContain(recipient);

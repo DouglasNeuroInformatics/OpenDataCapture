@@ -124,7 +124,10 @@ export class SubjectsService {
     });
   }
 
-  async deleteById(id: string, { ability, force }: EntityOperationOptions & { force?: boolean } = {}) {
+  async deleteById(
+    id: string,
+    { ability, force }: EntityOperationOptions & { force?: boolean } = {}
+  ): Promise<{ deletedRecordCount: number }> {
     const where = { AND: [accessibleQuery(ability, 'delete', 'Subject')], id };
     const subject = await this.subjectModel.findFirst({ where });
     if (!subject) {
@@ -132,7 +135,7 @@ export class SubjectsService {
     }
     if (!force) {
       await this.subjectModel.delete({ where });
-      return { success: true };
+      return { deletedRecordCount: 0 };
     }
     const recordWhere = { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], subjectId: subject.id };
     const records = await this.prismaClient.instrumentRecord.findMany({
@@ -143,7 +146,7 @@ export class SubjectsService {
     const files = await this.prismaClient.instrumentRecordFile.findMany({
       where: { recordId: { in: recordIds } }
     });
-    await this.prismaClient.$transaction([
+    const [, deletedRecords] = await this.prismaClient.$transaction([
       this.prismaClient.instrumentRecordFile.deleteMany({ where: { id: { in: files.map((file) => file.id) } } }),
       this.prismaClient.instrumentRecord.deleteMany({
         where: { ...recordWhere, id: { in: recordIds } }
@@ -167,7 +170,7 @@ export class SubjectsService {
         message: `Failed to delete storage objects after deleting subject '${id}'; orphaned objects require cleanup`
       });
     }
-    return { success: true };
+    return { deletedRecordCount: deletedRecords.count };
   }
 
   async find(

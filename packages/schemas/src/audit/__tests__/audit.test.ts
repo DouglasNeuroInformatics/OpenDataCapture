@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { $AuditLogsQueryParams, AUDIT_LOGS_MAX_PAGE_SIZE, AUDIT_LOGS_PAGE_SIZE } from '../audit.js';
+import { $AuditLogsQueryParams, AUDIT_LOGS_MAX_PAGE_SIZE, AUDIT_LOGS_PAGE_SIZE, AUDITED_ACTIONS } from '../audit.js';
+
+describe('AUDITED_ACTIONS', () => {
+  it.each(Object.entries(AUDITED_ACTIONS))(
+    'should declare each action written on %s once, so a filter menu cannot offer it twice',
+    (_entity, actions) => {
+      expect(new Set(actions).size).toBe(actions.length);
+    }
+  );
+});
 
 describe('$AuditLogsQueryParams', () => {
   it('should read the page and limit from their query string form', () => {

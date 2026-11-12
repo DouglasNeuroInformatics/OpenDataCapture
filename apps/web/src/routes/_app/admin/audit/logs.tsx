@@ -3,10 +3,15 @@ import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { snakeToCamelCase, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { Button, DataTable, DropdownMenu, Heading } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import { $AuditLogsQuerySearchParams, $AuditLogsSortBy } from '@opendatacapture/schemas/audit';
-import type {
+import {
   $AuditLogAction,
   $AuditLogEntity,
+  $AuditLogsQuerySearchParams,
+  $AuditLogsSortBy,
+  AUDITED_ACTIONS
+} from '@opendatacapture/schemas/audit';
+import type {
+  AuditedEntity,
   $AuditLogsQuerySearchParams as AuditLogsSearchParams
 } from '@opendatacapture/schemas/audit';
 import { createFileRoute } from '@tanstack/react-router';
@@ -31,17 +36,31 @@ const INITIAL_PAGE = 1;
 
 const INITIAL_SORT: { sortBy: $AuditLogsSortBy; sortOrder: SortOrder } = { sortBy: 'timestamp', sortOrder: 'desc' };
 
-const ACTIONS: $AuditLogAction[] = ['CREATE', 'DELETE', 'UPDATE', 'ARCHIVE', 'UNARCHIVE', 'LOGIN', 'SEND_EMAIL'];
+const isAuditedEntity = (entity: $AuditLogEntity): entity is AuditedEntity => Object.hasOwn(AUDITED_ACTIONS, entity);
 
-const ENTITIES: $AuditLogEntity[] = [
-  'ASSIGNMENT',
-  'GROUP',
-  'INSTRUMENT',
-  'INSTRUMENT_RECORD',
-  'SESSION',
-  'SUBJECT',
-  'USER'
-];
+const isAudited = (entity: AuditedEntity, action: $AuditLogAction) => {
+  const actions: readonly $AuditLogAction[] = AUDITED_ACTIONS[entity];
+  return actions.includes(action);
+};
+
+const ENTITIES = $AuditLogEntity.options.filter(isAuditedEntity).sort();
+
+const ACTIONS = $AuditLogAction.options.filter((action) => ENTITIES.some((entity) => isAudited(entity, action)));
+
+const actionsOn = (entity: AuditedEntity | undefined) => {
+  return entity ? ACTIONS.filter((action) => isAudited(entity, action)) : ACTIONS;
+};
+
+/**
+ * An old link or an edited URL can name an entity nothing writes, or an action never written on the
+ * chosen entity. Either is dropped, so the page never filters by a value its menus cannot show or
+ * clear.
+ */
+const $AuditedLogsSearchParams = $AuditLogsQuerySearchParams.transform(({ action, entity, ...search }) => {
+  const auditedEntity = entity && isAuditedEntity(entity) ? entity : undefined;
+  const auditedAction = action && actionsOn(auditedEntity).includes(action) ? action : undefined;
+  return { ...search, action: auditedAction, entity: auditedEntity };
+});
 
 const DateFormatMenu = ({ onChange, value }: { onChange: (value: DateFormat) => void; value: DateFormat }) => {
   const { t } = useTranslation();
@@ -89,6 +108,9 @@ const AuditLogsToolbar = () => {
   };
 
   const availableUsers = search.groupId ? users.filter((user) => user.groupIds.includes(search.groupId!)) : users;
+  const { action: selectedAction, entity: selectedEntity } = search;
+  const availableActions = actionsOn(selectedEntity);
+  const availableEntities = selectedAction ? ENTITIES.filter((entity) => isAudited(entity, selectedAction)) : ENTITIES;
   const hasFilters = Object.values(search).some((value) => value !== undefined);
 
   const localize = (value: $AuditLogAction | $AuditLogEntity) => t(`common.${snakeToCamelCase(toLowerCase(value))}`);
@@ -119,7 +141,7 @@ const AuditLogsToolbar = () => {
         allLabel={t({ en: 'Any Action', es: 'Cualquier acción', fr: 'Toute action' })}
         data-testid="audit-logs-filter-action"
         label={t('common.action')}
-        options={ACTIONS.map((action) => ({ label: localize(action), value: action }))}
+        options={availableActions.map((action) => ({ label: localize(action), value: action }))}
         value={search.action}
         onValueChange={(action) => setSearch({ action })}
       />
@@ -127,7 +149,7 @@ const AuditLogsToolbar = () => {
         allLabel={t({ en: 'Any Entity', es: 'Cualquier entidad', fr: 'Toute entité' })}
         data-testid="audit-logs-filter-entity"
         label={t('common.entity')}
-        options={ENTITIES.map((entity) => ({ label: localize(entity), value: entity }))}
+        options={availableEntities.map((entity) => ({ label: localize(entity), value: entity }))}
         value={search.entity}
         onValueChange={(entity) => setSearch({ entity })}
       />
@@ -310,5 +332,5 @@ export const Route = createFileRoute('/_app/admin/audit/logs')({
       context.queryClient.ensureQueryData(usersQueryOptions())
     ]);
   },
-  validateSearch: $AuditLogsQuerySearchParams
+  validateSearch: $AuditedLogsSearchParams
 });

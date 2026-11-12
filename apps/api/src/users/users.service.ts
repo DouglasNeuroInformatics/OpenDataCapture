@@ -20,6 +20,7 @@ import type { Prisma } from '@prisma/client';
 import { pwnedPassword } from 'hibp';
 
 import { AuditLogger } from '@/audit/audit.logger';
+import { changedRowFields } from '@/audit/audit.utils';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GroupsService } from '@/groups/groups.service';
@@ -27,6 +28,8 @@ import { PermissionSetsService } from '@/permission-sets/permission-sets.service
 
 /** Usernames are matched ignoring case, which the case-sensitive unique index cannot enforce. */
 const matchingUsername = (username: string): Prisma.StringFilter<'User'> => ({ equals: username, mode: 'insensitive' });
+
+type UserRow = Awaited<ReturnType<UsersService['findById']>>;
 
 @Injectable()
 export class UsersService {
@@ -51,9 +54,9 @@ export class UsersService {
       },
       where: { AND: [accessibleQuery(currentUser.ability, 'update', 'User')], id }
     });
-    await this.auditLogger.log('UPDATE', 'USER', {
+    await this.auditLogger.log('ARCHIVE', 'USER', {
       groupId: null,
-      metadata: { action: 'archive', targetUserId: id },
+      metadata: { targetUserId: id },
       userId: currentUser.id
     });
     return user;
@@ -211,9 +214,9 @@ export class UsersService {
       },
       where: { AND: [accessibleQuery(currentUser.ability, 'update', 'User')], id }
     });
-    await this.auditLogger.log('UPDATE', 'USER', {
+    await this.auditLogger.log('UNARCHIVE', 'USER', {
       groupId: null,
-      metadata: { action: 'unarchive', targetUserId: id },
+      metadata: { targetUserId: id },
       userId: currentUser.id
     });
     return user;
@@ -227,22 +230,25 @@ export class UsersService {
     if (id === currentUser.id && (data.disabled || isDemotion)) {
       throw new ForbiddenException('You may not remove your own administrator access');
     }
-    if (
-      data.username &&
-      (await this.userModel.exists({ id: { not: id }, username: matchingUsername(data.username) }))
-    ) {
-      throw new ConflictException(`User with username '${data.username}' already exists!`);
-    }
     let hashedPassword: string | undefined;
     if (password) {
       const username = data.username ?? (await this.findById(id, { ability })).username;
       await this.validatePassword(password, username);
       hashedPassword = await this.cryptoService.hashPassword(password);
     }
-    return this.userModel.update({
+    // Read after the breach check, which can take seconds, so the grants written below are not a copy
+    // that another admin's change could have overtaken.
+    const current = await this.findById(id, { ability });
+    if (
+      data.username &&
+      (await this.userModel.exists({ id: { not: id }, username: matchingUsername(data.username) }))
+    ) {
+      throw new ConflictException(`User with username '${data.username}' already exists!`);
+    }
+    const user = await this.userModel.update({
       data: {
         ...data,
-        additionalPermissions: groupIds ? await this.permissionsWithinGroups(id, groupIds, { ability }) : undefined,
+        additionalPermissions: groupIds ? this.permissionsWithinGroups(current, groupIds) : undefined,
         groups: {
           set: groupIds?.map((id) => ({ id }))
         },
@@ -256,6 +262,8 @@ export class UsersService {
       },
       where: { AND: [accessibleQuery(ability, 'update', 'User')], id }
     });
+    await this.logUserUpdate(current, user, { password, userId: currentUser.id });
+    return user;
   }
 
   /**
@@ -264,37 +272,36 @@ export class UsersService {
    * custom grant confined to a group is accepted only when the user belongs to that group, so what
    * the web client offers and what this accepts are one rule.
    */
-  async updatePermissions(id: string, data: $UpdateUserPermissionsData, { ability }: EntityOperationOptions = {}) {
-    const user = await this.findById(id, { ability });
-    const where = { AND: [accessibleQuery(ability, 'update', 'User')], id };
+  async updatePermissions(id: string, data: $UpdateUserPermissionsData, currentUser: RequestUser) {
+    const { ability } = currentUser;
+    const current = await this.findById(id, { ability });
+    let update: Prisma.UserUpdateInput;
     if (data.kind === 'permissionSet') {
-      if (user.basePermissionLevel === 'ADMIN') {
+      if (current.basePermissionLevel === 'ADMIN') {
         throw new BadRequestException('Administrators hold every permission, so they cannot hold a permission set');
       }
       await this.permissionSetsService.findById(data.permissionSetId, { ability });
-      return this.userModel.update({
-        data: { additionalPermissions: [], permissionSet: { connect: { id: data.permissionSetId } } },
-        omit: {
-          hashedPassword: true
-        },
-        where
-      });
+      update = { additionalPermissions: [], permissionSet: { connect: { id: data.permissionSetId } } };
+    } else {
+      const foreignGroupIds = data.permissions
+        .map(({ groupId }) => groupId)
+        .filter((groupId): groupId is string => groupId !== null && !current.groupIds.includes(groupId));
+      if (foreignGroupIds.length) {
+        throw new BadRequestException(
+          `Permissions may only be scoped to a group the user belongs to: ${foreignGroupIds.join(', ')}`
+        );
+      }
+      update = { additionalPermissions: data.permissions, permissionSet: { disconnect: true } };
     }
-    const foreignGroupIds = data.permissions
-      .map(({ groupId }) => groupId)
-      .filter((groupId): groupId is string => groupId !== null && !user.groupIds.includes(groupId));
-    if (foreignGroupIds.length) {
-      throw new BadRequestException(
-        `Permissions may only be scoped to a group the user belongs to: ${foreignGroupIds.join(', ')}`
-      );
-    }
-    return this.userModel.update({
-      data: { additionalPermissions: data.permissions, permissionSet: { disconnect: true } },
+    const user = await this.userModel.update({
+      data: update,
       omit: {
         hashedPassword: true
       },
-      where
+      where: { AND: [accessibleQuery(ability, 'update', 'User')], id }
     });
+    await this.logUserUpdate(current, user, { userId: currentUser.id });
+    return user;
   }
 
   async updateSelfById(id: string, { password, ...data }: $SelfUpdateUserData, currentUser: RequestUser) {
@@ -311,7 +318,12 @@ export class UsersService {
       hashedPassword = await this.cryptoService.hashPassword(password);
     }
 
-    return this.userModel.update({
+    // Unscoped, like the write below, because the id is the caller's own: a group manager in no
+    // group holds no rule that lets them read themselves. Read after the breach check, so the logged
+    // diff starts from the row as it stands just before the write.
+    const current = await this.findById(id);
+
+    const user = await this.userModel.update({
       data: {
         dateOfBirth,
         email,
@@ -329,6 +341,25 @@ export class UsersService {
       },
       where: { id }
     });
+    await this.logUserUpdate(current, user, { password, userId: currentUser.id });
+    return user;
+  }
+
+  /**
+   * The password is stored only as a hash, which neither row carries, so a new one is named apart
+   * from what the two rows show.
+   */
+  private async logUserUpdate(
+    before: UserRow,
+    after: UserRow,
+    { password, userId }: { password?: string; userId: string }
+  ): Promise<void> {
+    const fields = changedRowFields(before, after, ['groupIds']);
+    await this.auditLogger.logUpdate('USER', password ? [...fields, 'password'] : fields, {
+      groupId: null,
+      metadata: { targetUserId: after.id },
+      userId
+    });
   }
 
   /**
@@ -343,8 +374,7 @@ export class UsersService {
    * The user's stored grants minus those confined to a group outside `groupIds`. A grant scoped to a
    * group the user is leaving would otherwise keep reading that group's rows.
    */
-  private async permissionsWithinGroups(id: string, groupIds: string[], options: EntityOperationOptions) {
-    const { additionalPermissions } = await this.findById(id, options);
+  private permissionsWithinGroups({ additionalPermissions }: UserRow, groupIds: string[]) {
     return additionalPermissions.filter(({ groupId }) => groupId === null || groupIds.includes(groupId));
   }
 

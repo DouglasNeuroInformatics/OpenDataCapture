@@ -154,16 +154,16 @@ export class AssignmentsService {
     return staged.map(({ assignment }) => assignment);
   }
 
-  async deleteBulk(ids: string[], { ability }: EntityOperationOptions = {}) {
+  async deleteBulk(ids: string[], currentUser: RequestUser) {
     const assignments = await this.assignmentModel.findMany({
       where: {
-        AND: [accessibleQuery(ability, 'delete', 'Assignment')],
+        AND: [accessibleQuery(currentUser.ability, 'delete', 'Assignment')],
         id: { in: ids },
         status: { in: ['OUTSTANDING', 'EXPIRED'] }
       }
     });
 
-    const deletedIds: string[] = [];
+    const deleted: typeof assignments = [];
     const failedIds: string[] = [];
 
     for (const assignment of assignments) {
@@ -172,7 +172,7 @@ export class AssignmentsService {
           await this.gatewayService.deleteRemoteAssignment(assignment.id);
         }
         await this.assignmentModel.delete({ where: { id: assignment.id } });
-        deletedIds.push(assignment.id);
+        deleted.push(assignment);
       } catch (err) {
         this.loggingService.error({
           error: err,
@@ -182,7 +182,16 @@ export class AssignmentsService {
       }
     }
 
-    return { deletedCount: deletedIds.length, failedIds };
+    // One entry per assignment, as for an emailed link, so the log says which ones were deleted.
+    for (const { groupId, id } of deleted) {
+      await this.auditLogger.log('DELETE', 'ASSIGNMENT', {
+        groupId: groupId ?? null,
+        metadata: { assignmentId: id },
+        userId: currentUser.id
+      });
+    }
+
+    return { deletedCount: deleted.length, failedIds };
   }
 
   async find(

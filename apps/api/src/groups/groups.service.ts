@@ -1,11 +1,14 @@
 import { InjectModel } from '@douglasneuroinformatics/libnest';
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { $CreateGroupData, $UpdateGroupData } from '@opendatacapture/schemas/group';
 import type { GroupEmailTemplate } from '@opendatacapture/schemas/group';
 import type { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { omit } from 'lodash-es';
 
+import { AuditLogger } from '@/audit/audit.logger';
+import { changedRowFields } from '@/audit/audit.utils';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 
@@ -13,7 +16,8 @@ import type { EntityOperationOptions } from '@/core/types';
 export class GroupsService {
   constructor(
     @InjectModel('Group') private readonly groupModel: Model<'Group'>,
-    @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>
+    @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
+    private readonly auditLogger: AuditLogger
   ) {}
 
   async create({ name, settings, type, ...data }: $CreateGroupData) {
@@ -83,8 +87,9 @@ export class GroupsService {
       settings,
       ...data
     }: $UpdateGroupData,
-    { ability }: EntityOperationOptions = {}
+    currentUser: RequestUser
   ) {
+    const { ability } = currentUser;
     const where: Prisma.GroupWhereInput = { AND: [accessibleQuery(ability, 'update', 'Group')], id };
     const group = await this.groupModel.findFirst({ where });
     if (!group) {
@@ -121,8 +126,8 @@ export class GroupsService {
       validInstrumentIds = existingInstruments.map(({ id }) => id);
     }
 
-    try {
-      return await this.groupModel.update({
+    const updated = await this.groupModel
+      .update({
         data: {
           accessibleInstruments: validInstrumentIds
             ? {
@@ -143,16 +148,23 @@ export class GroupsService {
           ...data
         },
         where: { AND: [accessibleQuery(ability, 'update', 'Group')], id, ...revisionGuard }
+      })
+      .catch((err: unknown) => {
+        // P2025 is "no record matched the where clause". The findFirst above already matched on id
+        // and ability, so the revision guard is the only filter that can have started failing —
+        // i.e. a concurrent edit. Anything else is a real fault and has to surface.
+        if (revisionGuard.updatedAt && err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
+          throw new ConflictException(`Group with ID '${id}' has been modified since it was loaded`);
+        }
+        throw err;
       });
-    } catch (err) {
-      // P2025 is "no record matched the where clause". The findFirst above already matched on id
-      // and ability, so the revision guard is the only filter that can have started failing —
-      // i.e. a concurrent edit. Anything else is a real fault and has to surface.
-      if (revisionGuard.updatedAt && err instanceof PrismaClientKnownRequestError && err.code === 'P2025') {
-        throw new ConflictException(`Group with ID '${id}' has been modified since it was loaded`);
-      }
-      throw err;
-    }
+    // This write sets neither member list, so a difference in one is another writer's change.
+    const fields = changedRowFields(omit(group, 'subjectIds', 'userIds'), omit(updated, 'subjectIds', 'userIds'), [
+      'accessibleInstrumentIds',
+      'instrumentRepoIds'
+    ]);
+    await this.auditLogger.logUpdate('GROUP', fields, { groupId: id, userId: currentUser.id });
+    return updated;
   }
 
   /**

@@ -1,4 +1,4 @@
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { getModelToken } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
@@ -7,9 +7,12 @@ import { Test } from '@nestjs/testing';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { createAppAbility } from '@/auth/ability.utils';
 
 import { GroupsService } from '../groups.service';
+
+const admin = { ability: createAppAbility([{ action: 'manage', subject: 'all' }]), id: 'admin-1' } as RequestUser;
 
 /** A minimal template satisfying `$GroupEmailTemplate`, which requires renderable content. */
 const template = (id: string, name: string) => ({
@@ -21,6 +24,7 @@ const template = (id: string, name: string) => ({
 
 describe('GroupsService', () => {
   let groupsService: GroupsService;
+  let auditLogger: MockedInstance<AuditLogger>;
   let groupModel: MockedInstance<Model<'Group'>>;
   let instrumentModel: MockedInstance<Model<'Instrument'>>;
 
@@ -28,10 +32,12 @@ describe('GroupsService', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         GroupsService,
+        MockFactory.createForService(AuditLogger),
         MockFactory.createForModelToken(getModelToken('Group')),
         MockFactory.createForModelToken(getModelToken('Instrument'))
       ]
     }).compile();
+    auditLogger = moduleRef.get(AuditLogger);
     groupModel = moduleRef.get(getModelToken('Group'));
     instrumentModel = moduleRef.get(getModelToken('Instrument'));
     groupsService = moduleRef.get(GroupsService);
@@ -110,25 +116,77 @@ describe('GroupsService', () => {
   });
 
   describe('updateById', () => {
+    /** The id lists every stored group carries, which the logged diff compares. */
+    const groupRow = (fields: object) => ({ accessibleInstrumentIds: [], instrumentRepoIds: [], ...fields });
+
+    beforeEach(() => {
+      groupModel.update.mockResolvedValue(groupRow({ name: 'Test Group', settings: {} }));
+    });
+
+    it('should record the fields the update changed, in the group it changed', async () => {
+      groupModel.findFirst.mockResolvedValueOnce(
+        groupRow({
+          accessibleInstrumentIds: ['a', 'b'],
+          name: 'Old Name',
+          settings: {}
+        })
+      );
+      groupModel.update.mockResolvedValueOnce(
+        groupRow({ accessibleInstrumentIds: ['b', 'a'], name: 'New Name', settings: {} })
+      );
+      await groupsService.updateById('123', { name: 'New Name' }, admin);
+      expect(auditLogger.logUpdate).toHaveBeenCalledExactlyOnceWith('GROUP', ['name'], {
+        groupId: '123',
+        userId: admin.id
+      });
+    });
+
+    it("should leave the member lists out of the entry, since this write sets neither and a change in one is another writer's", async () => {
+      groupModel.findFirst.mockResolvedValueOnce(groupRow({ name: 'Old Name', settings: {}, userIds: ['user-1'] }));
+      groupModel.update.mockResolvedValueOnce(
+        groupRow({ name: 'New Name', settings: {}, subjectIds: ['subject-1'], userIds: ['user-1', 'user-2'] })
+      );
+      await groupsService.updateById('123', { name: 'New Name' }, admin);
+      expect(auditLogger.logUpdate.mock.lastCall?.[1]).toEqual(['name']);
+    });
+
+    it('should record no update that lost to a concurrent edit', async () => {
+      groupModel.findFirst.mockResolvedValueOnce(
+        groupRow({ settings: {}, updatedAt: new Date('2026-07-01T00:00:00Z') })
+      );
+      groupModel.update.mockRejectedValueOnce(
+        new PrismaClientKnownRequestError('No record was found for an update', {
+          clientVersion: '6.19.3',
+          code: 'P2025'
+        })
+      );
+      await expect(
+        groupsService.updateById('123', { expectedUpdatedAt: new Date('2026-07-01T00:00:00Z') }, admin)
+      ).rejects.toBeInstanceOf(ConflictException);
+      expect(auditLogger.logUpdate).not.toHaveBeenCalled();
+    });
+
     it('should throw a NotFoundException when no accessible group has the provided id', async () => {
       groupModel.findFirst.mockResolvedValueOnce(null);
-      await expect(groupsService.updateById('123', { name: 'Test Group' })).rejects.toBeInstanceOf(NotFoundException);
+      await expect(groupsService.updateById('123', { name: 'Test Group' }, admin)).rejects.toBeInstanceOf(
+        NotFoundException
+      );
       expect(groupModel.update).not.toHaveBeenCalled();
     });
 
     it('should set the instrumentRepos relation from instrumentRepoIds', async () => {
-      groupModel.findFirst.mockResolvedValueOnce({ name: 'Test Group', settings: {} });
-      await groupsService.updateById('123', { instrumentRepoIds: ['repo-1', 'repo-2'] });
+      groupModel.findFirst.mockResolvedValueOnce(groupRow({ name: 'Test Group', settings: {} }));
+      await groupsService.updateById('123', { instrumentRepoIds: ['repo-1', 'repo-2'] }, admin);
       expect(groupModel.update.mock.lastCall?.[0]).toMatchObject({
         data: { instrumentRepos: { set: [{ id: 'repo-1' }, { id: 'repo-2' }] } }
       });
     });
 
     it('should drop accessibleInstrumentIds that no longer exist before setting the relation', async () => {
-      groupModel.findFirst.mockResolvedValueOnce({ name: 'Test Group', settings: {} });
+      groupModel.findFirst.mockResolvedValueOnce(groupRow({ name: 'Test Group', settings: {} }));
       // 'deleted' was removed since the client loaded the group and must not reach the relation set.
       instrumentModel.findMany.mockResolvedValueOnce([{ id: 'live-1' }, { id: 'live-2' }]);
-      await groupsService.updateById('123', { accessibleInstrumentIds: ['live-1', 'deleted', 'live-2'] });
+      await groupsService.updateById('123', { accessibleInstrumentIds: ['live-1', 'deleted', 'live-2'] }, admin);
       expect(instrumentModel.findMany).toHaveBeenCalledWith({
         select: { id: true },
         where: {
@@ -142,8 +200,8 @@ describe('GroupsService', () => {
     });
 
     it('should not throw when the name is unchanged', async () => {
-      groupModel.findFirst.mockResolvedValueOnce({ name: 'Test Group', settings: {} });
-      await groupsService.updateById('123', { name: 'Test Group' });
+      groupModel.findFirst.mockResolvedValueOnce(groupRow({ name: 'Test Group', settings: {} }));
+      await groupsService.updateById('123', { name: 'Test Group' }, admin);
       // The current name must not be treated as a collision with itself.
       expect(groupModel.exists).not.toHaveBeenCalled();
       expect(groupModel.update).toHaveBeenCalled();
@@ -151,72 +209,108 @@ describe('GroupsService', () => {
 
     it('should write the email template list as a composite set', async () => {
       const templates = [{ body: { en: 'Link {{url}}' }, id: 'tpl-1', name: 'One', subject: { en: 'Subject' } }];
-      groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: new Date('2026-07-01T00:00:00Z') });
-      await groupsService.updateById('123', {
-        activeAssignmentEmailTemplateId: 'tpl-1',
-        emailTemplates: templates,
-        expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
-      });
+      groupModel.findFirst.mockResolvedValueOnce(
+        groupRow({ settings: {}, updatedAt: new Date('2026-07-01T00:00:00Z') })
+      );
+      await groupsService.updateById(
+        '123',
+        {
+          activeAssignmentEmailTemplateId: 'tpl-1',
+          emailTemplates: templates,
+          expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
+        },
+        admin
+      );
       expect(groupModel.update.mock.lastCall?.[0]).toMatchObject({ data: { emailTemplates: { set: templates } } });
     });
 
     // A duplicate id makes `find()` shadow every match after the first.
     it('should reject duplicate template ids', async () => {
-      groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: new Date('2026-07-01T00:00:00Z') });
+      groupModel.findFirst.mockResolvedValueOnce(
+        groupRow({ settings: {}, updatedAt: new Date('2026-07-01T00:00:00Z') })
+      );
       await expect(
-        groupsService.updateById('123', {
-          emailTemplates: [template('tpl-1', 'One'), template('tpl-1', 'Two')],
-          expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
-        })
+        groupsService.updateById(
+          '123',
+          {
+            emailTemplates: [template('tpl-1', 'One'), template('tpl-1', 'Two')],
+            expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
+          },
+          admin
+        )
       ).rejects.toBeInstanceOf(BadRequestException);
     });
 
     // A dangling active id makes participants silently receive the built-in wording.
     it('should reject an active template id that resolves to nothing', async () => {
-      groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: new Date('2026-07-01T00:00:00Z') });
+      groupModel.findFirst.mockResolvedValueOnce(
+        groupRow({ settings: {}, updatedAt: new Date('2026-07-01T00:00:00Z') })
+      );
       await expect(
-        groupsService.updateById('123', {
-          activeAssignmentEmailTemplateId: 'tpl-gone',
-          emailTemplates: [template('tpl-1', 'One')],
-          expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
-        })
+        groupsService.updateById(
+          '123',
+          {
+            activeAssignmentEmailTemplateId: 'tpl-gone',
+            emailTemplates: [template('tpl-1', 'One')],
+            expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
+          },
+          admin
+        )
       ).rejects.toBeInstanceOf(BadRequestException);
     });
 
     it('should accept a null active id, which selects the built-in default', async () => {
-      groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: new Date('2026-07-01T00:00:00Z') });
-      await groupsService.updateById('123', {
-        activeAssignmentEmailTemplateId: null,
-        emailTemplates: [template('tpl-1', 'One')],
-        expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
-      });
+      groupModel.findFirst.mockResolvedValueOnce(
+        groupRow({ settings: {}, updatedAt: new Date('2026-07-01T00:00:00Z') })
+      );
+      await groupsService.updateById(
+        '123',
+        {
+          activeAssignmentEmailTemplateId: null,
+          emailTemplates: [template('tpl-1', 'One')],
+          expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
+        },
+        admin
+      );
       expect(groupModel.update).toHaveBeenCalled();
     });
 
     // The stored active id has to stay resolvable when only the list is replaced.
     it('should reject a list that drops the currently active template', async () => {
-      groupModel.findFirst.mockResolvedValueOnce({
-        activeAssignmentEmailTemplateId: 'tpl-1',
-        settings: {},
-        updatedAt: new Date('2026-07-01T00:00:00Z')
-      });
-      await expect(
-        groupsService.updateById('123', {
-          emailTemplates: [template('tpl-2', 'Two')],
-          expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
+      groupModel.findFirst.mockResolvedValueOnce(
+        groupRow({
+          activeAssignmentEmailTemplateId: 'tpl-1',
+          settings: {},
+          updatedAt: new Date('2026-07-01T00:00:00Z')
         })
+      );
+      await expect(
+        groupsService.updateById(
+          '123',
+          {
+            emailTemplates: [template('tpl-2', 'Two')],
+            expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
+          },
+          admin
+        )
       ).rejects.toBeInstanceOf(BadRequestException);
     });
 
     // `emailTemplates` is replaced wholesale from the client's cached copy, so a concurrent edit
     // has to be rejected rather than silently overwritten.
     it('should reject an update composed against a stale revision', async () => {
-      groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: new Date('2026-07-02T00:00:00Z') });
+      groupModel.findFirst.mockResolvedValueOnce(
+        groupRow({ settings: {}, updatedAt: new Date('2026-07-02T00:00:00Z') })
+      );
       await expect(
-        groupsService.updateById('123', {
-          emailTemplates: [],
-          expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
-        })
+        groupsService.updateById(
+          '123',
+          {
+            emailTemplates: [],
+            expectedUpdatedAt: new Date('2026-07-01T00:00:00Z')
+          },
+          admin
+        )
       ).rejects.toBeInstanceOf(ConflictException);
       expect(groupModel.update).not.toHaveBeenCalled();
     });
@@ -224,8 +318,8 @@ describe('GroupsService', () => {
     // The pre-check is a separate read, so the revision has to constrain the write itself too.
     it('should carry the expected revision into the update where clause', async () => {
       const expectedUpdatedAt = new Date('2026-07-01T00:00:00Z');
-      groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: expectedUpdatedAt });
-      await groupsService.updateById('123', { emailTemplates: [], expectedUpdatedAt });
+      groupModel.findFirst.mockResolvedValueOnce(groupRow({ settings: {}, updatedAt: expectedUpdatedAt }));
+      await groupsService.updateById('123', { emailTemplates: [], expectedUpdatedAt }, admin);
       expect(groupModel.update.mock.lastCall?.[0]).toMatchObject({ where: { updatedAt: expectedUpdatedAt } });
     });
 
@@ -233,37 +327,39 @@ describe('GroupsService', () => {
     // in between. Prisma reports that as P2025, which has to read as a conflict rather than a 500.
     it('should map a lost conditional write to a conflict', async () => {
       const expectedUpdatedAt = new Date('2026-07-01T00:00:00Z');
-      groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: expectedUpdatedAt });
+      groupModel.findFirst.mockResolvedValueOnce(groupRow({ settings: {}, updatedAt: expectedUpdatedAt }));
       groupModel.update.mockRejectedValueOnce(
         new PrismaClientKnownRequestError('No record was found for an update', {
           clientVersion: '6.19.3',
           code: 'P2025'
         })
       );
-      await expect(groupsService.updateById('123', { emailTemplates: [], expectedUpdatedAt })).rejects.toBeInstanceOf(
-        ConflictException
-      );
+      await expect(
+        groupsService.updateById('123', { emailTemplates: [], expectedUpdatedAt }, admin)
+      ).rejects.toBeInstanceOf(ConflictException);
     });
 
     it('should not disguise an unrelated database error as a conflict', async () => {
       const expectedUpdatedAt = new Date('2026-07-01T00:00:00Z');
-      groupModel.findFirst.mockResolvedValueOnce({ settings: {}, updatedAt: expectedUpdatedAt });
+      groupModel.findFirst.mockResolvedValueOnce(groupRow({ settings: {}, updatedAt: expectedUpdatedAt }));
       groupModel.update.mockRejectedValueOnce(new Error('connection lost'));
-      await expect(groupsService.updateById('123', { emailTemplates: [], expectedUpdatedAt })).rejects.toThrow(
+      await expect(groupsService.updateById('123', { emailTemplates: [], expectedUpdatedAt }, admin)).rejects.toThrow(
         'connection lost'
       );
     });
 
     it('should leave the where clause unconstrained when no revision is supplied', async () => {
-      groupModel.findFirst.mockResolvedValueOnce({ settings: {} });
-      await groupsService.updateById('123', { name: 'Test Group' });
+      groupModel.findFirst.mockResolvedValueOnce(groupRow({ settings: {} }));
+      await groupsService.updateById('123', { name: 'Test Group' }, admin);
       expect(groupModel.update.mock.lastCall?.[0].where).not.toHaveProperty('updatedAt');
     });
 
     it('should throw a ConflictException when renaming to an existing name', async () => {
-      groupModel.findFirst.mockResolvedValueOnce({ name: 'Old Name', settings: {} });
+      groupModel.findFirst.mockResolvedValueOnce(groupRow({ name: 'Old Name', settings: {} }));
       groupModel.exists.mockResolvedValueOnce(true);
-      await expect(groupsService.updateById('123', { name: 'Taken Name' })).rejects.toBeInstanceOf(ConflictException);
+      await expect(groupsService.updateById('123', { name: 'Taken Name' }, admin)).rejects.toBeInstanceOf(
+        ConflictException
+      );
       expect(groupModel.exists).toHaveBeenCalledWith({ name: 'Taken Name' });
     });
   });

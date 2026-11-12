@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
 import { Worker } from 'node:worker_threads';
 
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { getModelToken, LoggingService, PRISMA_CLIENT_TOKEN } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
@@ -16,6 +16,7 @@ import { Test } from '@nestjs/testing';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 import { StorageService } from '@/storage/storage.service';
@@ -56,6 +57,7 @@ function useFakeWorker() {
 }
 
 describe('InstrumentRecordsService', () => {
+  let auditLogger: MockedInstance<AuditLogger>;
   let groupsService: MockedInstance<GroupsService>;
   let instrumentMeasuresService: MockedInstance<InstrumentMeasuresService>;
   let loggingService: MockedInstance<LoggingService>;
@@ -93,6 +95,7 @@ describe('InstrumentRecordsService', () => {
           })
         },
         MockFactory.createForModelToken(getModelToken('Session')),
+        MockFactory.createForService(AuditLogger),
         MockFactory.createForService(GroupsService),
         MockFactory.createForService(UsersService),
         MockFactory.createForService(InstrumentMeasuresService),
@@ -103,6 +106,7 @@ describe('InstrumentRecordsService', () => {
       ]
     }).compile();
 
+    auditLogger = moduleRef.get(AuditLogger);
     groupsService = moduleRef.get(GroupsService);
     instrumentMeasuresService = moduleRef.get(InstrumentMeasuresService);
     fileModel = moduleRef.get(getModelToken('InstrumentRecordFile'));
@@ -1199,10 +1203,18 @@ describe('InstrumentRecordsService', () => {
   });
 
   describe('updateById', () => {
-    const ability = createAppAbility([{ action: 'update', subject: 'InstrumentRecord' }]);
+    const currentUser = {
+      ability: createAppAbility([{ action: 'update', subject: 'InstrumentRecord' }]),
+      id: 'user-1'
+    } as RequestUser;
 
     const useRecord = (data: unknown) => {
-      instrumentRecordModel.findFirst.mockResolvedValueOnce({ data, id: 'record-1', instrumentId: 'instrument-1' });
+      instrumentRecordModel.findFirst.mockResolvedValueOnce({
+        data,
+        groupId: 'group-1',
+        id: 'record-1',
+        instrumentId: 'instrument-1'
+      });
     };
 
     const useInstrument = (instance: object = {}) => {
@@ -1221,7 +1233,7 @@ describe('InstrumentRecordsService', () => {
     it('should throw a NotFoundException when the record does not exist', async () => {
       instrumentRecordModel.findFirst.mockResolvedValueOnce(null);
 
-      await expect(instrumentRecordsService.updateById('record-1', {}, { ability })).rejects.toBeInstanceOf(
+      await expect(instrumentRecordsService.updateById('record-1', {}, currentUser)).rejects.toBeInstanceOf(
         NotFoundException
       );
 
@@ -1231,7 +1243,7 @@ describe('InstrumentRecordsService', () => {
     it('should reject an object update to a record whose data is an array', async () => {
       useRecord([{ answer: 1 }]);
 
-      await expect(instrumentRecordsService.updateById('record-1', { answer: 2 }, { ability })).rejects.toBeInstanceOf(
+      await expect(instrumentRecordsService.updateById('record-1', { answer: 2 }, currentUser)).rejects.toBeInstanceOf(
         BadRequestException
       );
 
@@ -1242,7 +1254,7 @@ describe('InstrumentRecordsService', () => {
       useRecord({ answer: 1, comment: 'kept' });
       useInstrument();
 
-      await instrumentRecordsService.updateById('record-1', { answer: 2 }, { ability });
+      await instrumentRecordsService.updateById('record-1', { answer: 2 }, currentUser);
 
       expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({
         data: { computedMeasures: null, data: { answer: 2, comment: 'kept' } }
@@ -1254,7 +1266,7 @@ describe('InstrumentRecordsService', () => {
       useRecord({ answers: [1, 2, 3] });
       useInstrument();
 
-      await instrumentRecordsService.updateById('record-1', { answers: [9] }, { ability });
+      await instrumentRecordsService.updateById('record-1', { answers: [9] }, currentUser);
 
       expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({ data: { data: { answers: [1, 2, 3] } } });
     });
@@ -1263,7 +1275,7 @@ describe('InstrumentRecordsService', () => {
       useRecord([{ answer: 1, comment: 'kept' }]);
       useInstrument();
 
-      await instrumentRecordsService.updateById('record-1', [{ answer: 2 }], { ability });
+      await instrumentRecordsService.updateById('record-1', [{ answer: 2 }], currentUser);
 
       expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({
         data: { data: [{ answer: 2, comment: 'kept' }] }
@@ -1277,7 +1289,7 @@ describe('InstrumentRecordsService', () => {
         validationSchema: { safeParseAsync: () => Promise.resolve({ error: { issues }, success: false }) }
       });
 
-      await expect(instrumentRecordsService.updateById('record-1', { answer: 'x' }, { ability })).rejects.toMatchObject(
+      await expect(instrumentRecordsService.updateById('record-1', { answer: 'x' }, currentUser)).rejects.toMatchObject(
         {
           response: { issues, message: 'Merged data does not match validation schema' }
         }
@@ -1291,7 +1303,7 @@ describe('InstrumentRecordsService', () => {
       useInstrument({ measures });
       instrumentMeasuresService.computeMeasures.mockReturnValueOnce({ score: 2 });
 
-      await instrumentRecordsService.updateById('record-1', { answer: 2 }, { ability });
+      await instrumentRecordsService.updateById('record-1', { answer: 2 }, currentUser);
 
       expect(instrumentMeasuresService.computeMeasures).toHaveBeenCalledWith(measures, { answer: 2 });
       expect(instrumentRecordModel.update.mock.lastCall?.[0]).toMatchObject({
@@ -1307,7 +1319,7 @@ describe('InstrumentRecordsService', () => {
       useRecord({ answer: 1 });
       useInstrument();
 
-      await instrumentRecordsService.updateById('record-1', { answer: 2 }, { ability });
+      await instrumentRecordsService.updateById('record-1', { answer: 2 }, { ...currentUser, ability });
 
       expect(instrumentRecordModel.update.mock.lastCall?.[0].where).toStrictEqual({
         AND: [accessibleQuery(ability, 'update', 'InstrumentRecord')],
@@ -1319,7 +1331,7 @@ describe('InstrumentRecordsService', () => {
       useRecord({ answer: 1 });
       useInstrument();
 
-      await expect(instrumentRecordsService.updateById('record-1', { answer: 2 }, { ability })).resolves.toStrictEqual({
+      await expect(instrumentRecordsService.updateById('record-1', { answer: 2 }, currentUser)).resolves.toStrictEqual({
         id: 'record-1'
       });
     });
@@ -1331,7 +1343,7 @@ describe('InstrumentRecordsService', () => {
       ]);
 
       await expect(
-        instrumentRecordsService.updateById('record-1', { answer: 'x' }, { ability })
+        instrumentRecordsService.updateById('record-1', { answer: 'x' }, { ...currentUser, ability })
       ).rejects.toBeInstanceOf(NotFoundException);
 
       expect(instrumentRecordModel.findFirst).toHaveBeenCalledWith({
@@ -1339,6 +1351,41 @@ describe('InstrumentRecordsService', () => {
       });
       expect(instrumentsService.findById).not.toHaveBeenCalled();
       expect(instrumentRecordModel.update).not.toHaveBeenCalled();
+    });
+
+    it("should record the data fields the update changed, in the record's group, and never their values", async () => {
+      useRecord({ answer: 1, comment: 'kept' });
+      useInstrument();
+
+      await instrumentRecordsService.updateById('record-1', { answer: 2, comment: 'kept' }, currentUser);
+
+      expect(auditLogger.logUpdate).toHaveBeenCalledExactlyOnceWith('INSTRUMENT_RECORD', ['answer'], {
+        groupId: 'group-1',
+        metadata: { recordId: 'record-1' },
+        userId: currentUser.id
+      });
+    });
+
+    it('should refuse to write data whose changes it cannot name, so no update goes unrecorded', async () => {
+      useRecord(null);
+      useInstrument();
+
+      await expect(instrumentRecordsService.updateById('record-1', { answer: 2 }, currentUser)).rejects.toThrow(
+        TypeError
+      );
+      expect(instrumentRecordModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should record no update the schema rejected', async () => {
+      useRecord({ answer: 1 });
+      useInstrument({
+        validationSchema: { safeParseAsync: () => Promise.resolve({ error: { issues: [] }, success: false }) }
+      });
+
+      await expect(instrumentRecordsService.updateById('record-1', { answer: 'x' }, currentUser)).rejects.toThrow(
+        BadRequestException
+      );
+      expect(auditLogger.logUpdate).not.toHaveBeenCalled();
     });
   });
 

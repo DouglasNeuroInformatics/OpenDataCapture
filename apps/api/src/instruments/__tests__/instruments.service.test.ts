@@ -291,6 +291,46 @@ describe('InstrumentsService', () => {
       expect(result).toEqual({ instrumentId: 'fresh-id', outcome: 'created' });
     });
 
+    it('records who created the series, in the group that owns it, naming it', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
+      vi.spyOn(instrumentsService, 'create').mockResolvedValue({ id: 'fresh-id' } as any);
+
+      await instrumentsService.createSeries(
+        {
+          details: { title: '  Totally New  ' },
+          groupId: 'group-1',
+          items: [{ edition: 1, name: 'FORM_C' }],
+          language: 'en'
+        },
+        adminUser
+      );
+
+      expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('CREATE', 'INSTRUMENT', {
+        groupId: 'group-1',
+        metadata: { instrumentId: 'fresh-id', title: 'Totally New' },
+        userId: adminUser.id
+      });
+    });
+
+    it('records nothing when it only reports a duplicate, since no series was created', async () => {
+      vi.spyOn(instrumentsService, 'find').mockResolvedValue([existingSeries]);
+
+      await instrumentsService.createSeries(
+        {
+          details: { title: 'My New Series' },
+          groupId: 'group-1',
+          items: [
+            { edition: 1, name: 'FORM_A' },
+            { edition: 1, name: 'FORM_B' }
+          ],
+          language: 'en'
+        },
+        adminUser
+      );
+
+      expect(auditLogger.log).not.toHaveBeenCalled();
+    });
+
     it('generates a valid, unilingual series source payload with selected items in order', async () => {
       vi.spyOn(instrumentsService, 'find').mockResolvedValue([]);
       vi.spyOn(instrumentsService, 'create').mockResolvedValue({ id: 'generated-id' } as any);
@@ -868,7 +908,7 @@ describe('InstrumentsService', () => {
       instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'target' });
       virtualizationService.eval.mockResolvedValue({
         isErr: () => false,
-        value: { content: { items: [] }, kind: 'SERIES' }
+        value: { content: { items: [] }, details: { title: 'Target Series' }, kind: 'SERIES' }
       } as any);
       instrumentRecordModel.count.mockResolvedValue(0);
       groupModel.findMany.mockResolvedValue([{ accessibleInstrumentIds: ['other', 'target'], id: 'g1' }]);
@@ -887,7 +927,7 @@ describe('InstrumentsService', () => {
       instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'target' });
       virtualizationService.eval.mockResolvedValue({
         isErr: () => false,
-        value: { content: { items: [] }, kind: 'SERIES' }
+        value: { content: { items: [] }, details: { title: 'Target Series' }, kind: 'SERIES' }
       } as any);
       instrumentRecordModel.count.mockResolvedValue(0);
       groupModel.findMany.mockResolvedValue([]);
@@ -896,6 +936,36 @@ describe('InstrumentsService', () => {
 
       // Checking the kind populates the cache, so a delete always leaves an entry behind to clean up.
       expect(instanceCache.has('target')).toBe(false);
+    });
+
+    it('records who deleted the series, in the group that owned it, naming it', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'target', seriesGroupId: 'group-1' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { content: { items: [] }, details: { title: { en: 'Target Series' } }, kind: 'SERIES' }
+      } as any);
+      instrumentRecordModel.count.mockResolvedValue(0);
+      groupModel.findMany.mockResolvedValue([]);
+
+      await instrumentsService.deleteById('target', adminUser);
+
+      expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('DELETE', 'INSTRUMENT', {
+        groupId: 'group-1',
+        metadata: { instrumentId: 'target', title: 'Target Series' },
+        userId: adminUser.id
+      });
+    });
+
+    it('records no deletion when the delete is refused', async () => {
+      instrumentModel.findFirst.mockResolvedValue({ bundle: '__BUNDLE__', id: 'target' });
+      virtualizationService.eval.mockResolvedValue({
+        isErr: () => false,
+        value: { content: { items: [] }, details: { title: 'Target Series' }, kind: 'SERIES' }
+      } as any);
+      instrumentRecordModel.count.mockResolvedValue(3);
+
+      await expect(instrumentsService.deleteById('target', adminUser)).rejects.toThrow(ForbiddenException);
+      expect(auditLogger.log).not.toHaveBeenCalled();
     });
 
     it('does not evict the cached instance when the delete is refused', async () => {

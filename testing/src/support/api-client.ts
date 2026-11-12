@@ -1,12 +1,17 @@
-import type { $CreateAssignmentData, Assignment } from '@opendatacapture/schemas/assignment';
+import type {
+  $CreateAssignmentData,
+  Assignment,
+  DeleteBulkAssignmentsResult
+} from '@opendatacapture/schemas/assignment';
 import { AUDIT_LOGS_MAX_PAGE_SIZE } from '@opendatacapture/schemas/audit';
-import type { $AuditLog, $AuditLogAction, $AuditLogsPage } from '@opendatacapture/schemas/audit';
+import type { $AuditLog, $AuditLogsPage, AuditedAction, AuditedEntity } from '@opendatacapture/schemas/audit';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Language, Permissions } from '@opendatacapture/schemas/core';
-import type { $CreateGroupData, Group } from '@opendatacapture/schemas/group';
+import type { $CreateGroupData, $UpdateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type {
   $CreateInstrumentRecordData,
+  $UpdateInstrumentRecordData,
   InstrumentRecord,
   UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
@@ -19,7 +24,13 @@ import type {
 } from '@opendatacapture/schemas/permission-set';
 import type { $CreateSessionData, Session, SessionType } from '@opendatacapture/schemas/session';
 import type { $CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { $CreateUserData, $UpdateUserData, $UpdateUserPermissionsData, User } from '@opendatacapture/schemas/user';
+import type {
+  $CreateUserData,
+  $SelfUpdateUserData,
+  $UpdateUserData,
+  $UpdateUserPermissionsData,
+  User
+} from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
 import { E2E_MAIL_CONFIG, SEEDED_USER_PASSWORD } from './constants';
@@ -76,11 +87,7 @@ export class ApiClient {
       201,
       'create group'
     );
-    const accessibleInstrumentIds = await this.getAccessibleInstrumentIds();
-    await this.expectOk(
-      this.request.patch(`${API}/groups/${group.id}`, { data: { accessibleInstrumentIds }, headers: this.authHeaders }),
-      'grant instrument access'
-    );
+    await this.updateGroup(group.id, { accessibleInstrumentIds: await this.getAccessibleInstrumentIds() });
     return group;
   }
 
@@ -207,6 +214,42 @@ export class ApiClient {
     return { credentials: { password, username }, user };
   }
 
+  /** Deletes assignments through the bulk route the web app's assignment table uses. */
+  async deleteAssignments(ids: string[]): Promise<DeleteBulkAssignmentsResult> {
+    return this.expectJson<DeleteBulkAssignmentsResult>(
+      this.request.post(`${API}/assignments/bulk/delete`, { data: { ids }, headers: this.authHeaders }),
+      200,
+      'delete assignments'
+    );
+  }
+
+  /** Deletes a record over the API, which no page of the web app does. */
+  async deleteRecord(id: string): Promise<void> {
+    await this.expectOk(
+      this.request.delete(`${API}/instrument-records/${id}`, { headers: this.authHeaders }),
+      `delete record '${id}'`
+    );
+  }
+
+  /** Deletes a series through the route the web app's instrument management uses. */
+  async deleteSeries(id: string): Promise<void> {
+    await this.expectOk(
+      this.request.delete(`${API}/instruments/${id}`, { headers: this.authHeaders }),
+      `delete series '${id}'`
+    );
+  }
+
+  /** Deletes a subject over the API, which no page of the web app does; `force` also removes its records. */
+  async deleteSubject(id: string, { force }: { force: boolean }): Promise<void> {
+    await this.expectOk(
+      this.request.delete(`${API}/subjects/${encodeURIComponent(id)}`, {
+        headers: this.authHeaders,
+        params: { force }
+      }),
+      `delete subject '${id}'`
+    );
+  }
+
   /**
    * The languages the instance currently offers. Read rather than assumed because
    * `admin-settings.spec.ts` turns one on and off, in a worker of its own.
@@ -229,15 +272,21 @@ export class ApiClient {
     );
   }
 
-  /** The newest audit entries for one action, as the audit log page and its JSON download read them. */
-  async findAuditLogs(action: $AuditLogAction): Promise<$AuditLog[]> {
+  /** The newest audit entries for one action on one entity, as the audit log page and its JSON download read them. */
+  async findAuditLogs<TEntity extends AuditedEntity>({
+    action,
+    entity
+  }: {
+    action: AuditedAction<TEntity>;
+    entity: TEntity;
+  }): Promise<$AuditLog[]> {
     const { data } = await this.expectJson<$AuditLogsPage>(
       this.request.get(`${API}/audit/logs`, {
         headers: this.authHeaders,
-        params: { action, limit: AUDIT_LOGS_MAX_PAGE_SIZE }
+        params: { action, entity, limit: AUDIT_LOGS_MAX_PAGE_SIZE }
       }),
       200,
-      `find the '${action}' audit logs`
+      `find the '${action}' '${entity}' audit logs`
     );
     return data;
   }
@@ -359,6 +408,37 @@ export class ApiClient {
   /** Links a user to a permission set, removing any custom grants they held. */
   async setUserPermissionSet(id: string, permissionSetId: string): Promise<User> {
     return this.putUserPermissions(id, { kind: 'permissionSet', permissionSetId });
+  }
+
+  async unarchiveUser(id: string): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/users/${id}/unarchive`, { headers: this.authHeaders }),
+      `unarchive user '${id}'`
+    );
+  }
+
+  /** Updates a group through the route the web app's group management uses. */
+  async updateGroup(id: string, data: $UpdateGroupData): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/groups/${id}`, { data, headers: this.authHeaders }),
+      `update group '${id}'`
+    );
+  }
+
+  /** Merges `data` into a record's data over the API, which no page of the web app does. */
+  async updateRecord(id: string, data: $UpdateInstrumentRecordData['data']): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/instrument-records/${id}`, { data: { data }, headers: this.authHeaders }),
+      `update record '${id}'`
+    );
+  }
+
+  /** Updates the account this client is signed in as, through the route the profile page uses. */
+  async updateSelf(id: string, data: $SelfUpdateUserData): Promise<void> {
+    await this.expectOk(
+      this.request.patch(`${API}/users/self-update/${id}`, { data, headers: this.authHeaders }),
+      `update own account '${id}'`
+    );
   }
 
   /** Updates a user's profile fields, which is everything except their permissions. */

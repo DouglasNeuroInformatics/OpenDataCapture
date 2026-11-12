@@ -38,6 +38,7 @@ const baseUser = {
 describe('UsersService', () => {
   let usersService: UsersService;
   let userModel: MockedInstance<Model<'User'>>;
+  let auditLogger: MockedInstance<AuditLogger>;
   let cryptoService: MockedInstance<CryptoService>;
   let groupsService: MockedInstance<GroupsService>;
   let permissionSetsService: MockedInstance<PermissionSetsService>;
@@ -56,6 +57,7 @@ describe('UsersService', () => {
     }).compile();
     userModel = moduleRef.get(getModelToken('User'));
     usersService = moduleRef.get(UsersService);
+    auditLogger = moduleRef.get(AuditLogger);
     cryptoService = moduleRef.get(CryptoService);
     groupsService = moduleRef.get(GroupsService);
     permissionSetsService = moduleRef.get(PermissionSetsService);
@@ -297,18 +299,20 @@ describe('UsersService', () => {
   });
 
   describe('updateById', () => {
+    const storedUser = {
+      additionalPermissions: [
+        { action: 'read', groupId: 'group-1', subject: 'Subject' },
+        { action: 'read', groupId: 'group-2', subject: 'Subject' },
+        { action: 'create', groupId: null, subject: 'Instrument' }
+      ],
+      groupIds: ['group-1', 'group-2'],
+      id: 'user-1',
+      username: 'jane.doe'
+    };
+
     beforeEach(() => {
-      userModel.findFirst.mockResolvedValue({
-        additionalPermissions: [
-          { action: 'read', groupId: 'group-1', subject: 'Subject' },
-          { action: 'read', groupId: 'group-2', subject: 'Subject' },
-          { action: 'create', groupId: null, subject: 'Instrument' }
-        ],
-        groupIds: ['group-1', 'group-2'],
-        id: 'user-1',
-        username: 'jane.doe'
-      });
-      userModel.update.mockResolvedValue({});
+      userModel.findFirst.mockResolvedValue(storedUser);
+      userModel.update.mockResolvedValue(storedUser);
     });
 
     it('should drop the grants confined to a group the user is leaving, and keep every other one', async () => {
@@ -379,7 +383,36 @@ describe('UsersService', () => {
       await expect(
         usersService.updateById('user-1', { password: 'New.Name', username: 'new.name' }, admin)
       ).rejects.toMatchObject({ response: { code: 'PASSWORD_MATCHES_USERNAME' } });
-      expect(userModel.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('should record the fields the update changed, naming the user it changed', async () => {
+      userModel.update.mockResolvedValue({ ...storedUser, groupIds: ['group-2', 'group-1'], username: 'janet.doe' });
+      await usersService.updateById('user-1', { groupIds: ['group-2', 'group-1'], username: 'janet.doe' }, admin);
+      expect(auditLogger.logUpdate).toHaveBeenCalledWith('USER', ['username'], {
+        groupId: null,
+        metadata: { targetUserId: 'user-1' },
+        userId: admin.id
+      });
+    });
+
+    it('should read the row it writes grants from after the breach check, so a slow check cannot restore grants changed meanwhile', async () => {
+      await usersService.updateById(
+        'user-1',
+        { groupIds: ['group-1'], password: 'jf8&Kd0!mZq2wLx', username: 'janet.doe' },
+        admin
+      );
+      expect(pwnedPassword).toHaveBeenCalledBefore(userModel.findFirst);
+    });
+
+    it('should name a new password as changed, though neither row carries it', async () => {
+      userModel.update.mockResolvedValue(storedUser);
+      await usersService.updateById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, admin);
+      expect(auditLogger.logUpdate.mock.lastCall?.[1]).toEqual(['password']);
+    });
+
+    it('should record no update that the service refused', async () => {
+      await expect(usersService.updateById(admin.id, { disabled: true }, admin)).rejects.toThrow(ForbiddenException);
+      expect(auditLogger.logUpdate).not.toHaveBeenCalled();
     });
 
     it('should remove the permission set of a user promoted to administrator, who already holds every permission', async () => {
@@ -419,6 +452,15 @@ describe('UsersService', () => {
       expect(userModel.update.mock.lastCall?.[0].data.archivedAt).toBeInstanceOf(Date);
       expect(userModel.update.mock.lastCall?.[0].where).toMatchObject({ id: 'user-1' });
     });
+
+    it('should record the archive as an archive, so the Archive filter finds it beside instruments', async () => {
+      await usersService.archiveById('user-1', admin);
+      expect(auditLogger.log).toHaveBeenCalledWith('ARCHIVE', 'USER', {
+        groupId: null,
+        metadata: { targetUserId: 'user-1' },
+        userId: admin.id
+      });
+    });
   });
 
   describe('unarchiveById', () => {
@@ -435,18 +477,29 @@ describe('UsersService', () => {
       expect(userModel.update.mock.lastCall?.[0].data).toMatchObject({ archivedAt: null });
       expect(userModel.update.mock.lastCall?.[0].where).toMatchObject({ id: 'user-1' });
     });
+
+    it('should record the restore as an unarchive, so the Unarchive filter finds it', async () => {
+      await usersService.unarchiveById('user-1', admin);
+      expect(auditLogger.log).toHaveBeenCalledWith('UNARCHIVE', 'USER', {
+        groupId: null,
+        metadata: { targetUserId: 'user-1' },
+        userId: admin.id
+      });
+    });
   });
 
   describe('updatePermissions', () => {
+    const storedUser = { basePermissionLevel: 'STANDARD', groupIds: ['group-1'], id: 'user-1' };
+
     beforeEach(() => {
-      userModel.findFirst.mockResolvedValue({ basePermissionLevel: 'STANDARD', groupIds: ['group-1'], id: 'user-1' });
-      userModel.update.mockResolvedValue({});
+      userModel.findFirst.mockResolvedValue(storedUser);
+      userModel.update.mockResolvedValue(storedUser);
     });
 
     describe('custom grants', () => {
       it('should write a grant confined to a group the user belongs to', async () => {
         const permissions: Permissions = [{ action: 'read', groupId: 'group-1', subject: 'Subject' }];
-        await usersService.updatePermissions('user-1', { kind: 'custom', permissions });
+        await usersService.updatePermissions('user-1', { kind: 'custom', permissions }, admin);
         expect(userModel.update.mock.lastCall?.[0]).toMatchObject({
           data: { additionalPermissions: permissions },
           where: { id: 'user-1' }
@@ -454,13 +507,13 @@ describe('UsersService', () => {
       });
 
       it('should remove the permission set in the same write, so the user never holds both', async () => {
-        await usersService.updatePermissions('user-1', { kind: 'custom', permissions: [] });
+        await usersService.updatePermissions('user-1', { kind: 'custom', permissions: [] }, admin);
         expect(userModel.update.mock.lastCall?.[0].data.permissionSet).toEqual({ disconnect: true });
       });
 
       it('should reject a grant confined to a group the user does not belong to, before writing anything', async () => {
         const permissions: Permissions = [{ action: 'read', groupId: 'group-2', subject: 'Subject' }];
-        await expect(usersService.updatePermissions('user-1', { kind: 'custom', permissions })).rejects.toThrow(
+        await expect(usersService.updatePermissions('user-1', { kind: 'custom', permissions }, admin)).rejects.toThrow(
           BadRequestException
         );
         expect(userModel.update).not.toHaveBeenCalled();
@@ -468,7 +521,7 @@ describe('UsersService', () => {
 
       it("should accept an unscoped grant whatever the user's groups", async () => {
         const permissions: Permissions = [{ action: 'create', groupId: null, subject: 'Instrument' }];
-        await usersService.updatePermissions('user-1', { kind: 'custom', permissions });
+        await usersService.updatePermissions('user-1', { kind: 'custom', permissions }, admin);
         expect(userModel.update.mock.lastCall?.[0]).toMatchObject({ data: { additionalPermissions: permissions } });
       });
     });
@@ -477,7 +530,7 @@ describe('UsersService', () => {
       const data = { kind: 'permissionSet', permissionSetId: 'set-1' } as const;
 
       it('should link the set and empty the custom grants in the same write, so the user never holds both', async () => {
-        await usersService.updatePermissions('user-1', data);
+        await usersService.updatePermissions('user-1', data, admin);
         expect(userModel.update.mock.lastCall?.[0]).toMatchObject({
           data: { additionalPermissions: [], permissionSet: { connect: { id: 'set-1' } } },
           where: { id: 'user-1' }
@@ -485,28 +538,28 @@ describe('UsersService', () => {
       });
 
       it('should look up the set with the caller ability', async () => {
-        await usersService.updatePermissions('user-1', data, { ability: admin.ability });
+        await usersService.updatePermissions('user-1', data, admin);
         expect(permissionSetsService.findById).toHaveBeenCalledWith('set-1', { ability: admin.ability });
       });
 
       it('should propagate a set lookup that finds nothing, before writing anything', async () => {
         permissionSetsService.findById.mockRejectedValue(new NotFoundException());
-        await expect(usersService.updatePermissions('user-1', data)).rejects.toThrow(NotFoundException);
+        await expect(usersService.updatePermissions('user-1', data, admin)).rejects.toThrow(NotFoundException);
         expect(userModel.update).not.toHaveBeenCalled();
       });
 
       it('should refuse a set for an administrator, who already holds every permission', async () => {
         userModel.findFirst.mockResolvedValue({ basePermissionLevel: 'ADMIN', groupIds: [], id: 'user-1' });
-        await expect(usersService.updatePermissions('user-1', data)).rejects.toThrow(BadRequestException);
+        await expect(usersService.updatePermissions('user-1', data, admin)).rejects.toThrow(BadRequestException);
         expect(userModel.update).not.toHaveBeenCalled();
       });
     });
 
     it('should throw when the user cannot be found, rather than creating one', async () => {
       userModel.findFirst.mockResolvedValue(null);
-      await expect(usersService.updatePermissions('user-1', { kind: 'custom', permissions: [] })).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(
+        usersService.updatePermissions('user-1', { kind: 'custom', permissions: [] }, admin)
+      ).rejects.toThrow(NotFoundException);
       expect(userModel.update).not.toHaveBeenCalled();
     });
 
@@ -517,10 +570,34 @@ describe('UsersService', () => {
       const ability = createAppAbility([
         { action: 'manage', conditions: { groupIds: { hasSome: ['group-1'] } }, subject: 'User' }
       ]);
-      await usersService.updatePermissions('user-1', data, { ability });
+      await usersService.updatePermissions('user-1', data, { ...admin, ability });
       expect(userModel.update.mock.lastCall?.[0]).toMatchObject({
         where: { AND: [accessibleQuery(ability, 'update', 'User')], id: 'user-1' }
       });
+    });
+
+    it('should record the permission fields the write changed, naming the user it changed', async () => {
+      userModel.update.mockResolvedValue({
+        additionalPermissions: [],
+        basePermissionLevel: 'STANDARD',
+        groupIds: ['group-1'],
+        id: 'user-1',
+        permissionSetId: 'set-1'
+      });
+      await usersService.updatePermissions('user-1', { kind: 'permissionSet', permissionSetId: 'set-1' }, admin);
+      expect(auditLogger.logUpdate).toHaveBeenCalledWith('USER', ['additionalPermissions', 'permissionSetId'], {
+        groupId: null,
+        metadata: { targetUserId: 'user-1' },
+        userId: admin.id
+      });
+    });
+
+    it('should record no permission write that the service refused', async () => {
+      const permissions: Permissions = [{ action: 'read', groupId: 'group-2', subject: 'Subject' }];
+      await expect(usersService.updatePermissions('user-1', { kind: 'custom', permissions }, admin)).rejects.toThrow(
+        BadRequestException
+      );
+      expect(auditLogger.logUpdate).not.toHaveBeenCalled();
     });
   });
 
@@ -528,8 +605,8 @@ describe('UsersService', () => {
     const currentUser = { id: 'user-1', username: 'jane.doe' } as any;
 
     beforeEach(() => {
-      userModel.findFirst.mockResolvedValue({ hashedPassword: 'hashed-current', id: 'user-1' });
-      userModel.update.mockResolvedValue({});
+      userModel.findFirst.mockResolvedValue({ groupIds: [], hashedPassword: 'hashed-current', id: 'user-1' });
+      userModel.update.mockResolvedValue({ groupIds: [], id: 'user-1' });
       cryptoService.comparePassword.mockResolvedValue(false);
     });
 
@@ -550,8 +627,32 @@ describe('UsersService', () => {
       expect(userModel.update).not.toHaveBeenCalled();
     });
 
+    it('should read the account it compares against by id alone, since a group manager in no group cannot read themselves', async () => {
+      const ability = createAppAbility([
+        { action: 'read', conditions: { groupIds: { hasSome: [] } }, subject: 'User' }
+      ]);
+      await usersService.updateSelfById('user-1', { firstName: 'Janet' }, { ...currentUser, ability });
+      expect(userModel.findFirst.mock.calls[0]?.[0]?.where).toStrictEqual({ AND: [{}], id: 'user-1' });
+    });
+
+    it('should read the row it compares after the breach check, so the entry names only this write', async () => {
+      await usersService.updateSelfById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, currentUser);
+      expect(pwnedPassword).toHaveBeenCalledBefore(userModel.findFirst);
+    });
+
+    it('should record the fields the user changed on their own account, never their values', async () => {
+      userModel.findFirst.mockResolvedValue({ firstName: 'Jane', groupIds: [], id: 'user-1', mustResetPassword: true });
+      userModel.update.mockResolvedValue({ firstName: 'Janet', groupIds: [], id: 'user-1', mustResetPassword: false });
+      await usersService.updateSelfById('user-1', { firstName: 'Janet', password: 'jf8&Kd0!mZq2wLx' }, currentUser);
+      expect(auditLogger.logUpdate).toHaveBeenCalledWith('USER', ['firstName', 'mustResetPassword', 'password'], {
+        groupId: null,
+        metadata: { targetUserId: 'user-1' },
+        userId: 'user-1'
+      });
+    });
+
     it('should throw when the account disappears before its current password can be compared', async () => {
-      userModel.findFirst.mockResolvedValue(null);
+      userModel.findFirst.mockResolvedValueOnce(null);
       await expect(usersService.updateSelfById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, currentUser)).rejects.toThrow(
         NotFoundException
       );
