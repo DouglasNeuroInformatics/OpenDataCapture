@@ -26,7 +26,7 @@ export const createAuthSlice: SliceCreator<AuthSlice> = (set, get) => {
   return {
     accessToken,
     changeGroup: (group) => {
-      set({ currentGroup: group, currentSession: null, preferredGroupId: group.id });
+      set({ currentGroup: group, currentSession: null, preferredGroupId: group?.id ?? null });
     },
     currentGroup: initialState?.currentGroup ?? null,
     currentUser: initialState?.currentUser ?? null,
