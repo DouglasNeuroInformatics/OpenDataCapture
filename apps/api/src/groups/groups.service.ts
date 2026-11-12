@@ -5,6 +5,7 @@ import { $CreateGroupData, $UpdateGroupData } from '@opendatacapture/schemas/gro
 import type { GroupEmailTemplate } from '@opendatacapture/schemas/group';
 import type { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { omit } from 'lodash-es';
 
 import { AuditLogger } from '@/audit/audit.logger';
 import { changedRowFields } from '@/audit/audit.utils';
@@ -157,11 +158,10 @@ export class GroupsService {
         }
         throw err;
       });
-    const fields = changedRowFields(group, updated, [
+    // This write sets neither member list, so a difference in one is another writer's change.
+    const fields = changedRowFields(omit(group, 'subjectIds', 'userIds'), omit(updated, 'subjectIds', 'userIds'), [
       'accessibleInstrumentIds',
-      'instrumentRepoIds',
-      'subjectIds',
-      'userIds'
+      'instrumentRepoIds'
     ]);
     await this.auditLogger.logUpdate('GROUP', fields, { groupId: id, userId: currentUser.id });
     return updated;

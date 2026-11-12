@@ -117,13 +117,7 @@ describe('GroupsService', () => {
 
   describe('updateById', () => {
     /** The id lists every stored group carries, which the logged diff compares. */
-    const groupRow = (fields: object) => ({
-      accessibleInstrumentIds: [],
-      instrumentRepoIds: [],
-      subjectIds: [],
-      userIds: [],
-      ...fields
-    });
+    const groupRow = (fields: object) => ({ accessibleInstrumentIds: [], instrumentRepoIds: [], ...fields });
 
     beforeEach(() => {
       groupModel.update.mockResolvedValue(groupRow({ name: 'Test Group', settings: {} }));
@@ -145,6 +139,15 @@ describe('GroupsService', () => {
         groupId: '123',
         userId: admin.id
       });
+    });
+
+    it("should leave the member lists out of the entry, since this write sets neither and a change in one is another writer's", async () => {
+      groupModel.findFirst.mockResolvedValueOnce(groupRow({ name: 'Old Name', settings: {}, userIds: ['user-1'] }));
+      groupModel.update.mockResolvedValueOnce(
+        groupRow({ name: 'New Name', settings: {}, subjectIds: ['subject-1'], userIds: ['user-1', 'user-2'] })
+      );
+      await groupsService.updateById('123', { name: 'New Name' }, admin);
+      expect(auditLogger.logUpdate.mock.lastCall?.[1]).toEqual(['name']);
     });
 
     it('should record no update that lost to a concurrent edit', async () => {
