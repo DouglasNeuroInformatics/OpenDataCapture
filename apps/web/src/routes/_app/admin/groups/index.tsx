@@ -288,12 +288,12 @@ const RouteComponent = () => {
                     );
                   }}
                 >
-                  {t({ en: 'Unarchive', es: 'Desarchivar', fr: 'Désarchiver' })}
+                  {t('common.unarchive')}
                 </Button>
               ) : (
                 <Dialog.Trigger asChild>
                   <Button className="flex-1" type="button" variant="danger">
-                    {t({ en: 'Archive', es: 'Archivar', fr: 'Archiver' })}
+                    {t('common.archive')}
                   </Button>
                 </Dialog.Trigger>
               )}
