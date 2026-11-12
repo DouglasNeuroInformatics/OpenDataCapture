@@ -395,6 +395,15 @@ describe('UsersService', () => {
       });
     });
 
+    it('should read the row it writes grants from after the breach check, so a slow check cannot restore grants changed meanwhile', async () => {
+      await usersService.updateById(
+        'user-1',
+        { groupIds: ['group-1'], password: 'jf8&Kd0!mZq2wLx', username: 'janet.doe' },
+        admin
+      );
+      expect(pwnedPassword).toHaveBeenCalledBefore(userModel.findFirst);
+    });
+
     it('should name a new password as changed, though neither row carries it', async () => {
       userModel.update.mockResolvedValue(storedUser);
       await usersService.updateById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, admin);
@@ -626,6 +635,11 @@ describe('UsersService', () => {
       expect(userModel.findFirst.mock.calls[0]?.[0]?.where).toStrictEqual({ AND: [{}], id: 'user-1' });
     });
 
+    it('should read the row it compares after the breach check, so the entry names only this write', async () => {
+      await usersService.updateSelfById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, currentUser);
+      expect(pwnedPassword).toHaveBeenCalledBefore(userModel.findFirst);
+    });
+
     it('should record the fields the user changed on their own account, never their values', async () => {
       userModel.findFirst.mockResolvedValue({ firstName: 'Jane', groupIds: [], id: 'user-1', mustResetPassword: true });
       userModel.update.mockResolvedValue({ firstName: 'Janet', groupIds: [], id: 'user-1', mustResetPassword: false });
@@ -638,7 +652,7 @@ describe('UsersService', () => {
     });
 
     it('should throw when the account disappears before its current password can be compared', async () => {
-      userModel.findFirst.mockResolvedValueOnce({ id: 'user-1' }).mockResolvedValueOnce(null);
+      userModel.findFirst.mockResolvedValueOnce(null);
       await expect(usersService.updateSelfById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, currentUser)).rejects.toThrow(
         NotFoundException
       );

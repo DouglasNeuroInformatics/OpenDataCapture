@@ -230,17 +230,20 @@ export class UsersService {
     if (id === currentUser.id && (data.disabled || isDemotion)) {
       throw new ForbiddenException('You may not remove your own administrator access');
     }
+    let hashedPassword: string | undefined;
+    if (password) {
+      const username = data.username ?? (await this.findById(id, { ability })).username;
+      await this.validatePassword(password, username);
+      hashedPassword = await this.cryptoService.hashPassword(password);
+    }
+    // Read after the breach check, which can take seconds, so the grants written below are not a copy
+    // that another admin's change could have overtaken.
     const current = await this.findById(id, { ability });
     if (
       data.username &&
       (await this.userModel.exists({ id: { not: id }, username: matchingUsername(data.username) }))
     ) {
       throw new ConflictException(`User with username '${data.username}' already exists!`);
-    }
-    let hashedPassword: string | undefined;
-    if (password) {
-      await this.validatePassword(password, data.username ?? current.username);
-      hashedPassword = await this.cryptoService.hashPassword(password);
     }
     const user = await this.userModel.update({
       data: {
@@ -308,15 +311,17 @@ export class UsersService {
 
     const { dateOfBirth, email, firstName, lastName, phoneNumber, sex } = data;
 
-    // Unscoped, like the write below, because the id is the caller's own: a group manager in no
-    // group holds no rule that lets them read themselves.
-    const current = await this.findById(id);
     let hashedPassword: string | undefined;
     if (password) {
       await this.validatePassword(password, currentUser.username);
       await this.validatePasswordIsNew(id, password);
       hashedPassword = await this.cryptoService.hashPassword(password);
     }
+
+    // Unscoped, like the write below, because the id is the caller's own: a group manager in no
+    // group holds no rule that lets them read themselves. Read after the breach check, so the logged
+    // diff starts from the row as it stands just before the write.
+    const current = await this.findById(id);
 
     const user = await this.userModel.update({
       data: {
