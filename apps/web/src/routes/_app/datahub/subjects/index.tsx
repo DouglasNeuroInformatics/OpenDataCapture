@@ -11,14 +11,13 @@ import {
 } from '@douglasneuroinformatics/libui/components';
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
-import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
+import { INSTRUMENT_RECORDS_EXPORT_MAX_RECORDS } from '@opendatacapture/schemas/instrument-records';
+import type { $ExportInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
 import type { Sex, Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 import { ChevronDownIcon, UserSearchIcon } from 'lucide-react';
-import { unpack } from 'msgpackr/unpack';
-import { unparse } from 'papaparse';
 
 import { CollectedFilterMenu } from '@/components/CollectedFilterMenu';
 import { ColorTagCell } from '@/components/ColorTagCell';
@@ -31,7 +30,14 @@ import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery
 import { useAppStore } from '@/store';
 import { DEFAULT_COLLECTED_FILTER, matchesCollectedFilter } from '@/utils/collected-filter';
 import type { CollectedFilter } from '@/utils/collected-filter';
-import { downloadSubjectTableExcel } from '@/utils/excel';
+import { downloadSubjectTableExcel, EXCEL_MAX_DATA_ROWS, ExcelRowLimitExceededError } from '@/utils/excel';
+import {
+  buildCsvExportBlob,
+  buildJsonExportBlob,
+  collectExcelExportRows,
+  downloadBlob,
+  IncompleteExportStreamError
+} from '@/utils/export';
 import { getListedSubjectIds } from '@/utils/table';
 import { getSexColor } from '@/utils/tag-colors';
 
@@ -234,20 +240,46 @@ const Toggles: React.FC<{
     }
   };
 
-  const getExportRecords = async () => {
-    const response = await axios.get<ArrayBuffer>('/v1/instrument-records/export', {
-      meta: {
-        disableDefaultTimeout: true
-      },
-      params: {
-        groupId: currentGroup?.id
-      },
-      responseType: 'arraybuffer'
-    });
-    return unpack(new Uint8Array(response.data)) as InstrumentRecordsExport;
+  const getExportErrorMessage = (err: unknown): string => {
+    if (isAxiosError(err) && err.response?.status === 422) {
+      const maxRecords = INSTRUMENT_RECORDS_EXPORT_MAX_RECORDS.toLocaleString();
+      return t({
+        en: `Export failed: More than ${maxRecords} records matched. Narrow the filters and try again.`,
+        es: `Error al exportar: coinciden más de ${maxRecords} registros. Ajuste los filtros e inténtelo de nuevo.`,
+        fr: `Échec de l'exportation : plus de ${maxRecords} enregistrements correspondent. Affinez les filtres et réessayez.`
+      });
+    }
+    if (err instanceof ExcelRowLimitExceededError) {
+      const maxRows = EXCEL_MAX_DATA_ROWS.toLocaleString();
+      return t({
+        en: `Export failed: Result exceeds Excel's limit of ${maxRows} rows. Export as CSV or JSON instead.`,
+        es: `Error al exportar: el resultado supera el límite de Excel de ${maxRows} filas. Exporte como CSV o JSON en su lugar.`,
+        fr: `Échec de l'exportation : le résultat dépasse la limite Excel de ${maxRows} lignes. Exportez plutôt au format CSV ou JSON.`
+      });
+    }
+    if (err instanceof IncompleteExportStreamError) {
+      return t({
+        en: 'Export failed: Download stream was interrupted before completion.',
+        es: 'Error al exportar: la descarga se interrumpió antes de completarse.',
+        fr: "Échec de l'exportation : le téléchargement a été interrompu avant la fin."
+      });
+    }
+    return t({ en: 'Export failed', es: 'Error al exportar', fr: "Échec de l'exportation" });
   };
 
   const handleExportSelection = (option: 'CSV' | 'Excel' | 'JSON') => {
+    const noEntriesMessage = t({
+      en: 'Export failed: No entries to export',
+      es: 'Error al exportar: no hay entradas que exportar',
+      fr: "Échec de l'exportation : aucune entrée à exporter"
+    });
+
+    const listedSubjects = getListedSubjectIds(table);
+    if (listedSubjects.size === 0) {
+      addNotification({ message: noEntriesMessage, type: 'error' });
+      return;
+    }
+
     const baseFilename = `${currentUser!.username}_${new Date().toISOString()}`;
     addNotification({
       message: t({
@@ -261,60 +293,73 @@ const Toggles: React.FC<{
       setTimeout(resolve, 350);
     });
 
-    getExportRecords()
-      .then((data): any => {
-        const listedSubjects = getListedSubjectIds(table);
+    const exportPayload: $ExportInstrumentRecordsData = {
+      groupId: currentGroup?.id,
+      subjectIds: [...listedSubjects]
+    };
 
-        const filteredData = data.filter((dataEntry) => listedSubjects.has(dataEntry.subjectId));
+    void (async () => {
+      try {
+        const response = await axios.post<ReadableStream<Uint8Array>>('/v1/instrument-records/export', exportPayload, {
+          adapter: 'fetch',
+          meta: {
+            disableDefaultErrorNotification: true,
+            disableDefaultTimeout: true,
+            idempotent: true
+          },
+          responseType: 'stream'
+        });
 
-        if (filteredData.length < 1) {
-          throw Error(
-            t({
-              en: 'Export failed: No entries to export',
-              es: 'Error al exportar: no hay entradas que exportar',
-              fr: "Échec de l'exportation : aucune entrée à exporter"
-            })
-          );
-        }
-
-        const exportData = filteredData;
-
+        let triggerDownload: () => void;
+        let rowCount: number;
         switch (option) {
-          case 'CSV':
-            void download('README.txt', t('datahub.index.table.exportHelpText'));
-            void download(`${baseFilename}.csv`, unparse(exportData));
+          case 'CSV': {
+            const csv = await buildCsvExportBlob(response.data);
+            rowCount = csv.rowCount;
+            triggerDownload = () => {
+              void download('README.txt', t('datahub.index.table.exportHelpText'));
+              downloadBlob(`${baseFilename}.csv`, csv.blob);
+            };
             break;
-          case 'Excel': {
-            downloadSubjectTableExcel(`${baseFilename}.xlsx`, exportData, 'Records');
-            return;
           }
-          case 'JSON':
-            return download(`${baseFilename}.json`, JSON.stringify(exportData, null, 2));
+          case 'Excel': {
+            const exportData = await collectExcelExportRows(response.data);
+            rowCount = exportData.length;
+            triggerDownload = () => {
+              downloadSubjectTableExcel(`${baseFilename}.xlsx`, exportData, 'Records');
+            };
+            break;
+          }
+          case 'JSON': {
+            const json = await buildJsonExportBlob(response.data);
+            rowCount = json.rowCount;
+            triggerDownload = () => {
+              downloadBlob(`${baseFilename}.json`, json.blob);
+            };
+            break;
+          }
         }
-      })
-      .then(() => {
-        return waitTime;
-      })
-      .then(() => {
+
+        if (rowCount < 1) {
+          await waitTime;
+          addNotification({ message: noEntriesMessage, type: 'error' });
+          return;
+        }
+
+        triggerDownload();
+        await waitTime;
         addNotification({
           message: t({ en: 'Export successful', es: 'Exportación realizada correctamente', fr: 'Exportation réussie' }),
           type: 'success'
         });
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
-        if (err instanceof Error && err.message) {
-          addNotification({
-            message: err.message,
-            type: 'error'
-          });
-        } else {
-          addNotification({
-            message: t({ en: 'Export failed', es: 'Error al exportar', fr: "Échec de l'exportation" }),
-            type: 'error'
-          });
-        }
-      });
+        addNotification({
+          message: getExportErrorMessage(err),
+          type: 'error'
+        });
+      }
+    })();
   };
 
   return (

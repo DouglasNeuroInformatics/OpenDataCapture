@@ -35,10 +35,6 @@ The same artifact is addressed three ways. They are not interchangeable.
 | `#runtime/v1/*`               | Node subpath imports        | `apps/api/package.json` `imports` **and** `apps/api/tsconfig.json` `paths`; `apps/api/libnest.config.ts` copies `dist` into `dist/runtime/v1` at build                                                        |
 | `@opendatacapture/runtime-v1` | ordinary package resolution | a `dependencies` entry, used to locate `dist` on disk                                                                                                                                                         |
 
-`apps/api/src/instrument-records/export-worker.js` tries a `#runtime/v1/...` import and falls back to
-`@opendatacapture/runtime-v1/...`, because the subpath import does not resolve the same way from
-source as from the built `dist`.
-
 Instrument source always uses the first form. `packages/instrument-bundler` marks every
 `/runtime/v1/...` specifier external **without checking that it resolves** (rewriting rules: its
 `AGENTS.md` §Module resolution), so a package that was never emitted, or a subpath the wrapper's

@@ -10,6 +10,7 @@ import { UsersModule } from '@/users/users.module';
 import { FilesController } from './files/files.controller';
 import { FilesService } from './files/files.service';
 import { InstrumentMeasuresService } from './instrument-measures.service';
+import { InstrumentRecordsExportService } from './instrument-records-export.service';
 import { InstrumentRecordsController } from './instrument-records.controller';
 import { InstrumentRecordsService } from './instrument-records.service';
 
@@ -17,6 +18,6 @@ import { InstrumentRecordsService } from './instrument-records.service';
   controllers: [FilesController, InstrumentRecordsController],
   exports: [InstrumentRecordsService],
   imports: [GroupsModule, InstrumentsModule, SessionsModule, SubjectsModule, StorageModule, UsersModule],
-  providers: [FilesService, InstrumentMeasuresService, InstrumentRecordsService]
+  providers: [FilesService, InstrumentMeasuresService, InstrumentRecordsExportService, InstrumentRecordsService]
 })
 export class InstrumentRecordsModule {}

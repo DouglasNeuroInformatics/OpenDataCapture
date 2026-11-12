@@ -280,7 +280,7 @@ exist.
 ## Build
 
 `libnest build` bundles to a single `dist/app.js` via esbuild. The `build.onComplete` hook in
-`libnest.config.ts` copies `@opendatacapture/runtime-v1/dist` and the export worker into `dist/`.
+`libnest.config.ts` copies `@opendatacapture/runtime-v1/dist` into `dist/`.
 **Any other non-bundled runtime asset must be copied there too, or it will not exist in production.**
 
 `nativeDependencies: ['esbuild']` in `libnest.config.ts` makes the build emit the esbuild native

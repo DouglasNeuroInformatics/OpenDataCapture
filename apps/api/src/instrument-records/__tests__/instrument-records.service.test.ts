@@ -1,6 +1,3 @@
-import { EventEmitter } from 'node:events';
-import { Worker } from 'node:worker_threads';
-
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { getModelToken, LoggingService, PRISMA_CLIENT_TOKEN } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
@@ -13,10 +10,8 @@ import {
   UnprocessableEntityException
 } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AbilityFactory } from '@/auth/ability.factory';
 import { accessibleQuery, createAppAbility } from '@/auth/ability.utils';
 import { StorageService } from '@/storage/storage.service';
 import { UsersService } from '@/users/users.service';
@@ -27,33 +22,6 @@ import { SessionsService } from '../../sessions/sessions.service';
 import { SubjectsService } from '../../subjects/subjects.service';
 import { InstrumentMeasuresService } from '../instrument-measures.service';
 import { InstrumentRecordsService } from '../instrument-records.service';
-
-import type { RecordType } from '../thread-types';
-
-// Every export runs the real worker unless a test swaps in a FakeWorker, so the protocol is exercised
-// end to end while the failure modes the real worker never produces can still be driven.
-vi.mock('worker_threads', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('worker_threads')>();
-  return {
-    ...actual,
-    Worker: vi.fn(function MockWorker(filename: string) {
-      return new actual.Worker(filename);
-    })
-  };
-});
-
-class FakeWorker extends EventEmitter {
-  postMessage = vi.fn();
-  terminate = vi.fn(() => Promise.resolve(0));
-}
-
-function useFakeWorker() {
-  const fakeWorker = new FakeWorker();
-  vi.mocked(Worker).mockImplementationOnce(function FakeWorkerConstructor() {
-    return fakeWorker as unknown as Worker;
-  });
-  return fakeWorker;
-}
 
 describe('InstrumentRecordsService', () => {
   let groupsService: MockedInstance<GroupsService>;
@@ -115,10 +83,6 @@ describe('InstrumentRecordsService', () => {
     sessionsService = moduleRef.get(SessionsService);
     subjectsService = moduleRef.get(SubjectsService);
     usersService = moduleRef.get(UsersService);
-  });
-
-  afterEach(() => {
-    vi.mocked(Worker).mockReset();
   });
 
   describe('deleteById', () => {
@@ -821,267 +785,6 @@ describe('InstrumentRecordsService', () => {
 
       expect(records).toHaveLength(1);
       expect(records[0]).toMatchObject({ id: 'record-1', session: { user: { username: null } } });
-    });
-  });
-
-  describe('exportRecords', () => {
-    it('should return an array of export records with correct shape', async () => {
-      const mockRecords = [
-        {
-          computedMeasures: { score: 85 },
-          date: '2023-01-01',
-          groupId: '123',
-          id: 'record-1',
-          instrumentId: 'instrument-1',
-          seriesInstrumentId: null,
-          session: {
-            date: '2023-01-01',
-            id: 'session-1',
-            type: 'IN_PERSON' as const,
-            user: { username: 'testuser' }
-          },
-          subject: {
-            age: 20,
-            groupIds: ['group-1'],
-            id: 'subject-1',
-            sex: 'MALE' as const
-          }
-        }
-      ] satisfies RecordType[];
-
-      const mockInstruments = [
-        {
-          id: 'instrument-1',
-          internal: { edition: 1, name: 'Test Instrument' }
-        }
-      ];
-
-      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce(mockRecords);
-      instrumentsService.findById.mockResolvedValueOnce(mockInstruments[0]);
-
-      const ability = { can: () => true } as any;
-
-      const result = await instrumentRecordsService.exportRecords({}, { ability });
-
-      expect(Array.isArray(result)).toBe(true);
-      expect(result.length).toBeGreaterThan(0);
-      expect(result[0]).toMatchObject({
-        groupId: '123',
-        instrumentEdition: 1,
-        instrumentName: 'Test Instrument',
-        measure: 'score',
-        sessionId: 'session-1',
-        sessionType: 'IN_PERSON',
-        subjectId: expect.any(String),
-        timestamp: expect.any(String),
-        username: 'testuser',
-        value: 85
-      });
-    });
-
-    describe('with the ability built at login', () => {
-      /**
-       * A raw aggregate row for one subject enrolled in both groups, so only the record's own
-       * `groupId` (null for a record collected outside any group) can tell the rows apart.
-       */
-      const exportRow = (groupId: null | string) => ({
-        computedMeasures: { score: 85 },
-        date: '2023-01-01',
-        groupId,
-        id: `record-${groupId}`,
-        instrumentId: 'instrument-1',
-        session: {
-          date: '2023-01-01',
-          id: `session-${groupId}`,
-          type: 'IN_PERSON' as const,
-          user: { username: 'testuser' }
-        },
-        subject: { age: 20, groupIds: ['group-1', 'group-2'], id: 'subject-1', sex: 'MALE' }
-      });
-
-      const abilityAt = (basePermissionLevel: 'ADMIN' | 'GROUP_MANAGER') => {
-        return new AbilityFactory(MockFactory.createMock(LoggingService) as unknown as LoggingService).createForPayload(
-          {
-            additionalPermissions: undefined,
-            basePermissionLevel,
-            firstName: 'Test',
-            groups: [{ id: 'group-1' }],
-            id: 'user-1',
-            lastName: 'User',
-            username: 'test-user'
-          } as any,
-          []
-        );
-      };
-
-      const exportedGroupIds = async (
-        rows: ReturnType<typeof exportRow>[],
-        basePermissionLevel: 'ADMIN' | 'GROUP_MANAGER'
-      ) => {
-        instrumentRecordModel.aggregateRaw.mockResolvedValueOnce(rows);
-        instrumentsService.findById.mockResolvedValue({ id: 'instrument-1', internal: { edition: 1, name: 'Test' } });
-        const result = await instrumentRecordsService.exportRecords({}, { ability: abilityAt(basePermissionLevel) });
-        return result.map((entry) => entry.groupId);
-      };
-
-      it("should export a group manager's own group and no other, even for a subject shared with another, since each raw row is checked as an instrument record", async () => {
-        const rows = [exportRow('group-1'), exportRow('group-2')];
-        expect(await exportedGroupIds(rows, 'GROUP_MANAGER')).toStrictEqual(['group-1']);
-      });
-
-      it("should leave records collected outside any group out of a group manager's export, even for a subject in their group, as the record list does", async () => {
-        const rows = [exportRow('group-1'), exportRow(null)];
-        expect(await exportedGroupIds(rows, 'GROUP_MANAGER')).toStrictEqual(['group-1']);
-      });
-
-      it('should export every group and the records collected outside any group to an administrator, labelling the latter root', async () => {
-        const rows = [exportRow('group-1'), exportRow('group-2'), exportRow(null)];
-        expect(await exportedGroupIds(rows, 'ADMIN')).toStrictEqual(['group-1', 'group-2', DEFAULT_GROUP_NAME]);
-      });
-    });
-
-    it('should join and project the session user by a cast-hardened lookup, so the export includes the username of whoever ran the session', async () => {
-      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
-      const ability = { can: () => true } as any;
-
-      await instrumentRecordsService.exportRecords({}, { ability });
-
-      const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
-
-      // Session documents only ever store a userId reference, never an embedded user object, so
-      // resolving a username requires an explicit join against UserModel.
-      const userLookupStage = pipeline.find((stage) => stage.$lookup?.from === 'UserModel');
-      expect(userLookupStage).toBeDefined();
-
-      const projectStage = pipeline.find((stage) => stage.$project);
-      expect(projectStage.$project.session.user.username).toBe('$sessionUser.username');
-    });
-
-    it('should match only the requested group in the aggregation, so a scoped export reads no other group', async () => {
-      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
-
-      await instrumentRecordsService.exportRecords({ groupId: 'group-1' }, { ability: createAppAbility([]) });
-
-      const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
-      const matchStage = pipeline.find((stage) => stage.$match);
-      expect(matchStage.$match.$expr).toStrictEqual({ $eq: ['$groupId', { $toObjectId: 'group-1' }] });
-    });
-
-    // A series carries no language-independent name, so the worker is handed the titles resolved
-    // here rather than the ids — an export naming only ids says nothing about what collected a row.
-    it('should resolve the title of every series the records reference before handing them to the worker', async () => {
-      const record = {
-        computedMeasures: { score: 85 },
-        date: '2023-01-01',
-        groupId: 'group-1',
-        id: 'record-1',
-        instrumentId: 'instrument-1',
-        seriesInstrumentId: 'series-1',
-        session: { date: '2023-01-01', id: 'session-1', type: 'IN_PERSON' as const, user: null },
-        subject: { age: 20, groupIds: ['group-1'], id: 'subject-1', sex: 'MALE' }
-      } satisfies RecordType;
-      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([record]);
-      instrumentsService.findById
-        .mockResolvedValueOnce({ id: 'instrument-1', internal: { edition: 1, name: 'X' } } as any)
-        .mockResolvedValueOnce({
-          details: { title: 'Happiness Series' },
-          id: 'series-1',
-          kind: 'SERIES',
-          language: 'en'
-        } as any);
-      const worker = useFakeWorker();
-
-      const result = instrumentRecordsService.exportRecords(
-        {},
-        { ability: createAppAbility([{ action: 'manage', subject: 'all' }]) }
-      );
-      await vi.waitFor(() => expect(worker.postMessage).toHaveBeenCalledOnce());
-
-      expect(worker.postMessage).toHaveBeenCalledWith({
-        data: {
-          instruments: [{ edition: 1, id: 'instrument-1', name: 'X' }],
-          seriesNames: { 'series-1': 'Happiness Series' }
-        },
-        type: 'INIT'
-      });
-      worker.emit('error', new Error('settle'));
-      await expect(result).rejects.toThrow('settle');
-    });
-
-    // Resolving that title unscoped would read the name of a series owned by a group the caller
-    // cannot see, and write it into a file they are handed. Scoped, an unreadable series resolves to
-    // nothing and the row names it by id instead.
-    it("should resolve a series title with the caller ability, so no export names another group's series", async () => {
-      const record = {
-        computedMeasures: { score: 85 },
-        date: '2023-01-01',
-        groupId: 'group-1',
-        id: 'record-1',
-        instrumentId: 'instrument-1',
-        seriesInstrumentId: 'series-1',
-        session: { date: '2023-01-01', id: 'session-1', type: 'IN_PERSON' as const, user: null },
-        subject: { age: 20, groupIds: ['group-1'], id: 'subject-1', sex: 'MALE' }
-      } satisfies RecordType;
-      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([record]);
-      instrumentsService.findById
-        .mockResolvedValueOnce({ id: 'instrument-1', internal: { edition: 1, name: 'X' } } as any)
-        .mockResolvedValueOnce({
-          details: { title: 'Happiness Series' },
-          id: 'series-1',
-          kind: 'SERIES',
-          language: 'en'
-        } as any);
-      const worker = useFakeWorker();
-      const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
-
-      const result = instrumentRecordsService.exportRecords({}, { ability });
-      await vi.waitFor(() => expect(worker.postMessage).toHaveBeenCalledOnce());
-
-      expect(instrumentsService.findById).toHaveBeenCalledWith('series-1', { ability });
-      worker.emit('error', new Error('settle'));
-      await expect(result).rejects.toThrow('settle');
-    });
-
-    describe('when the worker fails', () => {
-      const record = {
-        computedMeasures: { score: 85 },
-        date: '2023-01-01',
-        groupId: 'group-1',
-        id: 'record-1',
-        instrumentId: 'instrument-1',
-        seriesInstrumentId: null,
-        session: { date: '2023-01-01', id: 'session-1', type: 'IN_PERSON' as const, user: null },
-        subject: { age: 20, groupIds: ['group-1'], id: 'subject-1', sex: 'MALE' }
-      } satisfies RecordType;
-      const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
-
-      beforeEach(() => {
-        instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([record]);
-      });
-
-      it('should reject with the error the worker reports for a chunk', async () => {
-        instrumentsService.findById.mockResolvedValueOnce({
-          id: 'other-instrument',
-          internal: { edition: 1, name: 'X' }
-        });
-
-        await expect(instrumentRecordsService.exportRecords({}, { ability })).rejects.toThrow(
-          'Instrument not found for ID: instrument-1'
-        );
-      });
-
-      it('should reject and terminate the worker when it crashes', async () => {
-        instrumentsService.findById.mockResolvedValueOnce({ id: 'instrument-1', internal: { edition: 1, name: 'X' } });
-        const worker = useFakeWorker();
-        const error = new Error('worker crashed');
-
-        const result = instrumentRecordsService.exportRecords({}, { ability });
-        await vi.waitFor(() => expect(worker.postMessage).toHaveBeenCalledOnce());
-        worker.emit('error', error);
-
-        await expect(result).rejects.toBe(error);
-        expect(worker.terminate).toHaveBeenCalledOnce();
-      });
     });
   });
 

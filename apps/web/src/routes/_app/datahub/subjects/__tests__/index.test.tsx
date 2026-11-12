@@ -1,10 +1,17 @@
-import type { InstrumentRecordsExport, SubjectRecordSummary } from '@opendatacapture/schemas/instrument-records';
+import type {
+  InstrumentRecordsExport,
+  InstrumentRecordsExportFrame,
+  SubjectRecordSummary
+} from '@opendatacapture/schemas/instrument-records';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { pack } from 'msgpackr/pack';
+import { AxiosError } from 'axios';
+import type { AxiosResponse } from 'axios';
+import { Packr } from 'msgpackr/pack';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/datahub/subjects/index';
+import { ExcelRowLimitExceededError } from '@/utils/excel';
 
 import '@/services/i18n';
 
@@ -13,16 +20,17 @@ type StoreGroup = { id: string; settings: { subjectIdDisplayLength?: number } };
 type Notification = { message?: string; type: 'error' | 'info' | 'success' | 'warning' };
 
 type AxiosGetConfig = {
-  meta?: { disableDefaultTimeout?: boolean };
-  params?: { groupId?: string };
-  responseType?: 'arraybuffer';
   validateStatus?: (status: number) => boolean;
 };
 
 const mocks = vi.hoisted(() => ({
   addNotification: vi.fn<(notification: Notification) => void>(),
-  axios: { get: vi.fn<(url: string, config?: AxiosGetConfig) => Promise<unknown>>() },
+  axios: {
+    get: vi.fn<(url: string, config?: AxiosGetConfig) => Promise<unknown>>(),
+    post: vi.fn<(url: string, data?: unknown, config?: unknown) => Promise<unknown>>()
+  },
   download: vi.fn<(filename: string, data: string) => Promise<void>>(),
+  downloadBlob: vi.fn<(filename: string, blob: Blob) => void>(),
   downloadSubjectTableExcel: vi.fn(),
   navigate: vi.fn(),
   store: {
@@ -49,7 +57,10 @@ vi.mock('@douglasneuroinformatics/libui/hooks', async (importOriginal) => ({
   },
   useTheme: () => [mocks.theme]
 }));
-vi.mock('axios', () => ({ default: mocks.axios }));
+vi.mock('axios', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('axios')>()),
+  default: mocks.axios
+}));
 vi.mock('@/components/IdentificationForm', () => ({
   IdentificationForm: ({ onSubmit }: { onSubmit: (data: { id: string }) => void }) => (
     <button data-testid="identification-form-submit" type="button" onClick={() => onSubmit({ id: 'lookup-id' })} />
@@ -68,7 +79,14 @@ vi.mock('@/store', () => ({
     getState: () => mocks.store
   })
 }));
-vi.mock('@/utils/excel', () => ({ downloadSubjectTableExcel: mocks.downloadSubjectTableExcel }));
+vi.mock('@/utils/excel', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/utils/excel')>()),
+  downloadSubjectTableExcel: mocks.downloadSubjectTableExcel
+}));
+vi.mock('@/utils/export', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/utils/export')>()),
+  downloadBlob: mocks.downloadBlob
+}));
 
 const subject = (id: string, overrides: Partial<Subject> = {}): Subject => ({
   createdAt: new Date('2026-01-01'),
@@ -131,8 +149,31 @@ const exportAs = (option: string) => {
   fireEvent.click(screen.getByRole('menuitem', { name: option }));
 };
 
+const encodeExportStream = (frames: InstrumentRecordsExportFrame[]): ReadableStream<Uint8Array> => {
+  const packr = new Packr({ sequential: true, useRecords: true });
+  return new ReadableStream<Uint8Array>({
+    start(controller) {
+      for (const frame of frames) {
+        const payload = new Uint8Array(packr.pack(frame));
+        const framed = new Uint8Array(4 + payload.byteLength);
+        new DataView(framed.buffer).setUint32(0, payload.byteLength, false);
+        framed.set(payload, 4);
+        controller.enqueue(framed);
+      }
+      controller.close();
+    }
+  });
+};
+
 const resolveExport = (entries: InstrumentRecordsExport) => {
-  mocks.axios.get.mockResolvedValue({ data: pack(entries) });
+  const frames: InstrumentRecordsExportFrame[] =
+    entries.length > 0
+      ? [
+          { done: false, rows: entries },
+          { done: true, rowCount: entries.length }
+        ]
+      : [{ done: true, rowCount: 0 }];
+  mocks.axios.post.mockResolvedValue({ data: encodeExportStream(frames) });
 };
 
 const notified = (...types: Notification['type'][]) => {
@@ -448,16 +489,27 @@ describe('Route', () => {
       vi.useRealTimers();
     });
 
-    it('should request the export of the current group as binary', async () => {
+    it('should POST the current group and listed scoped subject ids for a streaming response', async () => {
       resolveExport([exportEntry('bob')]);
       renderDataHub();
       exportAs('JSON');
       await settleExport();
-      expect(mocks.axios.get).toHaveBeenCalledWith('/v1/instrument-records/export', {
-        meta: { disableDefaultTimeout: true },
-        params: { groupId: 'group-1' },
-        responseType: 'arraybuffer'
-      });
+      expect(mocks.axios.post).toHaveBeenCalledWith(
+        '/v1/instrument-records/export',
+        {
+          groupId: 'group-1',
+          subjectIds: [ALICE.id, BOB.id, CAROL.id]
+        },
+        {
+          adapter: 'fetch',
+          meta: {
+            disableDefaultErrorNotification: true,
+            disableDefaultTimeout: true,
+            idempotent: true
+          },
+          responseType: 'stream'
+        }
+      );
     });
 
     it('should tell the user the export has started, since it can take a while', async () => {
@@ -470,30 +522,48 @@ describe('Route', () => {
       ]);
     });
 
-    it('should export only the entries of subjects the table lists', async () => {
-      resolveExport([exportEntry('bob'), exportEntry('carol')]);
+    it('should send only the filtered subjects in subjectIds and write the streamed JSON blob', async () => {
+      resolveExport([exportEntry('bob')]);
       renderDataHub();
       fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'bob' } });
       exportAs('JSON');
       await settleExport();
-      const [filename, content] = mocks.download.mock.calls[0] ?? [];
+      expect(mocks.axios.post).toHaveBeenCalledWith(
+        '/v1/instrument-records/export',
+        { groupId: 'group-1', subjectIds: [BOB.id] },
+        expect.anything()
+      );
+      const [filename, blob] = mocks.downloadBlob.mock.calls[0]!;
       expect(filename).toMatch(/^jdoe_.+\.json$/);
-      expect(JSON.parse(content ?? 'null')).toEqual([exportEntry('bob')]);
+      expect(JSON.parse(await blob.text())).toEqual([exportEntry('bob')]);
     });
 
-    it('should download a CSV together with a README explaining its long format', async () => {
+    it('should fail immediately without calling the API when the filtered table lists no subjects', () => {
+      renderDataHub();
+      fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'nobody' } });
+      exportAs('JSON');
+      expect(mocks.axios.post).not.toHaveBeenCalled();
+      expect(mocks.addNotification).toHaveBeenCalledWith({
+        message: 'Export failed: No entries to export',
+        type: 'error'
+      });
+    });
+
+    it('should download a CSV blob together with a README explaining its long format', async () => {
       resolveExport([exportEntry('bob')]);
       renderDataHub();
       exportAs('CSV');
       await settleExport();
-      expect(mocks.download).toHaveBeenCalledTimes(2);
+      expect(mocks.download).toHaveBeenCalledOnce();
       expect(mocks.download.mock.calls[0]![0]).toBe('README.txt');
       expect(mocks.download.mock.calls[0]![1]).toMatch(/ultra-long format/);
-      expect(mocks.download.mock.calls[1]![0]).toMatch(/^jdoe_.+\.csv$/);
-      expect(mocks.download.mock.calls[1]![1]).toMatch(/^groupId,.+\r\ngroup-1,.+,bob,/);
+      expect(mocks.downloadBlob).toHaveBeenCalledOnce();
+      const [filename, blob] = mocks.downloadBlob.mock.calls[0]!;
+      expect(filename).toMatch(/^jdoe_.+\.csv$/);
+      expect(await blob.text()).toMatch(/^groupId,.+\r\ngroup-1,.+,bob,/);
     });
 
-    it('should write an Excel workbook of the listed entries', async () => {
+    it('should write an Excel workbook of the streamed entries', async () => {
       resolveExport([exportEntry('bob')]);
       renderDataHub();
       exportAs('Excel');
@@ -513,8 +583,8 @@ describe('Route', () => {
       expect(mocks.addNotification).toHaveBeenCalledWith({ message: 'Export successful', type: 'success' });
     });
 
-    it('should fail the export when none of its entries belong to a listed subject', async () => {
-      resolveExport([exportEntry('someone-else')]);
+    it('should fail the export when the stream yields zero rows', async () => {
+      resolveExport([]);
       renderDataHub();
       exportAs('JSON');
       await settleExport();
@@ -522,11 +592,78 @@ describe('Route', () => {
         message: 'Export failed: No entries to export',
         type: 'error'
       });
-      expect(mocks.download).not.toHaveBeenCalled();
+      expect(mocks.downloadBlob).not.toHaveBeenCalled();
     });
 
-    it('should report a generic failure when the request fails without an error message', async () => {
-      mocks.axios.get.mockRejectedValue('network down');
+    it('should report an interrupted download when the stream closes without its terminal frame', async () => {
+      mocks.axios.post.mockResolvedValue({
+        data: encodeExportStream([{ done: false, rows: [exportEntry('bob')] }])
+      });
+      renderDataHub();
+      exportAs('JSON');
+      await settleExport();
+      expect(mocks.addNotification).toHaveBeenCalledWith({
+        message: 'Export failed: Download stream was interrupted before completion.',
+        type: 'error'
+      });
+      expect(mocks.downloadBlob).not.toHaveBeenCalled();
+    });
+
+    it('should ask the user to narrow filters when the server rejects the export with 422', async () => {
+      mocks.axios.post.mockRejectedValue(
+        new AxiosError('Unprocessable Entity', 'ERR_BAD_RESPONSE', undefined, undefined, {
+          status: 422
+        } as AxiosResponse)
+      );
+      renderDataHub();
+      exportAs('JSON');
+      await settleExport();
+      expect(mocks.addNotification).toHaveBeenCalledWith({
+        message: expect.stringContaining('Narrow the filters and try again.'),
+        type: 'error'
+      });
+    });
+
+    it('should advise exporting as CSV or JSON when the result exceeds Excel row capacity', async () => {
+      resolveExport([exportEntry('bob')]);
+      mocks.downloadSubjectTableExcel.mockImplementationOnce(() => {
+        throw new ExcelRowLimitExceededError();
+      });
+      renderDataHub();
+      exportAs('Excel');
+      await settleExport();
+      expect(mocks.addNotification).toHaveBeenCalledWith({
+        message: expect.stringContaining('Export as CSV or JSON instead.'),
+        type: 'error'
+      });
+    });
+
+    it('should report a generic failure rather than the Excel row limit when a RangeError occurs during CSV or JSON export', async () => {
+      mocks.axios.post.mockRejectedValueOnce(new RangeError('Invalid typed array length'));
+      renderDataHub();
+      exportAs('CSV');
+      await settleExport();
+      expect(mocks.addNotification).toHaveBeenCalledWith({ message: 'Export failed', type: 'error' });
+    });
+
+    it('should report a generic failure when an Axios request fails with another status or without a response', async () => {
+      mocks.axios.post.mockRejectedValueOnce(new AxiosError('Network Error'));
+      renderDataHub();
+      exportAs('JSON');
+      await settleExport();
+      expect(mocks.addNotification).toHaveBeenCalledWith({ message: 'Export failed', type: 'error' });
+
+      mocks.addNotification.mockClear();
+      mocks.axios.post.mockRejectedValueOnce(
+        new AxiosError('Server Error', 'ERR_BAD_RESPONSE', undefined, undefined, { status: 500 } as AxiosResponse)
+      );
+      exportAs('JSON');
+      await settleExport();
+      expect(mocks.addNotification).toHaveBeenCalledWith({ message: 'Export failed', type: 'error' });
+    });
+
+    it('should report a generic failure when the export rejects with a non-Axios error', async () => {
+      mocks.axios.post.mockRejectedValue('network down');
       renderDataHub();
       exportAs('JSON');
       await settleExport();
