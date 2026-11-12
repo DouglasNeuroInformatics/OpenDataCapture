@@ -24,7 +24,10 @@ type Loader = (ctx: {
 
 type LoaderDeps = (ctx: { search: AuditLogsSearch }) => { search: AuditLogsSearch };
 
-type SearchValidator = { safeParse: (input: unknown) => { success: boolean } };
+type SearchValidator = {
+  parse: (input: unknown) => AuditLogsSearch;
+  safeParse: (input: unknown) => { success: boolean };
+};
 
 type NavigateOptions = { search: ((current: AuditLogsSearch) => AuditLogsSearch) | AuditLogsSearch; to: string };
 
@@ -226,6 +229,18 @@ describe('Route', () => {
       expect(validateSearch.safeParse({ action: 'TELEPORT' }).success).toBe(false);
     });
 
+    it.each<[AuditLogsSearch, AuditLogsSearch]>([
+      [{ entity: 'SESSION', groupId: 'group-1' }, { groupId: 'group-1' }],
+      [{ action: 'DELETE' }, {}],
+      [{ action: 'SEND_EMAIL', entity: 'USER' }, { entity: 'USER' }]
+    ])('should read %j as %j, so an old link leaves no filter the menus cannot show or clear', (search, expected) => {
+      expect(validateSearch.parse(search)).toEqual(expected);
+    });
+
+    it('should keep an action written on the chosen entity', () => {
+      expect(validateSearch.parse({ action: 'LOGIN', entity: 'USER' })).toEqual({ action: 'LOGIN', entity: 'USER' });
+    });
+
     it('should title the page as the audit logs', () => {
       renderPage();
       expect(screen.getByRole('heading', { level: 2, name: 'Audit Logs' })).toBeTruthy();
@@ -298,12 +313,6 @@ describe('Route', () => {
       mocks.search = { entity: 'USER' };
       renderPage();
       expect(filterOptions('audit-logs-filter-action')).toEqual(['Any Action', 'Update', 'Login']);
-    });
-
-    it('should offer no action for an entity nothing writes, which an old link can still name', () => {
-      mocks.search = { entity: 'SESSION' };
-      renderPage();
-      expect(filterOptions('audit-logs-filter-action')).toEqual(['Any Action']);
     });
 
     it('should filter by the chosen action', () => {
