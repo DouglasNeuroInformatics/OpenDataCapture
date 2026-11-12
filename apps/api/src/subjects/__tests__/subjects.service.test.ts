@@ -35,9 +35,8 @@ describe('SubjectsService', () => {
         {
           provide: PRISMA_CLIENT_TOKEN,
           useValue: {
-            $transaction: vi.fn(),
+            $transaction: vi.fn().mockResolvedValue([{ count: 0 }, { count: 0 }, { count: 0 }, {}]),
             instrumentRecord: {
-              count: vi.fn(),
               deleteMany: vi.fn(),
               findMany: vi.fn().mockResolvedValue([]),
               groupBy: vi.fn()
@@ -284,19 +283,6 @@ describe('SubjectsService', () => {
     });
   });
 
-  describe('countDeletableRecords', () => {
-    it("should count the subject's records the caller may delete, the ones a forced delete removes", async () => {
-      const ability = createAppAbility([
-        { action: 'delete', conditions: { groupId: { in: ['group-1'] } }, subject: 'InstrumentRecord' }
-      ]);
-      prismaClient.instrumentRecord.count.mockResolvedValueOnce(2);
-      await expect(subjectsService.countDeletableRecords('123', { ability })).resolves.toBe(2);
-      expect(prismaClient.instrumentRecord.count).toHaveBeenCalledExactlyOnceWith({
-        where: { AND: [accessibleQuery(ability, 'delete', 'InstrumentRecord')], subjectId: '123' }
-      });
-    });
-  });
-
   describe('deleteById', () => {
     it('should delete the subject via the subject model and not call $transaction, if force is falsy', async () => {
       subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
@@ -359,7 +345,7 @@ describe('SubjectsService', () => {
       const deletion = subjectsService.deleteById('123', { force: true });
       await vi.waitFor(() => expect(prismaClient.$transaction).toHaveBeenCalledOnce());
       expect(storageService.deleteObjects).not.toHaveBeenCalled();
-      commit.resolve([]);
+      commit.resolve([{ count: 2 }, { count: 2 }, { count: 0 }, {}]);
       await deletion;
       expect(prismaClient.instrumentRecordFile.findMany).toHaveBeenCalledWith({
         where: { recordId: { in: ['record-1', 'record-2'] } }
@@ -390,9 +376,10 @@ describe('SubjectsService', () => {
       prismaClient.instrumentRecordFile.findMany.mockResolvedValueOnce([
         { basename: 'file', groupId: null, id: 'file-1', index: 0, recordId: 'record-1' }
       ]);
+      prismaClient.$transaction.mockResolvedValueOnce([{ count: 1 }, { count: 1 }, { count: 0 }, {}]);
       const error = new Error('storage failed');
       storageService.deleteObjects.mockRejectedValueOnce(error);
-      await expect(subjectsService.deleteById('123', { force: true })).resolves.toEqual({ success: true });
+      await expect(subjectsService.deleteById('123', { force: true })).resolves.toEqual({ deletedRecordCount: 1 });
       expect(loggingService.error).toHaveBeenCalledWith({
         error,
         files: [{ groupId: null, location: { basename: 'file', index: 0 }, recordId: 'record-1' }],
@@ -416,10 +403,25 @@ describe('SubjectsService', () => {
 
     it('should leave dependent rows and storage alone when force is false', async () => {
       subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
-      await expect(subjectsService.deleteById('123')).resolves.toEqual({ success: true });
+      await expect(subjectsService.deleteById('123')).resolves.toEqual({ deletedRecordCount: 0 });
       expect(prismaClient.instrumentRecord.findMany).not.toHaveBeenCalled();
       expect(prismaClient.instrumentRecordFile.deleteMany).not.toHaveBeenCalled();
       expect(storageService.deleteObjects).not.toHaveBeenCalled();
+    });
+
+    it('should report the records the transaction deleted, rather than the ones it found before it ran', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce({ id: '123' });
+      prismaClient.instrumentRecord.findMany.mockResolvedValueOnce([{ id: 'record-1' }, { id: 'record-2' }]);
+      prismaClient.$transaction.mockResolvedValueOnce([{ count: 0 }, { count: 1 }, { count: 0 }, {}]);
+      await expect(subjectsService.deleteById('123', { force: true })).resolves.toEqual({ deletedRecordCount: 1 });
+    });
+
+    it('should answer a missing subject with a 404 even when the caller holds no rule on records', async () => {
+      subjectModel.findFirst.mockResolvedValueOnce(null);
+      const ability = createAppAbility([{ action: 'delete', subject: 'Subject' }]);
+      await expect(subjectsService.deleteById('123', { ability, force: true })).rejects.toBeInstanceOf(
+        NotFoundException
+      );
     });
 
     it('should throw NotFoundException when subject does not exist', async () => {

@@ -37,13 +37,21 @@ describe('SubjectsController', () => {
     subjectsController = moduleRef.get(SubjectsController);
     subjectsService = moduleRef.get(SubjectsService);
     auditLogger = moduleRef.get(AuditLogger);
+    subjectsService.deleteById.mockResolvedValue({ deletedRecordCount: 0 });
   });
 
   it('should delete a subject within what the caller may delete, forcing when asked', async () => {
-    subjectsService.deleteById.mockResolvedValue({ id: 'subject-1' });
+    await subjectsController.deleteById('subject-1', true, currentUser);
 
-    await expect(subjectsController.deleteById('subject-1', true, currentUser)).resolves.toEqual({ id: 'subject-1' });
     expect(subjectsService.deleteById).toHaveBeenCalledWith('subject-1', { ability, force: true });
+  });
+
+  it('should answer a delete with success alone, keeping the count of deleted records for the log', async () => {
+    subjectsService.deleteById.mockResolvedValue({ deletedRecordCount: 3 });
+
+    await expect(subjectsController.deleteById('subject-1', true, currentUser)).resolves.toStrictEqual({
+      success: true
+    });
   });
 
   it('should leave force unset when the query omits it, so a subject with records is not deleted by default', async () => {
@@ -53,11 +61,10 @@ describe('SubjectsController', () => {
   });
 
   it('should record a forced delete once, with the number of records it removed, rather than once per record', async () => {
-    subjectsService.countDeletableRecords.mockResolvedValue(3);
+    subjectsService.deleteById.mockResolvedValue({ deletedRecordCount: 3 });
 
     await subjectsController.deleteById('subject-1', true, currentUser);
 
-    expect(subjectsService.countDeletableRecords).toHaveBeenCalledWith('subject-1', { ability });
     expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('DELETE', 'SUBJECT', {
       groupId: null,
       metadata: { force: 'true', recordCount: '3', subjectId: 'subject-1' },
@@ -65,10 +72,9 @@ describe('SubjectsController', () => {
     });
   });
 
-  it('should record an unforced delete as removing no records, without reading any', async () => {
+  it('should record an unforced delete as unforced', async () => {
     await subjectsController.deleteById('subject-1', undefined, currentUser);
 
-    expect(subjectsService.countDeletableRecords).not.toHaveBeenCalled();
     expect(auditLogger.log.mock.lastCall?.[2].metadata).toEqual({
       force: 'false',
       recordCount: '0',

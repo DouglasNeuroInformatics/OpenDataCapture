@@ -26,18 +26,14 @@ export class SubjectsController {
     @Query('force', new ParseSchemaPipe({ isOptional: true, schema: $BooleanLike })) force: boolean | undefined,
     @CurrentUser() currentUser: RequestUser
   ) {
-    const { ability } = currentUser;
-    // Counted before the delete removes them. Only a forced delete removes any, and only it may
-    // read them: a caller allowed to delete a subject need not hold any rule on its records.
-    const recordCount = force ? await this.subjectsService.countDeletableRecords(id, { ability }) : 0;
-    const result = await this.subjectsService.deleteById(id, { ability, force });
+    const { deletedRecordCount } = await this.subjectsService.deleteById(id, { ability: currentUser.ability, force });
     // A subject can belong to several groups and the route names none, so the entry names no group.
     await this.auditLogger.log('DELETE', 'SUBJECT', {
       groupId: null,
-      metadata: { force: String(force === true), recordCount: String(recordCount), subjectId: id },
+      metadata: { force: String(force === true), recordCount: String(deletedRecordCount), subjectId: id },
       userId: currentUser.id
     });
-    return result;
+    return { success: true };
   }
 
   @ApiOperation({ summary: 'Get All Subjects' })
