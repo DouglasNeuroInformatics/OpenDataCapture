@@ -202,9 +202,14 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
             return formatTimestamp(value);
           },
           enableResizing: false,
-          header: ({ column }) => (
+          header: ({ column, table }) => (
             <div className="flex items-center gap-2">
-              <SortableHeader column={column} label={t('common.time')} sortOrder={sortOrderOf('timestamp')} />
+              <SortableHeader
+                column={column}
+                label={t('common.time')}
+                sortOrder={sortOrderOf('timestamp')}
+                table={table}
+              />
               <DateFormatMenu value={dateFormat} onChange={setDateFormat} />
             </div>
           ),
@@ -219,8 +224,8 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
             const value = ctx.getValue() as string;
             return <span className="overflow-hidden text-ellipsis whitespace-nowrap">{value}</span>;
           },
-          header: ({ column }) => (
-            <SortableHeader column={column} label={t('common.user')} sortOrder={sortOrderOf('user')} />
+          header: ({ column, table }) => (
+            <SortableHeader column={column} label={t('common.user')} sortOrder={sortOrderOf('user')} table={table} />
           ),
           id: 'user'
         },
@@ -230,8 +235,13 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
             const value = ctx.getValue() as string;
             return <span className="overflow-hidden text-ellipsis whitespace-nowrap">{value}</span>;
           },
-          header: ({ column }) => (
-            <SortableHeader column={column} label={t('common.activeGroup')} sortOrder={sortOrderOf('group')} />
+          header: ({ column, table }) => (
+            <SortableHeader
+              column={column}
+              label={t('common.activeGroup')}
+              sortOrder={sortOrderOf('group')}
+              table={table}
+            />
           ),
           id: 'group'
         },
@@ -247,8 +257,13 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
               />
             );
           },
-          header: ({ column }) => (
-            <SortableHeader column={column} label={t('common.action')} sortOrder={sortOrderOf('action')} />
+          header: ({ column, table }) => (
+            <SortableHeader
+              column={column}
+              label={t('common.action')}
+              sortOrder={sortOrderOf('action')}
+              table={table}
+            />
           )
         },
         {
@@ -261,8 +276,13 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
               </span>
             );
           },
-          header: ({ column }) => (
-            <SortableHeader column={column} label={t('common.entity')} sortOrder={sortOrderOf('entity')} />
+          header: ({ column, table }) => (
+            <SortableHeader
+              column={column}
+              label={t('common.entity')}
+              sortOrder={sortOrderOf('entity')}
+              table={table}
+            />
           )
         }
       ]}
@@ -272,7 +292,6 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
       onPaginationChange={({ pageIndex }) => setPage(pageIndex + 1)}
       onSortingChange={(state) => {
         setSort(readServerSort(state, $AuditLogsSortBy.options));
-        setPage(INITIAL_PAGE);
       }}
     />
   );
@@ -290,8 +309,8 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       <AuditLogsToolbar />
-      {/* Remounted when the filters change: in server mode the table owns its page index and offers no
-          way to set it, so a fresh store is the only way to return it to the first page. */}
+      {/* Remounted when the filters change: in server mode the table owns its page index, and the
+          toolbar has no handle on the table to return it to the first page. */}
       <AuditLogsTable key={JSON.stringify(search)} search={search} />
     </Fragment>
   );

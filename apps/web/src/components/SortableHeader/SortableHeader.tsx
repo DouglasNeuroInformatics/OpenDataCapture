@@ -10,6 +10,11 @@ type SortableHeaderProps<TRow> = {
    * mounts with no sorting state of its own, so the column reads as unsorted however it is ordered.
    */
   sortOrder?: 'asc' | 'desc';
+  /**
+   * Passed by a table in server mode, which does not return its page index to the first page when
+   * the sort changes, so the page controls would keep counting from the page the user left.
+   */
+  table?: TanstackTable.Table<TRow>;
 };
 
 const SORT_ICONS = { asc: ChevronUpIcon, desc: ChevronDownIcon };
@@ -18,14 +23,17 @@ const SORT_ICONS = { asc: ChevronUpIcon, desc: ChevronDownIcon };
  * A clickable column label. `DataTableHead` renders whatever the column supplies, so the sort
  * affordance lives here rather than coming from the table.
  */
-export const SortableHeader = <TRow,>({ column, label, sortOrder }: SortableHeaderProps<TRow>) => {
+export const SortableHeader = <TRow,>({ column, label, sortOrder, table }: SortableHeaderProps<TRow>) => {
   const sorted = sortOrder ?? column.getIsSorted();
   const Icon = sorted ? SORT_ICONS[sorted] : ChevronsUpDownIcon;
   return (
     <button
       className="hover:text-foreground flex min-w-0 items-center gap-1 transition-colors"
       type="button"
-      onClick={() => column.toggleSorting()}
+      onClick={() => {
+        column.toggleSorting();
+        table?.firstPage();
+      }}
     >
       <span className="truncate" title={label}>
         {label}
