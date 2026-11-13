@@ -629,6 +629,19 @@ describe('AssignmentsService', () => {
     });
   });
 
+  describe('findExistingIds', () => {
+    it('should return the given ids that name an assignment, selecting nothing else', async () => {
+      assignmentModel.findMany.mockResolvedValueOnce([{ id: 'assignment-2' }]);
+      await expect(assignmentsService.findExistingIds(['assignment-1', 'assignment-2'])).resolves.toStrictEqual([
+        'assignment-2'
+      ]);
+      expect(assignmentModel.findMany).toHaveBeenCalledExactlyOnceWith({
+        select: { id: true },
+        where: { id: { in: ['assignment-1', 'assignment-2'] } }
+      });
+    });
+  });
+
   describe('findPrivateKeyById', () => {
     it('should select only the private key of the assignment with that id', async () => {
       const privateKey = new Uint8Array([1, 2, 3]);

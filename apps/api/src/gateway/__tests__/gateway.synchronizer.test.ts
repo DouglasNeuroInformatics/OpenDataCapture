@@ -79,6 +79,7 @@ describe('GatewaySynchronizer', () => {
     setupService = moduleRef.get(SetupService);
 
     setupService.getState.mockResolvedValue({ isSetup: true });
+    assignmentsService.findExistingIds.mockImplementation((ids: string[]) => Promise.resolve(ids));
     assignmentsService.findById.mockImplementation((id: string) => Promise.resolve(createAssignment(id)));
     assignmentsService.findPrivateKeyById.mockResolvedValue(PRIVATE_KEY);
     instrumentsService.findById.mockResolvedValue({
@@ -148,6 +149,49 @@ describe('GatewaySynchronizer', () => {
       expect(instrumentRecordsService.create).toHaveBeenCalledTimes(2);
       expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledExactlyOnceWith('assignment-2');
       expect(assignmentsService.updateStatusById).toHaveBeenCalledExactlyOnceWith('assignment-2', 'COMPLETE');
+    });
+  });
+
+  describe('orphaned remote assignments', () => {
+    beforeEach(() => {
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([
+        createRemoteAssignment('orphaned-1'),
+        createRemoteAssignment('assignment-1')
+      ]);
+      assignmentsService.findExistingIds.mockResolvedValue(['assignment-1']);
+      instrumentRecordsService.create.mockResolvedValue({ id: 'record-1' });
+    });
+
+    it('should look up every fetched assignment in one query', async () => {
+      await gatewaySynchronizer.sync();
+      expect(assignmentsService.findExistingIds).toHaveBeenCalledExactlyOnceWith(['orphaned-1', 'assignment-1']);
+    });
+
+    // The private key its submission is encrypted to was deleted with the row, so it cannot be imported.
+    it('should delete a remote assignment that has no row here from the gateway without importing it', async () => {
+      await gatewaySynchronizer.sync();
+      expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledWith('orphaned-1');
+      expect(assignmentsService.findById).not.toHaveBeenCalledWith('orphaned-1');
+      expect(assignmentsService.updateStatusById).not.toHaveBeenCalledWith('orphaned-1', expect.anything());
+    });
+
+    it('should synchronize a remote assignment that has a row here as before', async () => {
+      await gatewaySynchronizer.sync();
+      expect(instrumentRecordsService.create).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ assignmentId: 'assignment-1' })
+      );
+      expect(assignmentsService.updateStatusById).toHaveBeenCalledExactlyOnceWith('assignment-1', 'COMPLETE');
+    });
+
+    it('should still synchronize the other assignments when an orphan cannot be deleted, so it is retried next pass', async () => {
+      const cause = new Error('Unreachable');
+      gatewayService.deleteRemoteAssignment.mockRejectedValueOnce(cause);
+      await gatewaySynchronizer.sync();
+      expect(loggingService.error).toHaveBeenCalledWith({
+        cause,
+        error: 'Failed to delete orphaned remote assignment with ID: orphaned-1'
+      });
+      expect(assignmentsService.updateStatusById).toHaveBeenCalledExactlyOnceWith('assignment-1', 'COMPLETE');
     });
   });
 

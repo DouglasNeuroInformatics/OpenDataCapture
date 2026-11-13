@@ -235,6 +235,33 @@ test.describe('gateway malformed submission', () => {
   });
 });
 
+test.describe('gateway subject deletion', () => {
+  // The link dies only once the next synchronization pass sweeps the gateway's copy, so the test
+  // allows two refresh intervals on top of the default budget.
+  test.describe.configure({ timeout: 30_000 + 2 * gatewayRefreshInterval });
+
+  test("should stop serving a subject's assignment link once the subject is force-deleted", async ({
+    adminToken,
+    api,
+    apiRequestContext
+  }) => {
+    const assignment = await seedAssignment(api);
+    expect((await apiRequestContext.get(assignment.url)).status()).toBe(200);
+
+    const deletion = await apiRequestContext.delete(
+      `/api/v1/subjects/${encodeURIComponent(assignment.subjectId)}?force=true`,
+      { headers: { Authorization: `Bearer ${adminToken}` } }
+    );
+    expect(deletion.status()).toBe(200);
+
+    await expect
+      .poll(async () => (await apiRequestContext.get(assignment.url)).status(), {
+        timeout: 2 * gatewayRefreshInterval
+      })
+      .toBe(404);
+  });
+});
+
 test.describe('gateway assignment errors', () => {
   test('should respond with 404 when the assignment id in the link does not exist', async ({
     context,

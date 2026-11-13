@@ -80,7 +80,9 @@ export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicatio
       return;
     }
 
-    for (const assignment of remoteAssignments) {
+    const trackedAssignments = await this.deleteOrphanedRemoteAssignments(remoteAssignments);
+
+    for (const assignment of trackedAssignments) {
       // A failure for one assignment must not prevent the others from being synchronized. The status
       // is left untouched so the assignment is retried on the next interval.
       try {
@@ -99,6 +101,33 @@ export class GatewaySynchronizer implements OnApplicationBootstrap, OnApplicatio
         });
       }
     }
+  }
+
+  /**
+   * Delete from the gateway every copy whose assignment no longer exists here, and return the rest.
+   * A copy outlives its row when the subject is force-deleted, or when a create stored it on the
+   * gateway but still failed. It can never be imported, because the private key its submission is
+   * encrypted to was deleted with the row, so left alone its link would keep collecting answers that
+   * are then lost.
+   */
+  private async deleteOrphanedRemoteAssignments(remoteAssignments: RemoteAssignment[]): Promise<RemoteAssignment[]> {
+    const remoteIds = remoteAssignments.map(({ id }) => id);
+    const existingIds = new Set(await this.assignmentsService.findExistingIds(remoteIds));
+    const orphanedIds = remoteIds.filter((id) => !existingIds.has(id));
+    for (const id of orphanedIds) {
+      // Logged rather than thrown: the gateway returns the copy on every pass until it is gone, so
+      // the next pass retries it without holding up the assignments that do have a row.
+      try {
+        await this.gatewayService.deleteRemoteAssignment(id);
+        this.loggingService.log(`Deleted orphaned remote assignment with ID: ${id}`);
+      } catch (err) {
+        this.loggingService.error({
+          cause: err,
+          error: `Failed to delete orphaned remote assignment with ID: ${id}`
+        });
+      }
+    }
+    return remoteAssignments.filter(({ id }) => existingIds.has(id));
   }
 
   private async handleAssignmentComplete(remoteAssignment: RemoteAssignment) {
