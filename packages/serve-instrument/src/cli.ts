@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import { Command, InvalidArgumentError } from 'commander';
+import { Command, InvalidArgumentError } from '@commander-js/extra-typings';
 
 import { name, version } from '../package.json';
 import { Server } from './server';
@@ -32,20 +32,19 @@ function parsePort(value: string): number {
   return port;
 }
 
-const program = new Command();
-
-program
+const withOptions = new Command()
   .name(name)
   .version(version)
   .allowExcessArguments(false)
-  .argument('<target>', 'the directory containing the instrument', (target: string) => {
-    return parseTarget(target, program.opts<{ all: boolean }>().all);
-  })
   .option('-a, --all', 'serve all instruments from forms/ and interactive/ subdirectories')
   .option('-p --port <number>', 'the port to run the dev server on', parsePort, 3000)
-  .option('-v, --verbose', 'enable verbose logging (includes request logs and build timing)')
-  .action(async (target: string) => {
-    const { all, port, verbose } = program.opts<{ all: boolean; port: number; verbose: boolean }>();
+  .option('-v, --verbose', 'enable verbose logging (includes request logs and build timing)');
+
+const program = withOptions
+  .argument('<target>', 'the directory containing the instrument', (target: string) => {
+    return parseTarget(target, withOptions.opts().all ?? false);
+  })
+  .action(async (target, { all, port, verbose }) => {
     const server = await Server.create({
       mode: all ? 'all' : 'single',
       port,

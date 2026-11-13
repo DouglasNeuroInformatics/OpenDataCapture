@@ -33,6 +33,7 @@
     "tsx": "catalog:"
   },
   "dependencies": {
+    "@commander-js/extra-typings": "catalog:",
     "@opendatacapture/runtime-internal": "workspace:*",
     "commander": "catalog:",
     "es-module-lexer": "^3.0.2",

@@ -9,6 +9,9 @@ catalogs:
     '@casl/ability':
       specifier: ^7.0.1
       version: 7.0.1
+    '@commander-js/extra-typings':
+      specifier: ~15.0.0
+      version: 15.0.0
     '@commitlint/cli':
       specifier: ^21.2.3
       version: 21.2.3
@@ -70,7 +73,7 @@ catalogs:
       specifier: ^1.20.0
       version: 1.20.0
     commander:
-      specifier: ^15.0.0
+      specifier: ~15.0.0
       version: 15.0.0
     conventional-commits-parser:
       specifier: ^7.1.2
@@ -842,6 +845,9 @@ importers:
 
   packages/instrument-bundler:
     dependencies:
+      '@commander-js/extra-typings':
+        specifier: 'catalog:'
+        version: 15.0.0(commander@15.0.0)
       '@opendatacapture/runtime-internal':
         specifier: workspace:*
         version: link:../runtime-internal
@@ -970,6 +976,9 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0
     devDependencies:
+      '@commander-js/extra-typings':
+        specifier: 'catalog:'
+        version: 15.0.0(commander@15.0.0)
       esbuild:
         specifier: 'catalog:'
         version: 0.28.2
@@ -1174,6 +1183,9 @@ importers:
         specifier: 'catalog:'
         version: 0.28.2
     devDependencies:
+      '@commander-js/extra-typings':
+        specifier: 'catalog:'
+        version: 15.0.0(commander@15.0.0)
       '@douglasneuroinformatics/libjs':
         specifier: 'catalog:'
         version: 3.2.1(neverthrow@8.2.0)(zod@vendor+zod@3.x)
@@ -2045,6 +2057,11 @@ packages:
     resolution: {integrity: sha512-q5P52BYb1hwVWE6dtID7VvuJWrlfbCv4klj7BjUUOqMz4jbSZD4C9fJ9lRjL2jnBGTg+gDDlaXN51rkWcLk4fg==}
     peerDependencies:
       commander: ~13.1.0
+
+  '@commander-js/extra-typings@15.0.0':
+    resolution: {integrity: sha512-yeJlba62xqmkgELUsn7356MEnzLLu/fw2x4lofFqGnXh6YysRdEs2BaLeLtg1+KU0AXvMeqQvTTp+3hBEBK+EA==}
+    peerDependencies:
+      commander: ~15.0.0
 
   '@commitlint/cli@21.2.3':
     resolution: {integrity: sha512-5yOX6IRjcrIReCxpyAd04hgI/yhUMpVBJ/ouwFV0wk9yx5+fYRDWZWJ5h55Tbedgfol+5m2mU5nqzbB8g3v0vQ==}
@@ -11716,6 +11733,10 @@ snapshots:
   '@commander-js/extra-typings@13.1.0(commander@13.1.0)':
     dependencies:
       commander: 13.1.0
+
+  '@commander-js/extra-typings@15.0.0(commander@15.0.0)':
+    dependencies:
+      commander: 15.0.0
 
   '@commitlint/cli@21.2.3(@types/node@24.19.0)(conventional-commits-parser@7.1.2)(typescript@6.0.3)':
     dependencies:
