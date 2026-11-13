@@ -35,23 +35,23 @@ for unit tests). A diff spanning rows runs each row's checks; any other file mea
    existing spec reaches: the suite is kept small on purpose.
 5. **Finish the second file.** Each row is a pair that must agree, where the second is easy to forget:
 
-   | You touched                               | What must follow                                                         | Owner                                          |
-   | ----------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------- |
-   | a file under `apps/web/src/routes/`       | `route-tree.ts` (the user's) and `testing/src/generated/route.d.ts`      | `.agents/docs/playbooks/add-web-route.md`      |
-   | a new folder under `packages/schemas/src` | its subpath in that package's `exports` — there is no `.` export         | `packages/schemas/AGENTS.md`                   |
-   | a new instrument directory                | its import _and_ `create` call in `apps/api/src/demo/demo.service.ts`    | `.agents/docs/playbooks/add-instrument.md`     |
-   | a wrapper under `vendor/`                 | `runtime/v1/package.json` devDependencies _and_ `runtime.config.js`      | `.agents/docs/playbooks/add-vendor-package.md` |
-   | an environment variable                   | the rest of the chain, in the playbook's order                           | `.agents/docs/playbooks/add-env-var.md`        |
-   | a `packages/react-core` component         | `src/index.ts` — the barrel is the public API, there are no deep imports | `packages/react-core/AGENTS.md`                |
-   | a request or response shape in `apps/api` | `cli/odc-cli`, which nothing links to the API                            | `cli/AGENTS.md`                                |
-   | a new workspace or vitest project         | the tables in `workspace-map.md` and `testing-strategy.md`               | `.agents/skills/writing-agent-docs/SKILL.md`   |
+   | You touched                               | What must follow                                                         | Owner                                             |
+   | ----------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------- |
+   | a file under `apps/web/src/routes/`       | `route-tree.ts` (the user's) and `testing/src/generated/route.d.ts`      | `.agents/docs/playbooks/add-web-route.md`         |
+   | a new folder under `packages/schemas/src` | its subpath in that package's `exports` — there is no `.` export         | `packages/schemas/AGENTS.md`                      |
+   | a new instrument directory                | its import _and_ `create` call in `apps/api/src/demo/demo.service.ts`    | `.agents/docs/playbooks/add-instrument.md`        |
+   | a wrapper under `vendor/`                 | `runtime/v1/package.json` devDependencies _and_ `runtime.config.js`      | `.agents/docs/playbooks/add-vendor-package.md`    |
+   | an environment variable                   | the rest of the chain, in the playbook's order                           | `.agents/docs/playbooks/add-env-var.md`           |
+   | a `packages/react-core` component         | `src/index.ts` — the barrel is the public API, there are no deep imports | `packages/react-core/AGENTS.md`                   |
+   | a request or response shape in `apps/api` | `cli/odc-cli`, which nothing links to the API                            | `cli/AGENTS.md`                                   |
+   | a new workspace or vitest project         | the tables in `workspace-map.md` and `testing-strategy.md`               | `.agents/skills/writing-docs-for-agents/SKILL.md` |
 
 6. **If the diff touches `apps/api`, account for every Prisma query, not a sample**: each `where` names
    `accessibleQuery` or your reply says why it is unscoped, and every handler calling a scoped service
    forwards `@CurrentUser('ability')` (`apps/api/AGENTS.md`).
 7. **Re-read the `AGENTS.md` of every package or app you modified** and confirm your change does not
    contradict it. If it does, revise the change, or propose the smallest `AGENTS.md` edit and wait for the
-   user's approval (root `AGENTS.md` hard rule); `.agents/skills/writing-agent-docs/SKILL.md` has the house format.
+   user's approval (root `AGENTS.md` hard rule); `.agents/skills/writing-docs-for-agents/SKILL.md` has the house format.
 8. **Before opening a PR, or pushing a follow-up that adds code to one, run
    `.agents/skills/adversarial-review/SKILL.md`** on the green branch. Fix, or decline with a reason, every confirmed finding,
    then repeat from step 1; review again only when the fixes added code beyond what the findings named.

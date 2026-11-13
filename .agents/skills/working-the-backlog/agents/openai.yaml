@@ -1,0 +1,3 @@
+interface:
+  display_name: 'Working the Backlog'
+  short_description: 'Turn one conflict-free batch of backlog issues into pull requests'

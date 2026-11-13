@@ -48,5 +48,5 @@ The last row is usually the database: `NODE_ENV=test` gives the API an in-memory
 `testing/src/global/setup.spec.ts`, while development uses a real Mongo that nothing resets, and JWT expiry is
 ignored in development.
 
-When no row matches and you find the cause, land the missing fact where `.agents/skills/writing-agent-docs/SKILL.md`
+When no row matches and you find the cause, land the missing fact where `.agents/skills/writing-docs-for-agents/SKILL.md`
 says it belongs — this table is a candidate.

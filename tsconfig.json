@@ -13,9 +13,7 @@
     "types": ["node"]
   },
   "include": [
-    ".github/scripts/__tests__/*.ts",
-    ".github/scripts/pr-body.ts",
-    ".github/scripts/release.cjs",
+    ".github/scripts/**/*",
     ".github/vitest.config.ts",
     "commitlint.config.ts",
     "knip.ts",

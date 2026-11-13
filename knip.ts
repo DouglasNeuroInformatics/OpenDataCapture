@@ -5,8 +5,6 @@ import runtimeConfig from './runtime/v1/runtime.config.js';
 const config: KnipConfig = {
   ignoreBinaries: ['env-cmd!'],
   ignoreIssues: {
-    // module.exports is the function actions/github-script require()s in .github/workflows
-    '.github/scripts/*.cjs': ['exports'],
     // reached through the /runtime/v1/* tsconfig paths; vendor wrappers resolve their peers from runtime/v1
     'vendor/**': ['unlisted']
   },
@@ -15,10 +13,9 @@ const config: KnipConfig = {
   includeEntryExports: true,
   workspaces: {
     '.': {
-      entry: ['scripts/increment-version.ts', '.github/scripts/*.cjs'],
+      entry: ['scripts/increment-version.ts'],
       ignoreBinaries: ['turbo'],
-      // the JSDoc type of the arguments actions/github-script injects, not an npm package
-      ignoreDependencies: ['github-script', '@astrojs/starlight'],
+      ignoreDependencies: ['@astrojs/starlight'],
       // docs/**/*.mdx is outreach content, compiled through the aliases in its astro.config.ts
       paths: { '@/components/*': ['apps/outreach/src/components/*'] },
       project: ['**/*.{cjs,js,ts}', '!.agents/**']

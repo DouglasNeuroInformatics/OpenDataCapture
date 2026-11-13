@@ -1,0 +1,38 @@
+name: PR Status
+# These triggers attach no run to a pull request, so this job stays out of its checks unless dispatched
+# from its branch. CI runs on every open and push, so those relabel at once; a review, a resolved thread
+# or a draft toggle starts no workflow that can write to a fork's pull request, so the schedule catches them.
+on:
+  workflow_run:
+    workflows: [CI, Commitlint, PR Body]
+    types: [completed]
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+permissions:
+  checks: read
+  contents: read
+  pull-requests: write
+  statuses: read
+# every run relabels every open pull request, so only the latest run matters
+concurrency:
+  group: pr-status
+  cancel-in-progress: true
+jobs:
+  label-pr-status:
+    runs-on: ubuntu-latest
+    steps:
+      # the job runs main's code with a write token and reads pull requests only through the API; it
+      # never checks out or runs a pull request's code
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          ref: main
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: Label Pull Requests by Status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/label-pr-status.ts

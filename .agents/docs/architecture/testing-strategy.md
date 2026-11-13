@@ -131,6 +131,14 @@ hook, which formats rather than verifies.
 tests before a release build.** `.github/workflows/commitlint.yaml` (`pull_request` to any branch)
 lints the commits the PR adds against `commitlint.config.ts`.
 
+The `main: pull requests only` ruleset requires `lint-and-test`, `commitlint` and `check` (from
+`.github/workflows/pr-body.yaml`) to pass before a merge, each pinned to the GitHub Actions app. Renaming
+one of those jobs blocks every pull request until the ruleset is updated to match.
+
+`.github/workflows/pr-status.yaml` gates nothing. It gives each open pull request exactly one `Status:`
+label, recomputed from GitHub's state by `.github/scripts/pr-status.ts`. Never set those labels by hand,
+because the next run overwrites them.
+
 ## Known warts
 
 Flag these rather than fixing them in passing; each is load-bearing somewhere.

@@ -1,29 +1,35 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
     "agent-browser": {
       "source": "vercel-labs/agent-browser",
       "sourceType": "github",
       "skillPath": "skills/agent-browser/SKILL.md",
-      "computedHash": "ecc7641aea05f85ca3b11e7759d32aaf52fe05946ab4b63739c7bf78a41237a2"
+      "computedHash": ""
     },
     "diagnosing-bugs": {
       "source": "mattpocock/skills",
       "sourceType": "github",
       "skillPath": "skills/engineering/diagnosing-bugs/SKILL.md",
-      "computedHash": "fd6c99466b7ba43be624e6e66ed6d7af2796ded7218f24c83820823977819e22"
+      "computedHash": ""
     },
     "interview": {
       "source": "joshunrau/skills",
       "sourceType": "github",
       "skillPath": "skills/interview/SKILL.md",
-      "computedHash": "6cf86ca51424350f10880c3a2fd3dd018c6682c90dfb81baf66e91615df4a0fa"
+      "computedHash": "92f32340ae3ac0f6b7f345ed07279c60306138b5d12005b2aa2186f8fd1d97f6"
+    },
+    "writing-normative-prose": {
+      "source": "joshunrau/skills",
+      "sourceType": "github",
+      "skillPath": "skills/writing-normative-prose/SKILL.md",
+      "computedHash": "adb93967d22da0c4e676f08163658c849251f44e0084e956f22899c7ccb203a0"
     },
     "writing-skills-for-agents": {
       "source": "joshunrau/skills",
       "sourceType": "github",
       "skillPath": "skills/writing-skills-for-agents/SKILL.md",
-      "computedHash": "692102f9ab7e6dc148240a3f6255aa9856b7bea177133d4241ca0906e67d7be6"
+      "computedHash": "ec98316925e2f0590bd75b17e2276b899cc18f2cd2d40e441cbf2056bdbb4701"
     }
   }
 }
