@@ -11,11 +11,11 @@ is `.agents/docs/playbooks/cut-a-release.md`. This file is the model both act on
 
 ## The decision is `planRelease`, and it reads only the repository
 
-`.github/scripts/release.cjs` exports `planRelease({ ref, tags, version })`. `release.yaml`'s
-`configure` job calls it with the pushed or dispatched ref, every `v*` git tag and the root
-`package.json` version, and every later job acts on its outputs. It never reads GHCR or npm: a deleted
-image or package must not be able to wedge the next release, and the GHCR lookup an earlier version
-made did exactly that.
+`.github/scripts/release.ts` exports `planRelease({ ref, tags, version })`. `release.yaml`'s
+`configure` job runs `scripts/plan-release.ts`, which calls it with the pushed or dispatched ref, every
+`v*` git tag and the root `package.json` version, and every later job acts on its outputs. It never
+reads GHCR or npm: a deleted image or package must not be able to wedge the next release, and the GHCR
+lookup an earlier version made did exactly that.
 
 | Output    | Meaning                                                                   |
 | --------- | ------------------------------------------------------------------------- |
@@ -65,7 +65,7 @@ major once the next major ships from `main`, and released only by
 `gh workflow run Release --ref release/<major>`. A push to it publishes nothing. Changes land on it by a
 pull request, which `ci.yaml` gates as it gates one to `main`.
 
-**A release branch takes fixes only.** `scripts/increment-version.ts` asks `release.cjs`'s
+**A release branch takes fixes only.** `scripts/increment-version.ts` asks `release.ts`'s
 `isSupersededMajor` whether the current major is superseded; if it is, it offers and accepts a patch
 bump only, and refuses a breaking or `feat` commit in range outright. On `main`, once a breaking
 commit is in range, it accepts a major bump only.

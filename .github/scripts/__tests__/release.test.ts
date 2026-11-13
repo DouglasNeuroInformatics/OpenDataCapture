@@ -1,10 +1,6 @@
-import fs from 'node:fs';
+import { describe, expect, it } from 'vitest';
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
-
-import release from '../release.cjs';
-
-const { planRelease } = release;
+import { planRelease, planReleaseOutputs } from '../release.ts';
 
 const MAIN = 'refs/heads/main';
 const RELEASE_2 = 'refs/heads/release/2';
@@ -93,42 +89,16 @@ describe('planRelease', () => {
   });
 });
 
-describe('release', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  function run(ref: string, version: string, tags: string) {
-    const readFileSync = vi.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify({ version }));
-    const core = { notice: vi.fn(), setOutput: vi.fn() };
-    const exec = { getExecOutput: vi.fn(() => Promise.resolve({ stdout: tags })) };
-    return { core, done: release({ context: { ref }, core, exec }), exec, readFileSync };
-  }
-
-  it('should plan from the root package.json and every v* tag in the repository', async () => {
-    const { done, exec, readFileSync } = run(MAIN, '2.6.0', 'v2.5.2\n');
-    await done;
-    expect(readFileSync).toHaveBeenCalledWith('package.json', 'utf-8');
-    expect(exec.getExecOutput).toHaveBeenCalledWith('git', ['tag', '--list', 'v*']);
-  });
-
-  it('should expose the plan for the root version and the git tags as workflow outputs', async () => {
-    const { core, done } = run(MAIN, '2.6.0', 'v2.5.1\nv2.5.2\n');
-    await done;
-    expect(Object.fromEntries(core.setOutput.mock.calls)).toEqual({
-      edge: 'true',
-      latest: 'true',
-      major: '2',
-      release: 'true',
-      version: '2.6.0'
+describe('planReleaseOutputs', () => {
+  it('should expose the plan for the root version and every listed tag as workflow outputs', () => {
+    expect(planReleaseOutputs({ ref: MAIN, tagList: 'v2.5.1\nv2.5.2\n', version: '2.6.0' })).toEqual({
+      githubOutput: 'edge=true\nlatest=true\nmajor=2\nrelease=true\nversion=2.6.0\n',
+      notice: null
     });
-    expect(core.notice).not.toHaveBeenCalled();
   });
 
-  it('should say that a release of a superseded major skips npm, so the missing publish is not a surprise', async () => {
-    const { core, done } = run(RELEASE_2, '2.6.1', 'v2.6.0\nv3.0.0\n');
-    await done;
-    expect(core.notice).toHaveBeenCalledWith(
+  it('should say that a release of a superseded major skips npm, so the missing publish is not a surprise', () => {
+    expect(planReleaseOutputs({ ref: RELEASE_2, tagList: 'v2.6.0\nv3.0.0\n', version: '2.6.1' }).notice).toBe(
       'Skipping npm: 2.6.1 releases the superseded 2 line, and npm publishes from main only'
     );
   });

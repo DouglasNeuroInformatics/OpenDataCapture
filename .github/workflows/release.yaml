@@ -2,12 +2,12 @@ name: Release
 on:
   push:
     branches: ['main']
-  # A release/<major> branch releases on dispatch only; release.cjs refuses any other ref.
+  # A release/<major> branch releases on dispatch only; release.ts refuses any other ref.
   workflow_dispatch:
 permissions:
   contents: write
   packages: write
-# One Release at a time across every ref: release.cjs plans from a tag snapshot, so a run on another
+# One Release at a time across every ref: release.ts plans from a tag snapshot, so a run on another
 # ref must not overlap it (.agents/docs/architecture/release-channels.md).
 concurrency:
   group: ${{ github.workflow }}
@@ -29,19 +29,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
         with:
-          fetch-depth: 0 # release.cjs reads every v* tag
+          fetch-depth: 0 # release.ts reads every v* tag
       - name: Derive Build Matrix
         id: matrix
         run: |
           matrix=$(docker compose config --no-interpolate --format json \
             | jq -c '{include:[.services|to_entries[]|select(.value.build and .value.image)|{image:(.value.image|split(":")[0]),dockerfile:.value.build.dockerfile}]}')
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
       - name: Plan Release
         id: plan
-        uses: actions/github-script@v9
-        with:
-          script: |
-            await require('./.github/scripts/release.cjs')({ context, core, github, exec, glob, io })
+        run: node scripts/plan-release.ts
   validate:
     runs-on: ubuntu-latest
     steps:

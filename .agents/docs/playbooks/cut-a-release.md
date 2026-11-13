@@ -69,13 +69,13 @@ them. Never hand-edit a version field.
 
 7. **Watch the run:** `gh run watch`, or `gh run list --workflow=Release --limit 1` for its id.
 
-   | Job           | Does                                                                                                                      | Does not run when                                                                                       |
-   | ------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-   | `configure`   | derives the image matrix from `docker compose config`; `release.cjs` plans the run from the root version and the git tags | never; **fails** on any ref but `main` and `release/<major>`, and on a branch dispatch the plan refuses |
-   | `validate`    | `pnpm lint`                                                                                                               | never                                                                                                   |
-   | `build`       | buildx `linux/amd64,linux/arm64` per image, pushing the tags the plan enables onto one manifest                           | `configure` or `validate` failed                                                                        |
-   | `publish-npm` | builds each publishable package and publishes each version npm lacks, over OIDC in the `release` environment              | `build` did not succeed, or the plan's `latest` is `false` (no release, or a release from a branch)     |
-   | `release`     | creates the GitHub release `v${version}` on the built commit from `scripts/changelog.ts section`                          | the plan's `release` is `false`, `build` did not succeed, or `publish-npm` ran and failed               |
+   | Job           | Does                                                                                                                     | Does not run when                                                                                       |
+   | ------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+   | `configure`   | derives the image matrix from `docker compose config`; `release.ts` plans the run from the root version and the git tags | never; **fails** on any ref but `main` and `release/<major>`, and on a branch dispatch the plan refuses |
+   | `validate`    | `pnpm lint`                                                                                                              | never                                                                                                   |
+   | `build`       | buildx `linux/amd64,linux/arm64` per image, pushing the tags the plan enables onto one manifest                          | `configure` or `validate` failed                                                                        |
+   | `publish-npm` | builds each publishable package and publishes each version npm lacks, over OIDC in the `release` environment             | `build` did not succeed, or the plan's `latest` is `false` (no release, or a release from a branch)     |
+   | `release`     | creates the GitHub release `v${version}` on the built commit from `scripts/changelog.ts section`                         | the plan's `release` is `false`, `build` did not succeed, or `publish-npm` ran and failed               |
 
    A `build` that fails or is cancelled shows `publish-npm` and `release` as **skipped**, not failed.
    On a push with no bump both are skipped by design; read `configure`'s `release` output first.
@@ -90,7 +90,7 @@ them. Never hand-edit a version field.
    tags are bare; the `v` is on the GitHub tag only. `scripts/publish.sh` is wired to nothing and is not a
    substitute: it pushes your daemon's local `:latest` of all four over the CI-published ones.
 
-   **`release.cjs` refusing other refs stops accidents only**, since a dispatched ref supplies its
+   **`release.ts` refusing other refs stops accidents only**, since a dispatched ref supplies its
    own workflow. The hosted configuration that does the enforcing is listed in
    `release-channels.md` §Release branches and must stay. The `Release tags` ruleset cannot restrict
    tag creation, because GitHub refuses the Actions app as a bypass actor.

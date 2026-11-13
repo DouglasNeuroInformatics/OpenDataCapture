@@ -8,7 +8,7 @@ import { parseArgs, styleText } from 'node:util';
 
 import { format } from 'prettier';
 
-import release from '../.github/scripts/release.cjs';
+import * as release from '../.github/scripts/release.ts';
 
 // The menu offers the bumps in this order, so they live in a tuple: perfectionist/sort-objects
 // alphabetizes object literals and would silently reorder the prompt.
