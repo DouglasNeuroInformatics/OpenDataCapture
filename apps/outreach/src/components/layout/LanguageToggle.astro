@@ -1,7 +1,13 @@
 ---
 import { useTranslations } from '../../i18n';
 
-const { t, resolvedLanguage } = useTranslations(Astro.url);
+type Props = {
+  altURL?: URL;
+};
+
+const translations = useTranslations(Astro.url);
+const { altURL = translations.altURL } = Astro.props;
+const { t, resolvedLanguage } = translations;
 
 const is404 = /^\/404\/?$/.test(Astro.url.pathname);
 ---
@@ -32,13 +38,13 @@ const is404 = /^\/404\/?$/.test(Astro.url.pathname);
   >
     <a
       class="block cursor-pointer p-2 text-center uppercase first:rounded-t-md last:rounded-b-md hover:backdrop-brightness-95 dark:hover:backdrop-brightness-150"
-      href={new URL(Astro.url.href.replace(`/${resolvedLanguage}`, `/en`))}
+      href={resolvedLanguage === 'en' ? Astro.url : altURL}
     >
       en
     </a>
     <a
       class="block cursor-pointer p-2 text-center uppercase first:rounded-t-md last:rounded-b-md hover:backdrop-brightness-95 dark:hover:backdrop-brightness-150"
-      href={new URL(Astro.url.href.replace(`/${resolvedLanguage}`, `/fr`))}
+      href={resolvedLanguage === 'fr' ? Astro.url : altURL}
     >
       fr
     </a>

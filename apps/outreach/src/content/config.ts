@@ -10,6 +10,7 @@ export const collections = {
       isDraft: z.boolean().optional(),
       language: z.enum(['en', 'fr']),
       title: z.string().min(1),
+      translationOf: reference('blog').optional(),
       type: z.enum(['article', 'caseStudy', 'video'])
     })
   }),

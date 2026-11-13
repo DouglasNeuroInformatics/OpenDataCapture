@@ -16,6 +16,12 @@ that directory as a post.
 3. **To add a new `type` value**, extend the enum in `config.ts` _and_ add the matching key to
    `apps/outreach/src/i18n/translations/blog.json`. The badge renders `t('blog.<type>')`, so
    without the key it shows the raw key.
+4. **To translate a post, give the translation its own filename in its language and set
+   `translationOf` to the original's filename without `.md`.** Set it on the translation only:
+   `getPublishedAltPost()` in `apps/outreach/src/lib/blog.ts` pairs the two from that one field and
+   fails the build if it names no post, if a post would pair with more than one other, or if both
+   are in the same language. Without it, the language toggle on either post goes to the other
+   language's blog index instead of the translation.
 
 ## Traps
 

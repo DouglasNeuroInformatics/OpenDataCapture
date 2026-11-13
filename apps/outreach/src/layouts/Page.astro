@@ -8,6 +8,7 @@ import { cn } from '@/utils';
 import '@/styles/main.css';
 
 type Props = {
+  altURL?: URL;
   bilingual?: boolean;
   hasDefaultLocaleRedirect?: boolean;
   className?: string;
@@ -18,14 +19,14 @@ type Props = {
 };
 
 const { resolvedLanguage } = useTranslations(Astro.url);
-const { className, ...props } = Astro.props;
+const { altURL, className, ...props } = Astro.props;
 ---
 
 <!doctype html>
 <html lang={resolvedLanguage}>
   <Head {...props} />
   <body class="flex min-h-screen flex-col">
-    <Header />
+    <Header altURL={altURL} />
     <main class={cn('container grow py-16', className)}>
       <slot />
     </main>
