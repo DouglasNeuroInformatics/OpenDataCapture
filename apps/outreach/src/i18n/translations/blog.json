@@ -8,6 +8,10 @@
     "en": "Our Blog",
     "fr": "Notre blogue"
   },
+  "minRead": {
+    "en": "min read",
+    "fr": "min de lecture"
+  },
   "title": {
     "en": "Blog",
     "fr": "Blogue"

@@ -11,7 +11,18 @@
     "en": "Change Theme",
     "fr": "Changer le thème"
   },
-  "docs": "Docs",
+  "docs": {
+    "en": "Docs",
+    "fr": "Documentation"
+  },
+  "faq": {
+    "en": "FAQ",
+    "fr": "FAQ"
+  },
+  "instrumentPlayground": {
+    "en": "Instrument Playground",
+    "fr": "Bac à sable d'instruments"
+  },
   "noContent": {
     "en": "There is no content here at the moment",
     "fr": "Il n'y a pas de contenu ici pour le moment"
@@ -20,13 +31,17 @@
     "en": "Overview",
     "fr": "Accueil"
   },
+  "pageNotFound": {
+    "en": "Not Found",
+    "fr": "Page introuvable"
+  },
+  "pageNotFoundHint": {
+    "en": "Please verify the URL or use the navigation menu above to find what you're looking for.",
+    "fr": "Veuillez vérifier l'URL ou utiliser le menu de navigation ci-dessus pour trouver ce que vous cherchez."
+  },
   "team": {
     "en": "Team",
     "fr": "L'équipe"
-  },
-  "faq": {
-    "en": "FAQ",
-    "fr": "FAQ"
   },
   "viewAltLangPrefix": {
     "en": "You can also view our",
