@@ -438,6 +438,14 @@ describe('Route', () => {
       expect(timeHeaderButton().querySelector('.lucide-chevron-down')).toBeTruthy();
     });
 
+    it('should return the pagination to the first page when the sort changes, so the next page is page two', () => {
+      renderPage();
+      goToPage(2);
+      fireEvent.click(timeHeaderButton());
+      fireEvent.click(document.querySelector('.lucide-chevron-right')!.closest('button')!);
+      expect(lastQueryParams()).toEqual({ page: 2, sortBy: 'timestamp', sortOrder: 'asc' });
+    });
+
     it.each([
       ['User', 'user'],
       ['Active Group', 'group'],
