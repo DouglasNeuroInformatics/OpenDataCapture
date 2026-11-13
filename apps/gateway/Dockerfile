@@ -24,12 +24,16 @@ RUN turbo build --filter=@opendatacapture/gateway
 RUN node -p "require('./apps/gateway/node_modules/prisma/package.json').version" > prisma-version
 
 # RUN SERVER
-FROM base AS runner
+FROM node:24-slim AS runner
+WORKDIR /app
 ENV CHECKPOINT_DISABLE=1
+ENV GATEWAY_DATABASE_URL=file:/app/sqlite/gateway.db
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates openssl && rm -rf /var/lib/apt/lists/*
 # run.sh applies the schema on every start, so the runner needs the Prisma CLI the lockfile resolved.
 # npm gives it a flat node_modules, which copying pnpm's symlinked one out of the installer would not.
 COPY --from=installer /app/prisma-version prisma-version
-RUN npm install --prefix /app/prisma-cli --no-audit --no-fund "prisma@$(cat prisma-version)"
+RUN npm install --prefix /app/prisma-cli --no-audit --no-fund "prisma@$(cat prisma-version)" && rm -rf /root/.npm
 COPY apps/gateway/prisma/schema.prisma /app/prisma/schema.prisma
 COPY apps/gateway/scripts/run.sh run.sh
 COPY --from=installer /app/apps/gateway/dist/ /app/dist/

@@ -89,8 +89,10 @@ bump, which is the month the release ships only if the PR merges that month.
 ## Base images
 
 **`main` floats; a release branch pins.** On `main` every Dockerfile builds `FROM node:lts-krypton`,
-so each `edge` build and each release from `main` picks up the newest Node 24 patch with no commit. A
-release branch replaces that line with the exact version, `FROM node:<major>.<minor>.<patch>`, in a
-`fix:` commit before its first bump, so a re-run of an old release builds the same runtime. A Node
-security release for a supported major is therefore a `fix:` commit on its branch that moves the pin,
-then a patch bump; nothing updates a branch's pin for you.
+and the api and gateway Dockerfiles run `FROM node:24-slim`, so each `edge` build and each release
+from `main` picks up the newest Node 24 patch with no commit. A release branch replaces those lines
+with the exact version — `FROM node:<major>.<minor>.<patch>-bookworm` and
+`FROM node:<major>.<minor>.<patch>-bookworm-slim` — in a `fix:` commit before its first bump, so a
+re-run of an old release builds and ships the same runtime. A Node security release for a supported
+major is therefore a `fix:` commit on its branch that moves both pins, then a patch bump; nothing
+updates a branch's pins for you.
