@@ -265,6 +265,32 @@ test.describe('data hub', () => {
     // Everything was collected just now, so the tightest window keeps it and nothing is lost.
     await datahubPage.selectCollectedWindow('pastMonth');
     await expect(datahubPage.rows).toHaveCount(1);
+    await expect(datahubPage.collectedPresetFilter.locator('option:checked')).toHaveText('Past month');
+  });
+
+  test('should keep early-March records in the past month at March end', async ({
+    api,
+    isolatedGroupManager,
+    page,
+    uniqueId
+  }) => {
+    const group = await isolatedGroupManager();
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    const included = `within-window-${uniqueId}`;
+    const excluded = `before-window-${uniqueId}`;
+    await api.uploadRecords(group.id, instrumentId, [
+      { data: HAPPINESS_RECORD, date: new Date(2026, 2, 2, 12), subjectId: included },
+      { data: HAPPINESS_RECORD, date: new Date(2026, 1, 27, 12), subjectId: excluded }
+    ]);
+
+    await page.clock.setFixedTime(new Date(2026, 2, 31, 12));
+    const datahubPage = new DatahubPage(page);
+    await datahubPage.goto('/datahub/subjects');
+    await expect(datahubPage.rows).toHaveCount(2);
+
+    await datahubPage.selectCollectedWindow('pastMonth');
+    await expect(datahubPage.rows).toHaveCount(1);
+    await expect(datahubPage.rows).toContainText(included.slice(0, 9));
   });
 
   // `GET /v1/subjects` is gated on `read Subject`, which a standard user holds, but resolving
