@@ -8,6 +8,16 @@ pull request. A PR with a failing check is never acceptable. A check you cannot 
 line in your reply naming it and why. A failure unrelated to your change is not yours to patch over: file it
 with `.agents/skills/opening-issues/SKILL.md` and name the issue in your reply.
 
+**A diff confined to these rows runs the row's checks in place of step 1**, then continues from step 7 (step 3
+for unit tests). A diff spanning rows runs each row's checks; any other file means the full list.
+
+| Files                                                                     | Checks                                                                          |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `AGENTS.md`, `.agents/`, `.claude/`, `.vscode/`, `.editorconfig`, READMEs | None: nothing reads them                                                        |
+| `.github/workflows/`                                                      | None locally: the pull request's CI run is the check                            |
+| `/docs`, `/blog`, `apps/outreach`                                         | `pnpm --filter @opendatacapture/outreach lint`, then `build`; no e2e reaches it |
+| Unit tests (`__tests__/`, a package's `test/`)                            | `pnpm lint` and `pnpm test:coverage`; the apps never load them                  |
+
 1. **Run `pnpm check` from the repo root** and fix every failure, a coverage shortfall included. It runs
    `pnpm lint`, `pnpm test:coverage` and `pnpm test:e2e` in sequence, so a lint failure hides the rest until it
    is fixed. `pnpm test:e2e` needs its browsers installed once per machine
