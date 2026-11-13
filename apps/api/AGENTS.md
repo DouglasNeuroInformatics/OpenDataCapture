@@ -231,6 +231,14 @@ missing or invalid variable is a hard startup crash, by design.
 Adding a variable touches several files that must agree — follow
 `.agents/docs/playbooks/add-env-var.md` step by step.
 
+**`request.ip` is the client's address only because two files agree.** `fastifyOptions.trustProxy` in
+`src/main.ts` trusts the bundled Caddy and the one address Caddy recorded, and leaves whether that
+address is a front proxy to `trusted_proxies` in the root `Caddyfile`
+(`TRUSTED_PROXIES` in `.env.template`). The throttler keys every limit on `request.ip`, so swapping in a
+stock `trustProxy` value either keys every client on the front proxy or lets a client forge its key —
+and fastify 5 treats a numeric hop count as trusting nothing. `test/suites/06-login-throttling.suite.ts`
+is what fails.
+
 ## Tests
 
 `pnpm exec vitest --project api` runs two kinds of test, both in the `api` project.
