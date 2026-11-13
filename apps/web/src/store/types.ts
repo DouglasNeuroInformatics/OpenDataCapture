@@ -11,7 +11,7 @@ export type CurrentUser = Omit<TokenPayload, 'basePermissionLevel' | 'kind' | 'p
 
 export type AuthSlice = {
   accessToken: null | string;
-  changeGroup: (group: Group) => void;
+  changeGroup: (group: Group | null) => void;
   currentGroup: Group | null;
   currentUser: CurrentUser | null;
   login: (accessToken: string) => void;

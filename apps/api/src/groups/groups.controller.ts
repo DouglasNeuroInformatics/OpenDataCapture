@@ -1,5 +1,6 @@
 import { ApiOperation, CurrentUser } from '@douglasneuroinformatics/libnest';
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import type { RequestUser } from '@douglasneuroinformatics/libnest';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { $CreateGroupData, $UpdateGroupData } from '@opendatacapture/schemas/group';
 
 import type { AppAbility } from '@/auth/auth.types';
@@ -11,6 +12,16 @@ import { GroupsService } from './groups.service';
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
+  // Archiving replaces deletion, and is gated on `manage all` for the reason `create` below is: a
+  // group manager's `manage Group` rule covers their own groups, so any `Group` action would let
+  // them take a group out of service from under its other members.
+  @ApiOperation({ summary: 'Archive Group' })
+  @Patch(':id/archive')
+  @RouteAccess(ADMIN_ONLY)
+  archiveById(@Param('id') id: string, @CurrentUser() currentUser: RequestUser) {
+    return this.groupsService.archiveById(id, currentUser);
+  }
+
   // Gated on `manage all` (admin alone) rather than `create Group`. A group manager holds
   // `manage Group` conditioned on their own groups, and the guard evaluates `@RouteAccess` against
   // the subject type, where CASL ignores conditions -- so `create Group` admits every group
@@ -20,13 +31,6 @@ export class GroupsController {
   @RouteAccess(ADMIN_ONLY)
   create(@Body() data: $CreateGroupData) {
     return this.groupsService.create(data);
-  }
-
-  @ApiOperation({ summary: 'Delete Group' })
-  @Delete(':id')
-  @RouteAccess({ action: 'delete', subject: 'Group' })
-  deleteById(@Param('id') id: string, @CurrentUser('ability') ability?: AppAbility) {
-    return this.groupsService.deleteById(id, { ability });
   }
 
   @ApiOperation({ summary: 'Get All Groups' })
@@ -41,6 +45,13 @@ export class GroupsController {
   @RouteAccess({ action: 'read', subject: 'Group' })
   findById(@Param('id') id: string, @CurrentUser('ability') ability?: AppAbility) {
     return this.groupsService.findById(id, { ability });
+  }
+
+  @ApiOperation({ summary: 'Unarchive Group' })
+  @Patch(':id/unarchive')
+  @RouteAccess(ADMIN_ONLY)
+  unarchiveById(@Param('id') id: string, @CurrentUser() currentUser: RequestUser) {
+    return this.groupsService.unarchiveById(id, currentUser);
   }
 
   @ApiOperation({ summary: 'Update Group' })

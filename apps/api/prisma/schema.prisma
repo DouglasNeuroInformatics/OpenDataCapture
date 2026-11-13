@@ -131,6 +131,9 @@ model Group {
   createdAt               DateTime               @default(now()) @db.Date
   updatedAt               DateTime               @updatedAt @db.Date
   id                      String                 @id @default(auto()) @map("_id") @db.ObjectId
+  // Set when an administrator archives the group, which then grants its members nothing from their
+  // next sign-in; null, or absent on a group written before the field existed, while active.
+  archivedAt              DateTime?              @db.Date
   accessibleInstrumentIds String[]
   accessibleInstruments   Instrument[]           @relation(fields: [accessibleInstrumentIds], references: [id])
   assignments             Assignment[]

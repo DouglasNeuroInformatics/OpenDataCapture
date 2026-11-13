@@ -66,11 +66,20 @@ export class AuthService {
       throw new ForbiddenException('Account Disabled');
     }
 
+    // An archived group grants its members nothing: every group rule `createForPayload` writes,
+    // including a permission set's, is derived from `groups`. A grant confined to a group is accepted
+    // only for one the user belongs to, so filtering it against the same list drops the grants
+    // confined to an archived group.
+    const activeGroups = user.groups.filter((group) => !group.archivedAt);
+    const activeGroupIds = new Set(activeGroups.map((group) => group.id));
+
     const tokenPayload: Omit<TokenPayload, 'permissions'> = {
-      additionalPermissions: user.additionalPermissions,
+      additionalPermissions: user.additionalPermissions.filter(
+        ({ groupId }) => groupId === null || activeGroupIds.has(groupId)
+      ),
       basePermissionLevel: user.basePermissionLevel,
       firstName: user.firstName,
-      groups: user.groups,
+      groups: activeGroups,
       id: user.id,
       kind: 'login',
       lastName: user.lastName,

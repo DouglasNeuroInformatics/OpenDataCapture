@@ -14,11 +14,14 @@ import { Route } from '@/routes/_app/admin/groups/index';
 
 import '@/services/i18n';
 
+type MutateOptions = { onSuccess?: () => void };
+
 const mocks = vi.hoisted(() => ({
-  deleteGroup: vi.fn(),
+  archiveGroup: vi.fn(),
   groups: [] as Group[],
   patch: vi.fn(),
-  repos: [] as InstrumentRepo[]
+  repos: [] as InstrumentRepo[],
+  unarchiveGroup: vi.fn()
 }));
 
 vi.mock('@/hooks/useSetupStateQuery', () => ({ useSetupStateQuery: () => ({ data: { tableColorMode: 'tags' } }) }));
@@ -30,8 +33,11 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
   Link: ({ children, to }: PropsWithChildren<{ to: string }>) => <a href={to}>{children}</a>
 }));
-vi.mock('@/hooks/useDeleteGroupMutation', () => ({
-  useDeleteGroupMutation: () => ({ mutate: mocks.deleteGroup })
+vi.mock('@/hooks/useArchiveGroupMutation', () => ({
+  useArchiveGroupMutation: () => ({ mutate: mocks.archiveGroup })
+}));
+vi.mock('@/hooks/useUnarchiveGroupMutation', () => ({
+  useUnarchiveGroupMutation: () => ({ mutate: mocks.unarchiveGroup })
 }));
 vi.mock('@/hooks/useGroupsQuery', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/hooks/useGroupsQuery')>()),
@@ -121,6 +127,8 @@ describe('Route', () => {
     useNotificationsStore.setState({ notifications: [] });
     mocks.groups = [groupFixture()];
     mocks.repos = [];
+    mocks.archiveGroup.mockImplementation((_variables: unknown, options?: MutateOptions) => options?.onSuccess?.());
+    mocks.unarchiveGroup.mockImplementation((_variables: unknown, options?: MutateOptions) => options?.onSuccess?.());
     mocks.patch.mockImplementation((_url: string, body: { instrumentRepoIds: string[] }) => {
       return Promise.resolve({ data: { ...groupFixture(), instrumentRepoIds: body.instrumentRepoIds } });
     });
@@ -139,6 +147,18 @@ describe('Route', () => {
     fireEvent.click(headerButton('Group Name'));
     expect(rows()[0]!.textContent).toContain('Beta');
     fireEvent.click(headerButton('Group Type'));
+    expect(rows()[0]!.textContent).toContain('Alpha');
+  });
+
+  it('should list archived groups first on the first sort by status, and active ones first on the second', () => {
+    mocks.groups = [
+      groupFixture({ id: 'a', name: 'Alpha' }),
+      groupFixture({ archivedAt: new Date('2026-03-04T12:00:00.000Z'), id: 'b', name: 'Beta' })
+    ];
+    renderPage();
+    fireEvent.click(headerButton('Status'));
+    expect(rows()[0]!.textContent).toContain('Beta');
+    fireEvent.click(headerButton('Status'));
     expect(rows()[0]!.textContent).toContain('Alpha');
   });
 
@@ -290,31 +310,59 @@ describe('Route', () => {
     });
   });
 
-  it('should ask for confirmation before deleting a group', () => {
+  it('should mark a group that is not archived as active', () => {
     renderPage();
-    openSheet();
-    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
-    expect(screen.getByText('Are you absolutely sure?')).toBeTruthy();
-    expect(mocks.deleteGroup).not.toHaveBeenCalled();
+    expect(within(rows()[0]!).getByTestId('group-status-active').textContent).toBe('Active');
   });
 
-  it('should delete the group and close the sheet once the deletion is confirmed', async () => {
+  it('should mark an archived group with the date it was archived, so an admin can tell it apart', () => {
+    mocks.groups = [groupFixture({ archivedAt: new Date('2026-03-04T12:00:00.000Z') })];
+    renderPage();
+    expect(within(rows()[0]!).getByTestId('group-status-archived').textContent).toBe('Archived on 2026-03-04');
+  });
+
+  it('should ask for confirmation before archiving a group', () => {
     renderPage();
     openSheet();
-    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Yes' }));
-    expect(mocks.deleteGroup).toHaveBeenCalledWith({ id: 'group-1' });
+    fireEvent.click(screen.getByRole('button', { name: 'Archive' }));
+    expect(screen.getByText('Are you absolutely sure?')).toBeTruthy();
+    expect(mocks.archiveGroup).not.toHaveBeenCalled();
+  });
+
+  it('should archive the group and close the sheet once the archive is confirmed', async () => {
+    renderPage();
+    openSheet();
+    fireEvent.click(screen.getByRole('button', { name: 'Archive' }));
+    fireEvent.click(screen.getByTestId('confirm-archive-group'));
+    expect(mocks.archiveGroup).toHaveBeenCalledWith({ id: 'group-1' }, expect.anything());
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
-  it('should keep the group and return to the sheet when the deletion is declined', async () => {
+  it('should keep the group and return to the sheet when archiving is declined', async () => {
     renderPage();
     openSheet();
-    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Archive' }));
     fireEvent.click(screen.getByRole('button', { name: 'No' }));
     await waitFor(() => expect(screen.queryByText('Are you absolutely sure?')).toBeNull());
-    expect(mocks.deleteGroup).not.toHaveBeenCalled();
+    expect(mocks.archiveGroup).not.toHaveBeenCalled();
     expect(screen.getByRole('dialog')).toBeTruthy();
+  });
+
+  it('should offer to unarchive an archived group in place of archiving it again', () => {
+    mocks.groups = [groupFixture({ archivedAt: new Date('2026-03-04T12:00:00.000Z') })];
+    renderPage();
+    const sheet = openSheet();
+    expect(within(sheet).getByRole('button', { name: 'Unarchive' })).toBeTruthy();
+    expect(within(sheet).queryByRole('button', { name: 'Archive' })).toBeNull();
+  });
+
+  it('should unarchive the group and close the sheet once it is restored', async () => {
+    mocks.groups = [groupFixture({ archivedAt: new Date('2026-03-04T12:00:00.000Z') })];
+    renderPage();
+    openSheet();
+    fireEvent.click(screen.getByRole('button', { name: 'Unarchive' }));
+    expect(mocks.unarchiveGroup).toHaveBeenCalledWith({ id: 'group-1' }, expect.anything());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it('should close the sheet when it is dismissed', async () => {
@@ -334,6 +382,38 @@ describe('Route', () => {
       save();
       expect(uncaughtErrors).toEqual([]);
       expect(mocks.patch).not.toHaveBeenCalled();
+    } finally {
+      window.removeEventListener('error', collectError);
+      removeStyle();
+    }
+  });
+
+  it('should close the confirmation of an archive it ignores, so the next sheet does not open on it', () => {
+    const removeStyle = animateSheetExit();
+    try {
+      renderPage();
+      fireEvent.keyDown(openSheet(), { key: 'Escape' });
+      fireEvent.click(screen.getByRole('button', { name: 'Archive' }));
+      fireEvent.click(screen.getByTestId('confirm-archive-group'));
+      const confirmation = screen.getByText('Are you absolutely sure?').closest('[role="dialog"]')!;
+      expect(confirmation.getAttribute('data-state')).toBe('closed');
+    } finally {
+      removeStyle();
+    }
+  });
+
+  it('should ignore an archive confirmed from a sheet that is already closing, rather than crash on the cleared selection', () => {
+    const removeStyle = animateSheetExit();
+    const uncaughtErrors: unknown[] = [];
+    const collectError = (event: ErrorEvent) => uncaughtErrors.push(event.error);
+    window.addEventListener('error', collectError);
+    try {
+      renderPage();
+      fireEvent.keyDown(openSheet(), { key: 'Escape' });
+      fireEvent.click(screen.getByRole('button', { name: 'Archive' }));
+      fireEvent.click(screen.getByTestId('confirm-archive-group'));
+      expect(uncaughtErrors).toEqual([]);
+      expect(mocks.archiveGroup).not.toHaveBeenCalled();
     } finally {
       window.removeEventListener('error', collectError);
       removeStyle();

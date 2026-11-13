@@ -1,4 +1,4 @@
-import type { Model } from '@douglasneuroinformatics/libnest';
+import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { getModelToken } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
@@ -7,9 +7,15 @@ import { Test } from '@nestjs/testing';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AuditLogger } from '@/audit/audit.logger';
 import { createAppAbility } from '@/auth/ability.utils';
 
 import { GroupsService } from '../groups.service';
+
+const admin = {
+  ability: createAppAbility([{ action: 'manage', subject: 'all' }]),
+  id: 'admin-1'
+} as RequestUser;
 
 /** A minimal template satisfying `$GroupEmailTemplate`, which requires renderable content. */
 const template = (id: string, name: string) => ({
@@ -20,6 +26,7 @@ const template = (id: string, name: string) => ({
 });
 
 describe('GroupsService', () => {
+  let auditLogger: MockedInstance<AuditLogger>;
   let groupsService: GroupsService;
   let groupModel: MockedInstance<Model<'Group'>>;
   let instrumentModel: MockedInstance<Model<'Instrument'>>;
@@ -29,9 +36,11 @@ describe('GroupsService', () => {
       providers: [
         GroupsService,
         MockFactory.createForModelToken(getModelToken('Group')),
-        MockFactory.createForModelToken(getModelToken('Instrument'))
+        MockFactory.createForModelToken(getModelToken('Instrument')),
+        MockFactory.createForService(AuditLogger)
       ]
     }).compile();
+    auditLogger = moduleRef.get(AuditLogger);
     groupModel = moduleRef.get(getModelToken('Group'));
     instrumentModel = moduleRef.get(getModelToken('Instrument'));
     groupsService = moduleRef.get(GroupsService);
@@ -93,19 +102,77 @@ describe('GroupsService', () => {
     });
   });
 
-  describe('deleteById', () => {
-    it('should delete the group with the provided id', async () => {
-      groupModel.delete.mockResolvedValueOnce({ id: '123', name: 'Test Group' });
-      await expect(groupsService.deleteById('123')).resolves.toMatchObject({ name: 'Test Group' });
-      expect(groupModel.delete.mock.lastCall?.[0]).toMatchObject({ where: { id: '123' } });
+  describe('archiveById', () => {
+    it('should set archivedAt rather than delete the group, so everything naming it keeps a real owner', async () => {
+      groupModel.findFirst.mockResolvedValueOnce({ archivedAt: null, id: '123' });
+      await groupsService.archiveById('123', admin);
+      expect(groupModel.update.mock.lastCall?.[0].data.archivedAt).toBeInstanceOf(Date);
+      expect(groupModel.update.mock.lastCall?.[0].where).toMatchObject({ id: '123' });
     });
 
-    it("should restrict the deletion to groups the user's ability may delete", async () => {
-      const ability = createAppAbility([{ action: 'delete', conditions: { id: 'group-1' }, subject: 'Group' }]);
-      await groupsService.deleteById('123', { ability });
-      expect(groupModel.delete.mock.lastCall?.[0]).toEqual({
-        where: { AND: [{ OR: [{ id: 'group-1' }] }], id: '123' }
+    it('should return the archived group', async () => {
+      groupModel.findFirst.mockResolvedValueOnce({ archivedAt: null, id: '123' });
+      groupModel.update.mockResolvedValueOnce({ archivedAt: new Date(), id: '123' });
+      await expect(groupsService.archiveById('123', admin)).resolves.toMatchObject({ archivedAt: expect.any(Date) });
+    });
+
+    it("should restrict the archive to groups the caller's ability may update", async () => {
+      const currentUser = {
+        ability: createAppAbility([{ action: 'update', conditions: { id: 'group-1' }, subject: 'Group' }]),
+        id: 'user-1'
+      } as RequestUser;
+      groupModel.findFirst.mockResolvedValueOnce({ archivedAt: null, id: '123' });
+      await groupsService.archiveById('123', currentUser);
+      const where = { AND: [{ OR: [{ id: 'group-1' }] }], id: '123' };
+      expect(groupModel.findFirst.mock.lastCall?.[0]).toEqual({ where });
+      expect(groupModel.update.mock.lastCall?.[0].where).toEqual(where);
+    });
+
+    it('should throw a NotFoundException when no accessible group has the provided id', async () => {
+      groupModel.findFirst.mockResolvedValueOnce(null);
+      await expect(groupsService.archiveById('123', admin)).rejects.toBeInstanceOf(NotFoundException);
+      expect(groupModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should record the archive in the audit log under the group', async () => {
+      groupModel.findFirst.mockResolvedValueOnce({ archivedAt: null, id: '123' });
+      await groupsService.archiveById('123', admin);
+      expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('ARCHIVE', 'GROUP', {
+        groupId: '123',
+        userId: 'admin-1'
       });
+    });
+
+    it('should leave an archived group alone, so it keeps the date it was first archived', async () => {
+      const group = { archivedAt: new Date('2026-01-01T00:00:00.000Z'), id: '123' };
+      groupModel.findFirst.mockResolvedValueOnce(group);
+      await expect(groupsService.archiveById('123', admin)).resolves.toBe(group);
+      expect(groupModel.update).not.toHaveBeenCalled();
+      expect(auditLogger.log).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('unarchiveById', () => {
+    it('should clear archivedAt to return the group to service', async () => {
+      groupModel.findFirst.mockResolvedValueOnce({ archivedAt: new Date(), id: '123' });
+      await groupsService.unarchiveById('123', admin);
+      expect(groupModel.update.mock.lastCall?.[0]).toMatchObject({ data: { archivedAt: null }, where: { id: '123' } });
+    });
+
+    it('should record the unarchive in the audit log under the group', async () => {
+      groupModel.findFirst.mockResolvedValueOnce({ archivedAt: new Date(), id: '123' });
+      await groupsService.unarchiveById('123', admin);
+      expect(auditLogger.log).toHaveBeenCalledExactlyOnceWith('UNARCHIVE', 'GROUP', {
+        groupId: '123',
+        userId: 'admin-1'
+      });
+    });
+
+    it('should leave a group that is not archived alone, since there is nothing to undo', async () => {
+      groupModel.findFirst.mockResolvedValueOnce({ archivedAt: null, id: '123' });
+      await groupsService.unarchiveById('123', admin);
+      expect(groupModel.update).not.toHaveBeenCalled();
+      expect(auditLogger.log).not.toHaveBeenCalled();
     });
   });
 

@@ -123,6 +123,13 @@ describe('createAuthSlice', () => {
     expect(store.getState().currentSession).toBeNull();
   });
 
+  it('should leave no group selected or remembered when the group is cleared', () => {
+    store.setState({ currentGroup: createGroup('a'), preferredGroupId: 'a' });
+    store.getState().changeGroup(null);
+    expect(store.getState().currentGroup).toBeNull();
+    expect(store.getState().preferredGroupId).toBeNull();
+  });
+
   it('should reload the page on logout, so no in-memory state outlives the session', () => {
     const reload = vi.spyOn(window.location, 'reload').mockImplementation(() => undefined);
     store.getState().logout();

@@ -60,6 +60,14 @@ describe('useSwitchableGroups', () => {
     expect(mockAxios.get).toHaveBeenCalledWith('/v1/groups');
   });
 
+  it('should not offer an admin an archived group, which can no longer be the current group', async () => {
+    store.currentUser = asUser({ isAdmin: true });
+    const archivedGroup = { ...createGroup('archived'), archivedAt: new Date('2026-01-03T00:00:00.000Z') };
+    mockAxios.get.mockResolvedValue({ data: [otherGroup, archivedGroup] });
+    const { result } = renderSwitchableGroups();
+    await waitFor(() => expect(result.current).toEqual([otherGroup]));
+  });
+
   it("should offer an admin their own groups until the platform's groups load, so the switcher does not blank out", () => {
     store.currentUser = asUser({ isAdmin: true });
     mockAxios.get.mockReturnValue(Promise.withResolvers<never>().promise);
