@@ -38,7 +38,7 @@ catalog:
   msgpackr: ^2.1.0
   motion: '13.4.4'
   neverthrow: ^8.2.0
-  nodemailer: ^10.0.11
+  nodemailer: ^10.2.1
   conventional-commits-parser: '^7.1.2'
   prisma: '^6.9.0'
   react-dropzone: ^20.1.2
@@ -63,6 +63,14 @@ catalogs:
 hoistPattern:
   - '*'
   - '!@storybook/react'
+overrides:
+  '@tailwindcss/typography>postcss-selector-parser': ^6.1.5
+  '@types/react': '-'
+  '@types/react-dom': '-'
+  'monaco-editor>dompurify': ^3.4.17
+  sharp: ^0.35.5
+  typescript: 6.0.x
+  'yaml@2': ^2.9.0
 minimumReleaseAge: 10080 # 7 days
 minimumReleaseAgeExclude:
   - '@douglasneuroinformatics/*'
