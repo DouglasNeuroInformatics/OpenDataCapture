@@ -13,7 +13,7 @@ type Props = {
 };
 
 const { author, datePublished, readingTime, className } = Astro.props;
-const { resolvedLanguage } = useTranslations(Astro.url);
+const { resolvedLanguage, t } = useTranslations(Astro.url);
 ---
 
 <div class:list={['flex items-center', className]}>
@@ -33,7 +33,7 @@ const { resolvedLanguage } = useTranslations(Astro.url);
         }
       </time>
       <span aria-hidden="true">&middot;</span>
-      <span>{Math.round(readingTime)} min read</span>
+      <span>{`${Math.round(readingTime)} ${t('blog.minRead')}`}</span>
     </div>
   </div>
 </div>

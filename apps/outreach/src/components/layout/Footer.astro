@@ -1,3 +1,9 @@
+---
+import { useTranslations } from '@/i18n';
+
+const { t } = useTranslations(Astro.url);
+---
+
 <footer class="bg-white py-4 text-sm shadow-sm dark:bg-slate-800">
   <div class="text-muted-foreground container hidden items-center justify-center gap-2 sm:flex">
     <a class="hover:text-foreground" href="https://douglasneuroinformatics.ca/" target="_blank" rel="noreferrer">
@@ -14,7 +20,7 @@
     </a>
     <span>&#183;</span>
     <a class="hover:text-foreground" href="https://playground.opendatacapture.org" target="_blank" rel="noreferrer">
-      Instrument Playground
+      {t('common.instrumentPlayground')}
     </a>
   </div>
   <p class="text-muted-foreground mt-1.5 text-center">
