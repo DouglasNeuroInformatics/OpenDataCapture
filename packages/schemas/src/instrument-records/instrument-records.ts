@@ -10,7 +10,6 @@ import type { SessionType } from '../session/session.js';
 
 export type $CreateInstrumentRecordData = z.infer<typeof $CreateInstrumentRecordData>;
 export const $CreateInstrumentRecordData = z.object({
-  assignmentId: z.string().optional(),
   data: $Json,
   date: $DateLike,
   groupId: z.string().optional(),

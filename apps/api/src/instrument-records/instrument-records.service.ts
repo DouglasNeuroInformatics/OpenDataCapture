@@ -51,6 +51,12 @@ import type {
   WorkerMessage
 } from './thread-types';
 
+/**
+ * `assignmentId` is not part of the public create schema, so only a caller inside the API, the
+ * gateway synchronizer, can link a record to the assignment it was collected for.
+ */
+type CreateInstrumentRecordInput = CreateInstrumentRecordData & { assignmentId?: string };
+
 type RecordSummaryFold = Map<string, { lastCollectedAt: Date | null; recordCount: number; subjectIds: Set<string> }>;
 
 /**
@@ -94,6 +100,7 @@ export class InstrumentRecordsService {
 
   async create(
     {
+      assignmentId,
       data: rawData,
       date,
       groupId,
@@ -101,7 +108,7 @@ export class InstrumentRecordsService {
       seriesInstrumentId,
       sessionId,
       subjectId
-    }: CreateInstrumentRecordData,
+    }: CreateInstrumentRecordInput,
     options?: EntityOperationOptions
   ): Promise<InstrumentRecord> {
     if (groupId) {
@@ -146,6 +153,11 @@ export class InstrumentRecordsService {
 
     return this.instrumentRecordModel.create({
       data: {
+        assignment: assignmentId
+          ? {
+              connect: { id: assignmentId }
+            }
+          : undefined,
         computedMeasures: instrument.measures
           ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
           : null,

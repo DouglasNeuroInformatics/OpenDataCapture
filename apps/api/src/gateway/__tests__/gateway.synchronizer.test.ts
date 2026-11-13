@@ -104,6 +104,19 @@ describe('GatewaySynchronizer', () => {
       expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledWith('assignment-1');
     });
 
+    it('should record when the subject completed the assignment, as the gateway reports it', async () => {
+      const remoteAssignment = createRemoteAssignment('assignment-1');
+      gatewayService.fetchRemoteAssignments.mockResolvedValue([remoteAssignment]);
+      instrumentRecordsService.create.mockResolvedValue({ id: 'record-1' });
+
+      await gatewaySynchronizer.sync();
+
+      expect(assignmentsService.updateStatusById).toHaveBeenCalledExactlyOnceWith('assignment-1', {
+        completedAt: remoteAssignment.completedAt,
+        status: 'COMPLETE'
+      });
+    });
+
     it('should decrypt with the private key read for that assignment alone', async () => {
       gatewayService.fetchRemoteAssignments.mockResolvedValue([createRemoteAssignment('assignment-1')]);
       instrumentRecordsService.create.mockResolvedValue({ id: 'record-1' });
@@ -147,7 +160,10 @@ describe('GatewaySynchronizer', () => {
 
       expect(instrumentRecordsService.create).toHaveBeenCalledTimes(2);
       expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledExactlyOnceWith('assignment-2');
-      expect(assignmentsService.updateStatusById).toHaveBeenCalledExactlyOnceWith('assignment-2', 'COMPLETE');
+      expect(assignmentsService.updateStatusById).toHaveBeenCalledExactlyOnceWith(
+        'assignment-2',
+        expect.objectContaining({ status: 'COMPLETE' })
+      );
     });
   });
 
@@ -175,7 +191,10 @@ describe('GatewaySynchronizer', () => {
       expect(loggingService.error).toHaveBeenCalledWith(
         expect.objectContaining({ error: 'Failed to Update Remote Setup State' })
       );
-      expect(assignmentsService.updateStatusById).toHaveBeenCalledWith('assignment-1', 'EXPIRED');
+      expect(assignmentsService.updateStatusById).toHaveBeenCalledWith(
+        'assignment-1',
+        expect.objectContaining({ status: 'EXPIRED' })
+      );
     });
 
     it('should log and end the pass when the remote assignments cannot be fetched', async () => {
@@ -202,7 +221,10 @@ describe('GatewaySynchronizer', () => {
       ]);
       await gatewaySynchronizer.sync();
       expect(gatewayService.deleteRemoteAssignment).toHaveBeenCalledWith('assignment-1');
-      expect(assignmentsService.updateStatusById).toHaveBeenCalledWith('assignment-1', 'CANCELED');
+      expect(assignmentsService.updateStatusById).toHaveBeenCalledWith(
+        'assignment-1',
+        expect.objectContaining({ status: 'CANCELED' })
+      );
       expect(sessionsService.create).not.toHaveBeenCalled();
     });
   });
@@ -291,6 +313,14 @@ describe('GatewaySynchronizer', () => {
       expect(instrumentRecordsService.create.mock.calls.map(([record]) => record)).toMatchObject([
         { instrumentId: 'ITEM_A-1', seriesInstrumentId: SERIES_ID },
         { instrumentId: 'ITEM_B-2', seriesInstrumentId: SERIES_ID }
+      ]);
+    });
+
+    it('should link every record of the series to the assignment it was submitted for', async () => {
+      await submit('$first$second', '$key1$key2');
+      expect(instrumentRecordsService.create.mock.calls.map(([record]) => record.assignmentId)).toEqual([
+        'assignment-1',
+        'assignment-1'
       ]);
     });
 

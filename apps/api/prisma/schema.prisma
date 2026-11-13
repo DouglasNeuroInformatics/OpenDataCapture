@@ -67,19 +67,19 @@ model AuditLog {
 }
 
 model Assignment {
-  createdAt         DateTime          @default(now()) @db.Date
-  updatedAt         DateTime          @updatedAt @db.Date
-  id                String            @id @map("_id")
+  createdAt         DateTime           @default(now()) @db.Date
+  updatedAt         DateTime           @updatedAt @db.Date
+  id                String             @id @map("_id")
   completedAt       DateTime?
   expiresAt         DateTime
-  group             Group?            @relation(fields: [groupId], references: [id])
-  groupId           String?           @db.ObjectId
-  instrument        Instrument        @relation(fields: [instrumentId], references: [id])
+  group             Group?             @relation(fields: [groupId], references: [id])
+  groupId           String?            @db.ObjectId
+  instrument        Instrument         @relation(fields: [instrumentId], references: [id])
   instrumentId      String
-  instrumentRecord  InstrumentRecord?
+  instrumentRecords InstrumentRecord[]
   redirectUrl       String?
   status            AssignmentStatus
-  subject           Subject           @relation(fields: [subjectId], references: [id])
+  subject           Subject            @relation(fields: [subjectId], references: [id])
   subjectId         String
   url               String
   encryptionKeyPair EncryptionKeyPair
@@ -180,10 +180,7 @@ model InstrumentRecord {
   seriesInstrument   Instrument?            @relation("SeriesInstrumentRecords", fields: [seriesInstrumentId], references: [id])
   seriesInstrumentId String?
   assignment         Assignment?            @relation(fields: [assignmentId], references: [id])
-  // Prisma requires @unique here for the 1:1 relation, but builds the index non-sparse, and MongoDB
-  // indexes a missing field as null — so a second record without an assignment would collide.
-  // ensureDatabaseIndexes in src/core/prisma.ts creates this one sparse instead.
-  assignmentId       String?                @unique
+  assignmentId       String?
   session            Session                @relation(fields: [sessionId], references: [id])
   sessionId          String                 @db.ObjectId
   pending            Boolean?
@@ -192,6 +189,7 @@ model InstrumentRecord {
   @@index([groupId, date])
   @@index([instrumentId])
   @@index([sessionId])
+  @@index([assignmentId])
   @@map("InstrumentRecordModel")
 }
 
