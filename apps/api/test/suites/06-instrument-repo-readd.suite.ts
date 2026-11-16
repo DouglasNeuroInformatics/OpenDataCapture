@@ -89,9 +89,20 @@ export default defineSuite('re-adding a registered instrument repository', funct
     return (await prisma().instrumentRepo.findUniqueOrThrow({ where: { id } })).accessToken;
   };
 
-  /** Answers every GitHub download with an empty repository, and passes any other request on. */
-  const stubGitHub = async () => {
-    const archive = await new JSZip().generateAsync({ type: 'arraybuffer' });
+  /**
+   * Answers every GitHub download with a repository, and passes any other request on.
+   *
+   * `providesInstrument` adds one instrument directory, which a sync that is expected to succeed
+   * needs: a repository providing none is refused outright. Its contents do not matter, since an
+   * instrument that fails to load is recorded against the sync rather than refused. The tests that
+   * expect a refusal leave it off, so they pay nothing for bundling an instrument no one reads.
+   */
+  const stubGitHub = async ({ providesInstrument = false }: { providesInstrument?: boolean } = {}) => {
+    const zip = new JSZip();
+    if (providesInstrument) {
+      zip.file('repo/lib/forms/example/index.ts', "export default 'example';");
+    }
+    const archive = await zip.generateAsync({ type: 'arraybuffer' });
     const realFetch = globalThis.fetch;
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation((input, init) => {
       return typeof input === 'string' && input.startsWith('https://api.github.com/')
@@ -158,7 +169,7 @@ export default defineSuite('re-adding a registered instrument repository', funct
       { action: 'update', groupId: ownGroup.id, subject: 'InstrumentRepo' }
     ]);
     const repo = await registerRepo('own-group-target', [ownGroup.id]);
-    const fetchSpy = await stubGitHub();
+    const fetchSpy = await stubGitHub({ providesInstrument: true });
 
     const response = await reAdd(headers, repo.url);
 
@@ -168,7 +179,7 @@ export default defineSuite('re-adding a registered instrument repository', funct
 
   it('should let an administrator replace the token and re-sync, which is how an expired one is refreshed', async () => {
     const repo = await registerRepo('admin-target', [otherGroup.id]);
-    const fetchSpy = await stubGitHub();
+    const fetchSpy = await stubGitHub({ providesInstrument: true });
 
     const response = await reAdd(adminHeaders, repo.url);
 

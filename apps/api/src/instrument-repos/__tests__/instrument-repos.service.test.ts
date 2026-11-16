@@ -251,6 +251,7 @@ describe('InstrumentReposService', () => {
       expect(instrumentRepoModel.create).not.toHaveBeenCalled();
       expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data).toStrictEqual({
         action: 'IMPORT',
+        createdCount: 0,
         failures: [],
         importedCount: 0,
         message: 'Repository not found',
@@ -269,6 +270,7 @@ describe('InstrumentReposService', () => {
 
       expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data).toStrictEqual({
         action: 'IMPORT',
+        createdCount: 0,
         failures,
         importedCount: 1,
         message: null,
@@ -517,6 +519,7 @@ describe('InstrumentReposService', () => {
 
     it.each([
       ['action', [{ action: 'asc' }]],
+      ['createdCount', [{ createdCount: 'asc' }]],
       ['failedCount', [{ failures: { _count: 'asc' } }]],
       ['importedCount', [{ importedCount: 'asc' }]],
       ['repoName', [{ repoName: 'asc' }]],
@@ -763,7 +766,7 @@ describe('InstrumentReposService', () => {
     });
 
     it('should request the main branch zipball from the GitHub API with the repo token', async () => {
-      fetchMock.mockResolvedValueOnce(await zipball({}));
+      fetchMock.mockResolvedValueOnce(await zipball(instrumentFiles('forms', 'A')));
 
       await service.create({ accessToken: 'repo-token', url });
 
@@ -773,7 +776,7 @@ describe('InstrumentReposService', () => {
 
     it('should fall back to the server-wide token when the repo has none', async () => {
       configService.get.mockReturnValue('server-token');
-      fetchMock.mockResolvedValueOnce(await zipball({}));
+      fetchMock.mockResolvedValueOnce(await zipball(instrumentFiles('forms', 'A')));
 
       await service.create({ url });
 
@@ -782,7 +785,7 @@ describe('InstrumentReposService', () => {
     });
 
     it('should send no authorization header when no token is configured', async () => {
-      fetchMock.mockResolvedValueOnce(await zipball({}));
+      fetchMock.mockResolvedValueOnce(await zipball(instrumentFiles('forms', 'A')));
 
       await service.create({ url });
 
@@ -880,6 +883,94 @@ describe('InstrumentReposService', () => {
 
       expect(instrumentRepoModel.create.mock.lastCall?.[0].data.instrumentIds).toStrictEqual(['existing']);
       expect(instrumentModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should refuse a repository that provides no instrument directories, rather than import nothing', async () => {
+      fetchMock.mockResolvedValueOnce(await zipball({ 'public/forms/A/index.ts': "export default 'A';" }));
+
+      await expect(service.create({ url })).rejects.toThrow(
+        'Found no instruments in owner/repo. An instrument is a directory holding an index.ts, index.tsx, index.js or index.jsx file, within lib/file, lib/forms, lib/interactive, lib/series at the root of the repository.'
+      );
+      expect(instrumentRepoModel.create).not.toHaveBeenCalled();
+    });
+
+    it('should log an empty repository as a failure, so it is not indistinguishable from a clean import', async () => {
+      fetchMock.mockResolvedValueOnce(await zipball({ 'README.md': '# repo' }));
+
+      await expect(service.create({ url })).rejects.toThrow('Found no instruments in owner/repo');
+
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data).toMatchObject({
+        createdCount: 0,
+        failures: [],
+        importedCount: 0,
+        message: expect.stringContaining('Found no instruments in owner/repo')
+      });
+    });
+
+    // The refusal runs on a sync too, where returning before the update is what keeps a repository's
+    // instruments listed: replacing the id list with nothing would de-list every one of them.
+    it('should keep the instruments a registered repository provides when a sync finds none', async () => {
+      instrumentRepoModel.findFirst.mockResolvedValueOnce({
+        accessToken: null,
+        id: 'r1',
+        instrumentIds: ['stored'],
+        name: 'repo',
+        owner: 'owner',
+        repoName: 'repo'
+      });
+      fetchMock.mockResolvedValueOnce(await zipball({ 'README.md': '# repo' }));
+
+      await expect(service.sync('r1')).rejects.toThrow('Found no instruments in owner/repo');
+
+      expect(instrumentRepoModel.update).not.toHaveBeenCalled();
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data).toMatchObject({
+        action: 'SYNC',
+        createdCount: 0,
+        importedCount: 0,
+        message: expect.stringContaining('Found no instruments in owner/repo'),
+        repoId: 'r1'
+      });
+    });
+
+    // A readable repository whose every instrument fails is not a repository that provides none, so the
+    // stored list stands rather than being replaced with nothing.
+    it('should keep the stored instrument list when a sync matches none of what it found', async () => {
+      instrumentRepoModel.findFirst.mockResolvedValueOnce({
+        accessToken: null,
+        id: 'r1',
+        instrumentIds: ['stored'],
+        name: 'repo',
+        owner: 'owner',
+        repoName: 'repo'
+      });
+      fetchMock.mockResolvedValueOnce(await zipball(instrumentFiles('forms', 'A')));
+      instrumentsService.create.mockRejectedValueOnce(new UnprocessableEntityException('details.title: Required'));
+
+      await service.sync('r1');
+
+      expect(instrumentRepoModel.update).not.toHaveBeenCalled();
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data).toMatchObject({
+        createdCount: 0,
+        importedCount: 0,
+        message: null
+      });
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data.failures).toHaveLength(1);
+    });
+
+    it('should count only the instruments it stored as created, so ones already present are not reported as new', async () => {
+      fetchMock.mockResolvedValueOnce(
+        await zipball({ ...instrumentFiles('forms', 'A'), ...instrumentFiles('forms', 'B') })
+      );
+      instrumentsService.create
+        .mockResolvedValueOnce({ id: 'created' })
+        .mockRejectedValueOnce(new ConflictException("Instrument with ID 'existing' already exists!"));
+
+      await service.create({ url });
+
+      expect(instrumentRepoSyncLogModel.create.mock.lastCall?.[0].data).toMatchObject({
+        createdCount: 1,
+        importedCount: 2
+      });
     });
 
     it('should record a conflict that does not name the existing instrument as a failure', async () => {

@@ -42,7 +42,13 @@ export const $InstrumentRepoSyncFailure = z.object({
 export type InstrumentRepoSyncLog = z.infer<typeof $InstrumentRepoSyncLog>;
 export const $InstrumentRepoSyncLog = $BaseModel.extend({
   action: $InstrumentRepoSyncAction,
+  /**
+   * How many of `importedCount` this run stored for the first time; the rest were already in the
+   * database. Null on an entry recorded before the two were counted separately.
+   */
+  createdCount: z.number().int().nonnegative().nullish(),
   failures: z.array($InstrumentRepoSyncFailure),
+  /** Every instrument the repository provided, whether this run created it or found it already stored. */
   importedCount: z.number().int().nonnegative(),
   /** Set when the repository as a whole could not be read, in which case nothing was imported. */
   message: z.string().nullish(),
@@ -61,6 +67,7 @@ export type InstrumentRepoSyncLogsSortBy = z.infer<typeof $InstrumentRepoSyncLog
 export const $InstrumentRepoSyncLogsSortBy = z.enum([
   'action',
   'createdAt',
+  'createdCount',
   'failedCount',
   'importedCount',
   'repoName',

@@ -281,6 +281,7 @@ model InstrumentRepoSyncLog {
   updatedAt     DateTime                    @updatedAt @db.Date
   id            String                      @id @default(auto()) @map("_id") @db.ObjectId
   action        InstrumentRepoSyncAction
+  createdCount  Int?
   failures      InstrumentRepoSyncFailure[]
   importedCount Int
   message       String?

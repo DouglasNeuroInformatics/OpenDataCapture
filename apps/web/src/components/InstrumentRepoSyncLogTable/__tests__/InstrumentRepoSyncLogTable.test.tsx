@@ -139,6 +139,21 @@ describe('InstrumentRepoSyncLogTable', () => {
     expect(statuses()).toEqual(['Partial success']);
   });
 
+  it('should mark a sync that imported nothing as failed, since failing every instrument is no part success', () => {
+    render(
+      <Table
+        logs={[
+          logFixture({
+            createdCount: 0,
+            failures: [{ instrumentDir: 'PHQ_9', message: 'Instrument validation failed', stage: 'LOAD' }],
+            importedCount: 0
+          })
+        ]}
+      />
+    );
+    expect(statuses()).toEqual(['Failed']);
+  });
+
   it('should mark a sync that could not read the repository as failed', () => {
     render(<Table logs={[logFixture({ importedCount: 0, message: 'Repository not found' })]} />);
     expect(statuses()).toEqual(['Failed']);
@@ -238,6 +253,38 @@ describe('InstrumentRepoSyncLogTable', () => {
       row.getByText('7')
     ];
     cells.forEach((cell) => expect(cell.className).toContain('whitespace-nowrap'));
+  });
+
+  it('should name how many of the imported instruments were new, so the total is not read as all new', () => {
+    render(<Table logs={[logFixture({ createdCount: 12, importedCount: 22 })]} />);
+    expect(within(rows()[0]!).getByText('22 (12 new)')).toBeTruthy();
+  });
+
+  it('should spell the whole split out on hover, since the cell has room for only the total', () => {
+    render(<Table logs={[logFixture({ createdCount: 12, importedCount: 22 })]} />);
+    expect(within(rows()[0]!).getByText('22 (12 new)').title).toBe('22 imported: 12 new, 10 already stored');
+  });
+
+  it('should show the total alone for an entry that imported nothing, which stored nothing to split', () => {
+    render(
+      <Table
+        logs={[
+          logFixture({
+            createdCount: 0,
+            failures: [{ instrumentDir: 'A', message: 'broken', stage: 'LOAD' }],
+            importedCount: 0
+          })
+        ]}
+      />
+    );
+    const cell = within(rows()[0]!).getByText('0');
+    expect(cell.title).toBe('0');
+  });
+
+  it('should show the total alone for an entry recorded before the split was counted', () => {
+    render(<Table logs={[logFixture({ createdCount: null, importedCount: 22 })]} />);
+    const cell = within(rows()[0]!).getByText('22');
+    expect(cell.title).toBe('22');
   });
 
   it('should carry the full repository name as a hover title, since the cell may clip it', () => {

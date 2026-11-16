@@ -549,18 +549,36 @@ describe('Route', () => {
     expect(screen.getByText('No instruments found in this repository.')).toBeTruthy();
   });
 
-  it('should list only the instruments that came from the viewed repository', () => {
+  it('should list only the instruments the viewed repository provides', () => {
     mocks.instrumentInfo.data = [
       scalarFixture({ id: 'form-1', title: 'Happiness Questionnaire' }),
-      scalarFixture({ id: 'form-2', sourceRepo: { id: 'repo-2', name: 'Other Repo' }, title: 'Breakfast Survey' }),
-      scalarFixture({ id: 'form-3', sourceRepo: null, title: 'Manual Upload' })
+      scalarFixture({ id: 'form-2', title: 'Breakfast Survey' }),
+      scalarFixture({ id: 'form-3', title: 'Elsewhere Survey' })
     ];
-    renderPage();
+    renderPage([repoFixture({ instrumentIds: ['form-1', 'form-2'] })]);
     fireEvent.click(rowAction('View'));
     const dialog = within(screen.getByRole('dialog'));
     expect(dialog.getByText('Happiness Questionnaire')).toBeTruthy();
-    expect(dialog.queryByText('Breakfast Survey')).toBeNull();
-    expect(dialog.queryByText('Manual Upload')).toBeNull();
+    expect(dialog.getByText('Breakfast Survey')).toBeTruthy();
+    expect(dialog.queryByText('Elsewhere Survey')).toBeNull();
+  });
+
+  // The import counts an instrument it found already stored, but leaves its provenance alone, so
+  // listing by provenance dropped exactly these while the activity log still counted them.
+  it('should list an instrument the repository provides but did not create, which provenance omits', () => {
+    mocks.instrumentInfo.data = [
+      scalarFixture({ id: 'form-1', sourceRepo: null, title: 'Uploaded Before The Repo' }),
+      scalarFixture({
+        id: 'form-2',
+        sourceRepo: { id: 'repo-2', name: 'Other Repo' },
+        title: 'Shared With Another Repo'
+      })
+    ];
+    renderPage([repoFixture({ instrumentIds: ['form-1', 'form-2'] })]);
+    fireEvent.click(rowAction('View'));
+    const dialog = within(screen.getByRole('dialog'));
+    expect(dialog.getByText('Uploaded Before The Repo')).toBeTruthy();
+    expect(dialog.getByText('Shared With Another Repo')).toBeTruthy();
   });
 
   it('should show the edition of a scalar instrument and a dash for a series, which has none', () => {
@@ -568,7 +586,7 @@ describe('Route', () => {
       scalarFixture({ edition: 3, id: 'form-1', title: 'Happiness Questionnaire' }),
       seriesFixture({ id: 'series-1', title: 'Baseline Battery' })
     ];
-    renderPage();
+    renderPage([repoFixture({ instrumentIds: ['form-1', 'series-1'] })]);
     fireEvent.click(rowAction('View'));
     const editions = within(screen.getByRole('dialog'))
       .getAllByRole('listitem')
@@ -576,12 +594,14 @@ describe('Route', () => {
     expect(editions).toEqual(['3', '-']);
   });
 
-  it('should list only the latest edition of an instrument the repository has bumped', () => {
+  // A bumped form is a new edition with an id of its own, and the sync replaces the id list, so the
+  // superseded edition stays in the database without being something the repository still provides.
+  it('should list only the edition of a bumped instrument that the repository still provides', () => {
     mocks.instrumentInfo.data = [
       scalarFixture({ edition: 4, id: 'form-1', internalName: 'GI', title: 'General Information' }),
       scalarFixture({ edition: 5, id: 'form-2', internalName: 'GI', title: 'General Information' })
     ];
-    renderPage();
+    renderPage([repoFixture({ instrumentIds: ['form-2'] })]);
     fireEvent.click(rowAction('View'));
     const editions = within(screen.getByRole('dialog'))
       .getAllByRole('listitem')
@@ -589,28 +609,30 @@ describe('Route', () => {
     expect(editions).toEqual(['5']);
   });
 
-  // The API orders by nothing this page controls, so the newest edition may arrive first.
-  it('should keep the latest edition even when it comes before the superseded one in the data', () => {
-    mocks.instrumentInfo.data = [
-      scalarFixture({ edition: 5, id: 'form-2', internalName: 'GI', title: 'General Information' }),
-      scalarFixture({ edition: 4, id: 'form-1', internalName: 'GI', title: 'General Information' })
-    ];
-    renderPage();
-    fireEvent.click(rowAction('View'));
-    const editions = within(screen.getByRole('dialog'))
-      .getAllByRole('listitem')
-      .map((item) => item.querySelectorAll('p')[2]!.textContent);
-    expect(editions).toEqual(['5']);
-  });
-
-  it('should count only the latest edition of each instrument once the instrument info has loaded', () => {
+  it('should count every instrument the repository provides, matching what the activity log imported', () => {
     mocks.instrumentInfo.data = [
       scalarFixture({ edition: 4, id: 'form-1', internalName: 'GI', title: 'General Information' }),
       scalarFixture({ edition: 5, id: 'form-2', internalName: 'GI', title: 'General Information' }),
       seriesFixture({ id: 'series-1', title: 'Baseline Battery' })
     ];
     renderPage([repoFixture({ instrumentIds: ['form-1', 'form-2', 'series-1'] })]);
-    expect(within(rows()[0]!).getByText('2')).toBeTruthy();
+    expect(within(rows()[0]!).getByText('3')).toBeTruthy();
+  });
+
+  // Nothing prunes the id list when an instrument is deleted, so the count has to resolve the same ids
+  // the dialog lists, or the row would claim one the dialog cannot show.
+  it('should leave an id whose instrument was deleted out of the count, as the dialog leaves it out', () => {
+    mocks.instrumentInfo.data = [scalarFixture({ id: 'form-1', title: 'Happiness Questionnaire' })];
+    renderPage([repoFixture({ instrumentIds: ['form-1', 'deleted-form'] })]);
+    expect(within(rows()[0]!).getByText('1')).toBeTruthy();
+    fireEvent.click(rowAction('View'));
+    expect(within(screen.getByRole('dialog')).getAllByRole('listitem')).toHaveLength(1);
+  });
+
+  it('should count what the repository provides before the instrument info has loaded, since it needs none', () => {
+    renderPage([repoFixture({ instrumentIds: ['form-1', 'form-2', 'form-3'] })]);
+    expect(mocks.instrumentInfo.data).toBeUndefined();
+    expect(within(rows()[0]!).getByText('3')).toBeTruthy();
   });
 
   it('should link to the repository source in the view dialog, so it can be opened on GitHub', () => {

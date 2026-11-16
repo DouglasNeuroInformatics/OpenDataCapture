@@ -45,27 +45,17 @@ import { useSyncInstrumentRepoMutation } from '@/hooks/useSyncInstrumentRepoMuta
 import { MIN_TABLE_BODY_HEIGHT } from '@/utils/data-table';
 
 /**
- * The instruments a repository currently provides: only the latest edition of each. Superseded
- * editions keep their repository provenance (records may still reference them), so without this a
- * bumped form would be listed once per edition it has ever had.
+ * The instruments a repository provides, as its last sync recorded them — the same set the activity
+ * log counted as imported.
+ *
+ * Resolved through that id list rather than through each instrument's `sourceRepo`, which names
+ * whichever import created it. An instrument already stored when the repository was registered is
+ * provided by it but was not created by it, so listing by provenance silently drops every one of
+ * those while the log still counts them.
  */
-function currentRepoInstruments(instruments: TranslatedInstrumentInfo[], repoId: string) {
-  const fromRepo = instruments.filter((instrument) => instrument.sourceRepo?.id === repoId);
-  // Keyed by internal name, which is what identifies one instrument across its editions. A series
-  // has no edition of its own, so it is never superseded and never keyed.
-  const latestEditions = new Map<string, number>();
-  for (const instrument of fromRepo) {
-    if (instrument.kind === 'SERIES') {
-      continue;
-    }
-    const latest = latestEditions.get(instrument.internal.name);
-    if (latest === undefined || latest < instrument.internal.edition) {
-      latestEditions.set(instrument.internal.name, instrument.internal.edition);
-    }
-  }
-  return fromRepo.filter((instrument) => {
-    return instrument.kind === 'SERIES' || latestEditions.get(instrument.internal.name) === instrument.internal.edition;
-  });
+function providedInstruments(instruments: TranslatedInstrumentInfo[], repo: InstrumentRepo) {
+  const providedIds = new Set(repo.instrumentIds);
+  return instruments.filter((instrument) => providedIds.has(instrument.id));
 }
 
 const AddRepoForm = ({
@@ -217,8 +207,8 @@ const RouteComponent = () => {
   });
   const latestSyncLogsQuery = useLatestInstrumentRepoSyncLogsQuery();
   const clearSyncLogsMutation = useClearInstrumentRepoSyncLogsMutation();
-  // Every edition, because the default collapses editions across all sources, not per repository;
-  // `currentRepoInstruments` then keeps the latest edition each repository provides.
+  // Every edition, because a repository's id list names the exact editions it provides, and the
+  // default collapses editions across all sources — which would hide any a repository still provides.
   const instrumentInfoQuery = useInstrumentInfoQuery({ params: { allEditions: true } });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
@@ -239,8 +229,11 @@ const RouteComponent = () => {
   const repoRows = reposQuery.data.map((repo) => ({
     ...repo,
     failedCount: latestSyncLogByRepoId.get(repo.id)?.failures.length,
+    // The same function the View dialog lists, so the count and the list cannot disagree: an id whose
+    // instrument has since been deleted is in neither. Until the instruments load there is nothing to
+    // resolve the ids against, and the length of the list itself is the better of the two answers.
     instrumentCount: instrumentInfoQuery.data
-      ? currentRepoInstruments(instrumentInfoQuery.data, repo.id).length
+      ? providedInstruments(instrumentInfoQuery.data, repo).length
       : repo.instrumentIds.length
   }));
 
@@ -368,6 +361,9 @@ const RouteComponent = () => {
                 },
                 {
                   accessorKey: 'instrumentCount',
+                  cell: (ctx) => (
+                    <span data-testid="instrument-repo-instrument-count">{ctx.row.original.instrumentCount}</span>
+                  ),
                   header: ({ column }) => (
                     <SortableHeader
                       column={column}
@@ -626,7 +622,7 @@ const RouteComponent = () => {
             const searchTerm = instrumentSearch.trim().toLowerCase();
             const repoInstruments =
               instrumentInfoQuery.data &&
-              currentRepoInstruments(instrumentInfoQuery.data, repoToView.id).filter((instrument) => {
+              providedInstruments(instrumentInfoQuery.data, repoToView).filter((instrument) => {
                 return instrument.details.title.toLowerCase().includes(searchTerm);
               });
             if (instrumentInfoQuery.isLoading) {
