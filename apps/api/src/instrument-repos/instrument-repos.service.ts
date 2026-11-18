@@ -56,6 +56,7 @@ const getSyncLogOrderBy = (
   const orderBy = {
     action: [{ action: sortOrder }],
     createdAt: [{ createdAt: sortOrder }],
+    createdCount: [{ createdCount: sortOrder }],
     failedCount: [{ failures: { _count: sortOrder } }],
     importedCount: [{ importedCount: sortOrder }],
     repoName: [{ repoName: sortOrder }],
@@ -63,6 +64,15 @@ const getSyncLogOrderBy = (
   }[sortBy];
   return [...orderBy, { id: 'desc' as const }];
 };
+
+/**
+ * The directories a repository may provide instruments in, relative to its root. `series` is scanned
+ * last, and callers must import in that order: a series is rejected unless every instrument it
+ * references is already stored, so the scalars a repo provides have to be created first. A series
+ * referencing a *different* repo still fails; see
+ * `.agents/docs/architecture/instrument-pipeline.md`.
+ */
+const INSTRUMENT_CATEGORIES = ['file', 'forms', 'interactive', 'series'] as const;
 
 const $ExceptionDetails = z.object({
   cause: z.object({ message: z.string() }).optional(),
@@ -131,7 +141,7 @@ export class InstrumentReposService implements OnModuleInit {
       await this.recordSync({ action: 'IMPORT', error: err, repoId: null, repoName });
       throw err;
     }
-    const { createdIds, failures, instrumentIds } = result;
+    const { createdIds, instrumentIds } = result;
 
     const repo = await this.instrumentRepoModel.create({
       data: {
@@ -148,13 +158,7 @@ export class InstrumentReposService implements OnModuleInit {
     // Attribute provenance only to instruments this import actually created. Instruments that
     // already existed (e.g. added manually) keep their original provenance.
     await this.tagInstruments(createdIds, repo.id, repo.name);
-    await this.recordSync({
-      action: 'IMPORT',
-      failures,
-      importedCount: instrumentIds.length,
-      repoId: repo.id,
-      repoName
-    });
+    await this.recordSync({ action: 'IMPORT', repoId: repo.id, repoName, result });
     // Re-adopt any pre-existing instruments orphaned by a previously-deleted copy of this repo.
     await this.reconcileOrphanedInstruments();
 
@@ -294,11 +298,7 @@ export class InstrumentReposService implements OnModuleInit {
 
   private discoverInstrumentDirs(repoDir: string): string[] {
     const dirs: string[] = [];
-    // `series` is scanned last, and callers must import in the returned order: a series is rejected
-    // unless every instrument it references is already stored, so the scalars a repo provides have to
-    // be created first. A series referencing a *different* repo still fails; see
-    // `.agents/docs/architecture/instrument-pipeline.md`.
-    for (const category of ['file', 'forms', 'interactive', 'series']) {
+    for (const category of INSTRUMENT_CATEGORIES) {
       const libDir = path.join(repoDir, 'lib', category);
       if (!fs.existsSync(libDir)) {
         continue;
@@ -453,6 +453,15 @@ export class InstrumentReposService implements OnModuleInit {
       const instrumentDirs = this.discoverInstrumentDirs(repoDir);
       this.loggingService.log(`Found ${instrumentDirs.length} instrument directories in ${owner}/${repoName}`);
 
+      // Importing nothing is a failure, not an empty success: a repository laid out any other way
+      // downloads cleanly and yields no directories, and a log reading "0 imported" with nothing wrong
+      // gives no way to tell that apart from a repository that is genuinely empty.
+      if (instrumentDirs.length === 0) {
+        throw new BadGatewayException(
+          `Found no instruments in ${owner}/${repoName}. An instrument is a directory holding an index.ts, index.tsx, index.js or index.jsx file, within ${INSTRUMENT_CATEGORIES.map((category) => `lib/${category}`).join(', ')} at the root of the repository.`
+        );
+      }
+
       // instrumentIds: every instrument the repo provides; createdIds: only those newly created here.
       const instrumentIds: string[] = [];
       const createdIds: string[] = [];
@@ -581,14 +590,21 @@ export class InstrumentReposService implements OnModuleInit {
 
   private recordSync(
     entry: { action: InstrumentRepoSyncAction; repoId: null | string; repoName: string } & (
-      { error: unknown } | { failures: InstrumentRepoSyncFailure[]; importedCount: number }
+      { error: unknown } | { result: RepoImportResult }
     )
   ) {
     const { action, repoId, repoName } = entry;
+    // Counted off the import result rather than passed in beside it, so the entry cannot disagree
+    // with what the import actually did.
     const outcome =
       'error' in entry
-        ? { failures: [], importedCount: 0, message: describeImportError(entry.error) }
-        : { failures: entry.failures, importedCount: entry.importedCount, message: null };
+        ? { createdCount: 0, failures: [], importedCount: 0, message: describeImportError(entry.error) }
+        : {
+            createdCount: entry.result.createdIds.length,
+            failures: entry.result.failures,
+            importedCount: entry.result.instrumentIds.length,
+            message: null
+          };
     return this.instrumentRepoSyncLogModel.create({ data: { action, repoId, repoName, ...outcome } });
   }
 
@@ -613,17 +629,18 @@ export class InstrumentReposService implements OnModuleInit {
 
     // Replaced rather than merged, so the list is what the repository provides now. An edition dropped
     // here stays in the database with its provenance tag, so groups can still see and administer it.
-    const updated = await this.instrumentRepoModel.update({
-      data: { instrumentIds: result.instrumentIds, lastSyncedAt: new Date() },
-      where: { id: repo.id }
-    });
-    const log = await this.recordSync({
-      action: 'SYNC',
-      failures: result.failures,
-      importedCount: result.instrumentIds.length,
-      repoId: repo.id,
-      repoName: repo.name
-    });
+    //
+    // A pass that matched nothing is left out of that replacement. Every instrument failing to load —
+    // a bad upstream commit, a series whose member edition is gone — is not evidence that the
+    // repository provides nothing, and writing an empty list would de-list instruments that are still
+    // stored and still assignable. The entry records the failures, so the pass is reported, not hidden.
+    const updated = result.instrumentIds.length
+      ? await this.instrumentRepoModel.update({
+          data: { instrumentIds: result.instrumentIds, lastSyncedAt: new Date() },
+          where: { id: repo.id }
+        })
+      : repo;
+    const log = await this.recordSync({ action: 'SYNC', repoId: repo.id, repoName: repo.name, result });
     // Re-adopt any instruments that were orphaned by a previously-deleted copy of this repo.
     await this.reconcileOrphanedInstruments();
     return { log, ok: true as const, repo: updated };

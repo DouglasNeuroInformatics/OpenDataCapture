@@ -60,6 +60,35 @@ const InstrumentRepoSyncLogTable = ({
     LOAD: t({ en: 'Load', es: 'Carga', fr: 'Chargement' })
   } satisfies { [K in InstrumentRepoSyncStage]: string };
 
+  /**
+   * `importedCount` is every instrument the repository provided; `createdCount` is how many of those
+   * this run stored for the first time, so the remainder were already in the database. The split rides
+   * in this one column because the table is already as wide as the page lets it be — two more columns
+   * would take their room from the repository name, whose header cannot truncate.
+   *
+   * An entry that imported nothing reads as the bare total: a run that was refused outright, or whose
+   * every instrument failed, records a `createdCount` of zero, and `0 (0 new)` would dress a row that
+   * stored nothing as a split it does not have.
+   */
+  const describeImported = ({ createdCount, importedCount }: InstrumentRepoSyncLog) => {
+    if (createdCount === null || createdCount === undefined || importedCount === 0) {
+      return { title: String(importedCount), value: String(importedCount) };
+    }
+    const existingCount = importedCount - createdCount;
+    return {
+      title: t({
+        en: `${importedCount} imported: ${createdCount} new, ${existingCount} already stored`,
+        es: `${importedCount} importados: ${createdCount} nuevos, ${existingCount} ya almacenados`,
+        fr: `${importedCount} importés : ${createdCount} nouveaux, ${existingCount} déjà stockés`
+      }),
+      value: t({
+        en: `${importedCount} (${createdCount} new)`,
+        es: `${importedCount} (${createdCount} nuevos)`,
+        fr: `${importedCount} (${createdCount} nouv.)`
+      })
+    };
+  };
+
   /** Which import or sync the dialog is showing, since the dialog is detached from its row. */
   const describeLog = (log: InstrumentRepoSyncLog) =>
     `${log.repoName} · ${actionLabels[log.action]} · ${log.createdAt.toLocaleString()}`;
@@ -161,13 +190,13 @@ const InstrumentRepoSyncLogTable = ({
                 />
               ),
               id: 'status',
-              size: 140
+              size: 124
             },
             {
               accessorKey: 'importedCount',
               cell: (ctx) => {
-                const count = String(ctx.row.original.importedCount);
-                return <TruncatedCell title={count} value={count} />;
+                const { title, value } = describeImported(ctx.row.original);
+                return <TruncatedCell title={title} value={value} />;
               },
               header: ({ column }) => (
                 <SortableHeader
@@ -176,7 +205,7 @@ const InstrumentRepoSyncLogTable = ({
                   sortOrder={sortOrderOf('importedCount')}
                 />
               ),
-              size: 114
+              size: 130
             },
             {
               accessorFn: (log) => log.failures.length,

@@ -87,6 +87,32 @@ test.describe('admin instrument repos refused import', () => {
   });
 });
 
+test.describe('admin instrument repos empty repository', () => {
+  test.use({ actingRole: 'ADMIN' });
+
+  test('should name the directories it looked in when a repository provides no instruments', async ({
+    getPageModel,
+    page
+  }) => {
+    const message =
+      'Found no instruments in example/empty. An instrument is a directory holding an index.ts, index.tsx, index.js or index.jsx file, within lib/file, lib/forms, lib/interactive, lib/series at the root of the repository.';
+    await page.route('**/v1/instrument-repos', (route) => {
+      if (route.request().method() !== 'POST') {
+        return route.continue();
+      }
+      return route.fulfill({ json: { error: 'Bad Gateway', message, statusCode: 502 }, status: 502 });
+    });
+    const reposPage = await getPageModel('/admin/instrument-repos');
+
+    await reposPage.addRepositoryButton.click();
+    await reposPage.githubUrlInput.fill('https://github.com/example/empty');
+    await reposPage.importButton.click();
+
+    await expect(reposPage.$ref.getByText(message)).toBeVisible();
+    await expect(reposPage.$ref.getByTestId('error-page')).toBeHidden();
+  });
+});
+
 test.describe('admin instrument repos activity log', () => {
   test.use({ actingRole: 'ADMIN' });
 
@@ -106,6 +132,7 @@ test.describe('admin instrument repos activity log', () => {
   const partialSync = {
     action: 'SYNC',
     createdAt: '2026-10-28T00:00:00.000Z',
+    createdCount: 1,
     failures: [
       {
         instrumentDir: 'CPP_SERIES',
@@ -148,6 +175,29 @@ test.describe('admin instrument repos activity log', () => {
     }));
     expect(overflow.clipped).toBe(true);
     expect(overflow.spill).toBeLessThanOrEqual(0);
+  });
+
+  // The count used to be read from each instrument's provenance, which names the import that created
+  // it, so an instrument the repository provides but did not create went uncounted here while the
+  // activity log still counted it as imported.
+  test('should count the instruments a repository provides, whichever import created them', async ({
+    getPageModel,
+    page
+  }) => {
+    await page.route(/\/v1\/instruments\/info/, (route) => route.fulfill({ json: [] }));
+    const reposPage = await getPageModel('/admin/instrument-repos');
+
+    await expect(reposPage.dataTable.getByTestId('instrument-repo-instrument-count')).toHaveText('2');
+  });
+
+  test('should say how many of the imported instruments were new, so the total is not read as all new', async ({
+    getPageModel
+  }) => {
+    const reposPage = await getPageModel('/admin/instrument-repos');
+
+    await reposPage.openActivityLog();
+
+    await expect(reposPage.syncLogTable.getByText('2 (1 new)')).toBeVisible();
   });
 
   test('should count the failed instruments and explain them in the activity log', async ({ getPageModel }) => {
