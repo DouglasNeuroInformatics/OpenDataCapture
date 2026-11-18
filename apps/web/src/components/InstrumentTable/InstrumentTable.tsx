@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, DataTable, DropdownMenu } from '@douglasneuroinformatics/libui/components';
+import { Button, DropdownMenu } from '@douglasneuroinformatics/libui/components';
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
@@ -9,6 +9,7 @@ import { ChevronDownIcon } from 'lucide-react';
 import { unparse } from 'papaparse';
 
 import { CollectedFilterMenu } from '@/components/CollectedFilterMenu';
+import { DataTable } from '@/components/DataTable';
 import { InstrumentKindCell } from '@/components/InstrumentKindCell';
 import { InstrumentPreviewDialog } from '@/components/InstrumentPreviewDialog';
 import type { InstrumentPreviewItem } from '@/components/InstrumentPreviewDialog';
@@ -260,6 +261,7 @@ type InstrumentTableProps = {
    */
   recordExport?: (option: RecordExportOption) => void;
   rows: InstrumentRow[];
+  tableName: string;
 };
 
 /**
@@ -272,7 +274,8 @@ export const InstrumentTable = ({
   onMinRecordsChange,
   onOpen,
   recordExport,
-  rows
+  rows,
+  tableName
 }: InstrumentTableProps) => {
   const { t } = useTranslation();
   const [highlightedRowId, setHighlightedRowId] = useState<null | string>(null);
@@ -324,8 +327,7 @@ export const InstrumentTable = ({
 
   return (
     <div className="flex grow flex-col" data-testid={testId}>
-      <DataTable
-        // A middle column's width is (container - pinned) / the cap below, so a lower cap makes each
+      <DataTable // A middle column's width is (container - pinned) / the cap below, so a lower cap makes each
         // one wider and lets the row scroll rather than squeezing five columns into whatever the
         // pinned title leaves. The caps keep KIND wide enough for "Interactive" beside its dot.
         columnBreakpoints={{ 0: 1, 512: 1, 768: 2, 1024: 3, 1280: 5 }}
@@ -435,6 +437,7 @@ export const InstrumentTable = ({
             onSelect: (row) => setPreview(toPreviewItem(row))
           }
         ]}
+        tableName={tableName}
         togglesComponent={ToolbarWithRows}
         onRowClick={(row) => setHighlightedRowId(row.id)}
         onRowDoubleClick={onOpen}

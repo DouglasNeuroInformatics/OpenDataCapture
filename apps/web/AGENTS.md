@@ -184,7 +184,10 @@ add UI that an e2e test will drive.
 
 ## Tables
 
-A table listing records is the libui `DataTable`. libui's plain `Table` is for a small table the
+A table listing records is `@/components/DataTable`: libui's `DataTable` plus a required `tableName`,
+under which it remembers the page and sort a user leaves it on (eslint rejects importing libui's
+own). A test rendering the same table twice clears `savedTableViews` from `@/services/table-views`
+between renders. libui's plain `Table` is for a small table the
 component lays out itself, such as the rows of inputs in `UserPermissionsEditor` and
 `PermissionSetRulesEditor`. Two of `DataTable`'s behaviours are load-bearing and neither is visible
 from the call site.

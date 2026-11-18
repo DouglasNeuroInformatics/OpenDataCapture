@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
-import { Button, DataTable, Heading } from '@douglasneuroinformatics/libui/components';
+import { Button, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { PermissionSetSummary } from '@opendatacapture/schemas/permission-set';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 
+import { DataTable } from '@/components/DataTable';
 import { PageHeader } from '@/components/PageHeader';
 import { SortableHeader } from '@/components/SortableHeader';
 import { TruncatedCell } from '@/components/TruncatedCell';
@@ -96,6 +97,7 @@ const RouteComponent = () => {
             onSelect: (permissionSet) => confirmDeletion(permissionSet)
           }
         ]}
+        tableName="admin-permission-sets"
         togglesComponent={() => (
           <Button asChild variant="outline">
             <Link data-testid="create-permission-set" to="/admin/permission-sets/create">

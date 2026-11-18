@@ -63,7 +63,12 @@ const RouteComponent = () => {
           })}
         </Heading>
       </PageHeader>
-      <InstrumentTable data-testid="instrument-hub-table" rows={data} onOpen={handleOpenInstrument} />
+      <InstrumentTable
+        data-testid="instrument-hub-table"
+        rows={data}
+        tableName={`datahub-instruments-${currentGroup?.id ?? 'all'}`}
+        onOpen={handleOpenInstrument}
+      />
     </React.Fragment>
   );
 };

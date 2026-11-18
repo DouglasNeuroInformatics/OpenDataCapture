@@ -4,7 +4,6 @@ import type { FormEvent } from 'react';
 import {
   Button,
   Card,
-  DataTable,
   Dialog,
   Heading,
   Input,
@@ -20,6 +19,7 @@ import type { InstrumentRepo, InstrumentRepoSyncLog } from '@opendatacapture/sch
 import { createFileRoute } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 
+import { DataTable } from '@/components/DataTable';
 import { InstrumentRepoSyncLogTable } from '@/components/InstrumentRepoSyncLogTable';
 import type { InstrumentRepoSyncLogSort } from '@/components/InstrumentRepoSyncLogTable';
 import { PageHeader } from '@/components/PageHeader';
@@ -451,6 +451,7 @@ const RouteComponent = () => {
                   onSelect: handleDeleteClick
                 }
               ]}
+              tableName="admin-instrument-repos"
               togglesComponent={() => (
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setIsDialogOpen(true)}>

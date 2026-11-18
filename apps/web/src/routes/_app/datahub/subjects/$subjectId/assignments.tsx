@@ -4,13 +4,14 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, DataTable, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
+import { Button, Heading, Input, Label, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { Assignment, AssignmentStatus } from '@opendatacapture/schemas/assignment';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
 import { AssignmentEmailForm } from '@/components/AssignmentEmailForm';
+import { DataTable } from '@/components/DataTable';
 import { QRCode } from '@/components/QRCode';
 import { SortableHeader } from '@/components/SortableHeader';
 import { config } from '@/config';
@@ -88,6 +89,7 @@ const AssignmentsTable: React.FC<{
   onSelection: (assignment: Assignment) => void;
   selectedId: null | string;
 }> = ({ assignments, onSelection, selectedId }) => {
+  const { subjectId } = Route.useParams();
   const { t } = useTranslation('datahub');
   const instrumentInfoQuery = useInstrumentInfoQuery();
   const instruments = new Map((instrumentInfoQuery.data ?? []).map((instrument) => [instrument.id, instrument]));
@@ -147,6 +149,7 @@ const AssignmentsTable: React.FC<{
         }
       ]}
       data={rows}
+      tableName={`subject-assignments-${subjectId}`}
       onRowClick={onSelection}
     />
   );

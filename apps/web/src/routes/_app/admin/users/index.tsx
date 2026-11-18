@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 
 import { snakeToCamelCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, DataTable, Dialog, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { User } from '@opendatacapture/schemas/user';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { DataTable } from '@/components/DataTable';
 import { PageHeader } from '@/components/PageHeader';
 import { SortableHeader } from '@/components/SortableHeader';
 import { useArchiveUserMutation } from '@/hooks/useArchiveUserMutation';
@@ -182,6 +183,7 @@ const RouteComponent = () => {
             onSelect: (user) => unarchiveUserMutation.mutate({ id: user.id })
           }
         ]}
+        tableName="admin-users"
         togglesComponent={() => (
           <Button variant="outline">
             <Link to="/admin/users/create">

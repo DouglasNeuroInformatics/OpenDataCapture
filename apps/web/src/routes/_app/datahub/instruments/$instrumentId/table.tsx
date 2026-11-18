@@ -1,13 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
-import {
-  ActionDropdown,
-  Button,
-  DataTable,
-  DropdownMenu,
-  TanstackTable
-} from '@douglasneuroinformatics/libui/components';
+import { ActionDropdown, Button, DropdownMenu, TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import { $SessionType } from '@opendatacapture/schemas/session';
@@ -16,6 +10,7 @@ import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { createFileRoute } from '@tanstack/react-router';
 import { ChevronDownIcon } from 'lucide-react';
 
+import { DataTable } from '@/components/DataTable';
 import { InstrumentTable } from '@/components/InstrumentTable';
 import type { InstrumentRow } from '@/components/InstrumentTable';
 import { SelectEdition } from '@/components/SelectEdition';
@@ -195,6 +190,7 @@ const RouteComponent = () => {
         minRecords={search.minRecords}
         recordExport={dl}
         rows={seriesMembers}
+        tableName={`series-members-${seriesInstrumentId}`}
         onMinRecordsChange={(value) => {
           void navigate({ search: (prev) => ({ ...prev, minRecords: value }) });
         }}
@@ -276,6 +272,7 @@ const RouteComponent = () => {
             ...measureColumns
           ]}
           data={records}
+          pageResetKey={[search.methods, search.series, search.minDateKey]}
           rowActions={[
             {
               label: t({ en: 'View Record', es: 'Ver registro', fr: "Voir l'enregistrement" }),
@@ -292,6 +289,7 @@ const RouteComponent = () => {
               }
             }
           ]}
+          tableName={`instrument-records-${seriesInstrumentId}`}
           onRowClick={(row) => setHighlightedRowId(row.__id__)}
           onRowDoubleClick={handleViewRecord}
         />

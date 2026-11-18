@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, Checkbox, DataTable, Dialog, Heading, Sheet } from '@douglasneuroinformatics/libui/components';
+import { Button, Checkbox, Dialog, Heading, Sheet } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $Group } from '@opendatacapture/schemas/group';
 import type { Group } from '@opendatacapture/schemas/group';
@@ -10,6 +10,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import axios from 'axios';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { DataTable } from '@/components/DataTable';
 import { PageHeader } from '@/components/PageHeader';
 import { SortableHeader } from '@/components/SortableHeader';
 import { useArchiveGroupMutation } from '@/hooks/useArchiveGroupMutation';
@@ -197,6 +198,7 @@ const RouteComponent = () => {
             onSelect: setSelectedGroup
           }
         ]}
+        tableName="admin-groups"
         togglesComponent={() => (
           <Button asChild variant="outline">
             <Link to="/admin/groups/create">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { DataTable, Dialog, Heading, Spinner, StatisticCard } from '@douglasneuroinformatics/libui/components';
+import { Dialog, Heading, Spinner, StatisticCard } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
@@ -11,6 +11,7 @@ import type { Summary, SummaryTrendWindow } from '@opendatacapture/schemas/summa
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
+import { DataTable } from '@/components/DataTable';
 import { InstrumentKindCell } from '@/components/InstrumentKindCell';
 import { PageHeader } from '@/components/PageHeader';
 import { SortableHeader } from '@/components/SortableHeader';
@@ -260,6 +261,7 @@ const RouteComponent = () => {
                           }
                         ]}
                         data={userInfoQuery.data}
+                        tableName="dashboard-users"
                       />
                     </div>
                   )}
@@ -346,6 +348,7 @@ const RouteComponent = () => {
                         ]}
                         data={instrumentInfo}
                         initialState={{ columnPinning: { right: ['kind'] } }}
+                        tableName="dashboard-instruments"
                       />
                     </div>
                   ) : (
@@ -413,6 +416,7 @@ const RouteComponent = () => {
                         ]}
                         data={recordCounter}
                         initialState={{ columnPinning: { right: ['count'] }, sorting: [{ desc: true, id: 'count' }] }}
+                        tableName="dashboard-record-counts"
                       />
                     </div>
                   ) : (
