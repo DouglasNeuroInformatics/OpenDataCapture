@@ -3,7 +3,8 @@ import * as module from 'node:module';
 import * as path from 'node:path';
 
 import type { Plugin } from 'esbuild';
-import ts from 'typescript';
+import { parseSync, Visitor } from 'oxc-parser';
+import type { ImportDeclaration } from 'oxc-parser';
 
 import { validatePackageName } from './utils.js';
 
@@ -15,6 +16,8 @@ type DtsPluginOptions = {
   outdir: string;
   packages: ResolvedPackage[];
 };
+
+type DependencyResolution = { issue: string; success: false } | { relativePath: string; success: true };
 
 function parseImportPath(importPath: string) {
   const segments = importPath.split('/');
@@ -28,13 +31,12 @@ function parseImportPath(importPath: string) {
 
 export function dtsPlugin(options: DtsPluginOptions): Plugin {
   const require = module.createRequire(options.configFilepath);
-  const printer = ts.createPrinter();
 
-  const resolveDependency = (importPath: string, importerFilepath: string) => {
+  const resolveDependency = (importPath: string, importerFilepath: string): DependencyResolution => {
     const { exportKey, packageId } = parseImportPath(importPath);
     const validationResult = validatePackageName(packageId);
     if (!validationResult.success) {
-      throw new Error(`Illegal import '${importPath}': ${validationResult.issue}`);
+      return { issue: `Illegal import '${importPath}': ${validationResult.issue}`, success: false };
     }
     const packageJsonId = `${packageId}/package.json`;
 
@@ -42,7 +44,10 @@ export function dtsPlugin(options: DtsPluginOptions): Plugin {
     try {
       packageJsonFilepath = require.resolve(packageJsonId, { paths: [importerFilepath] });
     } catch {
-      throw new Error(`Failed to resolve '${packageId}' from '${importerFilepath}' via '${packageJsonId}'`);
+      return {
+        issue: `Failed to resolve '${packageId}' from '${importerFilepath}' via '${packageJsonId}'`,
+        success: false
+      };
     }
     for (const pkg of options.packages) {
       if (pkg.packageJsonPath !== packageJsonFilepath) {
@@ -51,47 +56,29 @@ export function dtsPlugin(options: DtsPluginOptions): Plugin {
       const packageExport = pkg.exports[exportKey];
       if (packageExport) {
         if ('copy' in packageExport) {
-          throw new Error(`Found dependency '${importPath}' but export '${exportKey}' is a static asset`);
+          return {
+            issue: `Found dependency '${importPath}' but export '${exportKey}' is a static asset`,
+            success: false
+          };
         }
         const types = packageExport.types;
         if (types) {
           const outfile = options.entryPoints.find((item) => item.in === types)?.out;
           if (!outfile) {
-            throw new Error(`Could not find dependency with absolute input path '${types}'`);
+            return { issue: `Could not find dependency with absolute input path '${types}'`, success: false };
           }
           const outpath = path.resolve(options.outdir, outfile + (outfile.endsWith('.d') ? '.ts' : ''));
           const importerPath = options.entryPoints.find((item) => item.in === importerFilepath)!.out;
           const importer = path.resolve(options.outdir, importerPath + (importerPath.endsWith('.d') ? '.ts' : ''));
-          return path.relative(path.dirname(importer), outpath);
+          return { relativePath: path.relative(path.dirname(importer), outpath), success: true };
         }
-        throw new Error(`Found dependency '${importPath}' but export '${exportKey}' does not specify types`);
+        return {
+          issue: `Found dependency '${importPath}' but export '${exportKey}' does not specify types`,
+          success: false
+        };
       }
     }
-    throw new Error(`Could not find dependency '${importPath}' imported by '${importerFilepath}'`);
-  };
-
-  const factory = <T extends ts.SourceFile>(context: ts.TransformationContext) => {
-    return (rootNode: T): T => {
-      const visit = (node: ts.Node) => {
-        if (ts.isImportDeclaration(node)) {
-          const importPath = (node.moduleSpecifier as ts.StringLiteral).text;
-          const isRelativeImport = importPath.startsWith('./');
-          if (isRelativeImport) {
-            return ts.visitEachChild(node, visit, context);
-          }
-          const resolvedImportPath = resolveDependency(importPath, rootNode.fileName);
-          return ts.factory.updateImportDeclaration(
-            node,
-            node.modifiers,
-            node.importClause,
-            ts.factory.createStringLiteral(resolvedImportPath),
-            node.attributes
-          );
-        }
-        return ts.visitEachChild(node, visit, context);
-      };
-      return ts.visitNode(rootNode, visit) as T;
-    };
+    return { issue: `Could not find dependency '${importPath}' imported by '${importerFilepath}'`, success: false };
   };
 
   return {
@@ -104,23 +91,34 @@ export function dtsPlugin(options: DtsPluginOptions): Plugin {
       }));
       build.onLoad({ filter: /.*/, namespace }, async (args) => {
         const sourceText = await fs.readFile(args.path, 'utf-8');
-        const sourceFile = ts.createSourceFile(args.path, sourceText, ts.ScriptTarget.ESNext, true, ts.ScriptKind.TS);
-        let transformationResult: ts.TransformationResult<ts.SourceFile>;
-        try {
-          transformationResult = ts.transform(sourceFile, [factory]);
-        } catch (err) {
+        const parseResult = parseSync(args.path, sourceText, { lang: 'dts', sourceType: 'module' });
+        if (parseResult.errors.length) {
           return {
-            errors: [
-              {
-                location: {
-                  file: args.path
-                },
-                text: err instanceof Error ? err.message : 'Unknown Error'
-              }
-            ]
+            errors: parseResult.errors.map((error) => ({ location: { file: args.path }, text: error.message }))
           };
         }
-        const contents = printer.printFile(transformationResult.transformed[0]!);
+        // every import declaration, including those nested in `declare module` blocks, in source order
+        const importDeclarations: ImportDeclaration[] = [];
+        new Visitor({
+          ImportDeclaration(node) {
+            importDeclarations.push(node);
+          }
+        }).visit(parseResult.program);
+        let contents = '';
+        let copiedUpTo = 0;
+        for (const { source } of importDeclarations) {
+          if (source.value.startsWith('./')) {
+            continue;
+          }
+          const resolution = resolveDependency(source.value, args.path);
+          if (!resolution.success) {
+            return { errors: [{ location: { file: args.path }, text: resolution.issue }] };
+          }
+          // the specifier's span includes its quotes; splicing between them keeps the source's quote style
+          contents += sourceText.slice(copiedUpTo, source.start + 1) + resolution.relativePath;
+          copiedUpTo = source.end - 1;
+        }
+        contents += sourceText.slice(copiedUpTo);
         return {
           contents,
           loader: 'copy'
