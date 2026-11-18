@@ -16,34 +16,48 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import ts from 'typescript';
+import { parseSync } from 'oxc-parser';
+import type { ExportNamedDeclaration, TSInterfaceDeclaration, TSPropertySignature } from 'oxc-parser';
 
 const ROUTE_TREE_PATH = path.resolve(import.meta.dirname, '../../apps/web/src/route-tree.ts');
 const OUTPUT_PATH = path.resolve(import.meta.dirname, '../src/generated/route.d.ts');
 
 function extractRouteToMembers(sourceText: string): string[] {
-  const sourceFile = ts.createSourceFile('route-tree.ts', sourceText, ts.ScriptTarget.Latest, true);
+  const { errors, program } = parseSync(ROUTE_TREE_PATH, sourceText);
+  if (errors.length) {
+    throw new Error(
+      `Could not parse route-tree.ts:\n${errors.map((error) => error.codeframe ?? error.message).join('\n')}`
+    );
+  }
 
-  let members: null | string[] = null;
-  const visit = (node: ts.Node): void => {
-    if (ts.isInterfaceDeclaration(node) && node.name.text === 'FileRouteTypes') {
-      const toProperty = node.members.find((member): member is ts.PropertySignature => {
-        return ts.isPropertySignature(member) && member.name.getText(sourceFile) === 'to';
-      });
-      if (toProperty?.type && ts.isUnionTypeNode(toProperty.type)) {
-        members = toProperty.type.types.flatMap((typeNode) => {
-          if (ts.isLiteralTypeNode(typeNode) && ts.isStringLiteral(typeNode.literal)) {
-            return [typeNode.literal.text];
+  const fileRouteTypes = program.body.find(
+    (statement): statement is ExportNamedDeclaration & { declaration: TSInterfaceDeclaration } => {
+      return (
+        statement.type === 'ExportNamedDeclaration' &&
+        statement.declaration?.type === 'TSInterfaceDeclaration' &&
+        statement.declaration.id.name === 'FileRouteTypes'
+      );
+    }
+  )?.declaration;
+  const toProperty = fileRouteTypes?.body.body.find((member): member is TSPropertySignature => {
+    return member.type === 'TSPropertySignature' && member.key.type === 'Identifier' && member.key.name === 'to';
+  });
+  const toType = toProperty?.typeAnnotation?.typeAnnotation;
+  const members =
+    toType?.type === 'TSUnionType'
+      ? toType.types.flatMap((typeNode) => {
+          if (
+            typeNode.type === 'TSLiteralType' &&
+            typeNode.literal.type === 'Literal' &&
+            typeof typeNode.literal.value === 'string'
+          ) {
+            return [typeNode.literal.value];
           }
           return [];
-        });
-      }
-    }
-    ts.forEachChild(node, visit);
-  };
-  visit(sourceFile);
+        })
+      : [];
 
-  if (!members) {
+  if (!members.length) {
     throw new Error("Could not find `FileRouteTypes['to']` string-literal union in route-tree.ts");
   }
   return members;

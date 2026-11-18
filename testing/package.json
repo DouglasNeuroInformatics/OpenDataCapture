@@ -15,6 +15,7 @@
     "@opendatacapture/playground-url": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
     "@playwright/test": "^1.63.0",
+    "oxc-parser": "catalog:",
     "type-fest": "workspace:type-fest__4.x@*"
   }
 }

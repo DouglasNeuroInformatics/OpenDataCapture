@@ -1452,6 +1452,9 @@ importers:
       '@playwright/test':
         specifier: ^1.63.0
         version: 1.63.0
+      oxc-parser:
+        specifier: 'catalog:'
+        version: 0.150.0
       type-fest:
         specifier: workspace:type-fest__4.x@*
         version: link:../vendor/type-fest@4.x
