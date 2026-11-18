@@ -3,6 +3,8 @@ import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
 import { BadRequestException } from '@nestjs/common';
 import { ROUTE_ARGS_METADATA } from '@nestjs/common/constants';
+import { FastifyAdapter } from '@nestjs/platform-fastify';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -148,5 +150,39 @@ describe('InstrumentRecordsController', () => {
   it('should find the record scoped to the caller ability', async () => {
     await instrumentRecordsController.findById('record-1', ability);
     expect(instrumentRecordsService.findById).toHaveBeenCalledWith('record-1', { ability });
+  });
+
+  it('should match the static linear-model route even when a parameter route is registered first', async () => {
+    const moduleRef = await Test.createTestingModule({
+      controllers: [InstrumentRecordsController],
+      providers: [MockFactory.createForService(InstrumentRecordsService)]
+    }).compile();
+    const app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
+    const fastify = app.getHttpAdapter().getInstance();
+    fastify.addHook('onRequest', (request, _reply, done) => {
+      Object.assign(request, { user: { ability } });
+      done();
+    });
+    app.setGlobalPrefix('v1');
+
+    try {
+      await app.init();
+      await app.getHttpAdapter().getInstance().ready();
+
+      const service = moduleRef.get<MockedInstance<InstrumentRecordsService>>(InstrumentRecordsService);
+      const model = { score: { intercept: 1, slope: 2, stdErr: 0.5 } };
+      service.linearModel.mockResolvedValueOnce(model);
+
+      const response = await app.inject({
+        method: 'GET',
+        url: '/v1/instrument-records/linear-model?instrumentId=instrument-1'
+      });
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual(model);
+      expect(service.linearModel.mock.calls).toHaveLength(1);
+      expect(service.findById.mock.calls).toHaveLength(0);
+    } finally {
+      await app.close();
+    }
   });
 });
