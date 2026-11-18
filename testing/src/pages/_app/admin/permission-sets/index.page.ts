@@ -17,6 +17,7 @@ export class PermissionSetsPage extends AppPage {
 
   /** Opens a row's actions menu and picks one; the menu renders in a portal outside the table. */
   async chooseRowAction(name: string, action: 'Delete' | 'Manage') {
+    await this.search(name);
     await this.row(name).getByTestId('row-actions-trigger').click();
     await this.$ref.getByTestId('row-actions-dropdown').getByRole('menuitem', { name: action }).click();
   }
@@ -27,5 +28,10 @@ export class PermissionSetsPage extends AppPage {
 
   row(name: string): Locator {
     return this.table.getByTestId('data-table-row').filter({ hasText: name });
+  }
+
+  /** Other specs share the list and can push a set past the first page, so find it by name. */
+  async search(name: string) {
+    await this.table.getByTestId('data-table-search-bar').getByRole('searchbox').fill(name);
   }
 }

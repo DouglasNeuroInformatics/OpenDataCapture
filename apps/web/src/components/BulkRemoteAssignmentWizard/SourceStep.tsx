@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, Checkbox, DataTable, FileDropzone, Input, TextArea } from '@douglasneuroinformatics/libui/components';
+import { Button, Checkbox, FileDropzone, Input, TextArea } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { BULK_ASSIGNMENT_MAX_SUBJECTS } from '@opendatacapture/schemas/assignment';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
+import { DataTable } from '@/components/DataTable';
 import { SectionTabs } from '@/components/SectionTabs';
 import { SortableHeader } from '@/components/SortableHeader';
 import {
@@ -340,6 +341,7 @@ export const SourceStep = ({
                         : [])
                     ]}
                     data={rows}
+                    tableName={`bulk-assignment-subjects-${groupName}`}
                     onRowClick={(row) => toggle(row.id)}
                   />
                 </div>

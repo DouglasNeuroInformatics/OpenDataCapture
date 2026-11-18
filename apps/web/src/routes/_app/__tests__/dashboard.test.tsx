@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
 import { Route } from '@/routes/_app/dashboard';
+import { savedTableViews } from '@/services/table-views';
 
 import '@/services/i18n';
 
@@ -213,6 +214,7 @@ describe('Route', () => {
   describe('dashboard page', () => {
     beforeEach(() => {
       vi.clearAllMocks();
+      savedTableViews.clear();
       i18n.changeLanguage('en');
       mocks.store.currentGroup = null;
       mocks.summary = { data: SUMMARY };

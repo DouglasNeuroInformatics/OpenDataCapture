@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, DataTable, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
+import { Button, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { translateInstrumentInfo } from '@opendatacapture/instrument-utils';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
@@ -9,6 +9,7 @@ import type { InstrumentInfo, TranslatedInstrumentInfo } from '@opendatacapture/
 import { createFileRoute } from '@tanstack/react-router';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { DataTable } from '@/components/DataTable';
 import { InstrumentKindCell } from '@/components/InstrumentKindCell';
 import { InstrumentPreviewDialog } from '@/components/InstrumentPreviewDialog';
 import type { InstrumentPreviewItem, InstrumentSource } from '@/components/InstrumentPreviewDialog';
@@ -225,6 +226,7 @@ const FormInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
             onSelect: (row: InstrumentRow) => setPreviewItem(row.preview)
           }
         ]}
+        tableName="admin-form-instruments"
         // libui applies its row hover highlight only when a click handler is set; a single click does nothing here.
         onRowClick={() => undefined}
         onRowDoubleClick={(row) => setPreviewItem(row.preview)}
@@ -365,6 +367,7 @@ const SeriesInstrumentsView = ({ scalarInstruments }: InstrumentViewProps) => {
             onSelect: toggleArchive
           }
         ]}
+        tableName="admin-series-instruments"
         // libui applies its row hover highlight only when a click handler is set; a single click does nothing here.
         onRowClick={() => undefined}
         onRowDoubleClick={(row) => {

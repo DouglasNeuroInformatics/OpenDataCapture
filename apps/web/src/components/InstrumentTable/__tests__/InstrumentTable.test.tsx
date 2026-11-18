@@ -58,13 +58,13 @@ const row = (overrides: Partial<InstrumentRow> = {}): InstrumentRow => ({
 });
 
 const renderTable = (rows: InstrumentRow[], onOpen = vi.fn()) => {
-  render(<InstrumentTable rows={rows} onOpen={onOpen} />);
+  render(<InstrumentTable rows={rows} tableName="instruments" onOpen={onOpen} />);
   return onOpen;
 };
 
 const renderTableWithRecordExport = (rows: InstrumentRow[]) => {
   const recordExport = vi.fn();
-  render(<InstrumentTable recordExport={recordExport} rows={rows} onOpen={vi.fn()} />);
+  render(<InstrumentTable recordExport={recordExport} rows={rows} tableName="instruments" onOpen={vi.fn()} />);
   return recordExport;
 };
 
@@ -135,6 +135,7 @@ describe('InstrumentTable', () => {
       <InstrumentTable
         minRecords={5}
         rows={[row({ recordCount: 3 }), row({ id: 'hq-2', recordCount: 10, title: 'Big Study' })]}
+        tableName="instruments"
         onOpen={vi.fn()}
       />
     );

@@ -1,7 +1,7 @@
-import { DataTable } from '@douglasneuroinformatics/libui/components';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
+import { DataTable } from '@/components/DataTable';
 import { SearchSubmitGuard } from '@/components/SearchSubmitGuard/SearchSubmitGuard';
 
 // Initialises the shared libui translator, which the table's controls read on render.
@@ -10,7 +10,9 @@ import '@/services/i18n';
 const noop = () => undefined;
 
 const renderTable = (guarded: boolean) => {
-  const table = <DataTable columns={[{ accessorKey: 'id', header: 'ID' }]} data={[{ id: 'subject-1' }]} />;
+  const table = (
+    <DataTable columns={[{ accessorKey: 'id', header: 'ID' }]} data={[{ id: 'subject-1' }]} tableName="test" />
+  );
   render(guarded ? <SearchSubmitGuard>{table}</SearchSubmitGuard> : table);
   return screen.getByTestId('data-table-search-bar');
 };

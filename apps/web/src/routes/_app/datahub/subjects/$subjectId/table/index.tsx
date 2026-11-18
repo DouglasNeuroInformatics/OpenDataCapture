@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 
 import { camelToSnakeCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { ActionDropdown, DataTable, TanstackTable } from '@douglasneuroinformatics/libui/components';
+import { ActionDropdown, TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { createFileRoute } from '@tanstack/react-router';
 
+import { DataTable } from '@/components/DataTable';
 import { SelectEdition } from '@/components/SelectEdition';
 import { SelectInstrument } from '@/components/SelectInstrument';
 import { SortableHeader } from '@/components/SortableHeader';
@@ -19,7 +20,7 @@ import { timeframeMinDate } from '@/utils/timeframe';
 const RouteComponent = () => {
   const navigate = Route.useNavigate();
   const params = Route.useParams();
-  const { dl, editionOptions, instrumentId, instrumentOptions, records, setInstrumentId, setMinDate } =
+  const { dl, editionOptions, instrumentId, instrumentOptions, minDate, records, setInstrumentId, setMinDate } =
     useInstrumentVisualization({
       params: { subjectId: params.subjectId }
     });
@@ -88,6 +89,7 @@ const RouteComponent = () => {
             ...columns
           ]}
           data={records}
+          pageResetKey={[instrumentId, minDate]}
           rowActions={[
             {
               label: t('common.view'),
@@ -96,6 +98,7 @@ const RouteComponent = () => {
               }
             }
           ]}
+          tableName={`subject-records-${params.subjectId}`}
           onRowDoubleClick={(row) => {
             void navigate({ params: { recordId: row.__id__ }, to: './$recordId' });
           }}

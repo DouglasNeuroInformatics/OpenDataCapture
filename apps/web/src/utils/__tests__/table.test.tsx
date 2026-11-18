@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { DataTable } from '@douglasneuroinformatics/libui/components';
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import type { Subject } from '@opendatacapture/schemas/subject';
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
+import { DataTable } from '@/components/DataTable';
 import { getListedSubjectIds } from '@/utils/table';
 
 // Initialises the shared libui translator, which the table's controls read on render.
@@ -46,6 +46,7 @@ const renderMasterTableLike = (ids: string[]) => {
       ]}
       data={ids.map(subject)}
       rowActions={[{ label: 'View', onSelect: noop }]}
+      tableName="test"
       togglesComponent={Capture}
     />
   );

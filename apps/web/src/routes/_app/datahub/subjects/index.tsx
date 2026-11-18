@@ -1,14 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import {
-  ActionDropdown,
-  Button,
-  DataTable,
-  Dialog,
-  DropdownMenu,
-  Heading
-} from '@douglasneuroinformatics/libui/components';
+import { ActionDropdown, Button, Dialog, DropdownMenu, Heading } from '@douglasneuroinformatics/libui/components';
 import type { TanstackTable } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
@@ -22,6 +15,7 @@ import { unparse } from 'papaparse';
 
 import { CollectedFilterMenu } from '@/components/CollectedFilterMenu';
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { DataTable } from '@/components/DataTable';
 import { IdentificationForm } from '@/components/IdentificationForm';
 import { PageHeader } from '@/components/PageHeader';
 import { SearchSubmitGuard } from '@/components/SearchSubmitGuard';
@@ -533,12 +527,14 @@ const MasterDataTable: React.FC<{
           ],
           columnPinning: { left: ['subjectId'] }
         }}
+        pageResetKey={minRecordCount}
         rowActions={[
           {
             label: t({ en: 'View', es: 'Ver', fr: 'Voir' }),
             onSelect
           }
         ]}
+        tableName={`datahub-subjects-${currentGroup?.id ?? 'all'}`}
         togglesComponent={TogglesWithFilter}
         onRowClick={(subject) => setHighlightedRowId(subject.id)}
         onRowDoubleClick={onRowDoubleClick}

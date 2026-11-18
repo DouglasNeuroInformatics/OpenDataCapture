@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react';
 
-import { Badge, Button, DataTable, Dialog } from '@douglasneuroinformatics/libui/components';
+import { Badge, Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $InstrumentRepoSyncLogsSortBy } from '@opendatacapture/schemas/instrument-repo';
 import type {
@@ -10,6 +10,7 @@ import type {
 } from '@opendatacapture/schemas/instrument-repo';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { DataTable } from '@/components/DataTable';
 import { SortableHeader } from '@/components/SortableHeader';
 import { TruncatedCell } from '@/components/TruncatedCell';
 import { MIN_TABLE_BODY_HEIGHT, readServerSort } from '@/utils/data-table';
@@ -260,6 +261,7 @@ const InstrumentRepoSyncLogTable = ({
           }}
           mode="server"
           pageCount={pageCount}
+          tableName="instrument-repo-sync-log"
           onPaginationChange={({ pageIndex }) => onPageChange(pageIndex + 1)}
           onSortingChange={(state) => onSortChange(readServerSort(state, $InstrumentRepoSyncLogsSortBy.options))}
         />

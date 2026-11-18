@@ -1,7 +1,7 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
 
 import { snakeToCamelCase, toLowerCase } from '@douglasneuroinformatics/libjs';
-import { Button, DataTable, DropdownMenu, Heading } from '@douglasneuroinformatics/libui/components';
+import { Button, DropdownMenu, Heading } from '@douglasneuroinformatics/libui/components';
 import { useDownload, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $AuditLogsQuerySearchParams, $AuditLogsSortBy } from '@opendatacapture/schemas/audit';
 import type {
@@ -13,6 +13,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { CalendarIcon, DownloadIcon, XIcon } from 'lucide-react';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { DataTable } from '@/components/DataTable';
 import { FilterMenu } from '@/components/FilterMenu';
 import { PageHeader } from '@/components/PageHeader';
 import { SortableHeader } from '@/components/SortableHeader';
@@ -269,6 +270,7 @@ const AuditLogsTable: React.FC<{ search: AuditLogsSearchParams }> = ({ search })
       data={auditLogsQuery.data?.data ?? []}
       mode="server"
       pageCount={auditLogsQuery.data?.pageCount ?? 0}
+      tableName="admin-audit-logs"
       onPaginationChange={({ pageIndex }) => setPage(pageIndex + 1)}
       onSortingChange={(state) => {
         setSort(readServerSort(state, $AuditLogsSortBy.options));

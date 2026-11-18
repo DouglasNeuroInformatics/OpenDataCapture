@@ -189,6 +189,7 @@ test.describe('permission sets', () => {
     await api.createPermissionSet(RULES, { name });
 
     const listPage = await getPageModel('/admin/permission-sets');
+    await listPage.search(name);
     const cell = listPage.nameCell(name);
 
     await expect(cell).toHaveAttribute('title', name);

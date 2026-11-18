@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 
 import { toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, Card, Checkbox, DataTable, Dialog } from '@douglasneuroinformatics/libui/components';
+import { Button, Card, Checkbox, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Assignment } from '@opendatacapture/schemas/assignment';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 
 import { ColorTagCell } from '@/components/ColorTagCell';
+import { DataTable } from '@/components/DataTable';
 import { SortableHeader } from '@/components/SortableHeader';
 import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useDeleteBulkAssignmentsMutation } from '@/hooks/useDeleteBulkAssignmentsMutation';
@@ -221,6 +222,7 @@ export const DeleteRemoteAssignments = ({ groupId, onBack, subjectIdDisplayLengt
               }
             ]}
             data={rows}
+            tableName={`delete-remote-assignments-${groupId}`}
             onRowClick={(row) => toggle(row.id)}
           />
         )}

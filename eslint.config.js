@@ -35,6 +35,13 @@ const NO_TAILWIND_MERGE = {
   name: 'tailwind-merge'
 };
 
+const NO_LIBUI_DATA_TABLE = {
+  importNames: ['DataTable'],
+  message:
+    "Import DataTable from '@/components/DataTable'. libui's own forgets its page and sort when it unmounts, so a list reopened from a row's page starts over on page one.",
+  name: '@douglasneuroinformatics/libui/components'
+};
+
 const NO_AXIOS_INSTANCE = {
   message:
     'apps/web uses the default axios instance; the retry, offline and error-notification interceptors in src/services/axios.ts are installed on it. A separate instance silently bypasses all of them.',
@@ -198,6 +205,13 @@ export default config(
     rules: {
       'no-restricted-imports': ['error', { paths: [NO_BARE_ZOD, NO_CLSX, NO_TAILWIND_MERGE] }],
       'no-restricted-syntax': ['error', NO_AXIOS_INSTANCE]
+    }
+  },
+  {
+    files: ['apps/web/src/**/*'],
+    ignores: ['apps/web/src/components/DataTable/DataTable.tsx'],
+    rules: {
+      'no-restricted-imports': ['error', { paths: [NO_BARE_ZOD, NO_CLSX, NO_TAILWIND_MERGE, NO_LIBUI_DATA_TABLE] }]
     }
   },
   {
