@@ -61,10 +61,12 @@ test.describe('returning to a list', () => {
     await expect(firstRow).toHaveText(firstRowOnSecondPage);
   });
 
-  test('should come back to the page of subjects it left', async ({ api, isolatedGroupManager, page }) => {
+  test('should come back to the page of subjects it left', async ({ api, isolatedGroupManager, page, uniqueId }) => {
     const group = await isolatedGroupManager();
+    // The list shows only the first nine characters of an id, so these differ within them; ids from
+    // createSubject all start `subject_`, and two pages of them can read alike.
     for (let index = 0; index < 12; index++) {
-      await api.createSubject(group.id);
+      await api.createSession(group.id, { id: `${String(index).padStart(2, '0')}-${uniqueId}` });
     }
     await page.goto('/datahub/subjects');
     const { firstRow, firstRowOnSecondPage } = await returnFromSecondPage(page, { returnTestId: 'subject-hub-back' });
