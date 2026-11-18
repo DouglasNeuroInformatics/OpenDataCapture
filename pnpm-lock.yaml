@@ -102,6 +102,9 @@ catalogs:
     nodemailer:
       specifier: ^10.0.11
       version: 10.0.11
+    oxc-parser:
+      specifier: ^0.150.0
+      version: 0.150.0
     prisma:
       specifier: ^6.9.0
       version: 6.19.3
@@ -1100,6 +1103,9 @@ importers:
       esbuild:
         specifier: 'catalog:'
         version: 0.28.2
+      oxc-parser:
+        specifier: 'catalog:'
+        version: 0.150.0
       zod:
         specifier: workspace:zod__3.x@*
         version: link:../../vendor/zod@3.x
@@ -1446,6 +1452,9 @@ importers:
       '@playwright/test':
         specifier: ^1.63.0
         version: 1.63.0
+      oxc-parser:
+        specifier: 'catalog:'
+        version: 0.150.0
       type-fest:
         specifier: workspace:type-fest__4.x@*
         version: link:../vendor/type-fest@4.x

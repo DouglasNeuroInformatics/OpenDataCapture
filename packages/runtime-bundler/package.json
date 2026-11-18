@@ -18,6 +18,7 @@
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
     "esbuild": "catalog:",
+    "oxc-parser": "catalog:",
     "zod": "workspace:zod__3.x@*"
   }
 }

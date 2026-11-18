@@ -1,7 +1,6 @@
 import * as fs from 'node:fs/promises';
 
 import type { OnLoadArgs, OnResolveArgs, PluginBuild } from 'esbuild';
-import ts from 'typescript';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { assetPlugin, dtsPlugin } from '../plugin.js';
@@ -22,11 +21,6 @@ vi.mock('module', async (importOriginal) => ({
 }));
 
 vi.mock('fs/promises', () => ({ readFile: vi.fn() }));
-
-vi.mock('typescript', async (importOriginal) => {
-  const actual = (await importOriginal<{ default: typeof import('typescript') }>()).default;
-  return { default: { ...actual, transform: vi.fn(actual.transform) } };
-});
 
 /** Maps `'<packageJsonId>@<importerFilepath>'` to the resolved package.json path the mocked require would return. */
 const packageJsonResolutions = new Map<string, string>();
@@ -163,8 +157,64 @@ describe('dtsPlugin', () => {
     const { onLoadCallbacks } = setupPlugin(dtsPlugin({ configFilepath, entryPoints, outdir: '/out', packages }));
     const result: any = await onLoadCallbacks[0]!({ path: importerFilepath } as OnLoadArgs);
     expect(result.loader).toBe('copy');
-    expect(result.contents).toContain('from "../some-pkg/index.d.ts"');
+    expect(result.contents).toContain("from '../some-pkg/index.d.ts'");
     expect(result.contents).toContain("from './local.js'");
+  });
+
+  it('should change nothing but the text inside each bare specifier, so quote style and comments survive', async () => {
+    packageJsonResolutions.set(`some-pkg/package.json@${importerFilepath}`, '/repo/node_modules/some-pkg/package.json');
+    const packages: ResolvedPackage[] = [
+      {
+        exports: { '.': { types: '/repo/node_modules/some-pkg/index.d.ts' } },
+        name: 'some-pkg',
+        packageJsonPath: '/repo/node_modules/some-pkg/package.json',
+        packageRoot: '/repo/node_modules/some-pkg'
+      }
+    ];
+    const entryPoints: EntryPoint[] = [
+      { in: '/repo/node_modules/some-pkg/index.d.ts', out: 'some-pkg/index.d' },
+      { in: importerFilepath, out: 'app/index.d' }
+    ];
+    vi.mocked(fs.readFile).mockResolvedValueOnce(
+      "import type { X } from \"some-pkg\";\n/** café: import { Y } from 'some-pkg'; */\nimport type { Z } from 'some-pkg';\n"
+    );
+    const { onLoadCallbacks } = setupPlugin(dtsPlugin({ configFilepath, entryPoints, outdir: '/out', packages }));
+    const result: any = await onLoadCallbacks[0]!({ path: importerFilepath } as OnLoadArgs);
+    expect(result.contents).toBe(
+      "import type { X } from \"../some-pkg/index.d.ts\";\n/** café: import { Y } from 'some-pkg'; */\nimport type { Z } from '../some-pkg/index.d.ts';\n"
+    );
+  });
+
+  it('should rewrite a bare import nested in a declare module block, not only top-level imports', async () => {
+    packageJsonResolutions.set(`some-pkg/package.json@${importerFilepath}`, '/repo/node_modules/some-pkg/package.json');
+    const packages: ResolvedPackage[] = [
+      {
+        exports: { '.': { types: '/repo/node_modules/some-pkg/index.d.ts' } },
+        name: 'some-pkg',
+        packageJsonPath: '/repo/node_modules/some-pkg/package.json',
+        packageRoot: '/repo/node_modules/some-pkg'
+      }
+    ];
+    const entryPoints: EntryPoint[] = [
+      { in: '/repo/node_modules/some-pkg/index.d.ts', out: 'some-pkg/index.d' },
+      { in: importerFilepath, out: 'app/index.d' }
+    ];
+    vi.mocked(fs.readFile).mockResolvedValueOnce(
+      "declare module 'augmented' {\n  import type { X } from 'some-pkg';\n  export const x: X;\n}\n"
+    );
+    const { onLoadCallbacks } = setupPlugin(dtsPlugin({ configFilepath, entryPoints, outdir: '/out', packages }));
+    const result: any = await onLoadCallbacks[0]!({ path: importerFilepath } as OnLoadArgs);
+    expect(result.contents).toContain("import type { X } from '../some-pkg/index.d.ts';");
+  });
+
+  it('should leave an export-from declaration untouched, so its package need not be included', async () => {
+    const sourceText = "export type { X } from 'unlisted-pkg';\n";
+    vi.mocked(fs.readFile).mockResolvedValueOnce(sourceText);
+    const { onLoadCallbacks } = setupPlugin(
+      dtsPlugin({ configFilepath, entryPoints: [], outdir: '/out', packages: [] })
+    );
+    const result: any = await onLoadCallbacks[0]!({ path: importerFilepath } as OnLoadArgs);
+    expect(result.contents).toBe(sourceText);
   });
 
   it('should resolve a subpath import of a scoped package against its own export key', async () => {
@@ -187,7 +237,7 @@ describe('dtsPlugin', () => {
     vi.mocked(fs.readFile).mockResolvedValueOnce("import type { X } from '@scope/pkg/sub';\nexport type { X };\n");
     const { onLoadCallbacks } = setupPlugin(dtsPlugin({ configFilepath, entryPoints, outdir: '/out', packages }));
     const result: any = await onLoadCallbacks[0]!({ path: importerFilepath } as OnLoadArgs);
-    expect(result.contents).toContain('from "../@scope/pkg/sub.d.ts"');
+    expect(result.contents).toContain("from '../@scope/pkg/sub.d.ts'");
   });
 
   it('should error when the matched package does not export the imported subpath', async () => {
@@ -223,29 +273,16 @@ describe('dtsPlugin', () => {
     vi.mocked(fs.readFile).mockResolvedValueOnce("import type { X } from 'some-pkg';\nexport type { X };\n");
     const { onLoadCallbacks } = setupPlugin(dtsPlugin({ configFilepath, entryPoints, outdir: '/out', packages }));
     const result: any = await onLoadCallbacks[0]!({ path: importerFilepath } as OnLoadArgs);
-    expect(result.contents).toContain('from "../some-pkg/types.ts"');
+    expect(result.contents).toContain("from '../some-pkg/types.ts'");
   });
 
-  it('should report a non-error thrown during the transform as an unknown error', async () => {
-    vi.mocked(ts.transform).mockImplementationOnce(() => {
-      // eslint-disable-next-line @typescript-eslint/only-throw-error -- the plugin must report a thrown value that is not an Error
-      throw 'not an error';
-    });
-    vi.mocked(fs.readFile).mockResolvedValueOnce('export type X = string;\n');
-    const { onLoadCallbacks } = setupPlugin(
-      dtsPlugin({ configFilepath, entryPoints: [], outdir: '/out', packages: [] })
-    );
-    const result: any = await onLoadCallbacks[0]!({ path: importerFilepath } as OnLoadArgs);
-    expect(result.errors[0]).toEqual({ location: { file: importerFilepath }, text: 'Unknown Error' });
-  });
-
-  it('should report a transform failure as a load error rather than throw', async () => {
+  it('should report a syntax error as a load error on the file rather than emit the declaration', async () => {
     vi.mocked(fs.readFile).mockResolvedValueOnce('this is not valid { typescript syntax +++');
     const { onLoadCallbacks } = setupPlugin(
       dtsPlugin({ configFilepath, entryPoints: [], outdir: '/out', packages: [] })
     );
     const result: any = await onLoadCallbacks[0]!({ path: importerFilepath } as OnLoadArgs);
-    expect(Array.isArray(result.errors) || result.contents !== undefined).toBe(true);
+    expect(result).toEqual({ errors: [expect.objectContaining({ location: { file: importerFilepath } })] });
   });
 });
 

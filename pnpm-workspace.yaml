@@ -40,6 +40,7 @@ catalog:
   motion: '13.4.4'
   neverthrow: ^8.2.0
   nodemailer: ^10.0.11
+  oxc-parser: '^0.150.0'
   conventional-commits-parser: '^7.1.2'
   prisma: '^6.9.0'
   react-dropzone: ^20.1.2
