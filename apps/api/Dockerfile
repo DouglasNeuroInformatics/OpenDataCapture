@@ -22,7 +22,10 @@ RUN pnpm install --frozen-lockfile
 RUN turbo build --filter=@opendatacapture/api
 
 # RUN SERVER
-FROM base AS runner
+FROM node:24-slim AS runner
+WORKDIR /app
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates openssl && rm -rf /var/lib/apt/lists/*
 COPY --from=installer /app/apps/api/dist/ /app/dist/
 COPY --from=installer /app/apps/api/dist/runtime/ /runtime/
 

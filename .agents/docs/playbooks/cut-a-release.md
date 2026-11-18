@@ -123,9 +123,11 @@ the steps.
 
 1. **Cut `release/<major>` from the last `v<major>.*` tag, once the next major has shipped**, and push
    it. `configure` refuses a dispatch on it before then.
-2. **Pin the base image on the branch.** Replace `FROM node:lts-krypton` in every Dockerfile with the
-   exact version, as a `fix:` commit; the floating tag would rebuild an old release on whatever Node
-   is newest. Find it with `docker run --rm node:lts-krypton node --version` on the day you cut it.
+2. **Pin the base images on the branch.** Replace `FROM node:lts-krypton` in every Dockerfile with
+   `FROM node:<major>.<minor>.<patch>-bookworm` and `FROM node:24-slim` in the api and gateway
+   Dockerfiles with `FROM node:<major>.<minor>.<patch>-bookworm-slim`, as a `fix:` commit; the
+   floating tags would rebuild an old release on whatever Node is newest. Find the version with
+   `docker run --rm node:24-slim node --version` on the day you cut it.
 3. **Land each fix on `main` first, then take it onto the branch by a PR against the branch.** The
    PR states which category of `docs/en/5-reference/5.10-versioning.md` §What each version receives
    the fix falls under; anything else does not go onto the branch.
@@ -135,7 +137,7 @@ the steps.
    already tagged or is not on the branch's major. npm is skipped, with a notice.
 6. **Merge the branch back into `main`.** That carries the `CHANGELOG.md` section and makes the tag
    reachable, so the next range on `main` starts after it. Keep `main`'s version fields, support
-   table and floating `FROM node:lts-krypton` lines on a conflict.
+   table and floating `FROM node:...` lines on a conflict.
 
 ## Verify
 
