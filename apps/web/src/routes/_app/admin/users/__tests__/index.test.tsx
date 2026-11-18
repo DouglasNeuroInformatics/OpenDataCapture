@@ -12,6 +12,8 @@ import '@/services/i18n';
 const mocks = vi.hoisted(() => ({
   archiveUser: vi.fn(),
   currentUser: null as null | { username: string },
+  groups: [] as { id: string; name: string }[],
+  groupsQueryOptions: vi.fn(() => ({ queryKey: ['groups'] })),
   navigate: vi.fn(),
   unarchiveUser: vi.fn(),
   users: [] as User[],
@@ -27,6 +29,10 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
 vi.mock('@/hooks/useUsersQuery', () => ({
   usersQueryOptions: mocks.usersQueryOptions,
   useUsersQuery: () => ({ data: mocks.users })
+}));
+vi.mock('@/hooks/useGroupsQuery', () => ({
+  groupsQueryOptions: mocks.groupsQueryOptions,
+  useGroupsQuery: () => ({ data: mocks.groups })
 }));
 vi.mock('@/hooks/useArchiveUserMutation', () => ({ useArchiveUserMutation: () => ({ mutate: mocks.archiveUser }) }));
 vi.mock('@/hooks/useUnarchiveUserMutation', () => ({
@@ -95,6 +101,11 @@ describe('Route', () => {
     vi.clearAllMocks();
     mocks.archiveUser.mockReset();
     mocks.currentUser = null;
+    mocks.groups = [
+      { id: 'group-a', name: 'Gamma' },
+      { id: 'group-b', name: 'Alpha' },
+      { id: 'group-c', name: 'Beta' }
+    ];
   });
 
   afterEach(cleanup);
@@ -115,6 +126,54 @@ describe('Route', () => {
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);
     await runLoader(queryClient);
     expect(ensureQueryData).toHaveBeenCalledWith({ queryKey: ['users'] });
+  });
+
+  it('should prefetch the groups in the loader, so group names render without a waterfall', async () => {
+    const queryClient = new QueryClient();
+    const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue([]);
+    await runLoader(queryClient);
+    expect(ensureQueryData).toHaveBeenCalledWith({ queryKey: ['groups'] });
+  });
+
+  it('should show none for a user who belongs to no group', () => {
+    renderTable([userFixture({ groupIds: [] })]);
+    expect(screen.getByTestId('user-groups').textContent).toBe('None');
+  });
+
+  it('should show the name of the only group a user belongs to', () => {
+    renderTable([userFixture({ groupIds: ['group-c'] })]);
+    expect(screen.getByTestId('user-groups').textContent).toBe('Beta');
+  });
+
+  it('should leave out a group missing from the groups list, rather than showing its raw id', () => {
+    renderTable([userFixture({ groupIds: ['group-unknown', 'group-c'] })]);
+    expect(screen.getByTestId('user-groups').textContent).toBe('Beta');
+  });
+
+  it('should show the first group and a count of the rest, so a long membership fits the cell', () => {
+    renderTable([userFixture({ groupIds: ['group-c', 'group-a', 'group-b'] })]);
+    expect(screen.getByTestId('user-groups').textContent).toBe('Alpha +2');
+  });
+
+  it('should keep the full group list hidden until the cell is hovered', () => {
+    renderTable([userFixture({ groupIds: ['group-c', 'group-a', 'group-b'] })]);
+    expect(screen.queryByTestId('user-groups-list')).toBeNull();
+  });
+
+  it('should list every group a user belongs to when the cell is hovered', () => {
+    renderTable([userFixture({ groupIds: ['group-c', 'group-a', 'group-b'] })]);
+    fireEvent.focus(screen.getByTestId('user-groups'));
+    const items = within(screen.getAllByTestId('user-groups-list')[0]!).getAllByRole('listitem', { hidden: true });
+    expect(items.map((item) => item.textContent)).toEqual(['Alpha', 'Beta', 'Gamma']);
+  });
+
+  it('should sort users by their group names', () => {
+    renderTable([
+      userFixture({ groupIds: ['group-a'], id: 'b', username: 'bob' }),
+      userFixture({ groupIds: ['group-c'], id: 'a', username: 'alice' })
+    ]);
+    fireEvent.click(header('Groups'));
+    expect(usernames()).toEqual(['alice', 'bob']);
   });
 
   it('should mark a user who is not archived as active', () => {
@@ -140,7 +199,7 @@ describe('Route', () => {
   });
 
   it('should label a user without a base permission level as having none', () => {
-    renderTable([userFixture({ basePermissionLevel: null })]);
+    renderTable([userFixture({ basePermissionLevel: null, groupIds: ['group-a'] })]);
     expect(within(rows()[0]!).getByText('None')).toBeTruthy();
   });
 
