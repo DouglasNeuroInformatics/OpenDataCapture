@@ -69,6 +69,24 @@ test.describe('admin management', () => {
     await expect(page.getByTestId('user-status-active')).toBeVisible();
   });
 
+  test('should show the groups of a user in the users list and every one of them on hover', async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const secondGroup = await api.createGroup({ name: `B Group ${uniqueId}` });
+    const firstGroup = await api.createGroup({ name: `A Group ${uniqueId}` });
+    const { user } = await api.createUser({ groupIds: [secondGroup.id, firstGroup.id] });
+    await authenticateAs('ADMIN');
+    await page.goto('/admin/users');
+    await page.getByTestId('data-table-search-bar').getByRole('searchbox').fill(user.username);
+    const groupsCell = page.getByTestId('user-groups');
+    await expect(groupsCell).toHaveText(`${firstGroup.name} +1`);
+    await groupsCell.hover();
+    await expect(page.getByTestId('user-groups-list').first()).toHaveText([firstGroup.name, secondGroup.name].join(''));
+  });
+
   test('should show a validation error when the group name is missing', async ({ authenticateAs, page }) => {
     await authenticateAs('ADMIN');
     await page.goto('/admin/groups/create');

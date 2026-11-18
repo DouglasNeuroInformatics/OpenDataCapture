@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { snakeToCamelCase, toBasicISOString } from '@douglasneuroinformatics/libjs';
-import { Button, DataTable, Dialog, Heading } from '@douglasneuroinformatics/libui/components';
+import { Button, DataTable, Dialog, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { User } from '@opendatacapture/schemas/user';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
@@ -10,6 +10,7 @@ import { ColorTagCell } from '@/components/ColorTagCell';
 import { PageHeader } from '@/components/PageHeader';
 import { SortableHeader } from '@/components/SortableHeader';
 import { useArchiveUserMutation } from '@/hooks/useArchiveUserMutation';
+import { groupsQueryOptions, useGroupsQuery } from '@/hooks/useGroupsQuery';
 import { useUnarchiveUserMutation } from '@/hooks/useUnarchiveUserMutation';
 import { usersQueryOptions, useUsersQuery } from '@/hooks/useUsersQuery';
 import { useAppStore } from '@/store';
@@ -23,6 +24,7 @@ const RouteComponent = () => {
   const [theme] = useTheme();
   const navigate = useNavigate();
   const usersQuery = useUsersQuery();
+  const groupsQuery = useGroupsQuery();
   const archiveUserMutation = useArchiveUserMutation();
   const unarchiveUserMutation = useUnarchiveUserMutation();
   const currentUser = useAppStore((store) => store.currentUser);
@@ -32,6 +34,11 @@ const RouteComponent = () => {
   const handleOpenUser = (user: User) => {
     setHighlightedRowId(user.id);
     void navigate({ params: { userId: user.id }, to: '/admin/users/$userId' });
+  };
+
+  const groupNamesById = new Map(groupsQuery.data.map((group) => [group.id, group.name]));
+  const getGroupNames = (user: User) => {
+    return user.groupIds.flatMap((groupId) => groupNamesById.get(groupId) ?? []).sort((a, b) => a.localeCompare(b));
   };
 
   return (
@@ -74,6 +81,40 @@ const RouteComponent = () => {
               return t(`common.${snakeToCamelCase(basePermissionLevel)}`);
             },
             header: ({ column }) => <SortableHeader column={column} label={t('common.basePermissionLevel')} />
+          },
+          {
+            accessorFn: (user) => getGroupNames(user).join(', '),
+            cell: ({ row }) => {
+              const [firstGroupName, ...otherGroupNames] = getGroupNames(row.original);
+              if (!firstGroupName) {
+                return <span data-testid="user-groups">{t({ en: 'None', es: 'Ninguno', fr: 'Aucun' })}</span>;
+              }
+              return (
+                <Tooltip>
+                  <Tooltip.Trigger
+                    className="h-auto max-w-full p-0 font-normal hover:bg-transparent"
+                    data-testid="user-groups"
+                    size="sm"
+                    variant="ghost"
+                  >
+                    <span className="truncate">
+                      {otherGroupNames.length ? `${firstGroupName} +${otherGroupNames.length}` : firstGroupName}
+                    </span>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content>
+                    <ul data-testid="user-groups-list">
+                      {[firstGroupName, ...otherGroupNames].map((groupName) => (
+                        <li key={groupName}>{groupName}</li>
+                      ))}
+                    </ul>
+                  </Tooltip.Content>
+                </Tooltip>
+              );
+            },
+            header: ({ column }) => (
+              <SortableHeader column={column} label={t({ en: 'Groups', es: 'Grupos', fr: 'Groupes' })} />
+            ),
+            id: 'groups'
           },
           {
             accessorFn: (user) => Boolean(user.disabled),
@@ -201,6 +242,9 @@ const RouteComponent = () => {
 export const Route = createFileRoute('/_app/admin/users/')({
   component: RouteComponent,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(usersQueryOptions());
+    await Promise.all([
+      context.queryClient.ensureQueryData(usersQueryOptions()),
+      context.queryClient.ensureQueryData(groupsQueryOptions())
+    ]);
   }
 });
