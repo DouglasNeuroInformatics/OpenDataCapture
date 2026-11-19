@@ -52,15 +52,15 @@ test.describe('group switcher', () => {
     await expect(dashboardPage.groupSwitcher).toContainText(group.name);
   });
 
-  // The archived group is listed first, so a client that took the first of the user's groups as the
-  // current one without dropping archived groups would select it.
+  // The archived group is created, and so listed, first, so a client that took the first of the user's
+  // groups as the current one without dropping archived groups would select it.
   test('should offer a group manager only the active groups they belong to, and never start them in an archived one', async ({
     api,
     authenticateAs,
     page
   }) => {
-    const [archivedGroup, firstGroup, secondGroup, otherGroup] = await Promise.all([
-      api.createGroup(),
+    const archivedGroup = await api.createGroup();
+    const [firstGroup, secondGroup, otherGroup] = await Promise.all([
       api.createGroup(),
       api.createGroup(),
       api.createGroup()

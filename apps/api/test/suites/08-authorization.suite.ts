@@ -141,20 +141,20 @@ export default defineSuite('authorization', function () {
     expect(response.statusCode).toBe(201);
   };
 
-  /** A record for a new subject in the group, written the way a completed instrument is. */
-  const createRecord = async (groupId: string): Promise<InstrumentRecord> => {
+  /** An in-person session for a new subject, which enrols that subject in the group. */
+  const createSession = async (groupId: string): Promise<Session> => {
     const session = await request(adminHeaders, {
       method: 'POST',
-      payload: {
-        date: new Date(),
-        groupId,
-        subjectData: { id: `authorization-${randomUUID()}` },
-        type: 'IN_PERSON'
-      },
+      payload: { date: new Date(), groupId, subjectData: { id: `authorization-${randomUUID()}` }, type: 'IN_PERSON' },
       url: '/v1/sessions'
     });
     expect(session.statusCode).toBe(201);
-    const { id: sessionId, subjectId } = session.json<Session>();
+    return session.json<Session>();
+  };
+
+  /** A record for a new subject in the group, written the way a completed instrument is. */
+  const createRecord = async (groupId: string): Promise<InstrumentRecord> => {
+    const { id: sessionId, subjectId } = await createSession(groupId);
     const record = await request(adminHeaders, {
       method: 'POST',
       payload: { data: { score: 1 }, date: new Date(), groupId, instrumentId, sessionId, subjectId },
@@ -166,13 +166,7 @@ export default defineSuite('authorization', function () {
 
   /** A subject enrolled in the group, holding no records. */
   const createSubject = async (groupId: string): Promise<string> => {
-    const session = await request(adminHeaders, {
-      method: 'POST',
-      payload: { date: new Date(), groupId, subjectData: { id: `authorization-${randomUUID()}` }, type: 'IN_PERSON' },
-      url: '/v1/sessions'
-    });
-    expect(session.statusCode).toBe(201);
-    return session.json<Session>().subjectId;
+    return (await createSession(groupId)).subjectId;
   };
 
   /**
@@ -416,11 +410,17 @@ export default defineSuite('authorization', function () {
 
   // The datahub's instrument hub reads these endpoints with no `groupId`, so each decides on its own
   // what the caller may see. The manager here belongs to a group holding no records at all, so
-  // anything the summaries name came from another group.
+  // anything the summaries name came from another group. The series summary counts only records
+  // collected as part of a series, so the other group holds one of those as well as plain records.
   it.each(['by-instrument', 'by-series', 'by-subject'])(
     "should leave another group's records out of the %s datahub summary a group manager reads",
     async (summary) => {
       await uploadRecords(foreignGroup.id, [`authorization-hub-${randomUUID()}`]);
+      const seriesRecord = await createRecord(foreignGroup.id);
+      await prisma.instrumentRecord.update({
+        data: { seriesInstrumentId: await createSeries(foreignGroup.id) },
+        where: { id: seriesRecord.id }
+      });
       const emptyGroup = await createGroup();
       const headers = await login((await createUser('GROUP_MANAGER', [emptyGroup.id])).username);
 
