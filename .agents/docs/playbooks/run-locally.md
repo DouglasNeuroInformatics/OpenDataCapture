@@ -53,18 +53,18 @@ one.
 6. **`pnpm install`.** It also installs the husky pre-commit hook, which formats staged files with
    oxfmt and runs neither lint nor tests.
 
-7. **Run `pnpm build` once.** `runtime/v1/dist` is gitignored and read while Vite configs load, so a
+7. **Run `pnpm build:exports` once.** It builds the packages that export only build output. `runtime/v1/dist` is gitignored and read while Vite configs load, so a
    dev server started without it dies with
    `ENOENT: no such file or directory, scandir '<repo>/runtime/v1/dist'` from `generateManifest`
    (`packages/runtime-meta`), raised inside a plugin factory so it looks like a Vite configuration
-   error. Turbo's `dev`, `dev:test`, `lint` and `test:e2e` depend on `^build` and repair it; storybook,
-   outreach, root `pnpm test` and any bare `tsc` or `vitest` do not.
+   error. Root `pnpm dev`, `pnpm lint`, `pnpm test` and `pnpm test:e2e` build it first and so repair it;
+   storybook, outreach and any bare `tsc`, `oxlint` or `vitest` do not.
 
    Done when `runtime/v1/dist` exists.
 
 8. **`pnpm dev`** starts api, gateway and web only (`dev:core`); the gateway's sqlite `db:push` runs as
-   a dependency. The first run, and the first after any `.env` edit (`.env` is a turbo
-   `globalDependency`), spends minutes building before anything listens.
+   a dependency. A first run that skipped step 7 builds before anything listens; an `.env` edit rebuilds
+   nothing.
 
    | App     | Variable                  | Default |
    | ------- | ------------------------- | ------- |
@@ -90,7 +90,7 @@ one.
 
 ## The apps `pnpm dev` does not start
 
-Turbo hashes `.env` but never loads it, and `astro dev` does not read it either, hence the `env-cmd`
+Turbo never loads `.env`, and `astro dev` does not read it either, hence the `env-cmd`
 prefix.
 
 | App                       | Command                                                                | Port                              |

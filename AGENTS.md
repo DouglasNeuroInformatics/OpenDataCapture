@@ -18,8 +18,8 @@ pnpm install                # install deps
 pnpm generate:env           # create .env from .env.template — required before anything else runs
 pnpm dev                    # run core apps (api, gateway, web) via turbo
 pnpm build                  # turbo build (all packages/apps)
-pnpm lint                   # turbo lint — `tsc && oxlint --fix src` per package, plus lint:root for root-level scripts and configs
-pnpm format                 # turbo format (oxfmt per package)
+pnpm lint                   # turbo lint — one `oxlint --type-check --fix` over the whole repo (lint:root), plus `astro check` in apps/outreach
+pnpm format                 # oxfmt over the whole repo
 pnpm test                   # vitest across the workspace
 pnpm test:coverage          # vitest with coverage — fails below 100%, the gate CI runs
 pnpm test:e2e               # playwright, in testing/

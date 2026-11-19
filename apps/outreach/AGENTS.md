@@ -110,8 +110,8 @@ Every component is `.astro`; there are no React islands and no client framework 
 configured. Do not introduce one without asking.
 
 There is **no `vitest.config.ts` and no test suite in this package** — `pnpm test` does not cover it.
-`pnpm --filter @opendatacapture/outreach lint` runs `astro check && oxlint --fix src`, and `astro check`
-is the only thing type-checking `.astro` files, so run it after any change here.
+`pnpm --filter @opendatacapture/outreach lint` runs `astro check`, the only thing type-checking `.astro`
+files, so run it after any change here. Root `pnpm lint` runs it too, beside the repo-wide oxlint pass.
 
 `astro check` and typedoc run on this package's own `typescript` 6.0.x devDependency: neither supports
 TypeScript 7, which every other workspace uses.

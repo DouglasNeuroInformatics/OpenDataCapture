@@ -55,8 +55,8 @@ artifact** written for users outside this repo, so its instruction to put files 
 - **Relative imports need their file extension** (`./styles.css`, `./Component.tsx`); esbuild will
   not resolve `./Component`. `allowImportingTsExtensions` is on for this reason.
 - Runtime imports use the absolute `/runtime/v1/...` specifier, resolved by the `paths` mapping in
-  `tsconfig.json` to `runtime/v1/dist/*`. **`runtime/v1` must be built or `pnpm lint` (`tsc`) fails**
-  — turbo handles this via `^build`. Background: `.agents/docs/architecture/runtime-and-vendor.md`.
+  `tsconfig.json` to `runtime/v1/dist/*`. **`runtime/v1` must be built or the type-check fails**
+  — root `pnpm lint` builds it first. Background: `.agents/docs/architecture/runtime-and-vendor.md`.
 - The directory name matches `internal.name` in every instrument. `SERIES` instruments have no
   `internal` field at all.
 - **`perfectionist/sort-objects` is off for this package**, as it is for the playground's examples

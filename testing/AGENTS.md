@@ -17,8 +17,8 @@ is `.agents/docs/playbooks/add-e2e-test.md`; the tier-by-tier picture is
 - **Route literals come from a generated file.** `src/generated/route.d.ts` is git-ignored and
   written by `scripts/gen-routes.ts`, which parses `FileRouteTypes['to']` out of
   `apps/web/src/route-tree.ts`. A route added in `apps/web` does not exist here until
-  `pnpm --filter @opendatacapture/testing gen:routes` runs (it is also wired into `postinstall`,
-  `lint` and the `test:*` scripts). Never hand-edit that file.
+  `pnpm --filter @opendatacapture/testing gen:routes` runs (`postinstall`, the `test:*` scripts
+  and root `pnpm lint` run it too). Never hand-edit that file.
 - **Selectors are `data-testid` attributes owned by `apps/web`.** A new spec usually means adding a
   testid over there in the same change. Roles and labels are used only where no testid exists.
 - **One database, shared by every worker.** `setup` seeds it once through the UI and `teardown`
@@ -126,5 +126,5 @@ tag to a critical flow, leave it off everything else.
 
 There is **no `vitest.config.ts` here and no unit tier**; `pnpm test` never looks at this directory.
 
-`lint` is `pnpm gen:routes && tsc && oxlint --fix .` — note the `.`, not `src`, so the config and
-scripts are checked too.
+There is no `lint` script: root `pnpm lint` runs `gen:routes`, then type-checks and lints this whole
+directory, config and scripts included.

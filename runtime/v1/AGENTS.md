@@ -20,8 +20,8 @@ not mention this directory:
 | `apps/api`                                                                                                   | the `#runtime/v1/*` subpath import declared in `apps/api/package.json` resolves to nothing                                                                                                                   |
 | `instrument-bundler`, `instrument-library`, `playground`, `react-core`, `serve-instrument`, `gateway`, `web` | their tsconfig `paths` map `/runtime/v1/*` → `../../runtime/v1/dist/*`, so every instrument import is an unresolved module                                                                                   |
 
-Turbo covers this for `build` and `lint` (both depend on `^build`) but not for a bare `tsc` or
-`vitest` run. The build `rm -rf`s `outdir` before writing, so nothing hand-placed in `dist/` survives.
+Root `pnpm build`, `pnpm lint`, `pnpm dev`, `pnpm test` and `pnpm test:e2e` build it first; a bare
+`tsc` or `vitest` run does not. The build `rm -rf`s `outdir` before writing, so nothing hand-placed in `dist/` survives.
 
 ## Adding a library to the runtime
 
@@ -61,7 +61,7 @@ Export-shape rules and the `.d.ts` import constraint are in `packages/runtime-bu
 `version` is bumped repo-wide by `scripts/increment-version.ts`; the release workflow publishes any
 package with a `publishConfig` whose version is not yet on npm. Do not hand-edit it.
 
-There is **no `lint` or `format` script here**, so `pnpm lint` never type-checks this directory.
+Root `pnpm lint` type-checks what `tsconfig.json` includes: the config, the declarations and `test/`.
 
 ## Tests
 

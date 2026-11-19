@@ -89,6 +89,6 @@ boots with web's i18n resources and a live `esbuild-wasm`. That is what lets the
 ## No tests, no build
 
 There is no `vitest.config.ts` and no `build` script here, so `pnpm test` and `pnpm build` do not
-cover this workspace and neither does CI. `lint` is `tsc && oxlint --fix config vite.config.js`, and
+cover this workspace and neither does CI. Root `pnpm lint` checks it, and
 `tsconfig.json` includes only `config/*` and `vite.config.js` — **stories are type-checked by their
 owning package, never by this one.**

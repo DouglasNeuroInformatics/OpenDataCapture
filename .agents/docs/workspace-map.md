@@ -52,9 +52,9 @@ and a change is visible immediately. The exceptions:
 - **`playground-url` and `serve-instrument`** build only their `bin`. `playground-url`'s library
   export is still source. `serve-instrument` has no `exports` at all.
 
-Turbo's `build`, `lint`, `dev` and `test:e2e` tasks depend on `^build`, so `pnpm build` and
-`pnpm lint` from the root are always correct. Running `tsc` inside one package after a clean
-checkout is not, and `pnpm test` builds nothing.
+Root `pnpm build`, `pnpm lint`, `pnpm dev`, `pnpm test` and `pnpm test:e2e` build these first
+(`.agents/docs/architecture/testing-strategy.md` §Turbo task graph), so they are always correct. A
+bare `tsc`, `oxlint --type-check` or `vitest` after a clean checkout is not.
 
 ## Published to npm
 
