@@ -117,6 +117,13 @@ describe('useInterpretedInstrument', () => {
     expect(result.current).toMatchObject({ error: { cause: 'not an Error instance' } });
   });
 
+  it('should report LOADING for a null bundle without interpreting anything', () => {
+    const interpretSpy = vi.spyOn(InstrumentInterpreter.prototype, 'interpret');
+    const { result } = renderHook(() => useInterpretedInstrument(null));
+    expect(result.current.status).toBe('LOADING');
+    expect(interpretSpy).not.toHaveBeenCalled();
+  });
+
   it('should report every language of a multilingual instrument as supported', async () => {
     const bundle = `(async () => ({
       __runtimeVersion: 1,
