@@ -156,6 +156,42 @@ describe('InteractiveContent', () => {
     expect(addNotification).toHaveBeenCalledWith({ message: 'From the bundle', type: 'success' });
   });
 
+  it('should run the iframe in the interface language when the host holds no language', () => {
+    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    expect(screen.getByTitle('Open Data Capture - Interactive Instrument').getAttribute('lang')).toBe('en');
+  });
+
+  it('should run the iframe in the language the host holds, whatever the interface language', () => {
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="fr"
+        supportedLanguages={['en', 'fr']}
+        onChangeLanguage={vi.fn()}
+        onSubmit={vi.fn()}
+      />
+    );
+    expect(screen.getByTitle('Open Data Capture - Interactive Instrument').getAttribute('lang')).toBe('fr');
+  });
+
+  it("should hand a bundle's language change to the host holding the language, leaving the interface alone", () => {
+    const onChangeLanguage = vi.fn();
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en', 'fr']}
+        onChangeLanguage={onChangeLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
+    act(() => {
+      dispatch('changeLanguage', 'fr');
+    });
+    expect(onChangeLanguage).toHaveBeenCalledWith('fr');
+    expect(changeLanguage).not.toHaveBeenCalled();
+  });
+
   it('should zoom the iframe in and out within its lower bound', () => {
     render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
     expect(screen.getByText('100%')).toBeTruthy();

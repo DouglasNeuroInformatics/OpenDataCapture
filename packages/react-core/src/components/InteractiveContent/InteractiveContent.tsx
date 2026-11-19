@@ -23,11 +23,15 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
   enableLanguageLock,
   enableLanguageSelect,
   enableLanguageToggle,
+  language,
+  onChangeLanguage,
   onSubmit,
   supportedLanguages = []
 }) {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const { changeLanguage, resolvedLanguage, t } = useTranslation();
+  const contentLanguage = language ?? resolvedLanguage;
+  const changeContentLanguage = onChangeLanguage ?? changeLanguage;
   const [_, updateTheme] = useTheme();
   const [scale, setScale] = useState(100);
   const [hasSelectedLanguage, setHasSelectedLanguage] = useState(
@@ -58,9 +62,9 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
         setLockDialogOpen(true);
         return;
       }
-      changeLanguage(requested.data);
+      changeContentLanguage(requested.data);
     },
-    [addNotification, changeLanguage, isLocked, t]
+    [addNotification, changeContentLanguage, isLocked, t]
   );
 
   const handleChangeThemeEvent = useCallback(
@@ -162,7 +166,7 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
                           setLockDialogOpen(true);
                           return;
                         }
-                        changeLanguage(language);
+                        changeContentLanguage(language);
                       }}
                     >
                       {LANGUAGE_LABELS[language][resolvedLanguage]}
@@ -177,7 +181,7 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
               allow="fullscreen"
               className="origin-top-left"
               data-bundle={bundle}
-              lang={resolvedLanguage}
+              lang={contentLanguage}
               name="interactive-instrument"
               ref={iFrameRef}
               src="/runtime/v1/@opendatacapture/runtime-internal/interactive/iframe.html"
@@ -201,7 +205,7 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
                     key={language}
                     type="button"
                     onClick={() => {
-                      changeLanguage(language);
+                      changeContentLanguage(language);
                       setHasSelectedLanguage(true);
                     }}
                   >
@@ -259,11 +263,19 @@ export type InteractiveContentProps = Simplify<
   Pick<
     InteractiveInstrument['content'],
     'defaultFullscreen' | 'enableLanguageLock' | 'enableLanguageSelect' | 'enableLanguageToggle'
-  > & {
-    bundle: string;
-    onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
-    supportedLanguages?: Language[];
-  }
+  > &
+    (
+      | {
+          /** The language the instrument runs in, held by the host instead of the interface language. */
+          language: InterfaceLanguage;
+          onChangeLanguage: (language: InterfaceLanguage) => void;
+        }
+      | { language?: never; onChangeLanguage?: never }
+    ) & {
+      bundle: string;
+      onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
+      supportedLanguages?: Language[];
+    }
 >;
 
 // eslint-disable-next-line react/function-component-definition -- the named function passed to memo gives the component its display name

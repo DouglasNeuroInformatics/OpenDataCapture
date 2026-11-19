@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import type { Language } from '@opendatacapture/schemas/core';
 import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 
 import { ScalarInstrumentRenderer } from './ScalarInstrumentRenderer';
@@ -18,6 +19,8 @@ export type InstrumentRendererProps = {
   /** Whether to disable copy, download, print in the final summary */
   disableSummaryActions?: boolean;
   initialSeriesIndex?: number;
+  /** The language to run the instrument in, leaving the interface language alone. Defaults to the interface language. */
+  language?: Language;
   NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: InstrumentSubmitHandler;
   subject?: SubjectDisplayInfo;

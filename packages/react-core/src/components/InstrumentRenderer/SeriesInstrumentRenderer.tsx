@@ -6,10 +6,12 @@ import { Button, Heading, Spinner } from '@douglasneuroinformatics/libui/compone
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { getSeriesInstrumentParams } from '@opendatacapture/instrument-utils';
 import type { AnyUnilingualScalarInstrument, Json, UnilingualSeriesInstrument } from '@opendatacapture/runtime-core';
+import type { Language } from '@opendatacapture/schemas/core';
 import type { SeriesInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { CircleCheckIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 
+import { useInstrumentLanguage } from '../../hooks/useInstrumentLanguage';
 import { useInterpretedInstrument } from '../../hooks/useInterpretedInstrument';
 import { FormContent } from '../FormContent';
 import { InstrumentOverview } from '../InstrumentOverview';
@@ -32,6 +34,8 @@ export type SeriesInstrumentRendererProps = {
   /** When true, the "Begin" button on the overview screen is disabled. */
   disableBegin?: boolean;
   initialSeriesIndex?: number;
+  /** The language to run the instrument in, leaving the interface language alone. Defaults to the interface language. */
+  language?: Language;
   NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: InstrumentSubmitHandler<'SERIES'>;
   /** A localizable label for each constituent form's submit button. */
@@ -44,6 +48,7 @@ export const SeriesInstrumentRenderer = ({
   className,
   disableBegin,
   initialSeriesIndex,
+  language,
   NavigationBlocker,
   onSubmit,
   submitButtonLabel,
@@ -66,8 +71,13 @@ export const SeriesInstrumentRenderer = ({
   const scalarBundle = target.items[currentItemIndex]?.bundle;
   const scalarId = target.items[currentItemIndex]?.id;
 
-  const rootState = useInterpretedInstrument<UnilingualSeriesInstrument>(target.bundle);
-  const scalarState = useInterpretedInstrument<AnyUnilingualScalarInstrument>(scalarBundle ?? '');
+  const [contentLanguage, changeContentLanguage] = useInstrumentLanguage(language);
+  const rootState = useInterpretedInstrument<UnilingualSeriesInstrument>(target.bundle, undefined, contentLanguage);
+  const scalarState = useInterpretedInstrument<AnyUnilingualScalarInstrument>(
+    scalarBundle ?? '',
+    undefined,
+    contentLanguage
+  );
 
   const [isInstrumentInProgress, setIsInstrumentInProgress] = useState(false);
   const [completion, setCompletion] = useState<null | { itemName?: string; terminated: boolean }>(null);
@@ -213,6 +223,8 @@ export const SeriesInstrumentRenderer = ({
                       <InteractiveContent
                         bundle={scalarBundle!}
                         key={currentItemIndex}
+                        language={contentLanguage}
+                        onChangeLanguage={changeContentLanguage}
                         onSubmit={createSubmitHandler(instrument)}
                       />
                     ))

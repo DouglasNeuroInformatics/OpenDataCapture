@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 
+import type { Language } from '@opendatacapture/schemas/core';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -7,19 +8,28 @@ import { Route } from '@/routes/_app/instruments/accessible-instruments';
 
 import '@/services/i18n';
 
-type InstrumentInfoStub = { details: { title: string }; id: string; kind: 'FILE' | 'FORM' };
+type InstrumentInfoStub = {
+  details: { title: string };
+  id: string;
+  /** A file instrument needs neither, so the stubs that stand in for one carry neither. */
+  internal?: { edition: number; name: string };
+  kind: 'FILE' | 'FORM';
+  supportedLanguages?: string[];
+};
 
 type MockState = {
+  activeLanguages: string[];
   instrumentInfo: InstrumentInfoStub[] | undefined;
   store: { currentGroup: null | { accessibleInstrumentIds: string[] } };
 };
 
 const mocks = vi.hoisted(() => {
   const state: MockState = {
+    activeLanguages: ['en', 'fr', 'es'],
     instrumentInfo: undefined,
     store: { currentGroup: null }
   };
-  return { ...state, navigate: vi.fn() };
+  return { ...state, navigate: vi.fn(), showcaseProps: vi.fn() };
 });
 
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
@@ -27,26 +37,32 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
   createFileRoute: () => (options: { component: FC }) => ({ options }),
   useNavigate: () => mocks.navigate
 }));
+// The real showcase owns the per-card language dropdown; this stub reports the languages it was
+// given and hands one back, which is all this route is responsible for.
 vi.mock('@/components/InstrumentShowcase', () => ({
-  InstrumentShowcase: ({
-    data,
-    onSelect
-  }: {
+  InstrumentShowcase: (props: {
+    allowedLanguages?: readonly Language[];
     data: InstrumentInfoStub[];
-    onSelect: (info: InstrumentInfoStub) => void;
-  }) => (
-    <div data-testid="instrument-search-bar">
-      <input />
-      {data.map((instrument) => (
-        <button key={instrument.id} type="button" onClick={() => onSelect(instrument)}>
-          {instrument.details.title}
-        </button>
-      ))}
-    </div>
-  )
+    onSelect: (info: InstrumentInfoStub, language?: Language) => void;
+  }) => {
+    mocks.showcaseProps(props);
+    return (
+      <div data-testid="instrument-search-bar">
+        <input />
+        {props.data.map((instrument) => (
+          <button key={instrument.id} type="button" onClick={() => props.onSelect(instrument, 'fr')}>
+            {instrument.details.title}
+          </button>
+        ))}
+      </div>
+    );
+  }
 }));
 vi.mock('@/hooks/useInstrumentInfoQuery', () => ({
   useInstrumentInfoQuery: () => ({ data: mocks.instrumentInfo })
+}));
+vi.mock('@/hooks/useSetupStateQuery', () => ({
+  useSetupStateQuery: () => ({ data: { activeLanguages: mocks.activeLanguages } })
 }));
 vi.mock('@/store', () => ({
   useAppStore: (selector: (store: typeof mocks.store) => unknown) => selector(mocks.store)
@@ -54,11 +70,24 @@ vi.mock('@/store', () => ({
 
 const AccessibleInstrumentsPage = Route.options.component!;
 
-const allowed: InstrumentInfoStub = { details: { title: 'Allowed' }, id: 'instrument-1', kind: 'FORM' };
-const excluded: InstrumentInfoStub = { details: { title: 'Excluded' }, id: 'instrument-2', kind: 'FORM' };
+const allowed: InstrumentInfoStub = {
+  details: { title: 'Allowed' },
+  id: 'instrument-1',
+  internal: { edition: 1, name: 'Allowed' },
+  kind: 'FORM',
+  supportedLanguages: ['en', 'fr']
+};
+const excluded: InstrumentInfoStub = {
+  details: { title: 'Excluded' },
+  id: 'instrument-2',
+  internal: { edition: 1, name: 'Excluded' },
+  kind: 'FORM',
+  supportedLanguages: ['en']
+};
 
 describe('Route', () => {
   beforeEach(() => {
+    mocks.activeLanguages = ['en', 'fr', 'es'];
     mocks.instrumentInfo = [allowed, excluded];
     mocks.store.currentGroup = { accessibleInstrumentIds: ['instrument-1'] };
   });
@@ -99,11 +128,18 @@ describe('Route', () => {
     expect(document.activeElement).toBe(screen.getByRole('textbox'));
   });
 
-  it('should open the selected instrument, passing its info along to avoid refetching it', () => {
+  it('should offer the showcase only the languages the instance has active', () => {
+    mocks.activeLanguages = ['en', 'fr'];
+    render(<AccessibleInstrumentsPage />);
+    expect(mocks.showcaseProps).toHaveBeenCalledWith(expect.objectContaining({ allowedLanguages: ['en', 'fr'] }));
+  });
+
+  it('should open the instrument in the language its card was left on, with no further step', () => {
     render(<AccessibleInstrumentsPage />);
     fireEvent.click(screen.getByRole('button', { name: 'Allowed' }));
     expect(mocks.navigate).toHaveBeenCalledWith({
       params: { id: 'instrument-1' },
+      search: { language: 'fr' },
       state: { info: allowed },
       to: '/instruments/render/$id'
     });

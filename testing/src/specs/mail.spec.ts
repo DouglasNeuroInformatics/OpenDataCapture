@@ -97,5 +97,24 @@ test.describe('mail delivery', () => {
       expect(entry?.metadata?.recipient).toBe('p***@example.org');
       expect(JSON.stringify(entries)).not.toContain(recipient);
     });
+
+    // A failed delivery still returns the rendered message, so the link it carried can be read back.
+    test('should email the link in the language the assignment was created in, whatever the email language', async ({
+      api
+    }) => {
+      const group = await api.createGroup();
+      const assignment = await api.createAssignment({
+        expiresAt: new Date(Date.now() + 86_400_000),
+        groupId: group.id,
+        instrumentId: await api.findInstrumentId('FORM'),
+        language: 'fr',
+        subjectId: await api.createSubject(group.id)
+      });
+      expect(assignment.url).toMatch(/\?lang=fr$/);
+
+      const result = await api.sendAssignmentEmail(assignment.id, { language: 'en', recipient: 'p@example.org' });
+      expect(result.message).toContain(assignment.url);
+      expect(result.message).not.toContain('lang=en');
+    });
   });
 });

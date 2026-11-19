@@ -15,12 +15,15 @@ import type {
   BulkAssignmentIssue,
   BulkAssignmentPreflightResult
 } from '@opendatacapture/schemas/assignment';
+import type { Language } from '@opendatacapture/schemas/core';
 
 import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery, forcedAppSubject } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
 import { GatewayService } from '@/gateway/gateway.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
+
+import { withLinkLanguage } from './assignments.utils';
 
 /**
  * How many assignments a batch prepares at once. Key generation is CPU-bound, so an unbounded
@@ -76,7 +79,7 @@ export class AssignmentsService {
   }
 
   async create(
-    { expiresAt, groupId, instrumentId, redirectUrl, subjectId }: $CreateAssignmentData,
+    { expiresAt, groupId, instrumentId, language, redirectUrl, subjectId }: $CreateAssignmentData,
     currentUser: RequestUser
   ): Promise<Assignment> {
     if (groupId) {
@@ -96,6 +99,7 @@ export class AssignmentsService {
       expiresAt,
       groupId,
       instrumentId,
+      language,
       redirectUrl,
       subjectId
     });
@@ -350,17 +354,20 @@ export class AssignmentsService {
     expiresAt,
     groupId,
     instrumentId,
+    language,
     redirectUrl,
     subjectId
   }: {
     expiresAt: Date;
     groupId?: null | string;
     instrumentId: string;
+    language?: Language;
     redirectUrl?: string;
     subjectId: string;
   }): Promise<{ assignment: Assignment; publicKey: webcrypto.CryptoKey }> {
     const { privateKey, publicKey } = await HybridCrypto.generateKeyPair();
     const id = crypto.randomUUID();
+    const link = `${this.assignmentBaseUrl}/assignments/${id}`;
     const assignment = await this.assignmentModel.create({
       data: {
         encryptionKeyPair: {
@@ -374,7 +381,7 @@ export class AssignmentsService {
         redirectUrl,
         status: 'OUTSTANDING',
         subject: { connect: { id: subjectId } },
-        url: `${this.assignmentBaseUrl}/assignments/${id}`
+        url: language ? withLinkLanguage(link, language) : link
       }
     });
     return { assignment, publicKey };

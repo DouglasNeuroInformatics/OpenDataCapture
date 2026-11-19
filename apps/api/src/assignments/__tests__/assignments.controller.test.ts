@@ -241,6 +241,16 @@ describe('AssignmentsController', () => {
       });
     });
 
+    it('keeps the language the assignment was created in, so the emailed link matches the copied one', async () => {
+      assignmentsService.findById.mockResolvedValueOnce({ ...assignment, url: `${assignment.url}?lang=en` });
+      groupsService.findById.mockResolvedValueOnce({ emailTemplates: [] });
+      await sendEmail({ language: 'fr', recipient: 'p@x.org' });
+      expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
+        language: 'fr',
+        links: [{ url: `${assignment.url}?lang=en` }]
+      });
+    });
+
     // Every admin reads the audit log, so it records the domain the link went to, not the address.
     it('records who sent what to which masked address, with the outcome, in the audit entry', async () => {
       assignmentsService.findById.mockResolvedValueOnce(assignment);

@@ -1,7 +1,7 @@
 import { $Uint8ArrayLike } from '@douglasneuroinformatics/libjs';
 import { z } from 'zod/v4';
 
-import { $BaseModel, $DateLike, $Json } from '../core/core.js';
+import { $BaseModel, $DateLike, $Json, $Language } from '../core/core.js';
 import { $InstrumentBundleContainer } from '../instrument/instrument.base.js';
 const $AssignmentStatus = z.enum(['CANCELED', 'COMPLETE', 'EXPIRED', 'OUTSTANDING']);
 
@@ -68,6 +68,8 @@ const $CreateAssignmentData = z.object({
   expiresAt: $FutureDate,
   groupId: z.string().nullish(),
   instrumentId: z.string(),
+  /** The language the link opens the gateway in; without one the gateway picks its own. */
+  language: $Language.optional(),
   redirectUrl: $AssignmentRedirectUrl.optional(),
   subjectId: z.string()
 });

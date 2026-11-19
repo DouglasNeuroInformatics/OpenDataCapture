@@ -1,12 +1,15 @@
 import React from 'react';
 
-import { Card, Heading, Tooltip } from '@douglasneuroinformatics/libui/components';
+import { Card, Heading, Label, Tooltip } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { licenses } from '@opendatacapture/licenses';
 import { InstrumentIcon } from '@opendatacapture/react-core';
+import type { Language } from '@opendatacapture/schemas/core';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { BadgeAlertIcon, BadgeCheckIcon } from 'lucide-react';
+
+import { LanguageSelect } from '../LanguageSelect';
 
 type BaseCardItem = { label: string; tooltip?: React.ReactNode };
 
@@ -19,11 +22,29 @@ type CardItem = LinkCardItem | TextCardItem;
 type InstrumentCardProps = {
   highlighted?: boolean;
   instrument: TranslatedInstrumentInfo;
+  /** The language the card will be opened in, where the card offers a choice of them. */
+  language?: Language;
+  /** The languages to offer; the dropdown replaces the static list only when there are two or more. */
+  languageOptions?: Language[];
   onClick: () => void;
+  onLanguageChange?: (language: Language) => void;
 };
 
-export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentCardProps) => {
+export const InstrumentCard = ({
+  highlighted,
+  instrument,
+  language,
+  languageOptions,
+  onClick,
+  onLanguageChange
+}: InstrumentCardProps) => {
   const { t } = useTranslation();
+
+  // Narrowed once, so the dropdown's own props need no assertions.
+  const languageSelect =
+    language && onLanguageChange && languageOptions && languageOptions.length > 1
+      ? { onLanguageChange, options: languageOptions, value: language }
+      : null;
 
   const license = licenses.get(instrument.details.license);
 
@@ -62,16 +83,18 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
         es: 'Idiomas',
         fr: 'Langues'
       }),
-      text: instrument.supportedLanguages
-        .map((language) => {
-          switch (language) {
-            case 'en':
-              return 'English';
-            case 'fr':
-              return 'Français';
-          }
-        })
-        .join(', ')
+      text: languageSelect
+        ? undefined
+        : instrument.supportedLanguages
+            .map((supported) => {
+              switch (supported) {
+                case 'en':
+                  return 'English';
+                case 'fr':
+                  return 'Français';
+              }
+            })
+            .join(', ')
     },
     {
       kind: 'text',
@@ -178,6 +201,22 @@ export const InstrumentCard = ({ highlighted, instrument, onClick }: InstrumentC
               </div>
             );
           })}
+          {languageSelect && (
+            <div className="flex items-center gap-2 pt-0.5">
+              <Label htmlFor={`instrument-language-${instrument.id}`}>{t('core.language')}</Label>
+              <LanguageSelect
+                data-testid={`instrument-language-${instrument.id}`}
+                id={`instrument-language-${instrument.id}`}
+                options={languageSelect.options}
+                value={languageSelect.value}
+                onChange={languageSelect.onLanguageChange}
+                // The card opens the instrument when clicked, and the showcase opens the highlighted
+                // one on Enter; choosing a language must do neither.
+                onClick={(event) => event.stopPropagation()}
+                onKeyDown={(event) => event.stopPropagation()}
+              />
+            </div>
+          )}
         </div>
       </div>
     </Card>

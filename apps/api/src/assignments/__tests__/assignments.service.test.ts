@@ -388,6 +388,12 @@ describe('AssignmentsService', () => {
       expect(url).toBe(`http://localhost:3500/assignments/${id}`);
     });
 
+    it('should open the participant link in the language chosen for the assignment', async () => {
+      await assignmentsService.create({ ...data(), language: 'fr' }, permissiveUser());
+      const { id, url } = assignmentModel.create.mock.lastCall?.[0].data ?? {};
+      expect(url).toBe(`http://localhost:3500/assignments/${id}?lang=fr`);
+    });
+
     it('should point the participant link at the gateway site address in production', async () => {
       await compile({
         get: (key) => (key === 'NODE_ENV' ? 'production' : undefined),

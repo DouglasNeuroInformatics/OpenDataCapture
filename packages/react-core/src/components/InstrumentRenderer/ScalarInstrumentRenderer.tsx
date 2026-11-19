@@ -6,9 +6,11 @@ import { Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
 import type { AnyScalarInstrument, AnyUnilingualScalarInstrument, Json } from '@opendatacapture/runtime-core';
+import type { Language } from '@opendatacapture/schemas/core';
 import type { ScalarInstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
 import { match } from 'ts-pattern';
 
+import { useInstrumentLanguage } from '../../hooks/useInstrumentLanguage';
 import { useInterpretedInstrument } from '../../hooks/useInterpretedInstrument';
 import { FileInstrumentContent } from '../FileInstrumentContent';
 import { FormContent } from '../FormContent';
@@ -31,6 +33,8 @@ export type ScalarInstrumentRendererProps = {
   disableBegin?: boolean;
   /** Whether to disable copy, download, print in the final summary */
   disableSummaryActions?: boolean;
+  /** The language to run the instrument in, leaving the interface language alone. Defaults to the interface language. */
+  language?: Language;
   NavigationBlocker?: NavigationBlockerComponent;
   /** @deprecated */
   onCompileError?: (error: Error) => void;
@@ -48,6 +52,7 @@ export const ScalarInstrumentRenderer = ({
   className,
   disableBegin,
   disableSummaryActions,
+  language,
   NavigationBlocker,
   onCompileError,
   onSubmit,
@@ -57,7 +62,8 @@ export const ScalarInstrumentRenderer = ({
   target
 }: ScalarInstrumentRendererProps) => {
   const [data, setData] = useState<unknown>();
-  const interpreted = useInterpretedInstrument<AnyUnilingualScalarInstrument>(target.bundle, options);
+  const [contentLanguage, changeContentLanguage] = useInstrumentLanguage(language);
+  const interpreted = useInterpretedInstrument<AnyUnilingualScalarInstrument>(target.bundle, options, contentLanguage);
   const [index, setIndex] = useState<0 | 1 | 2>(0);
   const { t } = useTranslation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
@@ -136,7 +142,9 @@ export const ScalarInstrumentRenderer = ({
                 enableLanguageLock={instrument.content.enableLanguageLock}
                 enableLanguageSelect={instrument.content.enableLanguageSelect}
                 enableLanguageToggle={instrument.content.enableLanguageToggle}
+                language={contentLanguage}
                 supportedLanguages={instrument.supportedLanguages}
+                onChangeLanguage={changeContentLanguage}
                 onSubmit={createSubmitHandler(instrument)}
               />
             ))
