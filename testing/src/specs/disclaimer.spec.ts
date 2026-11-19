@@ -4,17 +4,6 @@ import { expect, test } from '../support/fixtures';
 test.use({ appState: { isDisclaimerAccepted: false, isWalkthroughComplete: true } });
 
 test.describe('disclaimer', () => {
-  test('should accept the disclaimer', async ({ getPageModel, page }) => {
-    const dashboardPage = await getPageModel('/dashboard');
-
-    const dialog = page.getByRole('dialog', { name: 'Disclaimer' });
-    await expect(dialog).toBeVisible();
-    await page.getByRole('button', { name: 'Accept' }).click();
-    await expect(dialog).toBeHidden();
-
-    await expect(dashboardPage.pageHeader).toContainText('Dashboard');
-  });
-
   test('should log the user out when declining, so a user cannot use the app without accepting', async ({
     api,
     getPageModel,

@@ -37,10 +37,6 @@ export class ContactPage extends AppPage {
     });
   }
 
-  async getCapturedMailtoLink(): Promise<string | undefined> {
-    return this.$ref.evaluate(() => window.__capturedMailto);
-  }
-
   async selectReason(reason: string): Promise<void> {
     await this.reasonField.click();
     await this.$ref.getByRole('option', { name: reason }).click();

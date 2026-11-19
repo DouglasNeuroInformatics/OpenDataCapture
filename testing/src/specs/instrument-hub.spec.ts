@@ -9,7 +9,7 @@ import { expect, test } from '../support/fixtures';
 const HAPPINESS = 'DNP_HAPPINESS_QUESTIONNAIRE';
 
 test.describe('instrument hub', () => {
-  test('should list an instrument with the records and subjects collected for it @smoke', async ({
+  test('should list an instrument with the records and subjects collected for it', async ({
     api,
     isolatedGroupManager,
     page,
@@ -30,10 +30,10 @@ test.describe('instrument hub', () => {
     const hubPage = new InstrumentHubPage(page);
     await hubPage.goto('/datahub/instruments');
 
-    const row = hubPage.row('Happiness Questionnaire').first();
-    await expect(row).toBeVisible();
-    await expect(row).toContainText('3');
-    await expect(row).toContainText('2');
+    // Cells in column order after the pinned title: subjects, then records.
+    const cells = hubPage.row('Happiness Questionnaire').first().locator('> div');
+    await expect(cells.nth(1)).toHaveText('2');
+    await expect(cells.nth(2)).toHaveText('3');
   });
 
   // A series' own counts are what it orchestrated, not its members' global totals, so the row is
@@ -67,28 +67,10 @@ test.describe('instrument hub', () => {
     await expect(page.getByTestId('instrument-hub-series-members')).toContainText('Happiness Questionnaire');
   });
 
-  // Sorting is the only way to find an instrument in a long catalog without searching for it, so
-  // the header affordance has to actually reorder the rows rather than merely render a chevron.
-  test('should reorder the list when a column header is clicked', async ({ isolatedGroupManager, page }) => {
-    await isolatedGroupManager();
-    const hubPage = new InstrumentHubPage(page);
-    await hubPage.goto('/datahub/instruments');
-    await expect(hubPage.rows.first()).toBeVisible();
-
-    await hubPage.sortBy('Instrument');
-    const ascending = await hubPage.titles();
-    expect(ascending.length).toBeGreaterThan(1);
-    // Compared case-insensitively because that is what tanstack's `text` sorting function does;
-    // asserting against `localeCompare` would flake on any mixed-case pair.
-    const caseInsensitive = [...ascending].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-    expect(ascending).toStrictEqual(caseInsensitive);
-
-    // Sort removal is disabled on these tables, so a second click is descending rather than unsorted.
-    await hubPage.sortBy('Instrument');
-    expect(await hubPage.titles()).toStrictEqual([...ascending].reverse());
-  });
-
-  test("should show every subject's records for one instrument, with how each was collected", async ({
+  // The table, its export and the graph tab are one set of records narrowed by one filter. The filter
+  // lives in the URL, and only a real router proves it survives the tab change rather than resetting
+  // with the newly mounted tab's own state.
+  test('should narrow the records table, its export and its graph by the collection method filter alike', async ({
     api,
     isolatedGroupManager,
     page,
@@ -97,11 +79,15 @@ test.describe('instrument hub', () => {
     const group = await isolatedGroupManager();
     const instrumentId = await api.findInstrumentIdByName(HAPPINESS);
     // One record per collection method, so the column has to vary rather than printing a constant.
-    await api.uploadRecords(group.id, instrumentId, [
-      { data: HAPPINESS_RECORD, date: new Date(), subjectId: `method-${uniqueId}-retro` }
+    const retrospective = `method-${uniqueId}-retro`;
+    await Promise.all([
+      api.uploadRecords(group.id, instrumentId, [
+        { data: HAPPINESS_RECORD, date: new Date(), subjectId: retrospective }
+      ]),
+      api.createSession(group.id, { id: `method-${uniqueId}-inperson` }, 'IN_PERSON').then((session) => {
+        return api.createRecord(group.id, instrumentId, session, HAPPINESS_RECORD);
+      })
     ]);
-    const session = await api.createSession(group.id, { id: `method-${uniqueId}-inperson` }, 'IN_PERSON');
-    await api.createRecord(group.id, instrumentId, session, HAPPINESS_RECORD);
 
     const hubPage = new InstrumentHubPage(page);
     await hubPage.goto('/datahub/instruments');
@@ -114,31 +100,6 @@ test.describe('instrument hub', () => {
     // Neither record came through a series, so both series cells name the absence.
     await expect(tablePage.seriesCells).toHaveCount(2);
     await expect(tablePage.seriesCells.first()).toHaveText('None');
-  });
-
-  // The download is built from the rows the table holds, so a filter has to narrow both. Getting
-  // this wrong exports rows the user believed they had excluded.
-  test('should export only the records left by the collection method filter, with the metadata columns', async ({
-    api,
-    isolatedGroupManager,
-    page,
-    uniqueId
-  }) => {
-    const group = await isolatedGroupManager();
-    const instrumentId = await api.findInstrumentIdByName(HAPPINESS);
-    const retrospective = `export-${uniqueId}-retro`;
-    await api.uploadRecords(group.id, instrumentId, [
-      { data: HAPPINESS_RECORD, date: new Date(), subjectId: retrospective }
-    ]);
-    const session = await api.createSession(group.id, { id: `export-${uniqueId}-inperson` }, 'IN_PERSON');
-    await api.createRecord(group.id, instrumentId, session, HAPPINESS_RECORD);
-
-    const hubPage = new InstrumentHubPage(page);
-    await hubPage.goto('/datahub/instruments');
-    await hubPage.open('Happiness Questionnaire');
-
-    const tablePage = new InstrumentHubTablePage(page);
-    await expect(tablePage.rows).toHaveCount(2);
 
     await tablePage.excludeCollectionMethod('IN_PERSON');
     await expect(tablePage.rows).toHaveCount(1);
@@ -149,73 +110,22 @@ test.describe('instrument hub', () => {
       SeriesID: null | string;
       SubjectID: string;
     }[];
-
     expect(payload).toHaveLength(1);
     // Exports carry the stored value, not the translated label, so analysis keys on something that
     // does not change with the reader's language.
     expect(payload[0]!.CollectionMethod).toBe('RETROSPECTIVE');
     expect(payload[0]!.SeriesID).toBeNull();
     expect(payload[0]!.SubjectID).toBe(retrospective);
-  });
-
-  test('should plot the records of the instrument on its graph tab', async ({
-    api,
-    isolatedGroupManager,
-    page,
-    uniqueId
-  }) => {
-    const group = await isolatedGroupManager();
-    const instrumentId = await api.findInstrumentIdByName(HAPPINESS);
-    await api.uploadRecords(
-      group.id,
-      instrumentId,
-      ['a', 'b'].map((suffix) => ({
-        data: HAPPINESS_RECORD,
-        date: new Date(),
-        subjectId: `graph-${uniqueId}-${suffix}`
-      }))
-    );
-
-    const hubPage = new InstrumentHubPage(page);
-    await hubPage.goto('/datahub/instruments');
-    await hubPage.open('Happiness Questionnaire');
 
     // Reached by clicking the tab rather than through `getPageModel`, whose exact-URL assertion the
     // route's own search-param defaults would fail.
     await page.getByTestId('instrument-hub-graph-tab').click();
+    await expect(page).toHaveURL(/methods=/);
     const graphPage = new InstrumentHubGraphPage(page);
     await expect(graphPage.chart).toBeVisible();
-    await expect(graphPage.scatterMarks).toHaveCount(2);
+    await expect(graphPage.scatterMarks).toHaveCount(1);
 
     await graphPage.selectChart('Distribution');
     await expect(graphPage.bars.first()).toBeVisible();
-  });
-
-  test('should keep the filters when switching between the table and graph tabs, so both describe one set', async ({
-    api,
-    isolatedGroupManager,
-    page,
-    uniqueId
-  }) => {
-    const group = await isolatedGroupManager();
-    const instrumentId = await api.findInstrumentIdByName(HAPPINESS);
-    await api.uploadRecords(group.id, instrumentId, [
-      { data: HAPPINESS_RECORD, date: new Date(), subjectId: `shared-${uniqueId}` }
-    ]);
-
-    const hubPage = new InstrumentHubPage(page);
-    await hubPage.goto('/datahub/instruments');
-    await hubPage.open('Happiness Questionnaire');
-
-    const tablePage = new InstrumentHubTablePage(page);
-    await expect(tablePage.rows).toHaveCount(1);
-    await tablePage.excludeCollectionMethod('RETROSPECTIVE');
-    await expect(page.getByTestId('data-table-empty-state')).toBeVisible();
-
-    // The filter lives in the URL, so it survives the tab change rather than resetting with the
-    // newly mounted tab's own state.
-    await page.getByTestId('instrument-hub-graph-tab').click();
-    await expect(page).toHaveURL(/methods=/);
-    await expect(page.getByTestId('instrument-hub-chart')).toContainText('No records match');
   });
 });

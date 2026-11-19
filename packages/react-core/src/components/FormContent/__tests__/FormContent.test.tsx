@@ -89,6 +89,59 @@ describe('FormContent', () => {
     expect(screen.getByRole('button', { name: 'Reset' })).toBeTruthy();
   });
 
+  it('should offer no reset button to an instrument that does not declare one', () => {
+    renderFormContent();
+    expect(screen.queryByRole('button', { name: 'Reset' })).toBeNull();
+  });
+
+  describe('with a reset button', () => {
+    const resettable: AnyUnilingualFormInstrument = {
+      ...instrument,
+      content: {
+        favoriteNumber: { kind: 'number', label: 'Favorite Number', variant: 'input' },
+        maritalStatus: {
+          kind: 'string',
+          label: 'Marital Status',
+          options: { married: 'Married', single: 'Single' },
+          variant: 'select'
+        }
+      },
+      resetButton: true,
+      validationSchema: z.object({ favoriteNumber: z.number(), maritalStatus: z.enum(['married', 'single']) })
+    };
+
+    const getMaritalStatus = () => document.querySelector<HTMLSelectElement>('select[name="maritalStatus"]')!;
+
+    const answer = (favoriteNumber: string, maritalStatus: string) => {
+      fireEvent.change(screen.getByLabelText('Favorite Number'), { target: { value: favoriteNumber } });
+      fireEvent.change(getMaritalStatus(), { target: { value: maritalStatus } });
+    };
+
+    it('should clear every answer, not only the validation errors, when the reset button is clicked', async () => {
+      renderFormContent({ instrument: resettable });
+      answer('7', 'married');
+      await waitFor(() => {
+        expect(getMaritalStatus().value).toBe('married');
+      });
+      fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+      await waitFor(() => {
+        expect(screen.getByLabelText<HTMLInputElement>('Favorite Number').value).toBe('');
+      });
+      expect(getMaritalStatus().value).toBe('');
+    });
+
+    it('should submit the answers given after a reset', async () => {
+      const onSubmit = renderFormContent({ instrument: resettable });
+      answer('7', 'married');
+      fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+      answer('3', 'single');
+      fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledWith({ data: { favoriteNumber: 3, maritalStatus: 'single' }, kind: 'FORM' });
+      });
+    });
+  });
+
   it('should submit the validated answers tagged as form data', async () => {
     const onSubmit = renderFormContent();
     fireEvent.change(screen.getByLabelText('Favorite Number'), { target: { value: '7' } });

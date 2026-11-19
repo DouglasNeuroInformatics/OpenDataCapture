@@ -74,6 +74,16 @@ describe('build', () => {
       expect(js).toContain('/runtime/v1/react@19.x/jsx-runtime');
     });
 
+    it('should embed an image whose extension is upper case as a data URL, so a stimulus named like a camera file loads', async () => {
+      const bytes = new Uint8Array([137, 80, 78, 71]);
+      const inputs = [
+        { content: `import stim from './stim.PNG';\nexport default { content: stim };`, name: 'index.ts' },
+        { content: bytes, name: 'stim.PNG' }
+      ];
+      const { js } = await build({ inputs });
+      expect(js).toContain(`data:image/png;base64,${Buffer.from(bytes).toString('base64')}`);
+    });
+
     it('should refuse to guess when the source imports two versions of react', async () => {
       const inputs = [
         { content: `import '/runtime/v1/react@18.x';\nimport '/runtime/v1/react@19.x';`, name: 'index.tsx' }

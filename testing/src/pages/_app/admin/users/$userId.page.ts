@@ -6,30 +6,16 @@ import { AppPage } from '../../route.page';
 
 export class AdminUserPage extends AppPage {
   readonly addPermissionRow: Locator;
-  readonly adminNotice: Locator;
-  readonly backLink: Locator;
-  readonly chosenPermissionSetRules: Locator;
-  readonly discardCustomGrantsWarning: Locator;
-  readonly manageAllWarning: Locator;
   readonly permissionRows: Locator;
-  readonly permissionSourceTabs: Locator;
-  readonly permissionsTable: Locator;
   readonly profileForm: Locator;
   readonly submitError: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.backLink = page.getByTestId('admin-user-back');
     this.profileForm = page.getByTestId('update-user-form');
     this.submitError = page.getByTestId('admin-user-edit-error');
-    this.permissionsTable = page.getByTestId('user-permissions-table');
     this.permissionRows = page.getByTestId('user-permission-row');
     this.addPermissionRow = page.getByTestId('add-permission-row').last();
-    this.adminNotice = page.getByTestId('user-permissions-admin-notice');
-    this.manageAllWarning = page.getByTestId('manage-all-warning');
-    this.permissionSourceTabs = page.getByTestId('user-permissions-source');
-    this.chosenPermissionSetRules = page.getByTestId('permission-set-chosen').getByTestId('permission-set-rule-row');
-    this.discardCustomGrantsWarning = page.getByTestId('user-permissions-discard-warning');
   }
 
   /**
@@ -48,16 +34,6 @@ export class AdminUserPage extends AppPage {
     await this.addPermissionRow.getByRole('button', { name: 'Add Permission' }).click();
   }
 
-  /** The items render in a portal outside the card, so they are found on the page. */
-  async choosePermissionSet(permissionSetId: string) {
-    await this.$ref.getByTestId('permission-set-select-trigger').click();
-    await this.$ref.getByTestId(`permission-set-select-item-${permissionSetId}`).click();
-  }
-
-  async choosePermissionSource(source: 'custom' | 'permissionSet') {
-    await this.$ref.getByTestId(`user-permissions-source-${source}`).click();
-  }
-
   async removePermission(index: number) {
     await this.permissionRows.nth(index).getByTestId('user-permission-remove').click();
   }
@@ -71,9 +47,5 @@ export class AdminUserPage extends AppPage {
   async selectPermissionOption(field: 'action' | 'scope' | 'subject', value: string) {
     await this.addPermissionRow.getByTestId(`${field}-select-trigger`).click();
     await this.$ref.getByTestId(`${field}-select-item-${value}`).click();
-  }
-
-  async submitPermission() {
-    await this.saveProfile();
   }
 }

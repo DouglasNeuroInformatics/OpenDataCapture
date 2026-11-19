@@ -1,5 +1,6 @@
-import { cleanup, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import { act, cleanup, renderHook } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useNavItems } from '../useNavItems';
 
@@ -221,6 +222,32 @@ describe('useNavItems', () => {
     ]);
   });
 
+  describe('in Spanish', () => {
+    beforeEach(() => {
+      act(() => i18n.changeLanguage('es'));
+    });
+
+    afterEach(() => {
+      act(() => i18n.changeLanguage('en'));
+    });
+
+    // The admin nav is written as inline `t()` strings rather than namespace keys, where a missing
+    // Spanish entry would render in English without any error.
+    it('should name the admin panel, its groups and its pages in Spanish', () => {
+      const panel = renderHook(() => useNavItems())
+        .result.current.flat()
+        .find((item) => item.label === 'Panel de administración');
+      expect(panel?.children?.map((child) => child.label)).toStrictEqual([
+        'Registros de auditoría',
+        'Acceso',
+        'Instrumentos',
+        'Instancia'
+      ]);
+      const instance = panel?.children?.find((child) => child.label === 'Instancia');
+      expect(instance?.children?.find((child) => child.url === '/admin/settings')?.label).toBe('Configuración');
+    });
+  });
+
   // The audit logs record activity on every entity, not only access changes, so they sit beside the
   // groups rather than inside one, one click from the panel.
   it('should link the audit logs directly from the admin panel rather than from inside a group', () => {
@@ -235,6 +262,26 @@ describe('useNavItems', () => {
       '/admin/groups',
       '/admin/users',
       '/admin/permission-sets'
+    ]);
+  });
+
+  // Both views of the instruments page are one route told apart by its search, so each link has to
+  // carry its view or both would open the same table.
+  it('should gather the instrument views and the repositories under instruments', () => {
+    const instruments = adminPanel()?.children?.find((child) => child.label === 'Instruments');
+    expect(instruments?.children?.map(({ search, url }) => ({ search, url }))).toStrictEqual([
+      { search: { view: 'forms' }, url: '/admin/instruments' },
+      { search: { view: 'series' }, url: '/admin/instruments' },
+      { search: undefined, url: '/admin/instrument-repos' }
+    ]);
+  });
+
+  it('should gather the instance-wide configuration pages under instance', () => {
+    const instance = adminPanel()?.children?.find((child) => child.label === 'Instance');
+    expect(instance?.children?.map((child) => child.url)).toStrictEqual([
+      '/admin/settings',
+      '/admin/branding',
+      '/admin/mail'
     ]);
   });
 

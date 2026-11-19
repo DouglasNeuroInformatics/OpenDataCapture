@@ -35,6 +35,10 @@ function getFieldLabel(name: 'ageAtImmigration' | 'maritalStatus') {
 }
 
 describe('DNP_ENHANCED_DEMOGRAPHICS_QUESTIONNAIRE', () => {
+  it('should offer a reset button, since it is the longest form in the library', () => {
+    expect(instrument.resetButton).toBe(true);
+  });
+
   describe('options', () => {
     it('should label each option in English for an English-speaking subject', () => {
       expect(getStringField('gender').options.en).toEqual({ female: 'Woman', male: 'Man', nonBinary: 'Non-Binary' });

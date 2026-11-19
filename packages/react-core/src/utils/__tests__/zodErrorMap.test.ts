@@ -196,6 +196,12 @@ describe('createZodErrorMaps', () => {
         {},
         REQUIRED
       ],
+      [
+        'an untouched select backed by an enum, which zod reports as an invalid value',
+        z4.object({ x: z4.enum(['A', 'B']) }),
+        {},
+        REQUIRED
+      ],
       ['a decimal in an integer field', z4.number().int(), 1.5, 'Must be a whole number'],
       ['a number where text is expected', z4.string(), 1, 'Must be text'],
       ['text where a number is expected', z4.number(), 'x', 'Must be a number'],

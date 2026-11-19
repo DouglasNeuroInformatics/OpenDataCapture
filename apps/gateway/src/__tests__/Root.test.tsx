@@ -1,9 +1,10 @@
 // @vitest-environment happy-dom
 
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
+import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import type { InstrumentRendererProps, InstrumentSubmitHandler } from '@opendatacapture/react-core';
 import type { InstrumentBundleContainer } from '@opendatacapture/schemas/instrument';
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import axios from 'axios';
 import type { MockInstance } from 'vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -98,6 +99,7 @@ describe('Root', () => {
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
+    i18n.changeLanguage('en');
   });
 
   it('should reveal the page once mounted on the client, so unstyled server markup is never shown', () => {
@@ -108,6 +110,14 @@ describe('Root', () => {
   it('should render the landing page for a visitor without an assignment', () => {
     render(<Root activeLanguages={['en']} kind="landing" language="en" />);
     expect(screen.getByTestId('gateway-landing')).toBeTruthy();
+  });
+
+  it('should translate the landing page when the patient picks another language, so one who cannot read the default can follow it', async () => {
+    render(<Root activeLanguages={['en', 'fr']} kind="landing" language="en" />);
+    expect(screen.getByRole('heading').textContent).toBe('Welcome');
+    fireEvent.keyDown(screen.getByTestId('language-toggle').querySelector('button')!, { key: 'Enter' });
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Français' }));
+    expect(screen.getByRole('heading').textContent).toBe('Bienvenue');
   });
 
   it('should keep the instrument locked until the subject solves the verification challenge', () => {

@@ -69,7 +69,7 @@ export default defineConfig({
       url: `http://localhost:${playgroundPort}`
     }
   ],
-  // Playwright's own default is half the cores. That many workers log in faster than the API's login
-  // throttle allows partway through the suite, and leave a developer's machine little for anything else.
+  // Playwright's own default is half the cores. Each worker is a Chromium beside the four servers, so
+  // memory runs out long before the cores do: two workers already peak near 7 GB.
   workers: workerCount ?? (process.env.CI ? 1 : 2)
 });

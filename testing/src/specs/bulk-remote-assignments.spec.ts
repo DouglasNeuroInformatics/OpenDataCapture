@@ -1,96 +1,62 @@
-import { BULK_ASSIGNMENT_MAX_SUBJECTS } from '@opendatacapture/schemas/assignment';
 import type { Assignment, BulkAssignmentFailure } from '@opendatacapture/schemas/assignment';
+import type { APIRequestContext } from '@playwright/test';
 
 import { expect, test } from '../support/fixtures';
+
+import type { ApiClient } from '../support/api-client';
 
 /**
  * Bulk remote assignments, driven through the API rather than the UI.
  *
  * This is the tier that exercises the parts unit tests cannot: real Mongo scoping, the real gateway
- * round trip, and the all-or-nothing guarantee across both. The wizard has its own coverage.
+ * round trip, and the all-or-nothing guarantee across both. The request schemas' refusals (past
+ * expiry, subject limit, plain-http redirect) are `packages/schemas` unit tests and
+ * `apps/api/test/suites/05-assignment-redirect.suite.ts`; the wizard has its own coverage.
  */
 
 const API = '/api/v1';
 
 const futureIso = (days: number) => new Date(Date.now() + days * 86_400_000).toISOString();
 
-test.describe('bulk remote assignments', () => {
-  /**
-   * A group with its own subjects. `api.createGroup` grants the group every instrument, and each
-   * subject is linked to the group by creating a session for it — the same path the app uses.
-   */
-  const seedGroup = async (
-    { adminToken, api, apiRequestContext }: { adminToken: string; api: any; apiRequestContext: any },
-    uniqueId: string,
-    subjectCount: number
-  ) => {
-    const group = await api.createGroup({ name: `Bulk${uniqueId}` });
-    const subjectIds: string[] = [];
-    for (let index = 0; index < subjectCount; index++) {
-      const id = `bulk_${uniqueId}_${index}`;
-      const response = await apiRequestContext.post(`${API}/sessions`, {
-        data: {
-          date: new Date().toISOString(),
-          groupId: group.id,
-          subjectData: { id },
-          type: 'IN_PERSON'
-        },
-        headers: { Authorization: `Bearer ${adminToken}` }
-      });
-      expect(response.status(), await response.text()).toBe(201);
-      subjectIds.push(id);
-    }
-    return { group, subjectIds };
-  };
+/**
+ * A group with its own subjects. `api.createGroup` grants the group every instrument, and each
+ * subject is linked to the group by creating a session for it — the same path the app uses.
+ */
+const seedGroup = async (api: ApiClient, uniqueId: string, subjectCount: number) => {
+  const group = await api.createGroup({ name: `Bulk${uniqueId}` });
+  const subjectIds: string[] = [];
+  for (let index = 0; index < subjectCount; index++) {
+    const session = await api.createSession(group.id, { id: `bulk_${uniqueId}_${index}` });
+    subjectIds.push(session.subjectId);
+  }
+  return { group, subjectIds };
+};
 
-  const instrumentIdsFor = async (apiRequestContext: any, adminToken: string, count: number) => {
-    const response = await apiRequestContext.get(`${API}/instruments/info`, {
-      headers: { Authorization: `Bearer ${adminToken}` }
-    });
-    const info = (await response.json()) as { id: string; kind: string }[];
-    return info
-      .filter(({ kind }) => kind === 'FORM' || kind === 'INTERACTIVE')
-      .slice(0, count)
-      .map(({ id }) => id);
-  };
-
-  const post = (apiRequestContext: any, adminToken: string, path: string, data: unknown) => {
-    return apiRequestContext.post(`${API}${path}`, { data, headers: { Authorization: `Bearer ${adminToken}` } });
-  };
-
-  test('should send every subject of a batch on to its redirect URL, and refuse one that is not https', async ({
-    adminToken,
-    api,
-    apiRequestContext,
-    uniqueId
-  }) => {
-    const { group, subjectIds } = await seedGroup({ adminToken, api, apiRequestContext }, uniqueId, 2);
-    const [instrumentId] = await instrumentIdsFor(apiRequestContext, adminToken, 1);
-    const request = { groupId: group.id, subjectIds, timepoints: [{ expiresAt: futureIso(30), instrumentId }] };
-
-    const refused = await post(apiRequestContext, adminToken, '/assignments/bulk', {
-      ...request,
-      redirectUrl: 'http://example.com/done'
-    });
-    expect(refused.status()).toBe(400);
-
-    const redirectUrl = `https://example.com/done/${uniqueId}`;
-    const created = await post(apiRequestContext, adminToken, '/assignments/bulk', { ...request, redirectUrl });
-    expect(created.status(), await created.text()).toBe(201);
-    expect(((await created.json()) as Assignment[]).map((assignment) => assignment.redirectUrl)).toEqual([
-      redirectUrl,
-      redirectUrl
-    ]);
+const instrumentIdsFor = async (apiRequestContext: APIRequestContext, adminToken: string, count: number) => {
+  const response = await apiRequestContext.get(`${API}/instruments/info`, {
+    headers: { Authorization: `Bearer ${adminToken}` }
   });
+  const info = (await response.json()) as { id: string; kind: string }[];
+  return info
+    .filter(({ kind }) => kind === 'FORM' || kind === 'INTERACTIVE')
+    .slice(0, count)
+    .map(({ id }) => id);
+};
 
-  test('should create one assignment per subject per timepoint, and refuse a repeat as a conflict', async ({
+const post = (apiRequestContext: APIRequestContext, adminToken: string, path: string, data: unknown) => {
+  return apiRequestContext.post(`${API}${path}`, { data, headers: { Authorization: `Bearer ${adminToken}` } });
+};
+
+test.describe('bulk remote assignments', () => {
+  test('should create one assignment per subject per timepoint, each sending its subject on, and refuse a repeat as a conflict', async ({
     adminToken,
     api,
     apiRequestContext,
     uniqueId
   }) => {
-    const { group, subjectIds } = await seedGroup({ adminToken, api, apiRequestContext }, uniqueId, 2);
+    const { group, subjectIds } = await seedGroup(api, uniqueId, 2);
     const [instrumentA, instrumentB] = await instrumentIdsFor(apiRequestContext, adminToken, 2);
+    const redirectUrl = `https://example.com/done/${uniqueId}`;
     const request = {
       groupId: group.id,
       subjectIds,
@@ -104,20 +70,17 @@ test.describe('bulk remote assignments', () => {
     expect(preflight.status()).toBe(200);
     expect(await preflight.json()).toMatchObject({ assignmentCount: 4, subjectCount: 2, timepointCount: 2 });
 
-    const created = await post(apiRequestContext, adminToken, '/assignments/bulk', request);
-    expect(created.status()).toBe(201);
+    const created = await post(apiRequestContext, adminToken, '/assignments/bulk', { ...request, redirectUrl });
+    expect(created.status(), await created.text()).toBe(201);
     const assignments = (await created.json()) as Assignment[];
-    expect(assignments).toHaveLength(4);
+    expect(assignments.map((assignment) => assignment.redirectUrl)).toEqual(Array(4).fill(redirectUrl));
 
     // The private key that decrypts an assignment must never reach a client.
     expect(JSON.stringify(assignments)).not.toContain('encryptionKeyPair');
 
     // Every assignment really exists, and is scoped to this group.
     for (const subjectId of subjectIds) {
-      const response = await apiRequestContext.get(`${API}/assignments?subjectId=${subjectId}`, {
-        headers: { Authorization: `Bearer ${adminToken}` }
-      });
-      const existing = (await response.json()) as Assignment[];
+      const existing = await api.findAssignments(subjectId);
       expect(existing.filter((assignment) => assignment.groupId === group.id)).toHaveLength(2);
     }
 
@@ -142,8 +105,8 @@ test.describe('bulk remote assignments', () => {
     apiRequestContext,
     uniqueId
   }) => {
-    const { group, subjectIds } = await seedGroup({ adminToken, api, apiRequestContext }, uniqueId, 1);
-    const other = await seedGroup({ adminToken, api, apiRequestContext }, `${uniqueId}x`, 1);
+    const { group, subjectIds } = await seedGroup(api, uniqueId, 1);
+    const other = await seedGroup(api, `${uniqueId}x`, 1);
     const [instrumentId] = await instrumentIdsFor(apiRequestContext, adminToken, 1);
 
     const response = await post(apiRequestContext, adminToken, '/assignments/bulk', {
@@ -157,50 +120,6 @@ test.describe('bulk remote assignments', () => {
     expect(issue?.kind === 'SUBJECT_UNAVAILABLE' && issue.subjectIds).toEqual(other.subjectIds);
 
     // All-or-nothing: the subject that *was* eligible must not have been assigned either.
-    const assignments = await apiRequestContext.get(`${API}/assignments?subjectId=${subjectIds[0]}`, {
-      headers: { Authorization: `Bearer ${adminToken}` }
-    });
-    expect((await assignments.json()) as Assignment[]).toHaveLength(0);
-  });
-
-  test('should refuse an instrument the group has not been granted', async ({
-    adminToken,
-    api,
-    apiRequestContext,
-    uniqueId
-  }) => {
-    const { group, subjectIds } = await seedGroup({ adminToken, api, apiRequestContext }, uniqueId, 1);
-    const response = await post(apiRequestContext, adminToken, '/assignments/bulk/preflight', {
-      groupId: group.id,
-      subjectIds,
-      timepoints: [{ expiresAt: futureIso(30), instrumentId: 'not-an-instrument' }]
-    });
-    expect(response.status()).toBe(422);
-    const failure = (await response.json()) as BulkAssignmentFailure;
-    expect(failure.issues.some(({ kind }) => kind === 'INSTRUMENT_UNAVAILABLE')).toBe(true);
-  });
-
-  test('should reject an expiry in the past and a batch beyond the subject limit', async ({
-    adminToken,
-    api,
-    apiRequestContext,
-    uniqueId
-  }) => {
-    const { group, subjectIds } = await seedGroup({ adminToken, api, apiRequestContext }, uniqueId, 1);
-    const [instrumentId] = await instrumentIdsFor(apiRequestContext, adminToken, 1);
-
-    const expired = await post(apiRequestContext, adminToken, '/assignments/bulk', {
-      groupId: group.id,
-      subjectIds,
-      timepoints: [{ expiresAt: new Date(Date.now() - 86_400_000).toISOString(), instrumentId }]
-    });
-    expect(expired.status()).toBe(400);
-
-    const tooMany = await post(apiRequestContext, adminToken, '/assignments/bulk/preflight', {
-      groupId: group.id,
-      subjectIds: Array.from({ length: BULK_ASSIGNMENT_MAX_SUBJECTS + 1 }, (_, index) => `s-${index}`),
-      timepoints: [{ expiresAt: futureIso(30), instrumentId }]
-    });
-    expect(tooMany.status()).toBe(400);
+    expect(await api.findAssignments(subjectIds[0]!)).toHaveLength(0);
   });
 });

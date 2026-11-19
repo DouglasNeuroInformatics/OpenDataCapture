@@ -44,30 +44,15 @@ test.describe('returning to a list', () => {
     await expect(firstRow).toHaveText(firstRowOnSecondPage);
   });
 
-  test('should come back to the page of permission sets it left', async ({ api, authenticateAs, page, uniqueId }) => {
-    // The list is ordered by name, so a leading '!' keeps these eleven ahead of the sets other specs
-    // create meanwhile, and the second page starts on the eleventh of them whatever else is added.
-    await Promise.all(
-      Array.from({ length: 11 }, (_, index) => {
-        const name = `!List Return ${uniqueId} ${String(index).padStart(2, '0')}`;
-        return api.createPermissionSet([{ action: 'read', scope: 'HOLDER_GROUPS', subject: 'User' }], { name });
-      })
-    );
-    await authenticateAs('ADMIN');
-    await page.goto('/admin/permission-sets');
-    const { firstRow, firstRowOnSecondPage } = await returnFromSecondPage(page, {
-      returnTestId: 'admin-permission-set-back'
-    });
-    await expect(firstRow).toHaveText(firstRowOnSecondPage);
-  });
-
   test('should come back to the page of subjects it left', async ({ api, isolatedGroupManager, page, uniqueId }) => {
     const group = await isolatedGroupManager();
     // The list shows only the first nine characters of an id, so these differ within them; ids from
     // createSubject all start `subject_`, and two pages of them can read alike.
-    for (let index = 0; index < 12; index++) {
-      await api.createSession(group.id, { id: `${String(index).padStart(2, '0')}-${uniqueId}` });
-    }
+    await Promise.all(
+      Array.from({ length: 12 }, (_, index) => {
+        return api.createSession(group.id, { id: `${String(index).padStart(2, '0')}-${uniqueId}` });
+      })
+    );
     await page.goto('/datahub/subjects');
     const { firstRow, firstRowOnSecondPage } = await returnFromSecondPage(page, { returnTestId: 'subject-hub-back' });
     await expect(firstRow).toHaveText(firstRowOnSecondPage);

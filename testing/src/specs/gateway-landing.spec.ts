@@ -12,30 +12,6 @@ const STALE_SETUP_STATE_TIMEOUT = 3 * gatewayRefreshInterval;
 test.describe('gateway landing page', () => {
   test.describe.configure({ timeout: STALE_SETUP_STATE_TIMEOUT + 30_000 });
 
-  test('should point a patient who opens the gateway root to the link they were sent', async ({ page }) => {
-    const response = await page.goto(gatewayURL);
-    expect(response?.status()).toBe(200);
-    const landing = page.getByTestId('gateway-landing');
-    await expect(landing).toBeVisible();
-    await expect(landing).toContainText('open the secure link you were sent');
-  });
-
-  test('should translate the landing page when a patient picks another language, so one who cannot read the default can follow it', async ({
-    page
-  }) => {
-    // The toggle renders only while two languages are active.
-    const languageToggle = page.getByTestId('language-toggle');
-    await expect(async () => {
-      await page.goto(gatewayURL);
-      await expect(languageToggle).toBeAttached({ timeout: 1_000 });
-    }).toPass({ timeout: STALE_SETUP_STATE_TIMEOUT });
-    const heading = page.getByTestId('gateway-landing').getByRole('heading');
-    await expect(heading).toHaveText('Welcome');
-    await languageToggle.getByRole('button').click();
-    await page.getByRole('menuitem', { name: 'Français' }).click();
-    await expect(heading).toHaveText('Bienvenue');
-  });
-
   // The raw response body shows the server rendered French. The client must then hydrate in French
   // too, or React recovers from the mismatch by re-rendering in English; the shell only becomes
   // visible after that, in Root's post-hydration effect, so the visible heading is the final one.

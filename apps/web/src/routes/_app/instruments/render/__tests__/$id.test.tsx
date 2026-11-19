@@ -7,11 +7,17 @@ import type { Subject } from '@opendatacapture/schemas/subject';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { NavigationBlocker } from '@/components/NavigationBlocker';
 import { Route } from '@/routes/_app/instruments/render/$id';
 
 import '@/services/i18n';
 
-type InstrumentRendererProps = { onSubmit: InstrumentSubmitHandler; subject?: Subject; target: unknown };
+type InstrumentRendererProps = {
+  NavigationBlocker?: unknown;
+  onSubmit: InstrumentSubmitHandler;
+  subject?: Subject;
+  target: unknown;
+};
 
 type AxiosRequestConfigStub = { onUploadProgress: (event: { loaded: number }) => void };
 
@@ -116,6 +122,11 @@ describe('Route', () => {
     it('should render the loaded bundle for the subject of the current session', () => {
       render(<InstrumentRenderPage />);
       expect(rendererProps()).toMatchObject({ subject, target: mocks.bundle });
+    });
+
+    it('should hand the renderer the router-backed NavigationBlocker, so leaving a started instrument asks first', () => {
+      render(<InstrumentRenderPage />);
+      expect(rendererProps().NavigationBlocker).toBe(NavigationBlocker);
     });
 
     it('should render without a subject when the session has none', () => {

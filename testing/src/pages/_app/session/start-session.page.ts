@@ -4,7 +4,6 @@ import { AppPage } from '../route.page';
 
 export class StartSessionPage extends AppPage {
   readonly dateOfBirthField: Locator;
-  readonly endSessionButton: Locator;
   readonly errorMessages: Locator;
   readonly pageHeader: Locator;
   readonly selectField: Locator;
@@ -30,19 +29,12 @@ export class StartSessionPage extends AppPage {
     this.sexTrigger = this.sessionForm.getByTestId('subjectSex-select-trigger');
     this.subjectIdErrors = this.sessionForm.locator('[data-field-group="subjectId"]').getByTestId('error-message-text');
     // The end session nav item opens a dialog rather than navigating, so it carries no route.
-    this.endSessionButton = page.getByTestId('nav-button-#');
   }
 
   /** Clicks outside the identifier combobox, which closes its popup and commits what was typed. */
   async dismissSubjectIdOptions() {
     // eslint-disable-next-line playwright/prefer-locator -- pageHeader is a Locator; the rule takes any name starting with "page" for a Page
     await this.pageHeader.click();
-  }
-
-  async endSession() {
-    await this.endSessionButton.click();
-    await this.$ref.getByRole('button', { name: 'Yes' }).click();
-    await this.sessionForm.waitFor({ state: 'visible' });
   }
 
   async fillCustomIdentifier(customIdentifier: string, sex: string) {

@@ -176,6 +176,60 @@ export default defineSuite('permission sets', function () {
       expect(rules).toContainEqual({ action: 'read', subject: 'Assignment' });
     });
 
+    it("should confine a holder's-groups rule to the holder's groups, where an every-group rule reads every group", async () => {
+      const otherGroup = await this.app.inject({
+        headers: adminHeaders,
+        method: 'POST',
+        payload: { name: `Other Group ${randomUUID()}`, type: 'RESEARCH' },
+        url: '/v1/groups'
+      });
+      expect(otherGroup.statusCode).toBe(201);
+      const otherGroupId = otherGroup.json<Group>().id;
+      const holder = (await createUser()).json<User>();
+      const teammate = (await createUser({ basePermissionLevel: 'GROUP_MANAGER' })).json<User>();
+      const outsider = (
+        await createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [otherGroupId] })
+      ).json<User>();
+      const response = await this.app.inject({
+        headers: adminHeaders,
+        method: 'POST',
+        payload: {
+          name: `Set ${randomUUID()}`,
+          rules: [
+            { action: 'read', scope: 'HOLDER_GROUPS', subject: 'User' },
+            { action: 'read', scope: 'ALL_GROUPS', subject: 'Group' }
+          ]
+        },
+        url: '/v1/permission-sets'
+      });
+      expect(response.statusCode).toBe(201);
+
+      // Read with a token minted after each change, since permissions are frozen into it at login.
+      const readAccess = async () => {
+        const headers = { authorization: `Bearer ${await login(holder.username)}` };
+        const readIds = async (path: 'groups' | 'users') => {
+          const listing = await this.app.inject({ headers, method: 'GET', url: `/v1/${path}` });
+          expect(listing.statusCode).toBe(200);
+          return listing.json<{ id: string }[]>().map(({ id }) => id);
+        };
+        return { groupIds: await readIds('groups'), userIds: await readIds('users') };
+      };
+      const before = await readAccess();
+      expect(before.userIds).not.toContain(teammate.id);
+      expect(before.groupIds).not.toContain(otherGroupId);
+
+      const assigned = await setPermissions(holder.id, {
+        kind: 'permissionSet',
+        permissionSetId: response.json<PermissionSet>().id
+      });
+      expect(assigned.statusCode).toBe(200);
+
+      const after = await readAccess();
+      expect(after.userIds).toContain(teammate.id);
+      expect(after.userIds).not.toContain(outsider.id);
+      expect(after.groupIds).toEqual(expect.arrayContaining([group.id, otherGroupId]));
+    });
+
     it('should switch between a set and custom grants, each write emptying the other', async () => {
       const permissionSet = await createPermissionSet();
       const user = (await createUser()).json<User>();

@@ -186,6 +186,25 @@ describe('UserPermissionsEditor', () => {
     expect(onDraftsChange.mock.lastCall?.[0]).toEqual([{ action: 'read', scope: 'group-2', subject: 'Subject' }]);
   });
 
+  it('should offer as a scope only the groups the user belongs to, since a grant elsewhere would be refused', () => {
+    const groupsWithOther = [...groups, { id: 'group-3', name: 'Group Three' }];
+    render(<Editor groups={groupsWithOther} user={{ ...user, groupIds: ['group-1', 'group-2'] }} />);
+    choose('action', 'read');
+    choose('subject', 'Subject');
+    fireEvent.keyDown(screen.getByTestId('scope-select-trigger'), { key: 'Enter' });
+    expect(screen.getByTestId('scope-select-item-group-1')).toBeTruthy();
+    expect(screen.getByTestId('scope-select-item-group-2')).toBeTruthy();
+    expect(screen.queryByTestId('scope-select-item-group-3')).toBeNull();
+  });
+
+  it('should offer no scope for a resource that cannot be confined to a group', () => {
+    render(<Editor groups={groups} user={user} />);
+    choose('action', 'create');
+    choose('subject', 'Instrument');
+    expect(screen.queryByTestId('scope-select-trigger')).toBeNull();
+    expect(onDraftsChange.mock.lastCall?.[0]).toMatchObject([{ action: 'create', subject: 'Instrument' }]);
+  });
+
   it('should leave the other drafts untouched when one row changes', () => {
     render(<Editor groups={groups} user={user} />);
     fireEvent.click(screen.getByRole('button', { name: 'Add Permission' }));

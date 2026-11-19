@@ -1,9 +1,10 @@
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { InstrumentTable } from '@/components/InstrumentTable/InstrumentTable';
 import type { InstrumentRow } from '@/components/InstrumentTable/InstrumentTable';
+import { savedTableViews } from '@/services/table-views';
 
 import '@/services/i18n';
 
@@ -90,6 +91,8 @@ const openPreview = () => {
 describe('InstrumentTable', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // The table restores the sort it was left with, so one test's sort would carry into the next.
+    savedTableViews.clear();
     mocks.instrumentInfo = [];
     mocks.preview.current = null;
     i18n.changeLanguage('en');
@@ -217,6 +220,21 @@ describe('InstrumentTable', () => {
     const onOpen = renderTable([row()]);
     fireEvent.doubleClick(screen.getAllByTestId('data-table-row')[0]!);
     expect(onOpen).toHaveBeenCalledWith(expect.objectContaining({ id: 'hq-1' }));
+  });
+
+  // Sorting is the only way to find an instrument in a long catalog without searching for it, so the
+  // header has to reorder the rows rather than merely render a chevron.
+  it('should reorder the rows by title, ascending and then descending, as the Instrument header is clicked', () => {
+    renderTable([
+      row({ id: 'beta', title: 'Beta' }),
+      row({ id: 'alpha', title: 'Alpha' }),
+      row({ id: 'gamma', title: 'Gamma' })
+    ]);
+    const header = within(screen.getByTestId('data-table-head')).getByText('Instrument').closest('button')!;
+    fireEvent.click(header);
+    expect(listedTitles()).toStrictEqual(['Alpha', 'Beta', 'Gamma']);
+    fireEvent.click(header);
+    expect(listedTitles()).toStrictEqual(['Gamma', 'Beta', 'Alpha']);
   });
 
   it('should match the search against the instrument title', () => {

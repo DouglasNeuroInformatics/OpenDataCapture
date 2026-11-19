@@ -528,6 +528,20 @@ describe('Route', () => {
     expect(screen.queryByText('Add Instrument Repository')).toBeNull();
   });
 
+  it('should keep the add dialog open with the URL entered when the import is refused, so it can be corrected', () => {
+    const url = 'https://github.com/owner/repository';
+    const Component = Route.options.component!;
+    mocks.repos = [repoFixture()];
+    const { rerender } = render(<Component />);
+    openAddDialog();
+    submitAddForm({ url });
+    mocks.isCreatePending = true;
+    rerender(<Component />);
+    mocks.isCreatePending = false;
+    rerender(<Component />);
+    expect(screen.getByLabelText<HTMLInputElement>('GitHub URL').value).toBe(url);
+  });
+
   it('should close the add dialog when it is dismissed', () => {
     renderPage();
     openAddDialog();

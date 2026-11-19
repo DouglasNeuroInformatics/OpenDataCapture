@@ -6,7 +6,6 @@ export class GroupEmailTemplatesPage extends AppPage {
   readonly builtInDefaultBadge: Locator;
   readonly createAnyway: Locator;
   readonly createBody: Locator;
-  readonly createLanguage: Locator;
   readonly createSubject: Locator;
   readonly createSubmit: Locator;
   readonly deleteConfirm: Locator;
@@ -19,30 +18,12 @@ export class GroupEmailTemplatesPage extends AppPage {
     this.root = page.getByTestId('group-email-templates');
     this.name = page.getByTestId('template-name');
     this.createSubject = page.getByTestId('template-create-subject');
-    this.createLanguage = page.getByTestId('template-create-language');
     this.createBody = page.getByTestId('template-create-body');
     this.insertUrl = page.getByTestId('template-create-insert-url');
     this.createSubmit = page.getByTestId('template-create-submit');
     this.createAnyway = page.getByTestId('template-create-anyway');
     this.deleteConfirm = page.getByTestId('template-delete-confirm');
     this.builtInDefaultBadge = page.getByTestId('template-active-builtin');
-  }
-
-  /** The create form's inline validation message, shown when the body is missing a placeholder. */
-  get createError(): Locator {
-    return this.$ref.getByTestId('template-create-error');
-  }
-
-  /** The options of whichever language picker is currently open. */
-  get openLanguageOptions(): Locator {
-    return this.$ref.getByRole('option');
-  }
-
-  /** Create a template authored in one language, accepting the missing-translations warning. */
-  async createTemplate(fields: { body: string; name: string; subject: string }) {
-    await this.fillCreateForm(fields);
-    await this.createAnyway.waitFor({ state: 'visible' });
-    await this.createAnyway.click();
   }
 
   /**
@@ -52,18 +33,6 @@ export class GroupEmailTemplatesPage extends AppPage {
    */
   deleteButtonFor(name: string): Locator {
     return this.rowFor(name).getByTestId(/^template-delete-/);
-  }
-
-  /**
-   * Fill and submit the create form in the currently selected language. Authoring a single
-   * language raises the missing-translations warning, so callers confirm it via
-   * {@link createAnyway}.
-   */
-  async fillCreateForm({ body, name, subject }: { body: string; name: string; subject: string }) {
-    await this.name.fill(name);
-    await this.createSubject.fill(subject);
-    await this.createBody.fill(body);
-    await this.createSubmit.click();
   }
 
   /** The list row whose label is `name`. */

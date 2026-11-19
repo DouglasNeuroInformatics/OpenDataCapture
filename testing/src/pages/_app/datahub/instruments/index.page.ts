@@ -23,15 +23,4 @@ export class InstrumentHubPage extends AppPage {
   row(title: string): Locator {
     return this.rows.filter({ hasText: title });
   }
-
-  /** Clicks a column header to cycle its sort. Removal is disabled, so this toggles asc ⇄ desc. */
-  async sortBy(label: string) {
-    await this.$ref.getByTestId('data-table-head').getByRole('button', { name: label }).click();
-  }
-
-  /** The visible title of every listed instrument, top to bottom — the first cell of each row. */
-  async titles(): Promise<string[]> {
-    const rows = await this.rows.all();
-    return Promise.all(rows.map(async (row) => (await row.locator('> div').first().innerText()).trim()));
-  }
 }

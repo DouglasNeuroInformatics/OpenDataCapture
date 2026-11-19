@@ -70,6 +70,26 @@ describe('SessionsService', () => {
       expect(sessionModel.createMany.mock.lastCall?.[0]).toMatchObject({ data: [{ groupId: 'group-1' }] });
     });
 
+    // The batched path once handed over only the ids, so a new subject lost the demographics its
+    // first session named.
+    it('should hand every subject over with the demographics its session names', async () => {
+      const subjectData = {
+        dateOfBirth: new Date('1990-05-17T00:00:00.000Z'),
+        firstName: 'Ada',
+        id: 'subject-1',
+        lastName: 'Lovelace',
+        sex: 'FEMALE' as const
+      };
+
+      await sessionsService.createMany({
+        entries: [{ date: new Date(), subjectData }],
+        groupId: null,
+        type: 'IN_PERSON'
+      });
+
+      expect(subjectsService.createMany).toHaveBeenCalledExactlyOnceWith([subjectData]);
+    });
+
     it('should associate the batch with the group in a single write', async () => {
       groupsService.findById.mockResolvedValueOnce({ id: 'group-1' } as any);
 

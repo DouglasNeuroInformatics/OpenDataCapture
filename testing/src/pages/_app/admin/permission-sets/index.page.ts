@@ -3,7 +3,6 @@ import type { Locator, Page } from '@playwright/test';
 import { AppPage } from '../../route.page';
 
 export class PermissionSetsPage extends AppPage {
-  readonly createLink: Locator;
   readonly destructiveActionDialog: Locator;
   readonly table: Locator;
 
@@ -11,7 +10,6 @@ export class PermissionSetsPage extends AppPage {
     super(page);
     // libui's DataTable sets its own testid and takes none from the route.
     this.table = page.getByTestId('data-table');
-    this.createLink = page.getByTestId('create-permission-set');
     this.destructiveActionDialog = page.getByTestId('destructive-action-dialog');
   }
 

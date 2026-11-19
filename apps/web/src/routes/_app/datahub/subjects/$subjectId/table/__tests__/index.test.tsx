@@ -85,6 +85,14 @@ describe('Route', () => {
     expect(headers()).toEqual(['DATE_COLLECTED', 'COLLECTION_METHOD', 'SERIES']);
   });
 
+  // `subject-table` once named the Table tab link as well, so a selector for the record table found
+  // the tab instead (#1475).
+  it('should carry the subject-table test id on the record table alone', () => {
+    renderTable([record()]);
+    expect(screen.getAllByTestId('subject-table')).toHaveLength(1);
+    expect(within(screen.getByTestId('subject-table')).getAllByTestId('data-table')).toHaveLength(1);
+  });
+
   it('should render a multiple-choice answer as comma-separated text', () => {
     renderTable([record({ totalScore: new Set(['a', 'b']) })]);
     expect(screen.getByTestId('subject-table-cell-totalScore').textContent).toBe('a, b');

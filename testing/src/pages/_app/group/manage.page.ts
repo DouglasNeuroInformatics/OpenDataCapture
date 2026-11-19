@@ -7,7 +7,6 @@ export class GroupManagePage extends AppPage {
   readonly instrumentCreatedAtTags: Locator;
   /** Every row's preview button, in row order, for asserting they form a column. */
   readonly instrumentPreviewButtons: Locator;
-  readonly subjectIdDisplayLengthInput: Locator;
   // The shared `Form` component's own submit button always has `aria-label="Submit"`, regardless of
   // its visible text, so this is the correct accessible name even though no custom label is set here.
   readonly submitButton: Locator;
@@ -16,7 +15,6 @@ export class GroupManagePage extends AppPage {
     super(page);
     this.instrumentCreatedAtTags = this.$ref.locator('[data-testid^="instrument-created-at-"]');
     this.instrumentPreviewButtons = this.$ref.locator('[data-testid^="instrument-preview-"]');
-    this.subjectIdDisplayLengthInput = page.getByLabel('Preferred Subject ID Display Length');
     this.submitButton = page.getByRole('button', { name: 'Submit' });
   }
 

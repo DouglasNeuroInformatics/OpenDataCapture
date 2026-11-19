@@ -5,21 +5,15 @@ import { AppPage } from '../../route.page';
 export type AuditLogsFilter = 'action' | 'entity' | 'group' | 'user';
 
 export class AuditLogsPage extends AppPage {
-  readonly clearFiltersButton: Locator;
   readonly dataTable: Locator;
   readonly downloadButton: Locator;
   readonly pageHeader: Locator;
-  readonly timeHeaderButton: Locator;
 
   constructor(page: Page) {
     super(page);
     this.pageHeader = page.getByTestId('page-header');
     this.dataTable = page.getByTestId('data-table');
-    this.clearFiltersButton = page.getByTestId('audit-logs-clear-filters');
     this.downloadButton = page.getByRole('button', { name: 'Download' });
-    this.timeHeaderButton = this.dataTable
-      .getByTestId('data-table-head')
-      .getByRole('button', { exact: true, name: 'Time' });
   }
 
   filterButton(filter: AuditLogsFilter) {

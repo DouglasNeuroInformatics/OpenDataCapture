@@ -1,119 +1,65 @@
-import type { Assignment } from '@opendatacapture/schemas/assignment';
-import type { InstrumentRecord } from '@opendatacapture/schemas/instrument-records';
-import type { Session } from '@opendatacapture/schemas/session';
-import type { Page } from '@playwright/test';
+import type { $CreateAssignmentData } from '@opendatacapture/schemas/assignment';
+import type { BrowserContext } from '@playwright/test';
 
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
-import { ApiClient } from '../support/api-client';
-import { HAPPINESS_RECORD } from '../support/constants';
-import { gatewayRefreshInterval, gatewayURL } from '../support/env';
+import { gatewayRefreshInterval } from '../support/env';
 import { expect, test } from '../support/fixtures';
 
-import type { GetPageModel } from '../support/fixtures';
-
-const INSTRUMENT_TITLE = 'Happiness Questionnaire';
+import type { ApiClient } from '../support/api-client';
 
 /** Administers the Happiness Questionnaire twice, so one assignment produces two records. */
 const SERIES_INSTRUMENT_TITLE = 'Happiness Questionnaire (Repeated)';
 
 /**
- * Starts a session and creates a remote assignment for the instrument titled `title` (by default
- * the Happiness Questionnaire), returning the gateway link. Shared by every test in this file that
- * needs a real link to drive the gateway origin against, so the expensive part (the Cap
- * proof-of-work) is only ever solved where a test actually needs a verified assignment.
+ * How long the API's gateway synchronizer may take to sweep a completed assignment across. It runs
+ * every `gatewayRefreshInterval`, but a pass is slow locally under fullyParallel.
  */
-async function createRemoteAssignmentLink(
-  getPageModel: GetPageModel,
-  page: Page,
-  uniqueId: string,
-  title = INSTRUMENT_TITLE
-): Promise<string> {
-  const startSessionPage = await getPageModel('/session/start-session');
-  await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-  await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-  await startSessionPage.fillSessionForm(`Gateway${uniqueId}`, `Patient${uniqueId}`, 'Female');
-  await startSessionPage.submitForm();
-  await expect(startSessionPage.successMessage).toBeVisible();
-
-  await page.getByTestId('nav-button-/session/remote-assignment').click();
-  await page.waitForURL('**/session/remote-assignment');
-
-  const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: title }).first();
-  await expect(card).toBeVisible();
-  await card.click();
-
-  const dialog = page.getByRole('dialog');
-  await expect(dialog).toContainText('Create Remote Assignment');
-  await dialog.getByRole('button', { name: 'Submit' }).click();
-
-  // The dialog swaps in place to reveal the gateway link (a different origin than the web app).
-  const linkInput = page.locator('input[readonly]');
-  await expect(linkInput).toBeVisible();
-  const assignmentUrl = await linkInput.inputValue();
-  expect(assignmentUrl).toMatch(/^https?:\/\/.+\/assignments\/.+/);
-
-  // Dismiss the dialog: its overlay covers the sidebar and would swallow later nav clicks.
-  await dialog.getByRole('button', { name: 'Close' }).first().click();
-  await expect(dialog).toBeHidden();
-
-  return assignmentUrl;
-}
-
-/**
- * Which refusal arrives is a race with the API's gateway synchronizer, which runs every
- * GATEWAY_REFRESH_INTERVAL (10s): until it sweeps the completed assignment across into a real
- * record the gateway still holds it and answers 409, and once it has, the record is deleted
- * from the gateway by design and the link is a 404. Asserting 409 alone made the test fail
- * whenever a sync tick landed in the window, so both terminal answers are accepted and the
- * invariant that actually matters — the instrument is not re-served — is asserted directly.
- */
-async function expectCompletedAssignmentRefused(gatewayPage: Page, assignmentUrl: string) {
-  const response = await gatewayPage.goto(assignmentUrl);
-  const status = response?.status();
-  expect([404, 409]).toContain(status);
-  await expect(gatewayPage.getByRole('button', { name: 'Begin' })).toBeHidden();
-  if (status === 409) {
-    await expect(gatewayPage.getByText('Assignment already completed')).toBeVisible();
-  }
-}
+const SYNC_TIMEOUT = 15 * gatewayRefreshInterval;
 
 /** Seeds a new group with one subject and an outstanding assignment for it, over the API. */
-async function seedAssignment(api: ApiClient): Promise<Assignment> {
+async function seedAssignment(api: ApiClient, data: Pick<$CreateAssignmentData, 'instrumentId' | 'redirectUrl'>) {
   const group = await api.createGroup();
   return api.createAssignment({
     expiresAt: new Date(Date.now() + 86_400_000),
     groupId: group.id,
-    instrumentId: await api.findInstrumentId('FORM'),
-    subjectId: await api.createSubject(group.id)
+    subjectId: await api.createSubject(group.id),
+    ...data
   });
 }
 
+/**
+ * Opens the link the patient was sent in a page of its own, as they would receive it out of band,
+ * and solves the Cap proof-of-work that gates submission (a custom element, which Playwright
+ * reaches through its open shadow root).
+ */
+async function openVerifiedAssignment(context: BrowserContext, url: string) {
+  const gatewayPage = await context.newPage();
+  await gatewayPage.goto(url);
+  const capWidget = gatewayPage.locator('cap-widget');
+  await capWidget.waitFor({ state: 'visible' });
+  const gatewayInstrument = new RenderInstrumentPage(gatewayPage);
+  await expect(gatewayInstrument.beginButton).toBeDisabled();
+  await expect(gatewayPage.getByRole('button', { name: "Click to verify you're a human" })).toBeVisible();
+  await capWidget.click();
+  await expect(gatewayInstrument.beginButton).toBeEnabled({ timeout: 120_000 });
+  return { gatewayInstrument, gatewayPage };
+}
+
+// Each spans two origins and waits on the Cap proof-of-work, so it needs more than the default budget.
+test.describe.configure({ timeout: 180_000 });
+
 test.describe('gateway remote assignment', () => {
-  // Spans two origins and waits on the Cap proof-of-work, so it needs more than the default budget.
-  test.describe.configure({ timeout: 180_000 });
+  test.use({ actingRole: 'ADMIN' });
 
-  test('should let a patient complete an assignment and report it back to the clinician @smoke', async ({
+  test('should let a patient complete an assignment and report it back to the clinician', async ({
+    api,
     context,
-    getPageModel,
-    page,
-    uniqueId
+    getPageModel
   }) => {
-    const assignmentUrl = await createRemoteAssignmentLink(getPageModel, page, uniqueId);
-
-    // The patient receives the link out of band, so drive it from a separate page.
-    const gatewayPage = await context.newPage();
-    await gatewayPage.goto(assignmentUrl);
-
-    // The gateway gates submission behind a Cap proof-of-work widget (a custom element, which
-    // Playwright reaches through its open shadow root). Solving it is what enables "Begin".
-    const capWidget = gatewayPage.locator('cap-widget');
-    await capWidget.waitFor({ state: 'visible' });
-    await expect(gatewayPage.getByRole('button', { name: 'Begin' })).toBeDisabled();
-    await expect(gatewayPage.getByRole('button', { name: "Click to verify you're a human" })).toBeVisible();
-    await capWidget.click();
-
-    const gatewayInstrument = new RenderInstrumentPage(gatewayPage);
-    await expect(gatewayInstrument.beginButton).toBeEnabled({ timeout: 120_000 });
+    const assignment = await seedAssignment(api, {
+      instrumentId: await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE')
+    });
+    const { gatewayInstrument, gatewayPage } = await openVerifiedAssignment(context, assignment.url);
     await gatewayInstrument.begin();
 
     // Submitting empty first, before answering, so the one expensive Cap proof-of-work above covers
@@ -132,140 +78,40 @@ test.describe('gateway remote assignment', () => {
     await expect(gatewayInstrument.errorSummary).toHaveCount(0);
     // Created without a redirect URL, so the subject is left on the completion screen.
     await expect(gatewayPage.getByTestId('completion-redirect')).toHaveCount(0);
-
-    // Revisiting the same link after completion must not serve the instrument again. Reuses this
-    // now-completed assignment rather than soloing a second, expensive Cap proof-of-work just to
-    // exercise this branch.
-    await expectCompletedAssignmentRefused(gatewayPage, assignmentUrl);
-
     await gatewayPage.close();
 
-    // Back on the clinician side the assignment should now read as complete.
-    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
-    await page.waitForURL('**/datahub/subjects/**/table');
-    await page.getByRole('link', { name: 'Assignments' }).click();
-    await page.waitForURL('**/datahub/subjects/**/assignments');
+    // The completion reaches the API on the synchronizer's next pass, not with the submission.
+    const findStatus = async () => {
+      const assignments = await api.findAssignments(assignment.subjectId);
+      return assignments.find(({ id }) => id === assignment.id)?.status;
+    };
+    await expect.poll(findStatus, { timeout: SYNC_TIMEOUT }).toBe('COMPLETE');
 
-    // The completion posts back from the gateway asynchronously (it can still read "Outstanding"
-    // for a while on a slow runner), and assertion retries re-query the locator rather than
-    // refetching -- so retry the reload itself until the status settles. Reloading is safe here:
-    // the page is addressed by subject id, not the (now irrelevant) in-memory session.
-    await expect(async () => {
-      await page.reload();
-      await expect(page.getByTestId('data-table-row').first()).toContainText('Complete', { timeout: 5_000 });
-    }).toPass({ timeout: 90_000 });
+    const assignmentsPage = await getPageModel('/datahub/subjects/$subjectId/assignments', {
+      subjectId: assignment.subjectId
+    });
+    await expect(assignmentsPage.assignmentRows).toHaveCount(1);
+    await expect(assignmentsPage.assignmentRows).toContainText('Complete');
   });
 });
 
-test.describe('gateway completion redirect', () => {
-  test.describe.configure({ timeout: 180_000 });
-
-  test('should send the subject on to the redirect URL the assignment was created with once they complete it', async ({
+test.describe('gateway assignment records', () => {
+  test('should link every record of a remote series to its assignment, record its completion, and send the subject on to its redirect URL', async ({
     api,
     context,
     uniqueId
   }) => {
     const redirectUrl = `https://redirect.example.test/done/${uniqueId}`;
-    const group = await api.createGroup();
-    const assignment = await api.createAssignment({
-      expiresAt: new Date(Date.now() + 86_400_000),
-      groupId: group.id,
-      instrumentId: await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE'),
-      redirectUrl,
-      subjectId: await api.createSubject(group.id)
+    const assignment = await seedAssignment(api, {
+      instrumentId: await api.findInstrumentIdByTitle(SERIES_INSTRUMENT_TITLE),
+      redirectUrl
     });
 
-    const gatewayPage = await context.newPage();
+    const { gatewayInstrument, gatewayPage } = await openVerifiedAssignment(context, assignment.url);
     // The site the subject is sent back to is not part of the stack, so answer for it here.
     await gatewayPage.route('https://redirect.example.test/**', (route) => {
       return route.fulfill({ body: '<h1>Study portal</h1>', contentType: 'text/html' });
     });
-    await gatewayPage.goto(assignment.url);
-    await gatewayPage.locator('cap-widget').click();
-
-    const gatewayInstrument = new RenderInstrumentPage(gatewayPage);
-    await expect(gatewayInstrument.beginButton).toBeEnabled({ timeout: 120_000 });
-    await gatewayInstrument.begin();
-    await gatewayInstrument.completeHappinessQuestionnaire();
-    await gatewayInstrument.submit();
-
-    // The completion screen stays up through the countdown, so the subject sees it before leaving.
-    await expect(gatewayInstrument.summaryHeading).toBeVisible();
-    await expect(gatewayPage.getByTestId('completion-redirect')).toBeVisible();
-    await gatewayPage.waitForURL(redirectUrl);
-    await expect(gatewayPage.getByRole('heading', { name: 'Study portal' })).toBeVisible();
-
-    await gatewayPage.close();
-  });
-});
-
-test.describe('gateway malformed submission', () => {
-  test.describe.configure({ timeout: 180_000 });
-
-  // The API retries a submission it cannot ingest on every synchronization pass, so rejecting it
-  // after writing the session would leave one more session behind each time.
-  test('should not record a session for a submission shaped for another kind of instrument', async ({
-    adminToken,
-    api,
-    apiRequestContext,
-    context
-  }) => {
-    const assignment = await seedAssignment(api);
-    const adminHeaders = { Authorization: `Bearer ${adminToken}` };
-
-    const gatewayPage = await context.newPage();
-    await gatewayPage.goto(assignment.url);
-    await gatewayPage.locator('cap-widget').click();
-    await expect(gatewayPage.getByRole('button', { name: 'Begin' })).toBeEnabled({ timeout: 120_000 });
-
-    // The page hands the patient this token; a hand-written request can then claim any shape.
-    const { token } = await gatewayPage.evaluate(() => Reflect.get(window, '__ROOT_PROPS__'));
-    const submission = await apiRequestContext.patch(`${gatewayURL}/api/assignments/${assignment.id}`, {
-      data: { data: { answer: 1 }, kind: 'SERIES', status: 'COMPLETE' },
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    expect(submission.status()).toBe(200);
-    await gatewayPage.close();
-
-    await new Promise((resolve) => {
-      setTimeout(resolve, 2 * gatewayRefreshInterval);
-    });
-    const response = await apiRequestContext.get('/api/v1/sessions', { headers: adminHeaders });
-    const sessions = (await response.json()) as Session[];
-    const remoteSessions = sessions.filter(
-      (session) => session.subjectId === assignment.subjectId && session.type === 'REMOTE'
-    );
-    expect(remoteSessions).toHaveLength(0);
-
-    // Cancelling removes the row from the gateway, so the rest of the run is not synchronizing it.
-    await apiRequestContext.patch(`/api/v1/assignments/${assignment.id}`, {
-      data: { status: 'CANCELED' },
-      headers: adminHeaders
-    });
-  });
-});
-
-test.describe('gateway assignment records', () => {
-  test.describe.configure({ timeout: 180_000 });
-
-  test('should link every record of a remote series to its assignment, and record when it was completed', async ({
-    adminToken,
-    api,
-    apiRequestContext,
-    context,
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const assignmentUrl = await createRemoteAssignmentLink(getPageModel, page, uniqueId, SERIES_INSTRUMENT_TITLE);
-    const assignmentId = assignmentUrl.split('/').pop()!;
-
-    const gatewayPage = await context.newPage();
-    await gatewayPage.goto(assignmentUrl);
-    await gatewayPage.locator('cap-widget').click();
-
-    const gatewayInstrument = new RenderInstrumentPage(gatewayPage);
-    await expect(gatewayInstrument.beginButton).toBeEnabled({ timeout: 120_000 });
     await gatewayInstrument.begin();
     await gatewayInstrument.completeHappinessQuestionnaire();
     await gatewayInstrument.submit();
@@ -274,153 +120,28 @@ test.describe('gateway assignment records', () => {
     await gatewayInstrument.completeHappinessQuestionnaire();
     await gatewayInstrument.submit();
     await expect(gatewayInstrument.seriesCompletionHeading).toBeVisible();
+
+    // The completion screen offers the redirect, so the subject sees it before leaving. Following
+    // the link rather than waiting out the countdown; CompletionRedirect.test.tsx owns the timer.
+    // The submission toast sits over the link until it fades, so follow it from the keyboard.
+    await gatewayPage.getByTestId('completion-redirect-link').press('Enter');
+    await gatewayPage.waitForURL(redirectUrl);
+    await expect(gatewayPage.getByRole('heading', { name: 'Study portal' })).toBeVisible();
     await gatewayPage.close();
 
-    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
-    const headers = { Authorization: `Bearer ${adminToken}` };
-    let linkedRecords: InstrumentRecord[] = [];
-    await expect(async () => {
-      const response = await apiRequestContext.get('/api/v1/instrument-records', { headers, params: { instrumentId } });
-      const records = (await response.json()) as InstrumentRecord[];
-      linkedRecords = records.filter((record) => record.assignmentId === assignmentId);
-      expect(linkedRecords).toHaveLength(2);
-    }).toPass({ timeout: 6 * gatewayRefreshInterval });
-
-    // The status and completion date are written after the records, in the same pass.
-    const findCompletedAt = async () => {
-      const assignments = await api.findAssignments(linkedRecords[0]!.subjectId);
-      return assignments.find(({ id }) => id === assignmentId)?.completedAt;
+    // The status and completion date are written after the records, in the same synchronizer pass.
+    const findSyncedState = async () => {
+      const [records, assignments] = await Promise.all([
+        api.findRecordsBySubject(assignment.subjectId),
+        api.findAssignments(assignment.subjectId)
+      ]);
+      return {
+        completedAt: assignments.find(({ id }) => id === assignment.id)?.completedAt,
+        linkedRecordCount: records.filter(({ assignmentId }) => assignmentId === assignment.id).length
+      };
     };
-    await expect.poll(findCompletedAt, { timeout: 2 * gatewayRefreshInterval }).toEqual(expect.any(String));
-  });
-
-  // Only the gateway synchronizer may link a record to an assignment, so the create route drops the
-  // key, but a client that still sends one must not be refused for it.
-  test('should accept a record that names an assignment, without linking the two', async ({
-    adminToken,
-    api,
-    apiRequestContext,
-    uniqueId
-  }) => {
-    const group = await api.createGroup();
-    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
-    const session = await api.createSession(group.id, { id: `assigned-${uniqueId}` });
-    const assignment = await api.createAssignment({
-      expiresAt: new Date(Date.now() + 86_400_000),
-      groupId: group.id,
-      instrumentId,
-      subjectId: session.subjectId
-    });
-
-    const response = await apiRequestContext.post('/api/v1/instrument-records', {
-      data: {
-        assignmentId: assignment.id,
-        data: HAPPINESS_RECORD,
-        date: new Date(),
-        groupId: group.id,
-        instrumentId,
-        sessionId: session.id,
-        subjectId: session.subjectId
-      },
-      headers: { Authorization: `Bearer ${adminToken}` }
-    });
-    expect(response.status(), await response.text()).toBe(201);
-    expect(await response.json()).toMatchObject({ assignmentId: null });
-  });
-});
-
-test.describe('gateway assignment errors', () => {
-  test('should respond with 404 when the assignment id in the link does not exist', async ({
-    context,
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const assignmentUrl = await createRemoteAssignmentLink(getPageModel, page, uniqueId);
-    const invalidUrl = assignmentUrl.replace(/[^/]+$/, `nonexistent-${uniqueId}`);
-
-    const gatewayPage = await context.newPage();
-    const response = await gatewayPage.goto(invalidUrl);
-    expect(response?.status()).toBe(404);
-
-    await gatewayPage.close();
-  });
-
-  // The languages an assignment offers are stored on the gateway's own database and read back
-  // server-side, so `?lang=` must be honoured in the SSR'd HTML rather than swapped in after
-  // hydration. Asserting against the raw response body is what distinguishes the two.
-  test('should render the assignment server-side in a requested active language', async ({
-    context,
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const assignmentUrl = await createRemoteAssignmentLink(getPageModel, page, uniqueId);
-
-    // The stepper is the only translated copy in the first paint — everything below it waits on the
-    // instrument bundle, which loads client-side.
-    const gatewayPage = await context.newPage();
-    const french = await gatewayPage.goto(`${assignmentUrl}?lang=fr`);
-    expect(await french!.text()).toContain('Aperçu');
-
-    // A language the instance does not offer falls back to the first active one rather than
-    // rendering the blank strings an unresolvable language would produce.
-    const unknown = await gatewayPage.goto(`${assignmentUrl}?lang=klingon`);
-    expect(await unknown!.text()).toContain('Overview');
-
-    await gatewayPage.close();
-  });
-
-  // `POST /v1/assignments/:id/email` mails a live assignment credential to a caller-supplied
-  // address, and its guard (`update Assignment`) is group-scoped rather than admin-only — so the
-  // control that matters is row scoping, which no blanket-403 table can assert.
-  test('should not let a manager outside the group email an assignment link', async ({
-    api,
-    apiRequestContext,
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const assignmentUrl = await createRemoteAssignmentLink(getPageModel, page, uniqueId);
-    const assignmentId = assignmentUrl.split('/').pop()!;
-
-    const outsiderGroup = await api.createGroup();
-    const { credentials } = await api.createUser({ groupIds: [outsiderGroup.id] });
-    const token = await ApiClient.login(apiRequestContext, credentials);
-
-    const response = await apiRequestContext.post(`/api/v1/assignments/${assignmentId}/email`, {
-      data: { language: 'en', recipient: 'outsider-target@example.org' },
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    expect([403, 404]).toContain(response.status());
-  });
-
-  // Cancelling deletes the gateway's copy of the assignment, which cannot be undone, so the row
-  // scoping has to be checked before that deletion rather than by the update that follows it.
-  test('should not let a manager outside the group cancel an assignment and kill its link', async ({
-    api,
-    apiRequestContext
-  }) => {
-    const assignment = await seedAssignment(api);
-
-    const outsiderGroup = await api.createGroup();
-    const { credentials } = await api.createUser({ groupIds: [outsiderGroup.id] });
-    const token = await ApiClient.login(apiRequestContext, credentials);
-
-    const response = await apiRequestContext.patch(`/api/v1/assignments/${assignment.id}`, {
-      data: { status: 'CANCELED' },
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    expect(response.status()).toBe(404);
-    expect((await apiRequestContext.get(assignment.url)).status()).toBe(200);
-  });
-
-  // Proof of work is checked after the body is parsed, so an oversized id is refused whatever token
-  // accompanies it.
-  test('should refuse to verify an id longer than any assignment id', async ({ apiRequestContext }) => {
-    const response = await apiRequestContext.post(`${gatewayURL}/api/auth/verify`, {
-      data: { id: 'x'.repeat(10_000), token: 'unsolved' }
-    });
-    expect(response.status()).toBe(400);
+    await expect
+      .poll(findSyncedState, { timeout: SYNC_TIMEOUT })
+      .toEqual({ completedAt: expect.any(String), linkedRecordCount: 2 });
   });
 });

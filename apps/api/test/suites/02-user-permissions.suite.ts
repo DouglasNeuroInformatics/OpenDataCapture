@@ -47,6 +47,30 @@ export default defineSuite('user permissions', function () {
     return response.json<Group>();
   };
 
+  const createStandardUser = async (username: string, groupIds: string[]): Promise<User> => {
+    const response = await this.app.inject({
+      headers: adminHeaders,
+      method: 'POST',
+      payload: {
+        basePermissionLevel: 'STANDARD',
+        firstName: 'Test',
+        groupIds,
+        lastName: 'User',
+        password: PASSWORD,
+        username
+      },
+      url: '/v1/users'
+    });
+    expect(response.statusCode).toBe(201);
+    return response.json<User>();
+  };
+
+  const findUser = async (id: string): Promise<User> => {
+    const response = await this.app.inject({ headers: adminHeaders, method: 'GET', url: `/v1/users/${id}` });
+    expect(response.statusCode).toBe(200);
+    return response.json<User>();
+  };
+
   beforeAll(async () => {
     const setup = await this.app.inject({
       method: 'POST',
@@ -101,6 +125,59 @@ export default defineSuite('user permissions', function () {
         conditions: { groupIds: { hasSome: [group.id] } },
         subject: 'Subject'
       });
+    });
+
+    it('should refuse to grant a write on users, which only an administrator may make, and store nothing', async () => {
+      const member = await createStandardUser('user.write.grantee', [group.id]);
+      const response = await this.app.inject({
+        headers: adminHeaders,
+        method: 'PUT',
+        payload: { kind: 'custom', permissions: [{ action: 'manage', groupId: group.id, subject: 'User' }] },
+        url: `/v1/users/${member.id}/permissions`
+      });
+      expect(response.statusCode).toBe(400);
+      expect((await findUser(member.id)).additionalPermissions).toEqual([]);
+    });
+  });
+
+  describe('PATCH /v1/users/:id', () => {
+    it('should ignore permissions sent through a profile update, so only the permissions route can grant', async () => {
+      const member = await createStandardUser('profile.update.grantee', [group.id]);
+      const response = await this.app.inject({
+        headers: adminHeaders,
+        method: 'PATCH',
+        payload: { additionalPermissions: [{ action: 'manage', groupId: null, subject: 'all' }] },
+        url: `/v1/users/${member.id}`
+      });
+      expect(response.statusCode).toBe(200);
+      expect((await findUser(member.id)).additionalPermissions).toEqual([]);
+    });
+
+    it('should drop a grant confined to a group the user is removed from, and keep an unscoped one', async () => {
+      const member = await createStandardUser('group.leaver', [group.id, otherGroup.id]);
+      const granted = await this.app.inject({
+        headers: adminHeaders,
+        method: 'PUT',
+        payload: {
+          kind: 'custom',
+          permissions: [
+            { action: 'read', groupId: group.id, subject: 'User' },
+            { action: 'create', groupId: null, subject: 'Instrument' }
+          ]
+        },
+        url: `/v1/users/${member.id}/permissions`
+      });
+      expect(granted.statusCode).toBe(200);
+      const response = await this.app.inject({
+        headers: adminHeaders,
+        method: 'PATCH',
+        payload: { groupIds: [otherGroup.id] },
+        url: `/v1/users/${member.id}`
+      });
+      expect(response.statusCode).toBe(200);
+      expect((await findUser(member.id)).additionalPermissions).toEqual([
+        { action: 'create', groupId: null, subject: 'Instrument' }
+      ]);
     });
   });
 

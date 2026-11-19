@@ -8,7 +8,6 @@ export class DatahubPage extends AppPage {
   readonly filtersTrigger: Locator;
   readonly minRecordsFilter: Locator;
   readonly pageHeader: Locator;
-  readonly rowActionsTrigger: Locator;
   readonly rows: Locator;
   readonly searchBar: Locator;
   readonly searchInput: Locator;
@@ -20,7 +19,6 @@ export class DatahubPage extends AppPage {
     this.minRecordsFilter = page.getByTestId('datahub-filter-min-records');
     this.collectedPresetFilter = page.getByTestId('datahub-filter-collected-preset');
     this.pageHeader = page.getByTestId('page-header');
-    this.rowActionsTrigger = page.getByTestId('row-actions-trigger').first();
     this.rows = page.getByTestId('data-table-body').getByTestId('data-table-row');
     this.searchBar = page.getByTestId('data-table-search-bar');
     this.searchInput = this.searchBar.getByRole('searchbox');

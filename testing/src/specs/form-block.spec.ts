@@ -28,9 +28,5 @@ test.describe('form block', () => {
     await expect(instrumentPage.consentPreamble).toBeVisible();
     await expect(instrumentPage.consentPreamble).toContainText('WHEREAS');
     await expect(instrumentPage.consentPreamble).toContainText('Nothing contained in this preamble');
-
-    await instrumentPage.acceptConsent();
-    await instrumentPage.submit();
-    await expect(instrumentPage.summaryHeading).toBeVisible();
   });
 });

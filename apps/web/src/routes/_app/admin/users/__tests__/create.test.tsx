@@ -196,6 +196,17 @@ describe('Route', () => {
     expect(mocks.mutateAsync.mock.lastCall?.[0].data.email).toBe('jdoe@example.org');
   });
 
+  it('should create the user without an email once one typed in is cleared again', async () => {
+    const form = renderPage();
+    fillCredentials(form);
+    choosePermissionLevel(form, 'ADMIN');
+    type(form, 'email', 'jdoe@example.org');
+    type(form, 'email', '');
+    submit();
+    await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
+    expect(mocks.mutateAsync.mock.lastCall?.[0].data.email).toBeUndefined();
+  });
+
   it('should report a generic failure when the create request fails for a reason other than the password', async () => {
     mocks.mutateAsync.mockRejectedValue(new Error('Network Error'));
     fillAndSubmit();
@@ -361,8 +372,14 @@ describe('Route', () => {
   it('should fill both password fields with a generated passphrase', () => {
     const form = renderPage();
     fireEvent.click(screen.getByLabelText('Generate Passphrase'));
-    expect(field(form, 'password').value).not.toBe('');
+    expect(field(form, 'password').value.split('-')).toHaveLength(5);
     expect(field(form, 'confirmPassword').value).toBe(field(form, 'password').value);
+  });
+
+  it('should reveal a generated passphrase, since a password nobody can read cannot be relayed', () => {
+    const form = renderPage();
+    fireEvent.click(screen.getByLabelText('Generate Passphrase'));
+    expect(field(form, 'password').type).toBe('text');
   });
 
   it('should force a password reset for a user created with a generated passphrase', async () => {
@@ -374,7 +391,7 @@ describe('Route', () => {
     choosePermissionLevel(form, 'ADMIN');
     submit();
     await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
-    expect(mocks.mutateAsync.mock.lastCall?.[0].data.mustResetPassword).toBe(true);
+    expect(mocks.mutateAsync.mock.lastCall?.[0].data).toMatchObject({ mustResetPassword: true, username: 'jdoe' });
   });
 
   it('should reject a weak password before contacting the server', async () => {
@@ -441,6 +458,16 @@ describe('Route', () => {
     await waitFor(() => {
       expect(errorMessages()).toContain('A user who is not an administrator must belong to at least one group');
     });
+  });
+
+  it('should create a disabled user below administrator with no group, since such an account only attributes uploaded data', async () => {
+    const form = renderPage();
+    fillCredentials(form);
+    choosePermissionLevel(form, 'STANDARD');
+    fireEvent.click(form.querySelector('#disabled-true')!);
+    submit();
+    await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
+    expect(mocks.mutateAsync.mock.lastCall?.[0].data).toMatchObject({ disabled: true, groupIds: [] });
   });
 
   it('should submit the groups chosen for a user below administrator', async () => {

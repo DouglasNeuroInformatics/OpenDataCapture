@@ -9,14 +9,8 @@ export class MailSettingsPage extends AppPage {
   readonly port: Locator;
   readonly saveConfig: Locator;
   readonly senderAddress: Locator;
-  readonly sendTest: Locator;
   readonly serverCard: Locator;
-  readonly templateBody: Locator;
-  readonly templateCard: Locator;
-  readonly templateLanguage: Locator;
-  readonly templateSave: Locator;
   readonly testConnection: Locator;
-  readonly testRecipient: Locator;
   readonly username: Locator;
 
   constructor(page: Page) {
@@ -30,17 +24,6 @@ export class MailSettingsPage extends AppPage {
     this.senderAddress = page.getByTestId('mail-sender-address');
     this.saveConfig = page.getByTestId('mail-save-config');
     this.testConnection = page.getByTestId('mail-test-connection');
-    this.testRecipient = page.getByTestId('mail-test-recipient');
-    this.sendTest = page.getByTestId('mail-send-test');
-    this.templateCard = page.getByTestId('mail-template-card');
-    this.templateBody = page.getByTestId('new-user-template-body');
-    this.templateLanguage = page.getByTestId('new-user-template-language');
-    this.templateSave = page.getByTestId('mail-template-save');
-  }
-
-  /** The options of the welcome template's language picker, once it is open. */
-  get openLanguageOptions(): Locator {
-    return this.$ref.getByRole('option');
   }
 
   /** Idempotent: a configuration left enabled by an earlier spec already shows the form. */
@@ -54,11 +37,6 @@ export class MailSettingsPage extends AppPage {
       await this.enableToggle.click();
     }
     await this.serverCard.waitFor({ state: 'visible' });
-  }
-
-  /** The validation message rendered under a field, keyed by that field's control id. */
-  fieldError(field: string): Locator {
-    return this.$ref.getByTestId(`mail-${field}-error`);
   }
 
   async fillServerConfig({
