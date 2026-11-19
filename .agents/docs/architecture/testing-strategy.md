@@ -25,6 +25,12 @@ from the `name` field in each package's `vitest.config.ts`, e.g. `api`, `web`, `
 single file with `pnpm exec vitest path/to/file.test.ts`. A scoped run with `--coverage` measures
 only what it ran against the whole coverage scope, so add `--coverage.thresholds.100=false` to it.
 
+**`pnpm test:coverage` and `pnpm test:e2e` take one lock per machine.** `scripts/with-test-lock.sh`
+holds a directory in the git common directory, which every worktree shares, so a second heavy run —
+from another session or worktree — waits and says whose run it is waiting on, rather than exhausting
+memory or colliding on the e2e ports. A lock whose holder has exited is taken over. `vitest` without
+`--coverage` and the scoped runs above take no lock.
+
 ## A test nothing collects passes silently
 
 Root `vitest.config.ts` collects only `.github/vitest.config.ts`, `apps/*/vitest.config.ts`,
