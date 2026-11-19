@@ -54,6 +54,29 @@ test.describe('start session', () => {
     await startSessionPage.submitForm();
     await expect(startSessionPage.successMessage).toBeVisible();
   });
+
+  // The form used to compute the session date once, when its code first loaded, so every in-person
+  // session started later in the same page load was backdated to that moment.
+  test('should date an in-person session when it is submitted, not when the page opened', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const openedAt = new Date();
+    await page.clock.install({ time: openedAt });
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.typeSubjectId(`timed-${uniqueId}`);
+    await startSessionPage.dismissSubjectIdOptions();
+    await page.clock.fastForward('02:00:00');
+
+    const sessionCreated = page.waitForResponse(
+      (response) => response.url().endsWith('/v1/sessions') && response.request().method() === 'POST'
+    );
+    await startSessionPage.submitForm();
+    const session = (await (await sessionCreated).json()) as { date: string };
+    expect(new Date(session.date).getTime()).toBeGreaterThanOrEqual(openedAt.getTime() + 2 * 60 * 60 * 1000);
+  });
 });
 
 // A custom id says nothing about the subject behind it, so the form fills in what an existing

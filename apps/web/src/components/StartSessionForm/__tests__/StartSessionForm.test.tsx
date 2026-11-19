@@ -440,6 +440,60 @@ describe('StartSessionForm', () => {
     });
   });
 
+  describe('timing', () => {
+    const DAY = 24 * 60 * 60 * 1000;
+
+    const pageLoadedAt = Date.now();
+
+    const toDateString = (time: number) => new Date(time).toISOString().slice(0, 10);
+
+    const moveClock = (time: number) => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(time);
+    };
+
+    const enterSessionDate = (form: HTMLElement, date: string) => {
+      const input = form.querySelector<HTMLInputElement>('[name="sessionDate"]')!;
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: date } });
+      fireEvent.blur(input);
+    };
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should date an in-person session at submission, so a session started later in the same page load is not backdated to when the page opened', async () => {
+      const startedAt = pageLoadedAt + 2 * 60 * 60 * 1000;
+      const form = renderForm([]);
+      typeIdentifier('abc');
+      closeIdentifierPopup();
+      moveClock(startedAt);
+      await submitAndSettle(form);
+      expect(onSubmit.mock.lastCall?.[0].date).toStrictEqual(new Date(startedAt));
+    });
+
+    it('should accept a retrospective date later than when the page opened once that date has passed', async () => {
+      const form = renderForm([]);
+      typeIdentifier('abc');
+      closeIdentifierPopup();
+      fireEvent.change(form.querySelector('[name="sessionType"]')!, { target: { value: 'RETROSPECTIVE' } });
+      enterSessionDate(form, toDateString(pageLoadedAt + DAY));
+      moveClock(pageLoadedAt + 2 * DAY);
+      fireEvent.click(submitButton());
+      await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+      expect(onSubmit.mock.lastCall?.[0].date).toStrictEqual(new Date(toDateString(pageLoadedAt + DAY)));
+    });
+
+    it("should accept a date of birth that reaches the group's minimum age only after the page opened", async () => {
+      const minimumAgeReachedAt = pageLoadedAt - 18 * 31556952000 + 5 * DAY;
+      const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
+      fillPersonalInfo(form, { dateOfBirth: toDateString(minimumAgeReachedAt), firstName: 'Jane' });
+      moveClock(pageLoadedAt + 10 * DAY);
+      await submitAndSettle(form);
+    });
+  });
+
   describe('date of birth', () => {
     const futureDateOfBirth = `${new Date().getFullYear() + 1}-01-01`;
 

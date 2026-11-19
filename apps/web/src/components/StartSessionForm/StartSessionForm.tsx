@@ -19,7 +19,9 @@ import { z } from 'zod/v4';
 import { useSubjectDemographicsLookup } from '@/hooks/useSubjectDemographicsLookup';
 import { getValueForLanguage } from '@/utils/language';
 
-const currentDate = new Date();
+const MILLISECONDS_PER_YEAR = 31556952000;
+
+const isNotInFuture = (date: Date) => date <= new Date();
 
 type StartSessionFormValues = FormTypes.PartialData<StartSessionFormData>;
 
@@ -62,9 +64,6 @@ export const StartSessionForm = ({
   const lookupDemographics = useSubjectDemographicsLookup();
   const [autofilled, setAutofilled] = useState<AutofilledDemographics>({});
   const latestCustomId = useRef('');
-  const minDateOfBirth = currentGroup?.settings.minimumAge
-    ? new Date(currentDate.getTime() - currentGroup.settings.minimumAge * 31556952000)
-    : undefined;
 
   const scopeCustomId = (customId: string) => {
     return encodeScopedSubjectId(customId, { groupName: currentGroup?.name ?? DEFAULT_GROUP_NAME });
@@ -230,8 +229,8 @@ export const StartSessionForm = ({
           sessionType: $SessionType.exclude(['REMOTE']),
           sessionDate: z
             .date()
-            .max(currentDate, { message: t('session.errors.assessmentMustBeInPast') })
-            .default(currentDate)
+            .refine(isNotInFuture, { message: t('session.errors.assessmentMustBeInPast') })
+            .default(() => new Date())
         })
         .superRefine((val, ctx) => {
           if (val.subjectIdentificationMethod === 'CUSTOM_ID') {
@@ -287,7 +286,9 @@ export const StartSessionForm = ({
               }
             }
           }
-          if (val.subjectDateOfBirth && val.subjectDateOfBirth > currentDate) {
+          const minimumAge = currentGroup?.settings.minimumAge;
+          const minDateOfBirth = minimumAge ? new Date(Date.now() - minimumAge * MILLISECONDS_PER_YEAR) : undefined;
+          if (val.subjectDateOfBirth && !isNotInFuture(val.subjectDateOfBirth)) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t({
@@ -301,9 +302,9 @@ export const StartSessionForm = ({
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t({
-                en: `Subject must be above age of ${currentGroup?.settings.minimumAge}`,
-                es: `El sujeto debe tener más de ${currentGroup?.settings.minimumAge} años`,
-                fr: `Le sujet doit avoir au moins ${currentGroup?.settings.minimumAge} ans`
+                en: `Subject must be above age of ${minimumAge}`,
+                es: `El sujeto debe tener más de ${minimumAge} años`,
+                fr: `Le sujet doit avoir au moins ${minimumAge} ans`
               }),
               path: ['subjectDateOfBirth']
             });
