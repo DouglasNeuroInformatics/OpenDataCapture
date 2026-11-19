@@ -78,7 +78,7 @@ export const SeriesInstrumentRenderer = ({
     useInstrumentLanguage(language);
   const rootState = useInterpretedInstrument<UnilingualSeriesInstrument>(target.bundle, undefined, contentLanguage);
   const scalarState = useInterpretedInstrument<AnyUnilingualScalarInstrument>(
-    scalarBundle ?? '',
+    scalarBundle ?? null,
     undefined,
     contentLanguage
   );

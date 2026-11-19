@@ -20,12 +20,12 @@ export type InterpretedInstrumentState<TInstrument extends AnyUnilingualInstrume
 /**
  * Interpret an instrument bundle directly in the browser
  *
- * @param bundle - the JavaScript code to be interpreted directly in the browser
+ * @param bundle - the JavaScript code to be interpreted directly in the browser, or `null` while there is none
  * @param language - the language to translate into; defaults to the interface language
  * @returns The instrument generated from the code, translated into that language, if possible, otherwise the default
  */
 export function useInterpretedInstrument<TInstrument extends AnyUnilingualInstrument = AnyUnilingualInstrument>(
-  bundle: string,
+  bundle: null | string,
   options?: InterpretOptions,
   language?: InterfaceLanguage
 ): InterpretedInstrumentState<TInstrument & { supportedLanguages: Language[] }> {
@@ -35,6 +35,9 @@ export function useInterpretedInstrument<TInstrument extends AnyUnilingualInstru
   const targetLanguage = language ?? resolvedLanguage;
 
   useEffect(() => {
+    if (bundle === null) {
+      return;
+    }
     // A bundle that resolves after the hook has moved on to another one would otherwise be reported
     // as the outcome of that other bundle, or leave this stuck reporting LOADING for it forever.
     let isCurrent = true;
