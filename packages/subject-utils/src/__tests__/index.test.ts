@@ -2,10 +2,13 @@ import type { ClinicalSubjectIdentificationData } from '@opendatacapture/schemas
 import { describe, expect, it } from 'vitest';
 
 import {
+  deriveCustomFieldsSubjectId,
   encodeScopedSubjectId,
   generateSubjectHash,
   inferSubjectIdentificationMethod,
+  isCustomFieldsSubjectId,
   isSubjectWithPersonalInfo,
+  normalizeCustomFieldValue,
   removeSubjectIdScope,
   toStoredSubjectId
 } from '../index.js';
@@ -18,6 +21,8 @@ const validIdentificationData = {
 } as const;
 
 const nameHash = '520be817915752b50f418a743a54b692ce8e2a0a3421931598ffad246182568f';
+
+const customFieldsSubjectId = 'cf_1284ad542e92c54dbe37f0dc1f37114bb4ca53d7000a810e7c30359f15d7ec34';
 
 describe('generateSubjectHash', () => {
   it('should hash valid clinical identification data to a deterministic string', async () => {
@@ -205,5 +210,117 @@ describe('toStoredSubjectId', () => {
   });
   it('should leave a value that already holds a scope alone', () => {
     expect(toStoredSubjectId('Other_Group$ex_111', { groupName: 'My Group' })).toBe('Other_Group$ex_111');
+  });
+  it('should leave a custom-fields id unscoped, so it names the subject every group shares', () => {
+    expect(toStoredSubjectId(customFieldsSubjectId, { groupName: 'My Group' })).toBe(customFieldsSubjectId);
+  });
+});
+
+describe('isCustomFieldsSubjectId', () => {
+  it('should accept cf_ followed by 64 lowercase hex characters', () => {
+    expect(isCustomFieldsSubjectId(customFieldsSubjectId)).toBe(true);
+  });
+  it('should reject uppercase hex, which derivation never writes', () => {
+    expect(isCustomFieldsSubjectId(`cf_${nameHash.toUpperCase()}`)).toBe(false);
+  });
+  it('should reject a digest of the wrong length', () => {
+    expect(isCustomFieldsSubjectId(customFieldsSubjectId.slice(0, -1))).toBe(false);
+  });
+  it('should reject a bare digest, which is a name hash', () => {
+    expect(isCustomFieldsSubjectId(nameHash)).toBe(false);
+  });
+});
+
+describe('normalizeCustomFieldValue', () => {
+  it.each([
+    ['Jané', 'JANE'],
+    ['Jean Paul', 'JEANPAUL'],
+    ['Jean\u2011Paul', 'JEANPAUL'],
+    ["O'Brien", 'OBRIEN'],
+    ['ab-12 34', 'AB1234'],
+    ['１２３４', '1234'],
+    ['Straße', 'STRASSE'],
+    ['Иван', 'ИВАН']
+  ])('should keep only the uppercase letters and digits of %s, giving %s', (typed, normalized) => {
+    expect(normalizeCustomFieldValue(typed)).toBe(normalized);
+  });
+  it.each([
+    ['Lebœuf', 'LEBOEUF'],
+    ['Ægir', 'AEGIR'],
+    ['Sørensen', 'SORENSEN'],
+    ['Łukasz', 'LUKASZ'],
+    ['Đorđe', 'DORDE'],
+    ['Ðóra', 'DORA'],
+    ['Þór', 'THOR']
+  ])('should spell out the letters NFKD leaves whole, so %s becomes %s', (typed, normalized) => {
+    expect(normalizeCustomFieldValue(typed)).toBe(normalized);
+  });
+  it('should keep 李 and 里 apart, so two subjects are never merged', () => {
+    expect([normalizeCustomFieldValue('李'), normalizeCustomFieldValue('里')]).toEqual(['李', '里']);
+  });
+  it('should remove a combining mark that uppercasing introduces, so ǰ becomes J', () => {
+    expect(normalizeCustomFieldValue('ǰ')).toBe('J');
+  });
+  it('should normalize punctuation alone to an empty string', () => {
+    expect(normalizeCustomFieldValue(' -/. ')).toBe('');
+  });
+});
+
+describe('deriveCustomFieldsSubjectId', () => {
+  const salt = '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f';
+
+  it('should derive with PBKDF2-SHA-256 over the JSON array of normalized values at 600,000 iterations', async () => {
+    await expect(deriveCustomFieldsSubjectId(['AB12', 'REX'], { iterations: 600_000, salt })).resolves.toBe(
+      'cf_1284ad542e92c54dbe37f0dc1f37114bb4ca53d7000a810e7c30359f15d7ec34'
+    );
+  });
+  it('should use the iteration count it is given', async () => {
+    await expect(deriveCustomFieldsSubjectId(['AB12', 'REX'], { iterations: 1000, salt })).resolves.toBe(
+      'cf_55bf9f2b20c484237eb7ff3a865164f9436c155b4ed7051db5282c45224959af'
+    );
+  });
+  it('should normalize each value itself, so a caller cannot forget to', async () => {
+    await expect(deriveCustomFieldsSubjectId(['ab-12', ' Rex '], { iterations: 1000, salt })).resolves.toBe(
+      'cf_55bf9f2b20c484237eb7ff3a865164f9436c155b4ed7051db5282c45224959af'
+    );
+  });
+  it('should keep field boundaries, so ["AB", "C"] and ["A", "BC"] are different subjects', async () => {
+    await expect(
+      Promise.all([
+        deriveCustomFieldsSubjectId(['AB', 'C'], { iterations: 1000, salt }),
+        deriveCustomFieldsSubjectId(['A', 'BC'], { iterations: 1000, salt })
+      ])
+    ).resolves.toEqual([
+      'cf_b259140eea61c11ee9ae9e9c588c8658cd07b34becd5384d522434beb51df58b',
+      'cf_7c273fcc2043db276f976eca3f6d342152d8f86ad75e58e8d6d6a801f02c4504'
+    ]);
+  });
+  it('should hash the UTF-8 encoding, so 李 and 里 give different ids', async () => {
+    await expect(
+      Promise.all([
+        deriveCustomFieldsSubjectId(['李'], { iterations: 1000, salt }),
+        deriveCustomFieldsSubjectId(['里'], { iterations: 1000, salt })
+      ])
+    ).resolves.toEqual([
+      'cf_b8371d43ffc6f1407359605879b8705cda6689915f39b7499fc92a0d5f3c4b22',
+      'cf_ee997483bb6ef14ebb034cb15635cf14b8f5a7a5a0487ea6ccd971fc3d281f8f'
+    ]);
+  });
+  it('should derive an id isCustomFieldsSubjectId accepts', async () => {
+    const id = await deriveCustomFieldsSubjectId(['AB12'], { iterations: 1, salt });
+    expect(isCustomFieldsSubjectId(id)).toBe(true);
+  });
+  it('should refuse a value that normalizes to nothing, rather than hash an empty field', async () => {
+    await expect(deriveCustomFieldsSubjectId(['AB12', '--'], { iterations: 1000, salt })).rejects.toThrow(
+      /letter or digit/
+    );
+  });
+  it('should refuse an empty list of values, which would give every subject the same id', async () => {
+    await expect(deriveCustomFieldsSubjectId([], { iterations: 1000, salt })).rejects.toThrow(/at least one value/);
+  });
+  it('should refuse a salt that is not 64 lowercase hex characters, rather than derive from misread bytes', async () => {
+    await expect(deriveCustomFieldsSubjectId(['AB12'], { iterations: 1000, salt: salt.toUpperCase() })).rejects.toThrow(
+      /salt/
+    );
   });
 });
