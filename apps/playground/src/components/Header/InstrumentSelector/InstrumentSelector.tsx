@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button, Popover } from '@douglasneuroinformatics/libui/components';
 import { cn } from '@douglasneuroinformatics/libui/utils';
@@ -12,7 +12,6 @@ import { useAppStore } from '@/store';
 
 export const InstrumentSelector = () => {
   const [open, setOpen] = useState(false);
-  const listId = useId();
   const instruments = useAppStore((store) => store.instruments);
   const selectedInstrument = useAppStore((store) => store.selectedInstrument);
   const setSelectedInstrument = useAppStore((store) => store.setSelectedInstrument);
@@ -30,10 +29,10 @@ export const InstrumentSelector = () => {
     <Popover open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
         <Button
-          aria-controls={listId}
           aria-expanded={open}
           aria-label="Load an instrument..."
           className="w-full flex-1 justify-between"
+          // eslint-disable-next-line jsx-a11y/role-has-required-aria-props -- Radix's PopoverTrigger sets aria-controls to the popover content when it renders this button
           role="combobox"
           variant="outline"
         >
@@ -44,7 +43,7 @@ export const InstrumentSelector = () => {
       <Popover.Content className="w-72 p-0 lg:w-96">
         <Command>
           <Command.Input placeholder="Search..." />
-          <Command.List id={listId}>
+          <Command.List>
             <Command.Empty>No Instruments Found</Command.Empty>
             {Object.entries(categorizedInstruments).map(([heading, instruments]) => (
               <Command.Group heading={heading} key={heading}>
