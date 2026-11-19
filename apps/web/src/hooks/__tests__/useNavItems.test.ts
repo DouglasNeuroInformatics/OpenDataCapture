@@ -276,13 +276,10 @@ describe('useNavItems', () => {
     ]);
   });
 
+  // The mail server is a tab of the settings page, so it has no link of its own.
   it('should gather the instance-wide configuration pages under instance', () => {
     const instance = adminPanel()?.children?.find((child) => child.label === 'Instance');
-    expect(instance?.children?.map((child) => child.url)).toStrictEqual([
-      '/admin/settings',
-      '/admin/branding',
-      '/admin/mail'
-    ]);
+    expect(instance?.children?.map((child) => child.url)).toStrictEqual(['/admin/settings', '/admin/branding']);
   });
 
   it('should leave no admin page at the top level of the sidebar, so admin links never mix with clinical ones', () => {

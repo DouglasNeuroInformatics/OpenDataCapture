@@ -60,7 +60,7 @@ run the generator.
    it first.
 
 10. **Add the tests.** A unit test named after the route file, in a `__tests__/` folder beside it
-    (`routes/_app/admin/__tests__/mail.test.tsx` tests `routes/_app/admin/mail.tsx`), and an e2e test
+    (`routes/_app/admin/__tests__/settings.test.tsx` tests `routes/_app/admin/settings.tsx`), and an e2e test
     — `.agents/docs/playbooks/add-e2e-test.md`.
 
 ## Verify
