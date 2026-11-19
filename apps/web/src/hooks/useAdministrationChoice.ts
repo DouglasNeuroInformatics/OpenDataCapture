@@ -1,35 +1,33 @@
 import { useState } from 'react';
 
-import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@opendatacapture/schemas/core';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 
-import { getAdministrationChoice } from '@/utils/administration-choice';
+import { getLanguageOptions } from '@/utils/administration-choice';
 import type { AdministrationChoice } from '@/utils/administration-choice';
 
 /**
- * The language a picked instrument is administered in. Picking an instrument starts at the interface
- * language, falling back as {@link getAdministrationChoice} does.
+ * The language a picked instrument is assigned in. No language is chosen to begin with, which
+ * leaves it to the subject's browser — the assignment is made before anyone knows what they read.
  *
  * @param allowedLanguages - narrows the instrument's own languages, e.g. to the instance's active ones
  */
 export function useAdministrationChoice(allowedLanguages?: readonly Language[]) {
-  const { resolvedLanguage } = useTranslation();
   const [instrument, setInstrument] = useState<null | TranslatedInstrumentInfo>(null);
-  const [preferredLanguage, setLanguage] = useState<Language>(resolvedLanguage);
+  const [language, setLanguage] = useState<Language | undefined>(undefined);
 
-  const describe = (picked: TranslatedInstrumentInfo, preferred: Language): AdministrationChoice => {
-    return getAdministrationChoice(picked, { allowedLanguages, preferredLanguage: preferred });
+  const describe = (picked: TranslatedInstrumentInfo, chosen: Language | undefined): AdministrationChoice => {
+    return { instrument: picked, language: chosen, languageOptions: getLanguageOptions(picked, allowedLanguages) };
   };
 
   const pick = (picked: TranslatedInstrumentInfo): AdministrationChoice => {
     setInstrument(picked);
-    setLanguage(resolvedLanguage);
-    return describe(picked, resolvedLanguage);
+    setLanguage(undefined);
+    return describe(picked, undefined);
   };
 
   return {
-    choice: instrument ? describe(instrument, preferredLanguage) : null,
+    choice: instrument ? describe(instrument, language) : null,
     pick,
     setLanguage
   };

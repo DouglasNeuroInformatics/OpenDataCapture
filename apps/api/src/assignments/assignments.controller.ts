@@ -41,7 +41,6 @@ import { MailService } from '@/mail/mail.service';
 import { redactEmails } from '@/mail/mail.utils';
 
 import { AssignmentsService } from './assignments.service';
-import { withLinkLanguage } from './assignments.utils';
 
 @Controller('assignments')
 export class AssignmentsController {
@@ -133,7 +132,7 @@ export class AssignmentsController {
       language,
       links: assignments.map((assignment) => ({
         expiresAt: assignment.expiresAt,
-        url: withLinkLanguage(assignment.url, language)
+        url: assignment.url
       })),
       recipient,
       template: await this.resolveTemplate(groupId ?? null, templateId, ability)
@@ -157,7 +156,7 @@ export class AssignmentsController {
     const assignment = await this.assignmentsService.findById(id, { ability });
     const result = await this.mailService.sendAssignmentEmail({
       language,
-      links: [{ expiresAt: assignment.expiresAt, url: withLinkLanguage(assignment.url, language) }],
+      links: [{ expiresAt: assignment.expiresAt, url: assignment.url }],
       recipient,
       template: await this.resolveTemplate(assignment.groupId ?? null, templateId, ability)
     });

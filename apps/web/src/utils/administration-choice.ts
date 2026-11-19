@@ -3,7 +3,10 @@ import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrume
 
 type AdministrationChoice = {
   instrument: TranslatedInstrumentInfo;
-  /** Absent only when the instrument offers none of the allowed languages. */
+  /**
+   * The language to open the instrument in. Absent means none was chosen, which a remote assignment
+   * leaves to the subject's browser and the instrument offers none of the allowed languages.
+   */
   language: Language | undefined;
   languageOptions: Language[];
 };
@@ -15,14 +18,20 @@ type AdministrationChoiceOptions = {
   preferredLanguage: Language;
 };
 
-/** The language a picked instrument is administered in, and the languages it could be. */
+/** The languages an instrument may be opened in here: its own, narrowed to the instance's active ones. */
+function getLanguageOptions(instrument: TranslatedInstrumentInfo, allowedLanguages?: readonly Language[]): Language[] {
+  return instrument.supportedLanguages.filter((language) => !allowedLanguages || allowedLanguages.includes(language));
+}
+
+/**
+ * The language a picked instrument opens in where one must be settled now, as on a showcase card
+ * that opens the instrument in a single click.
+ */
 function getAdministrationChoice(
   instrument: TranslatedInstrumentInfo,
   { allowedLanguages, preferredLanguage }: AdministrationChoiceOptions
 ): AdministrationChoice {
-  const languageOptions: Language[] = instrument.supportedLanguages.filter(
-    (language) => !allowedLanguages || allowedLanguages.includes(language)
-  );
+  const languageOptions = getLanguageOptions(instrument, allowedLanguages);
   return {
     instrument,
     language: languageOptions.includes(preferredLanguage) ? preferredLanguage : languageOptions[0],
@@ -30,5 +39,5 @@ function getAdministrationChoice(
   };
 }
 
-export { getAdministrationChoice };
+export { getAdministrationChoice, getLanguageOptions };
 export type { AdministrationChoice };

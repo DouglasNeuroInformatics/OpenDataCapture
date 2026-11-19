@@ -112,6 +112,17 @@ test.describe('remote assignment', () => {
     await expect(remoteAssignmentPage.urlInput).not.toHaveValue(firstUrl);
   });
 
+  // The default leaves the link without a language, so the gateway reads the subject's browser.
+  test('should create a link with no language unless one is chosen', async ({ getPageModel, page, uniqueId }) => {
+    await startSession(getPageModel, `Default${uniqueId}`, `User${uniqueId}`, 'Female');
+    await page.getByTestId('nav-button-/session/remote-assignment').click();
+    await page.waitForURL('**/session/remote-assignment');
+    const remoteAssignmentPage = new RemoteAssignmentPage(page);
+    await remoteAssignmentPage.selectInstrument('Happiness Questionnaire');
+    await remoteAssignmentPage.submitAssignmentForm();
+    await expect(remoteAssignmentPage.urlInput).toHaveValue(/\/assignments\/[^?]+$/);
+  });
+
   test('should create a link that opens the gateway in the language chosen for the assignment', async ({
     getPageModel,
     page,

@@ -223,7 +223,8 @@ describe('Route', () => {
       fireEvent.blur(input);
       submitForm();
       expect(await screen.findByText('Expiry date must be in the future')).toBeTruthy();
-      expect(mocks.mutateAsync).not.toHaveBeenCalled();
+      // Settles the form's own submit cycle, so no state update lands after the test has finished.
+      await waitFor(() => expect(mocks.mutateAsync).not.toHaveBeenCalled());
     });
 
     it('should create the assignment, expiring on the chosen day, for the session subject in the current group', async () => {
@@ -233,10 +234,15 @@ describe('Route', () => {
           expiresAt: new Date('2026-01-08'),
           groupId: 'group-1',
           instrumentId: 'instrument-1',
-          language: 'en',
+          language: undefined,
           subjectId: 'subject-1'
         }
       });
+    });
+
+    it('should leave the language unset by default, so the browser that opens the link decides', async () => {
+      await createAssignment();
+      expect(mocks.mutateAsync).toHaveBeenCalledWith({ data: expect.objectContaining({ language: undefined }) });
     });
 
     it('should assign the language chosen in the dialog, so the link opens the gateway in it', async () => {
@@ -248,13 +254,13 @@ describe('Route', () => {
       expect(mocks.mutateAsync).toHaveBeenCalledWith({ data: expect.objectContaining({ language: 'fr' }) });
     });
 
-    it('should offer only the languages the gateway serves, so the link cannot ask for one it would ignore', async () => {
+    it('should offer no language dropdown when the gateway serves only one, since there is nothing to pin', async () => {
       mocks.activeLanguages = ['fr'];
       selectInstrument();
       expect(screen.queryByTestId('administration-language')).toBeNull();
       submitForm();
       await waitForLink();
-      expect(mocks.mutateAsync).toHaveBeenCalledWith({ data: expect.objectContaining({ language: 'fr' }) });
+      expect(mocks.mutateAsync).toHaveBeenCalledWith({ data: expect.objectContaining({ language: undefined }) });
     });
 
     it('should refuse a redirect URL that is not https, without creating the assignment', async () => {
@@ -262,7 +268,7 @@ describe('Route', () => {
       fireEvent.change(screen.getByLabelText('Redirect URL (Optional)'), { target: { value: 'http://example.com' } });
       submitForm();
       await waitFor(() => expect(screen.getByTestId('error-message-text')).toBeTruthy());
-      expect(mocks.mutateAsync).not.toHaveBeenCalled();
+      await waitFor(() => expect(mocks.mutateAsync).not.toHaveBeenCalled());
     });
 
     it('should create the assignment with the redirect URL given', async () => {
@@ -305,7 +311,7 @@ describe('Route', () => {
       expect(mocks.QRCode.mock.lastCall?.[0]).toEqual({ url: assignment.url });
       expect(mocks.AssignmentEmailForm.mock.lastCall?.[0]).toEqual({
         assignment,
-        initialLanguage: 'en',
+        initialLanguage: undefined,
         instrumentLanguages: ['en', 'fr']
       });
     });

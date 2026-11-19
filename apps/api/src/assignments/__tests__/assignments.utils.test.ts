@@ -9,9 +9,9 @@ describe('withLinkLanguage', () => {
     );
   });
 
-  it('should keep the language a link was created in, so an email in another language cannot re-point it', () => {
+  it('should replace a language already on the link rather than name two', () => {
     expect(withLinkLanguage('https://gateway.example/assignments/abc?lang=en', 'es')).toBe(
-      'https://gateway.example/assignments/abc?lang=en'
+      'https://gateway.example/assignments/abc?lang=es'
     );
   });
 

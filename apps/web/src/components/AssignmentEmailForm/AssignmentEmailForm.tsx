@@ -12,7 +12,10 @@ import { useGroupQuery } from '@/hooks/useGroupQuery';
 import { useMailErrorMessage } from '@/hooks/useMailErrorMessage';
 import { useSendAssignmentEmailMutation } from '@/hooks/useSendAssignmentEmailMutation';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
+import { getLinkLanguage } from '@/utils/assignment-link';
 import { sendableLanguages } from '@/utils/language';
+
+import { ConfirmEmailLanguageDialog } from './ConfirmEmailLanguageDialog';
 
 const DEFAULT_TEMPLATE_OPTION = '__default__';
 
@@ -33,6 +36,7 @@ export const AssignmentEmailForm = ({ assignment, initialLanguage, instrumentLan
   const [languageChoice, setLanguageChoice] = useState<Language>(initialLanguage ?? resolvedLanguage);
   const [templateChoice, setTemplateChoice] = useState<null | string>(null);
   const [feedback, setFeedback] = useState<null | { message: string; tone: 'error' | 'success' }>(null);
+  const [isConfirmingLanguage, setIsConfirmingLanguage] = useState(false);
 
   // The server resolves the template from the assignment's own group, so this must query that
   // group rather than whichever one is currently selected in the app store - on the datahub they
@@ -65,10 +69,14 @@ export const AssignmentEmailForm = ({ assignment, initialLanguage, instrumentLan
   // leave the trigger showing a value with no matching item while a different one is posted.
   const language = languageOptions.includes(languageChoice) ? languageChoice : (languageOptions[0] ?? 'en');
 
+  // The link's own language, which the email's does not have to match — so it is worth confirming.
+  const linkLanguage = assignment ? getLinkLanguage(assignment.url) : undefined;
+
   const handleSendEmail = () => {
     if (!assignment || !recipient) {
       return;
     }
+    setIsConfirmingLanguage(false);
     setFeedback(null);
     const fail = (message: string) => {
       setFeedback({ message, tone: 'error' });
@@ -204,7 +212,13 @@ export const AssignmentEmailForm = ({ assignment, initialLanguage, instrumentLan
           disabled={!recipient || sendEmailMutation.isPending || groupQuery.isLoading}
           type="button"
           variant="primary"
-          onClick={handleSendEmail}
+          onClick={() => {
+            if (linkLanguage && linkLanguage !== language) {
+              setIsConfirmingLanguage(true);
+              return;
+            }
+            handleSendEmail();
+          }}
         >
           {sendEmailMutation.isPending
             ? t({ en: 'Sending…', es: 'Enviando…', fr: 'Envoi en cours…' })
@@ -222,6 +236,15 @@ export const AssignmentEmailForm = ({ assignment, initialLanguage, instrumentLan
         >
           {feedback.message}
         </p>
+      )}
+      {linkLanguage && (
+        <ConfirmEmailLanguageDialog
+          emailLanguage={isConfirmingLanguage ? language : null}
+          isPending={sendEmailMutation.isPending}
+          linkLanguage={linkLanguage}
+          onConfirm={handleSendEmail}
+          onOpenChange={setIsConfirmingLanguage}
+        />
       )}
     </div>
   );

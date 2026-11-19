@@ -138,7 +138,7 @@ describe('AssignmentsController', () => {
       await sendEmail({ language: 'en', recipient: 'p@x.org' });
       expect(groupsService.findById).not.toHaveBeenCalled();
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
-        links: [{ expiresAt: assignment.expiresAt, url: `${assignment.url}?lang=en` }],
+        links: [{ expiresAt: assignment.expiresAt, url: assignment.url }],
         recipient: 'p@x.org',
         template: DEFAULT_ASSIGNMENT_EMAIL_TEMPLATE
       });
@@ -150,7 +150,7 @@ describe('AssignmentsController', () => {
       assignmentsService.findById.mockResolvedValueOnce({ ...assignment, groupId: null });
       await sendEmail({ language: 'en', recipient: 'p@x.org' });
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
-        links: [{ expiresAt: assignment.expiresAt, url: `${assignment.url}?lang=en` }]
+        links: [{ expiresAt: assignment.expiresAt, url: assignment.url }]
       });
     });
 
@@ -237,11 +237,11 @@ describe('AssignmentsController', () => {
       await sendEmail({ language: 'fr', recipient: 'p@x.org' });
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
         language: 'fr',
-        links: [{ url: `${assignment.url}?lang=fr` }]
+        links: [{ url: assignment.url }]
       });
     });
 
-    it('keeps the language the assignment was created in, so the emailed link matches the copied one', async () => {
+    it('never re-points the link, so an email in another language cannot override what the link says', async () => {
       assignmentsService.findById.mockResolvedValueOnce({ ...assignment, url: `${assignment.url}?lang=en` });
       groupsService.findById.mockResolvedValueOnce({ emailTemplates: [] });
       await sendEmail({ language: 'fr', recipient: 'p@x.org' });
@@ -339,8 +339,8 @@ describe('AssignmentsController', () => {
       expect(mailService.sendAssignmentEmail).toHaveBeenCalledOnce();
       expect(mailService.sendAssignmentEmail.mock.lastCall?.[0]).toMatchObject({
         links: [
-          { expiresAt: assignment.expiresAt, url: `${assignment.url}?lang=en` },
-          { expiresAt: second.expiresAt, url: `${second.url}?lang=en` }
+          { expiresAt: assignment.expiresAt, url: assignment.url },
+          { expiresAt: second.expiresAt, url: second.url }
         ],
         recipient: 'p@x.org'
       });
