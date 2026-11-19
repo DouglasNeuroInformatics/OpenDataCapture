@@ -649,12 +649,7 @@ export class InstrumentRecordsService {
       {
         $project: {
           computedMeasures: 1,
-          date: {
-            $dateToString: {
-              date: '$createdAt',
-              format: '%Y-%m-%d'
-            }
-          },
+          date: { $dateToString: { date: '$date' } },
           // `$ifNull` for the same reason as in `summarizeRecords`: `$toString` of a missing field is
           // itself missing, so a record belonging to no group would drop `groupId` from the row
           // entirely and arrive as undefined behind a type that says it is a string.
@@ -665,12 +660,7 @@ export class InstrumentRecordsService {
           instrumentId: 1,
           seriesInstrumentId: { $ifNull: ['$seriesInstrumentId', null] },
           session: {
-            date: {
-              $dateToString: {
-                date: '$session.date',
-                format: '%Y-%m-%d'
-              }
-            },
+            date: { $dateToString: { date: '$session.date' } },
             id: {
               $toString: '$session._id'
             },
