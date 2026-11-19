@@ -1,15 +1,15 @@
 {
   "name": "@opendatacapture/playground",
-  "type": "module",
   "version": "0.0.0",
   "private": true,
   "license": "Apache-2.0",
+  "type": "module",
   "scripts": {
     "build": "tsc && pnpm exec vite build",
     "deploy": "rsync -r dist/* unrjos@cloud1.douglasneuroinformatics.ca:/home/unrjos/www/playground.opendatacapture.org",
     "dev": "NODE_ENV=development pnpm exec vite",
-    "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
+    "format": "oxfmt src",
+    "lint": "tsc && oxlint --fix src",
     "test": "env-cmd -f ../../.env vitest"
   },
   "dependencies": {
@@ -34,6 +34,7 @@
     "monaco-editor": "^0.57.0",
     "motion": "catalog:",
     "neverthrow": "catalog:",
+    "prettier": "catalog:",
     "react": "workspace:react__19.x@*",
     "react-dom": "workspace:react-dom__19.x@*",
     "react-dropzone": "catalog:",

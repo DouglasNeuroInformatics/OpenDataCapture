@@ -89,6 +89,10 @@ const config: KnipConfig = {
       // bundled into runtime/v1, so its whole surface is public API
       includeEntryExports: false
     },
+    'packages/oxlint-config': {
+      // oxlint loads it from the path that src/index.js resolves
+      ignoreDependencies: ['eslint-plugin-perfectionist']
+    },
     'packages/playground-url': {
       entry: ['src/cli.ts!', 'scripts/*.js'],
       includeEntryExports: false
@@ -111,10 +115,10 @@ const config: KnipConfig = {
       includeEntryExports: false
     },
     'packages/runtime-internal': {
-      ignoreIssues: { 'src/index.d.ts': ['exports', 'types'] }
+      ignoreIssues: { 'src/types.d.ts': ['exports', 'types'] }
     },
     'packages/runtime-meta': {
-      ignoreIssues: { 'src/index.d.ts': ['exports', 'types'] }
+      ignoreIssues: { 'src/types.d.ts': ['exports', 'types'] }
     },
     'packages/serve-instrument': {
       // scripts/build.js bundles src/client.tsx into dist/client.js, which the server inlines into each page

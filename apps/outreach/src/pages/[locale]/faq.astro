@@ -8,10 +8,6 @@ import Page from '@/layouts/Page.astro';
 
 const { resolvedLanguage, t } = useTranslations(Astro.url);
 
-export const getStaticPaths = () => {
-  return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
-};
-
 const faq = await getCollection('faq');
 faq.sort((a, b) => {
   if (a.data.order > b.data.order) {
@@ -21,39 +17,41 @@ faq.sort((a, b) => {
   }
   return 0;
 });
+
+export const getStaticPaths = () => {
+  return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
+};
 ---
 
 <Page bilingual>
   <PageHeading title={t('faq.heading')} />
   <div class="mx-auto max-w-3xl">
-    {
-      faq.map(({ data: { entries, title } }) => (
-        <div>
-          <h3 class="my-4 font-semibold tracking-tight md:text-lg">{title[resolvedLanguage]}</h3>
-          <ul class="accordion">
-            {entries.map(({ answer, question }) => (
-              <li class="accordion-item border-b">
-                <button class="accordion-trigger flex w-full flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180">
-                  {question[resolvedLanguage]}
-                  <ChevronDownIcon class="text-muted-foreground accordion-trigger-icon h-4 w-4 shrink-0 rotate-90 transition-transform duration-200" />
-                </button>
-                <div class="accordion-content h-0 overflow-hidden text-sm">
-                  <div class="text-muted-foreground pb-4">
-                    {Array.isArray(answer[resolvedLanguage]) ? (
-                      (answer[resolvedLanguage] as string[]).map((paragraph) => (
-                        <p class="my-4 first:mt-0">{paragraph}</p>
-                      ))
-                    ) : (
-                      <p>{answer[resolvedLanguage]}</p>
-                    )}
-                  </div>
+    {faq.map(({ data: { entries, title } }) => (
+      <div>
+        <h3 class="my-4 font-semibold tracking-tight md:text-lg">{title[resolvedLanguage]}</h3>
+        <ul class="accordion">
+          {entries.map(({ answer, question }) => (
+            <li class="accordion-item border-b">
+              <button class="accordion-trigger flex w-full flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180">
+                {question[resolvedLanguage]}
+                <ChevronDownIcon class="text-muted-foreground accordion-trigger-icon h-4 w-4 shrink-0 rotate-90 transition-transform duration-200" />
+              </button>
+              <div class="accordion-content h-0 overflow-hidden text-sm">
+                <div class="text-muted-foreground pb-4">
+                  {Array.isArray(answer[resolvedLanguage]) ? (
+                    (answer[resolvedLanguage] as string[]).map((paragraph) => (
+                      <p class="my-4 first:mt-0">{paragraph}</p>
+                    ))
+                  ) : (
+                    <p>{answer[resolvedLanguage]}</p>
+                  )}
                 </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))
-    }
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
   </div>
 </Page>
 <script>

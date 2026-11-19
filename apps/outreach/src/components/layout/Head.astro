@@ -1,13 +1,13 @@
 ---
-import themeInitScript from '@/scripts/theme-init.js?url';
 import { useTranslations } from '@/i18n';
+import themeInitScript from '@/scripts/theme-init.js?url';
 
 type Props = {
   bilingual?: boolean;
   hasDefaultLocaleRedirect?: boolean;
   meta?: {
-    title?: string;
     description?: string;
+    title?: string;
   };
 };
 
@@ -27,17 +27,15 @@ const path = Astro.url.pathname.replace(/^(\/en|\/fr)/, '');
   <meta property="og:description" content={meta?.description ?? t('meta.description')} />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
-  {
-    bilingual && (
-      <>
-        <meta property="og:locale" content={resolvedLanguage} />
-        <meta property="og:locale:alternate" content={altLanguage} />
-        {hasDefaultLocaleRedirect && <link rel="alternate" href={new URL(path, Astro.site)} hreflang="x-default" />}
-        <link rel="alternate" href={new URL(`/en${path}`, Astro.site)} hreflang="en" />
-        <link rel="alternate" href={new URL(`/fr${path}`, Astro.site)} hreflang="fr" />
-      </>
-    )
-  }
+  {bilingual && (
+    <>
+      <meta property="og:locale" content={resolvedLanguage} />
+      <meta property="og:locale:alternate" content={altLanguage} />
+      {hasDefaultLocaleRedirect && <link rel="alternate" href={new URL(path, Astro.site)} hreflang="x-default" />}
+      <link rel="alternate" href={new URL(`/en${path}`, Astro.site)} hreflang="en" />
+      <link rel="alternate" href={new URL(`/fr${path}`, Astro.site)} hreflang="fr" />
+    </>
+  )}
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="sitemap" href="/sitemap-index.xml" />
   <script is:inline src={themeInitScript}></script>

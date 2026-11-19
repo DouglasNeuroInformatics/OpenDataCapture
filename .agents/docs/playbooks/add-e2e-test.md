@@ -23,7 +23,7 @@ starting — `playwright.config.ts` boots api, gateway, web and playground itsel
 
 4. **Register it in `pageModels` in `testing/src/support/fixtures.ts`** if the spec navigates to it with
    `getPageModel`, keyed by the route literal — `'/datahub/subjects/$subjectId/assignments':
-SubjectAssignmentsPage`. A page reached by clicking through needs no entry; use `new XPage(page)`.
+   SubjectAssignmentsPage`. A page reached by clicking through needs no entry; use `new XPage(page)`.
 
 5. **Write the spec** at `testing/src/specs/<flow>.spec.ts`, importing
    `import { expect, test } from '../support/fixtures';`. With the raw `@playwright/test` import, a
@@ -44,7 +44,7 @@ SubjectAssignmentsPage`. A page reached by clicking through needs no entry; use 
 ## Verify
 
 ```sh
-pnpm --filter @opendatacapture/testing lint                                      # gen:routes, tsc, eslint .
+pnpm --filter @opendatacapture/testing lint                                      # gen:routes, tsc, oxlint .
 pnpm --filter @opendatacapture/testing test:e2e --list src/specs/<flow>.spec.ts  # your titles, under [chromium]
 pnpm --filter @opendatacapture/testing test:e2e src/specs/<flow>.spec.ts         # one spec; setup still runs
 pnpm test:e2e                                                                    # whole suite, from repo root

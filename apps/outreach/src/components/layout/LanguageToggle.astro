@@ -7,7 +7,7 @@ type Props = {
 
 const translations = useTranslations(Astro.url);
 const { altURL = translations.altURL } = Astro.props;
-const { t, resolvedLanguage } = translations;
+const { resolvedLanguage, t } = translations;
 
 const is404 = /^\/404\/?$/.test(Astro.url.pathname);
 ---

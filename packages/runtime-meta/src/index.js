@@ -9,10 +9,10 @@ const RUNTIME_DIST_DIRNAME = 'dist';
 
 export const RUNTIME_VERSIONS = ['v1'];
 
-/** @type {import('.').MANIFEST_FILENAME} */
+/** @type {typeof import('./types.d.ts').MANIFEST_FILENAME} */
 export const MANIFEST_FILENAME = 'runtime.json';
 
-/** @type {import('.').generateManifest} */
+/** @type {typeof import('./types.d.ts').generateManifest} */
 export async function generateManifest(baseDir) {
   /** @type {{ declarations: string[], html: string[], sources: string[], styles: string[] }} */
   const results = { declarations: [], html: [], sources: [], styles: [] };
@@ -37,11 +37,11 @@ export async function generateManifest(baseDir) {
   return results;
 }
 
-/** @type {import('.').parsePackages} */
+/** @type {typeof import('./types.d.ts').parsePackages} */
 export function parsePackages(runtimeVersion, manifest) {
   const importPathPattern = /^(@?[^@/]+(?:\/[^@/]+)?)(?:@([^/]+))?/;
 
-  /** @type {Map<string, import('.').RuntimePackageMetadata>} */
+  /** @type {Map<string, import('./types.d.ts').RuntimePackageMetadata>} */
   const packages = new Map();
 
   /** @param {string} filename @param {'css' | 'html' | 'js'} kind */
@@ -70,11 +70,11 @@ export function parsePackages(runtimeVersion, manifest) {
   return [...packages.values()];
 }
 
-/** @type {import('.').generateMetadata} */
+/** @type {typeof import('./types.d.ts').generateMetadata} */
 export async function generateMetadata(options) {
   const require = module.createRequire(options.rootDir);
 
-  /** @type {import('.').RuntimeMetadataMap} */
+  /** @type {import('./types.d.ts').RuntimeMetadataMap} */
   const metadata = new Map();
 
   for (const v of RUNTIME_VERSIONS) {
@@ -91,7 +91,7 @@ export async function generateMetadata(options) {
   return metadata;
 }
 
-/** @type {import('.').resolveRuntimeAsset} */
+/** @type {typeof import('./types.d.ts').resolveRuntimeAsset} */
 export async function resolveRuntimeAsset(url, metadata) {
   const [version, ...paths] = url?.split('/').filter(Boolean) ?? [];
   const filepath = paths.join('/');
@@ -100,7 +100,7 @@ export async function resolveRuntimeAsset(url, metadata) {
     return null;
   }
 
-  const { baseDir, manifest } = /** @type {import('.').RuntimeVersionMetadata} */ (metadata.get(version));
+  const { baseDir, manifest } = /** @type {import('./types.d.ts').RuntimeVersionMetadata} */ (metadata.get(version));
 
   if (filepath === MANIFEST_FILENAME) {
     return {

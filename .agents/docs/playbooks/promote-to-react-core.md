@@ -39,7 +39,7 @@ done; `apps/web`'s until step 9.
 6. **Repoint every `@/…` import.** react-core has no `@` alias, and neither does Storybook for files
    here. `@/components/*` becomes a relative sibling import; `@/store`, `@/hooks/*`, `@/config`,
    `@/services/*` and `@/utils/*` become props per step 5. A relative path climbing into
-   `apps/web/src` typechecks and no eslint rule forbids it — nothing under `src/` may resolve outside
+   `apps/web/src` typechecks and no oxlint rule forbids it — nothing under `src/` may resolve outside
    the package.
 
 7. **Declare every remaining bare import in `packages/react-core/package.json`** (`@heroicons/react`,

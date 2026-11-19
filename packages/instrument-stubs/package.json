@@ -1,9 +1,9 @@
 {
   "name": "@opendatacapture/instrument-stubs",
-  "type": "module",
   "version": "0.0.0",
-  "sideEffects": false,
   "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
   "exports": {
     "./file": "./src/file.js",
     "./forms": "./src/forms.js",
@@ -11,12 +11,9 @@
     "./series": "./src/series.js"
   },
   "scripts": {
-    "format": "prettier --write src",
-    "lint": "eslint --fix src",
+    "format": "oxfmt src",
+    "lint": "oxlint --fix src",
     "test": "vitest"
-  },
-  "peerDependencies": {
-    "@opendatacapture/runtime-core": "workspace:*"
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
@@ -24,5 +21,8 @@
   },
   "devDependencies": {
     "happy-dom": "catalog:"
+  },
+  "peerDependencies": {
+    "@opendatacapture/runtime-core": "workspace:*"
   }
 }

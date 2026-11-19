@@ -1,25 +1,18 @@
 {
   "name": "@opendatacapture/react-core",
-  "type": "module",
   "version": "0.0.0",
-  "sideEffects": false,
   "private": true,
   "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": "./src/index.ts",
     "./globals.css": "./src/globals.css"
   },
   "scripts": {
-    "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
+    "format": "oxfmt src",
+    "lint": "tsc && oxlint --fix src",
     "test": "vitest"
-  },
-  "peerDependencies": {
-    "axios": "catalog:",
-    "react": "workspace:react__19.x@*",
-    "react-dom": "workspace:react-dom__19.x@*",
-    "tailwindcss": "catalog:",
-    "zod": "workspace:zod__3.x@*"
   },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
@@ -49,5 +42,12 @@
     "happy-dom": "catalog:",
     "type-fest": "workspace:type-fest__4.x@*",
     "vite": "catalog:"
+  },
+  "peerDependencies": {
+    "axios": "catalog:",
+    "react": "workspace:react__19.x@*",
+    "react-dom": "workspace:react-dom__19.x@*",
+    "tailwindcss": "catalog:",
+    "zod": "workspace:zod__3.x@*"
   }
 }

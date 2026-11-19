@@ -1,1 +1,12 @@
-prettier-pre-commit
+STAGED_FILES=$(mktemp)
+trap 'rm -f "$STAGED_FILES"' EXIT
+
+git diff --cached --name-only --diff-filter=ACMR -z > "$STAGED_FILES"
+
+# Given no path, oxfmt formats the whole working directory
+[ -s "$STAGED_FILES" ] || exit 0
+
+xargs -0 pnpm exec oxfmt --no-error-on-unmatched-pattern < "$STAGED_FILES"
+
+# Add the formatted files back to staging
+xargs -0 git add < "$STAGED_FILES"

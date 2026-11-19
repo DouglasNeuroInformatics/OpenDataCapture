@@ -1,3 +1,5 @@
+/** @import { CreateRule } from '@oxlint/plugins' */
+
 const LITERAL_BODY_TYPES = new Set([
   'ArrayExpression',
   'JSXElement',
@@ -6,7 +8,7 @@ const LITERAL_BODY_TYPES = new Set([
   'TemplateLiteral'
 ]);
 
-/** @type {import('eslint').Rule.RuleModule} */
+/** @type {CreateRule} */
 export const multilineArrowBody = {
   create(context) {
     const { sourceCode } = context;

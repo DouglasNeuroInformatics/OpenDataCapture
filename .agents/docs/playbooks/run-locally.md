@@ -51,7 +51,7 @@ one.
    Done when `rs.status().ok` returns 1.
 
 6. **`pnpm install`.** It also installs the husky pre-commit hook, which formats staged files with
-   prettier and runs neither lint nor tests.
+   oxfmt and runs neither lint nor tests.
 
 7. **Run `pnpm build` once.** `runtime/v1/dist` is gitignored and read while Vite configs load, so a
    dev server started without it dies with

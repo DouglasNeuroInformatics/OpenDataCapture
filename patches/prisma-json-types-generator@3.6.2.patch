@@ -1,0 +1,65 @@
+diff --git a/dist/handler/model-payload.js b/dist/handler/model-payload.js
+index 2ea986da6386099a40838b11b305a548b3fa8a87..2ac34c102c8fa340d7f6a64c62bbf71bbee0c754 100644
+--- a/dist/handler/model-payload.js
++++ b/dist/handler/model-payload.js
+@@ -2,7 +2,7 @@
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.handleModelPayload = handleModelPayload;
+ const tslib_1 = require("tslib");
+-const typescript_1 = tslib_1.__importDefault(require("typescript"));
++const typescript_1 = tslib_1.__importDefault(require("@typescript/typescript6"));
+ const error_1 = require("../util/error");
+ const replace_object_1 = require("./replace-object");
+ /** Replacer responsible for the main <Model>Payload type. */
+diff --git a/dist/handler/module.js b/dist/handler/module.js
+index 7163a744b17b7e385af7cc12f50e86355115b6ea..b780de224f7445fc0b56fbb219f9723ba70e0318 100644
+--- a/dist/handler/module.js
++++ b/dist/handler/module.js
+@@ -2,7 +2,7 @@
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.handlePrismaModule = handlePrismaModule;
+ const tslib_1 = require("tslib");
+-const typescript_1 = tslib_1.__importDefault(require("typescript"));
++const typescript_1 = tslib_1.__importDefault(require("@typescript/typescript6"));
+ const constants_1 = require("../util/constants");
+ const error_1 = require("../util/error");
+ const statement_1 = require("./statement");
+diff --git a/dist/handler/replace-object.js b/dist/handler/replace-object.js
+index 1e51d23cc001a924d4e3474babd07337a85c95b4..680caaab696d250f03e999978c3718543573aa0a 100644
+--- a/dist/handler/replace-object.js
++++ b/dist/handler/replace-object.js
+@@ -2,7 +2,7 @@
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.replaceObject = replaceObject;
+ const tslib_1 = require("tslib");
+-const typescript_1 = tslib_1.__importDefault(require("typescript"));
++const typescript_1 = tslib_1.__importDefault(require("@typescript/typescript6"));
+ const find_signature_1 = require("../helpers/find-signature");
+ const type_parser_1 = require("../helpers/type-parser");
+ const create_signature_1 = require("../util/create-signature");
+diff --git a/dist/handler/statement.js b/dist/handler/statement.js
+index 97a76bb65644fedc9218b40500b197adb74c5845..fe83a885da4ffa4ff1c0a1b6f735cbc423dba23c 100644
+--- a/dist/handler/statement.js
++++ b/dist/handler/statement.js
+@@ -2,7 +2,7 @@
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.handleStatement = handleStatement;
+ const tslib_1 = require("tslib");
+-const typescript_1 = tslib_1.__importDefault(require("typescript"));
++const typescript_1 = tslib_1.__importDefault(require("@typescript/typescript6"));
+ const regex_1 = require("../helpers/regex");
+ const model_payload_1 = require("./model-payload");
+ const replace_object_1 = require("./replace-object");
+diff --git a/dist/on-generate.js b/dist/on-generate.js
+index 37cfe3fc3d77f61376f819ea650ed8f97e71fe39..5e09e15dfb1c2a9db1580562558ff180ab26db3e 100644
+--- a/dist/on-generate.js
++++ b/dist/on-generate.js
+@@ -4,7 +4,7 @@ exports.onGenerate = onGenerate;
+ const tslib_1 = require("tslib");
+ const promises_1 = tslib_1.__importDefault(require("node:fs/promises"));
+ const node_path_1 = require("node:path");
+-const typescript_1 = tslib_1.__importDefault(require("typescript"));
++const typescript_1 = tslib_1.__importDefault(require("@typescript/typescript6"));
+ const module_1 = require("./handler/module");
+ const statement_1 = require("./handler/statement");
+ const dmmf_1 = require("./helpers/dmmf");

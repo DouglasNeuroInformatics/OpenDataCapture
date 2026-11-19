@@ -12,7 +12,7 @@ that is deliberately left alone is recorded in the owning workspace's `AGENTS.md
 - **TS2345 on a route literal you just added** is expected until the user regenerates `route-tree.ts`
   (`.agents/docs/playbooks/add-web-route.md`). Every Vite run in `apps/web` (`dev`, `dev:test`, the Playwright
   webServer, `vite build`) rewrites that tracked file; if `git status` shows it after a debugging run, revert it.
-- **`pnpm lint` passed and the tree changed**: `eslint --fix` sorted your new code. Keep the rewrite.
+- **`pnpm lint` passed and the tree changed**: `oxlint --fix` sorted your new code. Keep the rewrite.
 - **`Failed to find .env file at default paths`**: run `pnpm generate:env` (root `AGENTS.md`).
 - **ENOENT while a Vite config resolves, or `/runtime/v1/*` unresolved**: `runtime/v1/dist` is unbuilt. Turbo
   builds it; a bare `tsc`, `vitest` or storybook does not (`.agents/docs/playbooks/run-locally.md`).

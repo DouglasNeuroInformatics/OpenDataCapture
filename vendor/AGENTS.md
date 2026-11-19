@@ -11,7 +11,7 @@ file is the rules for editing what is already here.
 
 ## Nothing in this directory is checked by anything
 
-`vendor/**/*` is in the `ignores` block of the root `eslint.config.js`. No package here has a
+`vendor/**/*` is in the `ignorePatterns` of the root `oxlint.config.ts`. No package here has a
 `tsconfig.json`, a `vitest.config.ts` or any `scripts`, so `pnpm lint` never visits them and `tsc`
 never reads a wrapper's declarations except through a consumer that imports them. The one automated
 guard is `runtime/v1/test/vendor-pairing.test.ts`. Every other rule below is one you have to hold

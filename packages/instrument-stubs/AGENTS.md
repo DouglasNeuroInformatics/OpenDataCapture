@@ -24,14 +24,14 @@ const { z } = await import('zod/v3');
 Note the version in that specifier. `src/file.js` and `src/interactive.js` use `zod/v4`;
 `src/forms.js` uses both — `zod/v3` in `unilingualFormInstrument`, `zod/v4` in
 `bilingualFormInstrument`. Match whichever the stub you are copying uses — a bare `zod` import is an
-eslint error repo-wide.
+oxlint error repo-wide.
 
 `src/file.js` is the smallest stub showing the whole shape (dynamic zod import, `internal`,
 `validationSchema` — `src/series.js` is shorter but has none of those); read it before adding one.
 
 ## Types
 
-There is **no `tsconfig.json`** and `lint` is `eslint --fix src` with no `tsc`. Shapes are asserted
+There is **no `tsconfig.json`** and `lint` is `oxlint --fix src` with no `tsc`. Shapes are asserted
 with JSDoc `@type` annotations that nothing in this package checks — a wrong stub surfaces as a
 failing `packages/schemas` test or a consumer's `tsc` error.
 
@@ -40,8 +40,8 @@ failing `packages/schemas` test or a consumer's `tsc` error.
 `pnpm exec vitest --project instrument-stubs` runs `src/__tests__/*.test.js` in vitest's node
 environment; a test that needs a DOM (as `interactive.test.js` does) opts into happy-dom with a
 `// @vitest-environment happy-dom` header. **Tests are `.test.js`, not `.test.ts`**: vitest would
-run either, but with no `tsconfig.json` here eslint's typed parser rejects a `.ts` file with
-`couldn't find any tsconfig.json`, failing `lint`. Import the stub modules directly
+run either, but with no `tsconfig.json` here type-aware oxlint lints a `.ts` file with default
+compiler options instead of the repo's, which can report false positives. Import the stub modules directly
 (`../forms.js`); each export is the `{ instance, ... }` object `createInstrumentStub` resolves to.
 
 The stubs are also the fixtures for `packages/schemas/src/instrument/__tests__/*.test.ts`, so

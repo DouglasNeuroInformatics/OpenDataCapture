@@ -1,13 +1,17 @@
 {
   "name": "opendatacapture",
-  "type": "module",
   "version": "2.6.0",
   "private": true,
-  "packageManager": "pnpm@10.34.3",
   "license": "Apache-2.0",
-  "engines": {
-    "node": "^24.22.1 || >=26.12.1"
-  },
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "type": "module",
   "scripts": {
     "build": "env-cmd turbo run build",
     "check": "pnpm lint && pnpm test:coverage && pnpm test:e2e",
@@ -24,7 +28,7 @@
     "generate:env": "./scripts/generate-env.sh",
     "knip": "NODE_ENV=development env-cmd knip",
     "lint": "turbo run lint lint:root",
-    "lint:root": "tsc --noEmit && eslint --fix .github/scripts .github/vitest.config.ts commitlint.config.ts knip.ts scripts vitest.config.ts",
+    "lint:root": "tsc --noEmit && oxlint --fix .github/scripts .github/vitest.config.ts commitlint.config.ts knip.ts oxfmt.config.ts oxlint.config.ts scripts vitest.config.ts",
     "postinstall": "turbo telemetry disable",
     "prepare": "husky",
     "start": "turbo run start",
@@ -34,39 +38,32 @@
     "ws": "./scripts/workspace.sh $@"
   },
   "devDependencies": {
+    "@astrojs/compiler-rs": "catalog:",
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
-    "@douglasneuroinformatics/eslint-config": "^6.0.0",
-    "@douglasneuroinformatics/prettier-config": "^0.4.0",
-    "@douglasneuroinformatics/tsconfig": "^2.0.0",
+    "@douglasneuroinformatics/tsconfig": "^3.0.0",
+    "@opendatacapture/oxlint-config": "workspace:*",
     "@types/node": "24.x",
     "@vitest/coverage-v8": "^5.0.2",
-    "@vitest/eslint-plugin": "catalog:",
     "conventional-commits-parser": "catalog:",
     "env-cmd": "^11.0.0",
-    "eslint": "9.39.x",
-    "eslint-plugin-playwright": "catalog:",
     "expect-type": "^1.4.0",
     "husky": "^9.1.7",
     "js-yaml": "^5.4.2",
     "knip": "^6.38.0",
-    "prettier": "^3.9.9",
-    "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.8.1",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
     "sort-json": "^2.0.1",
     "tsx": "catalog:",
     "turbo": "^2.11.5",
-    "typescript": "6.0.x",
+    "typescript": "catalog:",
     "vitest": "^5.0.2"
   },
-  "os": [
-    "darwin",
-    "linux"
-  ],
-  "cpu": [
-    "x64",
-    "arm64"
-  ],
+  "engines": {
+    "node": "^24.22.1 || >=26.12.1"
+  },
+  "packageManager": "pnpm@10.34.3",
   "pnpm": {
     "overrides": {
       "@tailwindcss/typography>postcss-selector-parser": "^6.1.5",
@@ -74,7 +71,6 @@
       "@types/react-dom": "-",
       "find-my-way@9": "^9.7.0",
       "sharp": "^0.35.5",
-      "typescript": "6.0.x",
       "yaml@2": "^2.9.0"
     },
     "onlyBuiltDependencies": [

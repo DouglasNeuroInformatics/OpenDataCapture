@@ -5,7 +5,7 @@ React components shared across the frontends: `apps/web`, `apps/gateway`, `apps/
 compiled instrument bundle into a running instrument.
 
 Read the root `AGENTS.md` first for the rules that apply everywhere. Conventions for components,
-props and styling are the same as `apps/web` — see `apps/web/AGENTS.md`; eslint applies its
+props and styling are the same as `apps/web` — see `apps/web/AGENTS.md`; oxlint applies its
 `no-clsx` / `no-tailwind-merge` / `import/no-default-export` / `jsx-no-literals` rules to
 `packages/react-core/src/**` and `apps/web/src/**` together.
 
@@ -153,4 +153,4 @@ libui's `t()` needs an initialised i18n, which no app supplies here — call
 `@testing-library/user-event` are **not** installed: assert with `toBeTruthy()`, interact with
 `fireEvent`.
 
-`pnpm --filter @opendatacapture/react-core lint` runs `tsc` then eslint.
+`pnpm --filter @opendatacapture/react-core lint` runs `tsc` then oxlint.

@@ -45,7 +45,8 @@ describe('AuthService', () => {
   /** The permissions the minted token actually carries, read back off the signed payload. */
   const mintedPermissions = async (currentUser: RequestUser): Promise<Permission[]> => {
     await authService.getCreateInstrumentToken(currentUser);
-    return (jwtService.signAsync.mock.lastCall?.[0] as { permissions: Permission[] }).permissions;
+    const [payload] = jwtService.signAsync.mock.lastCall ?? [];
+    return (payload as { permissions: Permission[] }).permissions;
   };
 
   beforeEach(() => {

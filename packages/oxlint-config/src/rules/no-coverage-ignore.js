@@ -1,6 +1,8 @@
+/** @import { CreateRule } from '@oxlint/plugins' */
+
 const COVERAGE_IGNORE = /^[\s*]*(?:c8|istanbul|v8)\s+ignore(?:\s|$)/u;
 
-/** @type {import('eslint').Rule.RuleModule} */
+/** @type {CreateRule} */
 export const noCoverageIgnore = {
   create(context) {
     return {

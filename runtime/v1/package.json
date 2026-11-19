@@ -1,34 +1,34 @@
 {
   "name": "@opendatacapture/runtime-v1",
-  "type": "module",
   "version": "2.6.0",
+  "homepage": "https://github.com/DouglasNeuroInformatics/OpenDataCapture/#readme",
+  "bugs": {
+    "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues"
+  },
+  "license": "Apache-2.0",
   "author": {
     "name": "Douglas Neuroinformatics",
     "email": "support@douglasneuroinformatics.ca"
   },
-  "license": "Apache-2.0",
-  "publishConfig": {
-    "access": "public"
-  },
-  "homepage": "https://github.com/DouglasNeuroInformatics/OpenDataCapture/#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture.git",
     "directory": "runtime/v1"
-  },
-  "bugs": {
-    "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture/issues"
-  },
-  "exports": {
-    "./*": "./dist/*",
-    "./env": "./env.d.ts",
-    "./package.json": "./package.json"
   },
   "files": [
     "dist",
     "env.d.ts",
     "global.d.ts"
   ],
+  "type": "module",
+  "exports": {
+    "./*": "./dist/*",
+    "./env": "./env.d.ts",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "pnpm exec runtime-bundler",
     "test": "vitest"

@@ -11,7 +11,7 @@ import {
 } from '@/utils/chart-palette';
 
 describe('CHART_PALETTE_NAMES', () => {
-  // The themes object is alphabetised by eslint, which would otherwise put `default` in the middle.
+  // The themes object is alphabetised by oxlint, which would otherwise put `default` in the middle.
   it('should offer the default theme first, since that is the one most users want', () => {
     expect(CHART_PALETTE_NAMES[0]).toBe('default');
   });

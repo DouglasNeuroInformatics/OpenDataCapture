@@ -30,7 +30,9 @@ type SomeUnilingualInstrument<TKind extends InstrumentKind> = Extract<AnyUniling
 
 /** @internal */
 type AnyUnilingualScalarInstrument =
-  AnyUnilingualFileInstrument | AnyUnilingualFormInstrument | AnyUnilingualInteractiveInstrument;
+  | AnyUnilingualFileInstrument
+  | AnyUnilingualFormInstrument
+  | AnyUnilingualInteractiveInstrument;
 
 /** @internal */
 type SomeUnilingualScalarInstrument<TKind extends InstrumentKind> = Extract<

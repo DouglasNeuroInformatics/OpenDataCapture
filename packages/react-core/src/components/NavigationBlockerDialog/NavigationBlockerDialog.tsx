@@ -10,6 +10,7 @@ export type NavigationBlockerDialogProps = {
   open: boolean;
 };
 
+// eslint-disable-next-line react/function-component-definition -- the named function passed to memo gives the component its display name
 export const NavigationBlockerDialog = memo<NavigationBlockerDialogProps>(function NavigationBlockerDialog({
   message,
   onCancel,

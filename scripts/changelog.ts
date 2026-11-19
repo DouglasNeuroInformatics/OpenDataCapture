@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { CommitParser } from 'conventional-commits-parser';
-import { format } from 'prettier';
+
+import { formatSource } from './format.ts';
 
 type Bump = 'major' | 'minor' | 'patch';
 
@@ -164,7 +165,7 @@ function toDocsCopy(changelog: string): string {
 
 async function writeFormatted(filePath: string, contents: string): Promise<void> {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, await format(contents, { filepath: filePath }));
+  fs.writeFileSync(filePath, await formatSource(filePath, contents));
 }
 
 async function write(version: string): Promise<void> {

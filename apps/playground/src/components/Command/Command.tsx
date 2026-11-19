@@ -10,23 +10,18 @@ import { CommandInput } from './CommandInput';
 import { CommandItem } from './CommandItem';
 import { CommandList } from './CommandList';
 
-type CommandRootProps = Simplify<React.ComponentPropsWithoutRef<typeof CommandPrimitive>>;
+type CommandRootProps = Simplify<React.ComponentProps<typeof CommandPrimitive>>;
 
-const CommandRoot = React.forwardRef<React.ElementRef<typeof CommandPrimitive>, CommandRootProps>(function Command(
-  { className, ...props },
-  ref
-) {
-  return (
-    <CommandPrimitive
-      className={cn(
-        'bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md',
-        className
-      )}
-      ref={ref}
-      {...props}
-    />
-  );
-});
+const CommandRoot = ({ className, ref, ...props }: CommandRootProps) => (
+  <CommandPrimitive
+    className={cn(
+      'bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md',
+      className
+    )}
+    ref={ref}
+    {...props}
+  />
+);
 
 export const Command = Object.assign(CommandRoot, {
   Empty: CommandEmpty,

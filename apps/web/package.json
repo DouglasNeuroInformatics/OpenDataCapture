@@ -1,16 +1,16 @@
 {
   "name": "@opendatacapture/web",
-  "type": "module",
   "version": "0.0.0",
   "private": true,
   "license": "Apache-2.0",
+  "type": "module",
   "scripts": {
     "build": "tsc && NODE_ENV=production NODE_OPTIONS='--import=tsx' pnpm exec vite build",
     "dev": "NODE_ENV=development NODE_OPTIONS='--import=tsx' env-cmd -f ../../.env pnpm exec vite",
     "dev:test": "NODE_ENV=test NODE_OPTIONS='--import=tsx' env-cmd -f ../../.env pnpm exec vite --mode test",
-    "format": "prettier --write src",
+    "format": "oxfmt src",
     "format:translations": "find src/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
-    "lint": "tsc && eslint --fix src",
+    "lint": "tsc && oxlint --fix src",
     "start": "NODE_ENV=production env-cmd -f ../../.env -- pnpm exec import-meta-env -x .env.public -p dist/index.html && python -m http.server -d dist 3000",
     "test": "env-cmd -f ../../.env vitest"
   },

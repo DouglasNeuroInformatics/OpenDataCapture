@@ -1,0 +1,22 @@
+{
+  "name": "@opendatacapture/oxlint-config",
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "format": "oxfmt src",
+    "lint": "tsc && oxlint --fix src",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "eslint-plugin-perfectionist": "catalog:",
+    "eslint-plugin-playwright": "catalog:"
+  },
+  "devDependencies": {
+    "@oxlint/plugins": "catalog:",
+    "oxlint": "catalog:"
+  }
+}

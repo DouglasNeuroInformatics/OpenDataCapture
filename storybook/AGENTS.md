@@ -64,7 +64,7 @@ before writing one. Two things are easy to get wrong:
 
 - Types come from **`@storybook/react-vite`**, not `@storybook/react`.
 - The default export is the `Meta`. `import/no-default-export` is enforced across
-  `*/components/**`, but `eslint.config.js` exempts `**/*.stories.tsx` — this is the one place in
+  `*/components/**`, but `oxlint.config.ts` exempts `**/*.stories.tsx` — this is the one place in
   those directories where a default export is correct.
 
 Theme switching is `withThemeByDataAttribute` on `data-mode`, matching `apps/web`.
@@ -78,7 +78,7 @@ prerequisites a fresh clone does not have:
 - **`runtime/v1/dist` built.** `vite.config.js` installs `@opendatacapture/vite-plugin-runtime`,
   which reads `@opendatacapture/runtime-v1/dist` while resolving the Vite config and then serves it
   under `/runtime`. If that directory does not exist the dev server throws before it starts. `pnpm
-build` produces it. Background: `.agents/docs/architecture/runtime-and-vendor.md`.
+  build` produces it. Background: `.agents/docs/architecture/runtime-and-vendor.md`.
 
 `config/preview.ts` runs `await esbuild.initialize(...)` at module scope and imports
 `apps/web/src/services/i18n` for its side effect, so **every** story — including react-core ones —
@@ -89,6 +89,6 @@ boots with web's i18n resources and a live `esbuild-wasm`. That is what lets the
 ## No tests, no build
 
 There is no `vitest.config.ts` and no `build` script here, so `pnpm test` and `pnpm build` do not
-cover this workspace and neither does CI. `lint` is `tsc && eslint --fix config vite.config.js`, and
+cover this workspace and neither does CI. `lint` is `tsc && oxlint --fix config vite.config.js`, and
 `tsconfig.json` includes only `config/*` and `vite.config.js` — **stories are type-checked by their
 owning package, never by this one.**

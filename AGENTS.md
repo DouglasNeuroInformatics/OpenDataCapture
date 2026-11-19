@@ -1,7 +1,7 @@
 # Open Data Capture
 
 An electronic data capture platform for administering remote and in-person clinical instruments.
-It is a pnpm/Turborepo monorepo written in TypeScript: 27 first-party workspaces under `apps/`,
+It is a pnpm/Turborepo monorepo written in TypeScript: 28 first-party workspaces under `apps/`,
 `packages/`, `runtime/`, `storybook/` and `testing/`, plus 38 thin version-pinned wrappers under
 `vendor/` that are also workspaces.
 
@@ -18,8 +18,8 @@ pnpm install                # install deps
 pnpm generate:env           # create .env from .env.template — required before anything else runs
 pnpm dev                    # run core apps (api, gateway, web) via turbo
 pnpm build                  # turbo build (all packages/apps)
-pnpm lint                   # turbo lint — `tsc && eslint --fix src` per package, plus lint:root for root-level scripts and configs
-pnpm format                 # turbo format (prettier per package)
+pnpm lint                   # turbo lint — `tsc && oxlint --fix src` per package, plus lint:root for root-level scripts and configs
+pnpm format                 # turbo format (oxfmt per package)
 pnpm test                   # vitest across the workspace
 pnpm test:coverage          # vitest with coverage — fails below 100%, the gate CI runs
 pnpm test:e2e               # playwright, in testing/
@@ -87,8 +87,8 @@ Outside call sites, an assertion the lint flags (`as`, `!`) is allowed only when
 Advanced type-level constructs (e.g., conditional types, template literal types, inference extraction, mapped types) are a routine tool.
 
 **Tests.** A unit test is `<file>.test.ts(x)` in a `__tests__/` folder beside the file it tests, or
-in a package's `test/` folder when it drives the whole package; eslint enforces the layout
-(`odc/unit-test-subject` in `.eslint/rules/`, beside the repo's other custom rules). Keep test
+in a package's `test/` folder when it drives the whole package; oxlint enforces the layout
+(`opendatacapture/unit-test-subject` in `packages/oxlint-config/src/rules/`, beside the repo's other custom rules). Keep test
 bodies short; each verifies one behavior. Descriptions are concise, grammatical sentences stating
 the behavioral reason, e.g. `'should key the cache on every parameter, so paging does not serve a
 stale page'`.

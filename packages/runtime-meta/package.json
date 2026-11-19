@@ -1,19 +1,19 @@
 {
   "name": "@opendatacapture/runtime-meta",
-  "type": "module",
   "version": "0.0.0",
-  "sideEffects": false,
   "private": true,
   "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
+      "types": "./src/types.d.ts",
       "import": "./src/index.js"
     }
   },
   "scripts": {
-    "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
+    "format": "oxfmt src",
+    "lint": "tsc && oxlint --fix src",
     "test": "vitest"
   }
 }

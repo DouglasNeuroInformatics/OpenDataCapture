@@ -46,7 +46,7 @@ project, so its test files are collected by nothing and CI stays green. The loud
    devDependency — ask first per the root rule, then `pnpm install`. Redeclare under `resolve.alias`
    any alias the source imports; `vite.config.ts` is not loaded during tests.
 
-5. **Add `vitest.config.ts` to the package's `tsconfig.json` `include`.** Package eslint runs on `src`
+5. **Add `vitest.config.ts` to the package's `tsconfig.json` `include`.** Package oxlint runs on `src`
    only, so `tsc` is the config's only check. Tests in `test/` rather than `src/` need `test/**/*.ts`
    there too (`packages/runtime-bundler`), or nothing type-checks them.
 

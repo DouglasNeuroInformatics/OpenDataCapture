@@ -1,3 +1,5 @@
+/** @import { CreateRule, Definition, ESTree, Scope, Variable } from '@oxlint/plugins' */
+
 const EVENT_PROP = /^on[A-Z]/u;
 
 const HANDLER_NAME = /^handle[A-Z]/u;
@@ -6,11 +8,14 @@ const SETTER_NAME = /^set[A-Z]/u;
 
 const FUNCTION_EXPRESSIONS = new Set(['ArrowFunctionExpression', 'FunctionExpression']);
 
+/** @type {(callee: ESTree.Expression) => boolean} */
 const isUseCallback = (callee) => {
-  const name = callee.type === 'MemberExpression' ? callee.property.name : callee.name;
-  return name === 'useCallback';
+  const identifier = callee.type === 'MemberExpression' ? callee.property : callee;
+  const isNamed = identifier.type === 'Identifier' || identifier.type === 'PrivateIdentifier';
+  return isNamed && identifier.name === 'useCallback';
 };
 
+/** @type {(definition: Definition) => boolean} */
 const isFunctionWrittenInFile = ({ node, type }) => {
   if (type === 'FunctionName') {
     return true;
@@ -22,6 +27,7 @@ const isFunctionWrittenInFile = ({ node, type }) => {
   return FUNCTION_EXPRESSIONS.has(init.type) || (init.type === 'CallExpression' && isUseCallback(init.callee));
 };
 
+/** @type {(scope: null | Scope, name: string) => undefined | Variable} */
 const findVariable = (scope, name) => {
   if (!scope) {
     return undefined;
@@ -29,7 +35,7 @@ const findVariable = (scope, name) => {
   return scope.set.get(name) ?? findVariable(scope.upper, name);
 };
 
-/** @type {import('eslint').Rule.RuleModule} */
+/** @type {CreateRule} */
 export const handlerNames = {
   create(context) {
     return {

@@ -14,7 +14,10 @@ import { getRightPanelGradient } from '@/utils/branding';
 import { getValueForLanguage } from '@/utils/language';
 
 type LoginResult =
-  { accessToken: string; kind: 'success' } | { kind: 'archived' } | { kind: 'disabled' } | { kind: 'unauthorized' };
+  | { accessToken: string; kind: 'success' }
+  | { kind: 'archived' }
+  | { kind: 'disabled' }
+  | { kind: 'unauthorized' };
 
 const loginRequest = async (credentials: $LoginCredentials): Promise<LoginResult> => {
   const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {

@@ -6,9 +6,8 @@ import path from 'node:path';
 import readline from 'node:readline/promises';
 import { parseArgs, styleText } from 'node:util';
 
-import { format } from 'prettier';
-
 import * as release from '../.github/scripts/release.ts';
+import { formatSource } from './format.ts';
 
 // The menu offers the bumps in this order, so they live in a tuple: perfectionist/sort-objects
 // alphabetizes object literals and would silently reorder the prompt.
@@ -348,7 +347,7 @@ async function editSupportTable(previousMajor: number, newMajor: number): Promis
   const table = [header, separator, `| ${newMajor} | ${released} | — | — |`, ...rows].join('\n');
   const updated = `${contents.slice(0, start + SUPPORT_TABLE_START.length)}\n\n${table}\n\n${contents.slice(end)}`;
   return {
-    contents: await format(updated, { filepath: absolutePath }),
+    contents: await formatSource(absolutePath, updated),
     relativePath: SUPPORT_POLICY_FILE,
     summary: `${previousMajor}.x supported until ${supportedUntil}`
   };

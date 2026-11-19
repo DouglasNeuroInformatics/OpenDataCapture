@@ -126,5 +126,5 @@ tag to a critical flow, leave it off everything else.
 
 There is **no `vitest.config.ts` here and no unit tier**; `pnpm test` never looks at this directory.
 
-`lint` is `pnpm gen:routes && tsc && eslint --fix .` — note the `.`, not `src`, so the config and
+`lint` is `pnpm gen:routes && tsc && oxlint --fix .` — note the `.`, not `src`, so the config and
 scripts are checked too.

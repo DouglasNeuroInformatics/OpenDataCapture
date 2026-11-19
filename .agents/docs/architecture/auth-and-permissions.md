@@ -15,8 +15,8 @@ that they may read _some_ subject; the `where` decides whether they may read _th
 
 ## Layer 1: `@RouteAccess`
 
-`REQUIRE_ROUTE_ACCESS` in the root `eslint.config.js` flags a handler without one; the guard turns a
-missing one into a 500. Nothing checks the value. Routes whose declaration is not the ordinary
+`opendatacapture/require-route-access` (`packages/oxlint-config/src/rules/`) flags a handler without
+one; the guard turns a missing one into a 500. Nothing checks the value. Routes whose declaration is not the ordinary
 `{ action, subject }` on the model they serve:
 
 | Route                             | Declaration                                   | Why it is safe                                                                                                                   |

@@ -1,23 +1,22 @@
 ---
+import { useTranslations } from '@/i18n';
+import type { Language } from '@/i18n';
 import Page from '@/layouts/Page.astro';
-import { type Language, useTranslations } from '@/i18n';
 
 const languages: Language[] = ['en', 'fr'];
 ---
 
 <Page className="flex flex-col items-center justify-center">
   <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">404</h1>
-  {
-    languages.map((language) => {
-      const { t } = useTranslations(new URL(`/${language}/`, Astro.url));
-      return (
-        <div class="mt-6 flex flex-col items-center" lang={language}>
-          <h2 class="text-xl font-bold tracking-tight sm:text-2xl">{t('common.pageNotFound')}</h2>
-          <p class="text-muted-foreground mt-2 max-w-prose text-center text-sm sm:text-base">
-            {t('common.pageNotFoundHint')}
-          </p>
-        </div>
-      );
-    })
-  }
+  {languages.map((language) => {
+    const { t } = useTranslations(new URL(`/${language}/`, Astro.url));
+    return (
+      <div class="mt-6 flex flex-col items-center" lang={language}>
+        <h2 class="text-xl font-bold tracking-tight sm:text-2xl">{t('common.pageNotFound')}</h2>
+        <p class="text-muted-foreground mt-2 max-w-prose text-center text-sm sm:text-base">
+          {t('common.pageNotFoundHint')}
+        </p>
+      </div>
+    );
+  })}
 </Page>

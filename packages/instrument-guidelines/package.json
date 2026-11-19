@@ -1,27 +1,19 @@
 {
   "name": "@opendatacapture/instrument-guidelines",
-  "type": "module",
   "version": "2.6.0",
   "description": "Guidelines for authoring Open Data Capture instruments, intended to be read by an AI agent (e.g. Claude Code).",
+  "keywords": [
+    "agent",
+    "claude",
+    "guidelines",
+    "instrument",
+    "opendatacapture"
+  ],
   "license": "Apache-2.0",
-  "publishConfig": {
-    "access": "public"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture.git",
     "directory": "packages/instrument-guidelines"
-  },
-  "keywords": [
-    "opendatacapture",
-    "instrument",
-    "agent",
-    "guidelines",
-    "claude"
-  ],
-  "exports": {
-    "./AGENTS.md": "./AGENTS.md",
-    "./package.json": "./package.json"
   },
   "bin": {
     "instrument-guidelines": "./bin/cli.mjs"
@@ -30,8 +22,16 @@
     "bin",
     "AGENTS.md"
   ],
+  "type": "module",
+  "exports": {
+    "./AGENTS.md": "./AGENTS.md",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "format": "prettier --write bin",
-    "lint": "eslint --fix bin"
+    "format": "oxfmt bin",
+    "lint": "oxlint --fix bin"
   }
 }

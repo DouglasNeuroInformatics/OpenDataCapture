@@ -2,7 +2,7 @@
 
 Turns a built runtime directory (`runtime/v1/dist`) into something serveable: a manifest of relative
 paths, a per-package view of it, and a URL-to-content resolver. Private, no build step — `exports`
-points at `src/index.js` with a hand-written `src/index.d.ts` beside it, under `checkJs`. Consumed by
+points at `src/index.js` with a hand-written `src/types.d.ts` beside it, under `checkJs`. Consumed by
 `vite-plugin-runtime`, `packages/serve-instrument/src/server.tsx`, and
 `apps/outreach/src/pages/resources/runtime/[version].json.ts`.
 
@@ -18,8 +18,8 @@ Note the manifest still lists those files, so they are still served — they jus
 or fails according to the _caller's_ `node_modules`, so `rootDir` must be a directory inside the
 consuming workspace (callers pass `import.meta.dirname` or the Astro root).
 
-**Nothing checks `src/index.d.ts` against `src/index.js`.** Every function export is annotated
-`/** @type {import('.').fn} */` (`RUNTIME_VERSIONS` is the one unannotated export), so a signature
+**Nothing checks `src/types.d.ts` against `src/index.js`.** Every function export is annotated
+`/** @type {typeof import('./types.d.ts').fn} */` (`RUNTIME_VERSIONS` is the one unannotated export), so a signature
 change means editing both. Rewriting the package in
 TypeScript would change what `exports` resolves to.
 

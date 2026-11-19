@@ -109,7 +109,7 @@ hydrated tree can disagree with the SSR'd HTML until you do.
 - `@/` aliases `src/`, declared in both `vite.config.ts` and `tsconfig.json`.
 - Ambient declarations live in `src/typings/` and `src/vite-env.d.ts`: `res.locals.loadRoot`,
   `window.__ROOT_PROPS__`, the `cap-widget` JSX element, `__RELEASE__`.
-- The eslint blocks for `apps/web` and `packages/react-core` (no default exports, no bare `clsx`,
+- The oxlint blocks for `apps/web` and `packages/react-core` (no default exports, no bare `clsx`,
   `jsx-no-literals`) **do not cover this app**, and default exports are in use. Translation is still
   required, and there are no translation resource files — `src/services/i18n.ts` initializes with
   `{}`, so every string is inline `t({ en, es, fr })`. Every interface language needs an entry;

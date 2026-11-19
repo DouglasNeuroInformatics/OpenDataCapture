@@ -32,6 +32,7 @@ export const InstrumentSelector = () => {
           aria-expanded={open}
           aria-label="Load an instrument..."
           className="w-full flex-1 justify-between"
+          // eslint-disable-next-line jsx-a11y/role-has-required-aria-props -- Radix's PopoverTrigger sets aria-controls to the popover content when it renders this button
           role="combobox"
           variant="outline"
         >

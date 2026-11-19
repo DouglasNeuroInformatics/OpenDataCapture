@@ -6,6 +6,7 @@ import { motion, useSpring, useTransform } from 'motion/react';
 
 import { useFileInstrumentContentStore } from './store';
 
+// eslint-disable-next-line react/function-component-definition -- the named function passed to memo gives the component its display name
 export const UploadProgressBar = memo(function UploadProgressBar() {
   const { loadedFiles, totalFiles, totalProgress } = useFileInstrumentContentStore((store) => store.uploadState!);
 
