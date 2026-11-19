@@ -1,4 +1,4 @@
-import { CryptoService, InjectModel } from '@douglasneuroinformatics/libnest';
+import { ConfigService, CryptoService, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import {
@@ -35,6 +35,7 @@ export class UsersService {
   constructor(
     @InjectModel('User') private readonly userModel: Model<'User'>,
     private readonly auditLogger: AuditLogger,
+    private readonly configService: ConfigService,
     private readonly cryptoService: CryptoService,
     private readonly groupsService: GroupsService,
     private readonly permissionSetsService: PermissionSetsService
@@ -353,6 +354,7 @@ export class UsersService {
    * `BadRequestException` if the password is too weak, matches the username, or has
    * appeared in a known data breach. The breach check fails open: if the Have I Been
    * Pwned API is unreachable (e.g. an air-gapped deployment), the password is allowed.
+   * `PASSWORD_BREACH_CHECK_ENABLED=false` skips the check, so nothing waits on that server.
    */
   private async validatePassword(password: string, username: string): Promise<void> {
     if (!estimatePasswordStrength(password).success) {
@@ -360,6 +362,9 @@ export class UsersService {
     }
     if (password.toLowerCase() === username.toLowerCase()) {
       throw this.passwordError('PASSWORD_MATCHES_USERNAME', 'Password must not be the same as the username');
+    }
+    if (!this.configService.get('PASSWORD_BREACH_CHECK_ENABLED')) {
+      return;
     }
     let breachCount: number;
     try {

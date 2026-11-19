@@ -75,4 +75,11 @@ describe('$Env', () => {
   it('should not require storage variables while storage is disabled', () => {
     expect($Env.safeParse({ ...testEnv, STORAGE_ENABLED: 'false' }).success).toBe(true);
   });
+
+  it('should check passwords against known breaches unless it is turned off, so a deployment is protected by default', () => {
+    expect($Env.parse(testEnv).PASSWORD_BREACH_CHECK_ENABLED).toBe(true);
+    expect($Env.parse({ ...testEnv, PASSWORD_BREACH_CHECK_ENABLED: 'false' }).PASSWORD_BREACH_CHECK_ENABLED).toBe(
+      false
+    );
+  });
 });

@@ -39,6 +39,9 @@ export default mergeConfig(
     plugins: [apiOnlySwcPlugin, libnestPlugin],
     root: import.meta.dirname,
     test: {
+      // The integration suites create users through the real UsersService, which would otherwise ask
+      // the Have I Been Pwned API about every password.
+      env: { PASSWORD_BREACH_CHECK_ENABLED: 'false' },
       globals: true,
       name: 'api'
     }

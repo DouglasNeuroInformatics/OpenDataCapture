@@ -1,4 +1,4 @@
-import { CryptoService, getModelToken } from '@douglasneuroinformatics/libnest';
+import { ConfigService, CryptoService, getModelToken } from '@douglasneuroinformatics/libnest';
 import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { MockFactory } from '@douglasneuroinformatics/libnest/testing';
 import type { MockedInstance } from '@douglasneuroinformatics/libnest/testing';
@@ -38,6 +38,7 @@ const baseUser = {
 describe('UsersService', () => {
   let usersService: UsersService;
   let userModel: MockedInstance<Model<'User'>>;
+  let configService: MockedInstance<ConfigService>;
   let cryptoService: MockedInstance<CryptoService>;
   let groupsService: MockedInstance<GroupsService>;
   let permissionSetsService: MockedInstance<PermissionSetsService>;
@@ -49,6 +50,7 @@ describe('UsersService', () => {
         UsersService,
         MockFactory.createForModelToken(getModelToken('User')),
         MockFactory.createForService(AuditLogger),
+        MockFactory.createForService(ConfigService),
         MockFactory.createForService(CryptoService),
         MockFactory.createForService(GroupsService),
         MockFactory.createForService(PermissionSetsService)
@@ -56,6 +58,7 @@ describe('UsersService', () => {
     }).compile();
     userModel = moduleRef.get(getModelToken('User'));
     usersService = moduleRef.get(UsersService);
+    configService = moduleRef.get(ConfigService);
     cryptoService = moduleRef.get(CryptoService);
     groupsService = moduleRef.get(GroupsService);
     permissionSetsService = moduleRef.get(PermissionSetsService);
@@ -63,6 +66,7 @@ describe('UsersService', () => {
     userModel.exists.mockResolvedValue(false);
     userModel.create.mockResolvedValue({});
     cryptoService.hashPassword.mockResolvedValue('hashed-password');
+    configService.get.mockReturnValue(true);
     // By default the password is strong and has not appeared in a breach.
     (estimatePasswordStrength as Mock).mockReturnValue({ feedback: {}, score: 4, success: true });
     (pwnedPassword as Mock).mockResolvedValue(0);
@@ -287,6 +291,13 @@ describe('UsersService', () => {
     it('fails open and allows the password when the breach check is unreachable', async () => {
       (pwnedPassword as Mock).mockRejectedValue(new Error('network unreachable'));
       await usersService.create({ ...baseUser });
+      expect(userModel.create).toHaveBeenCalledOnce();
+    });
+
+    it('should not contact Have I Been Pwned when the breach check is disabled, so an offline instance never waits on it', async () => {
+      configService.get.mockReturnValue(false);
+      await usersService.create({ ...baseUser });
+      expect(pwnedPassword).not.toHaveBeenCalled();
       expect(userModel.create).toHaveBeenCalledOnce();
     });
 
