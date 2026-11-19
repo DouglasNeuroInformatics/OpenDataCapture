@@ -1,7 +1,7 @@
 import { toBasicISOString, toLocalISOString } from '@douglasneuroinformatics/libjs';
 import type { BulkAssignmentFailure } from '@opendatacapture/schemas/assignment';
 import { $Sex } from '@opendatacapture/schemas/subject';
-import { encodeScopedSubjectId, generateSubjectHash, removeSubjectIdScope } from '@opendatacapture/subject-utils';
+import { generateSubjectHash, removeSubjectIdScope, toStoredSubjectId } from '@opendatacapture/subject-utils';
 import Papa from 'papaparse';
 
 /**
@@ -46,22 +46,6 @@ const SEX_ALIASES: { [key: string]: 'FEMALE' | 'MALE' } = {
 };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
-
-const GENERATED_ID = /^[0-9a-f]{64}$/i;
-
-/**
- * Turn an identifier as a person would write it into the one the record is stored under.
- *
- * A custom identifier is stored scoped to its group (`Group$id`) but is shown, exported and spoken
- * about without that prefix, so a user pasting what they see would otherwise never match. A digest
- * is never scoped, and an already-scoped value is left alone.
- */
-function toStoredSubjectId(value: string, groupName: string | undefined): string {
-  if (!groupName || value.includes('$') || GENERATED_ID.test(value)) {
-    return value;
-  }
-  return encodeScopedSubjectId(value, { groupName });
-}
 
 /**
  * The outcome of looking an identifier up among a group's subjects. Ambiguous is kept apart from
@@ -410,7 +394,7 @@ type SubjectIdResolution = {
  */
 async function resolveSubjectIds(
   result: BulkParseResult,
-  { groupName, knownSubjectIds, maxSubjects }: { groupName?: string; knownSubjectIds?: string[]; maxSubjects: number }
+  { groupName, knownSubjectIds, maxSubjects }: { groupName: string; knownSubjectIds?: string[]; maxSubjects: number }
 ): Promise<SubjectIdResolution> {
   const errors: BulkParseError[] = [];
   const resolved: ResolvedRow[] = [];
@@ -426,7 +410,7 @@ async function resolveSubjectIds(
         errors.push({ message: 'Missing subject ID', row: rowNumber });
         continue;
       }
-      const stored = toStoredSubjectId(value, groupName);
+      const stored = toStoredSubjectId(value, { groupName });
       if (!knownSubjectIds) {
         resolved.push({ id: stored, rowNumber });
         continue;
@@ -548,7 +532,7 @@ type EmailListResolution = {
 function resolveEmailList(
   rows: { [key: string]: string }[],
   mapping: Partial<{ [key: string]: CanonicalField }>,
-  { groupName, knownSubjectIds }: { groupName?: string; knownSubjectIds: string[] }
+  { groupName, knownSubjectIds }: { groupName: string; knownSubjectIds: string[] }
 ): EmailListResolution {
   const subjectIdHeader = Object.keys(mapping).find((header) => mapping[header] === 'subjectId');
   const emailHeader = Object.keys(mapping).find((header) => mapping[header] === 'email');
@@ -564,7 +548,7 @@ function resolveEmailList(
     if (!rawId) {
       continue;
     }
-    const stored = toStoredSubjectId(rawId, groupName);
+    const stored = toStoredSubjectId(rawId, { groupName });
     const match = matchKnownSubjectId(stored, knownSubjectIds);
     // An ambiguous identifier names nobody in particular, which is as unusable here as one naming
     // nobody at all, and the file spelled both the same way.

@@ -14,7 +14,7 @@
     "@douglasneuroinformatics/libcrypto": "catalog:",
     "@opendatacapture/runtime-internal": "workspace:*",
     "@opendatacapture/schemas": "workspace:*",
-    "transliteration": "^2.3.5"
+    "transliteration": "2.6.1"
   },
   "devDependencies": {
     "type-fest": "workspace:type-fest__4.x@*"

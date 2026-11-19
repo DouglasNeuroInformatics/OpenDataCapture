@@ -1,7 +1,9 @@
 # packages/subject-utils
 
-Derives and formats clinical subject identifiers. Four exports: `generateSubjectHash`,
-`encodeScopedSubjectId`, `isSubjectWithPersonalInfo`, and `removeSubjectIdScope` (re-exported from
+Derives and formats clinical subject identifiers. Ten exports: `generateSubjectHash`,
+`encodeScopedSubjectId`, `isSubjectWithPersonalInfo`, `inferSubjectIdentificationMethod`,
+`toStoredSubjectId`, `CUSTOM_FIELDS_SUBJECT_ID_PREFIX`, `DERIVED_SUBJECT_ID_PATTERNS`,
+`normalizeCustomFieldValue`, `deriveCustomFieldsSubjectId`, and `removeSubjectIdScope` (re-exported from
 `@opendatacapture/runtime-internal`). Source-only — `exports` is `"./src/index.ts"`, no build step.
 Used by `apps/web`, `apps/api` and `packages/react-core`.
 

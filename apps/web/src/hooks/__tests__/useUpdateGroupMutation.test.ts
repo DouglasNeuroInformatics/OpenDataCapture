@@ -39,7 +39,7 @@ function renderUpdateMutation(options?: Parameters<typeof useUpdateGroupMutation
   const wrapper = ({ children }: PropsWithChildren) => {
     return createElement(QueryClientProvider, { children, client: queryClient });
   };
-  return renderHook(() => useUpdateGroupMutation(options), { wrapper });
+  return { ...renderHook(() => useUpdateGroupMutation(options), { wrapper }), queryClient };
 }
 
 describe('useUpdateGroupMutation', () => {
@@ -47,6 +47,12 @@ describe('useUpdateGroupMutation', () => {
     vi.clearAllMocks();
     mockAxios.patch.mockResolvedValue({ data: group });
     store.currentGroup = { id: 'group-1' };
+  });
+
+  it('should seed the group query with the saved group, so a page reading it fresh shows the save', async () => {
+    const { queryClient, result } = renderUpdateMutation();
+    await result.current.mutateAsync({ name: 'Renamed' });
+    expect(queryClient.getQueryData(['group', 'group-1'])).toMatchObject({ id: 'group-1', name: 'Group One' });
   });
 
   it('patches the currently selected group and keeps the default error toast', async () => {

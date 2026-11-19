@@ -10,33 +10,32 @@ import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type { Group } from '@opendatacapture/schemas/group';
 import { $SessionType } from '@opendatacapture/schemas/session';
 import type { $CreateSessionData } from '@opendatacapture/schemas/session';
-import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
-import type { Sex, SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
+import type { Sex } from '@opendatacapture/schemas/subject';
+import type { SubjectIdentificationSettings } from '@opendatacapture/schemas/subject-identification';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
 
+import { useCustomIdentificationFields } from '@/hooks/useCustomIdentificationFields';
+import type { CustomFieldsFormData } from '@/hooks/useCustomIdentificationFields';
 import { useSubjectDemographicsLookup } from '@/hooks/useSubjectDemographicsLookup';
+import { useSubjectIdentificationMethodOptions } from '@/hooks/useSubjectIdentificationMethodOptions';
 import { getValueForLanguage } from '@/utils/language';
 
-const currentDate = new Date();
+const MILLISECONDS_PER_YEAR = 31556952000;
+
+const isNotInFuture = (date: Date) => date <= new Date();
 
 type StartSessionFormValues = FormTypes.PartialData<StartSessionFormData>;
 
 type AutofilledDemographics = Pick<StartSessionFormValues, 'subjectDateOfBirth' | 'subjectSex'>;
 
-/** Empty unless a custom identifier is in use, so switching method clears what it filled in. */
-const selectedCustomId = (values: StartSessionFormValues) => {
-  return values.subjectIdentificationMethod === 'CUSTOM_ID' ? (values.subjectId ?? '') : '';
-};
-
-type StartSessionFormData = {
-  sessionDate: Date;
+type StartSessionFormData = CustomFieldsFormData & {
+  sessionDate?: Date;
   sessionType: 'IN_PERSON' | 'RETROSPECTIVE';
   subjectDateOfBirth?: Date;
   subjectFirstName?: string;
   subjectId?: string;
-  subjectIdentificationMethod: SubjectIdentificationMethod;
   subjectLastName?: string;
   subjectSex?: Sex;
 };
@@ -47,12 +46,14 @@ type StartSessionFormProps = {
   initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
   onSubmit: (data: $CreateSessionData) => Promisable<void>;
   readOnly: boolean;
+  subjectIdentificationSettings: Pick<SubjectIdentificationSettings, 'customFields' | 'offeredMethods'>;
   username?: null | string;
 };
 
 export const StartSessionForm = ({
   currentGroup,
   customSubjectIds,
+  subjectIdentificationSettings,
   username,
   initialValues,
   readOnly,
@@ -61,24 +62,49 @@ export const StartSessionForm = ({
   const { resolvedLanguage, t } = useTranslation();
   const lookupDemographics = useSubjectDemographicsLookup();
   const [autofilled, setAutofilled] = useState<AutofilledDemographics>({});
-  const latestCustomId = useRef('');
-  const minDateOfBirth = currentGroup?.settings.minimumAge
-    ? new Date(currentDate.getTime() - currentGroup.settings.minimumAge * 31556952000)
-    : undefined;
+  const latestIdentity = useRef('');
+  const customFields = useCustomIdentificationFields(subjectIdentificationSettings.customFields);
+  const { options: methodOptions } = useSubjectIdentificationMethodOptions(subjectIdentificationSettings);
 
   const scopeCustomId = (customId: string) => {
     return encodeScopedSubjectId(customId, { groupName: currentGroup?.name ?? DEFAULT_GROUP_NAME });
+  };
+
+  /**
+   * What identifies the subject so far, if enough to look them up: empty for personal information,
+   * an incomplete entry or a method switch, so either of the last two clears what was filled in.
+   */
+  const selectIdentity = (values: StartSessionFormValues) => {
+    if (values.subjectIdentificationMethod === 'CUSTOM_ID') {
+      return values.subjectId ? `CUSTOM_ID:${values.subjectId}` : '';
+    } else if (
+      values.subjectIdentificationMethod === 'CUSTOM_FIELDS' &&
+      Object.keys(customFields.findErrors(values)).length === 0
+    ) {
+      return `CUSTOM_FIELDS:${JSON.stringify(customFields.orderValues(values))}`;
+    }
+    return '';
+  };
+
+  /** The stored id of a subject who may already exist, or null when there can be none yet. */
+  const findExistingSubjectId = async (values: StartSessionFormValues) => {
+    if (values.subjectIdentificationMethod === 'CUSTOM_FIELDS') {
+      return customFields.deriveSubjectId(values);
+    }
+    // A custom id absent from the group's suggestions belongs to no subject, so it is not looked up.
+    return values.subjectId && customSubjectIds.includes(values.subjectId) ? scopeCustomId(values.subjectId) : null;
   };
 
   const autofillExistingSubject = async (
     values: StartSessionFormValues,
     setValues: Dispatch<SetStateAction<StartSessionFormValues>>
   ) => {
-    const customId = selectedCustomId(values);
-    latestCustomId.current = customId;
-    const demographics = customSubjectIds.includes(customId) ? await lookupDemographics(scopeCustomId(customId)) : null;
+    const identity = selectIdentity(values);
+    latestIdentity.current = identity;
+    const subjectId = identity ? await findExistingSubjectId(values) : null;
+    const demographics = subjectId ? await lookupDemographics(subjectId) : null;
     // A slower lookup for an identifier the user has since moved on from must not overwrite the newer one.
-    if (latestCustomId.current !== customId) {
+    if (latestIdentity.current !== identity) {
       return;
     }
     const next: AutofilledDemographics = {
@@ -107,10 +133,7 @@ export const StartSessionForm = ({
             subjectIdentificationMethod: {
               kind: 'string',
               label: 'Method',
-              options: {
-                CUSTOM_ID: t('common.customIdentifier'),
-                PERSONAL_INFO: t('common.personalInfo')
-              },
+              options: methodOptions,
               variant: 'select'
             }
           }
@@ -133,6 +156,7 @@ export const StartSessionForm = ({
                   : null;
               }
             },
+            ...customFields.formFields,
             subjectFirstName: {
               kind: 'dynamic',
               deps: ['subjectIdentificationMethod'],
@@ -199,7 +223,8 @@ export const StartSessionForm = ({
                   ? {
                       description: t('session.dateAssessed.description'),
                       kind: 'date',
-                      label: t('session.dateAssessed.label')
+                      label: t('session.dateAssessed.label'),
+                      variant: 'datetime'
                     }
                   : null;
               }
@@ -213,14 +238,14 @@ export const StartSessionForm = ({
       submitBtnLabel={t('core.submit')}
       subscribe={{
         onChange: autofillExistingSubject,
-        selector: selectedCustomId
+        selector: selectIdentity
       }}
       validationSchema={z
         .object({
           subjectFirstName: z.string().optional(),
           subjectLastName: z.string().optional(),
-          subjectIdentificationMethod: $SubjectIdentificationMethod,
-          // Every check on the identifier and the date of birth lives in the refinement below: zod v4
+          subjectIdentificationMethod: z.enum(Object.keys(methodOptions)),
+          // Every check on the identifier and the two dates lives in the refinement below: zod v4
           // omits an optional property that failed its own checks from the value it hands the
           // refinement, which then reads the field as missing and adds a contradictory required-field
           // error.
@@ -228,12 +253,25 @@ export const StartSessionForm = ({
           subjectDateOfBirth: z.date().optional(),
           subjectSex: z.enum(['MALE', 'FEMALE']).optional(),
           sessionType: $SessionType.exclude(['REMOTE']),
-          sessionDate: z
-            .date()
-            .max(currentDate, { message: t('session.errors.assessmentMustBeInPast') })
-            .default(currentDate)
+          sessionDate: z.date().optional(),
+          ...customFields.shape
         })
         .superRefine((val, ctx) => {
+          if (val.sessionType === 'RETROSPECTIVE') {
+            if (!val.sessionDate) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t('core.form.requiredField'),
+                path: ['sessionDate']
+              });
+            } else if (!isNotInFuture(val.sessionDate)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t('session.errors.assessmentMustBeInPast'),
+                path: ['sessionDate']
+              });
+            }
+          }
           if (val.subjectIdentificationMethod === 'CUSTOM_ID') {
             if (!val.subjectId) {
               ctx.addIssue({
@@ -275,6 +313,10 @@ export const StartSessionForm = ({
                 console.error(err);
               }
             }
+          } else if (val.subjectIdentificationMethod === 'CUSTOM_FIELDS') {
+            for (const [key, message] of Object.entries(customFields.findErrors(val))) {
+              ctx.addIssue({ code: z.ZodIssueCode.custom, message, path: [key] });
+            }
           } else {
             const requiredKeys = ['subjectFirstName', 'subjectLastName', 'subjectSex', 'subjectDateOfBirth'] as const;
             for (const key of requiredKeys) {
@@ -287,7 +329,9 @@ export const StartSessionForm = ({
               }
             }
           }
-          if (val.subjectDateOfBirth && val.subjectDateOfBirth > currentDate) {
+          const minimumAge = currentGroup?.settings.minimumAge;
+          const minDateOfBirth = minimumAge ? new Date(Date.now() - minimumAge * MILLISECONDS_PER_YEAR) : undefined;
+          if (val.subjectDateOfBirth && !isNotInFuture(val.subjectDateOfBirth)) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t({
@@ -301,24 +345,20 @@ export const StartSessionForm = ({
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t({
-                en: `Subject must be above age of ${currentGroup?.settings.minimumAge}`,
-                es: `El sujeto debe tener más de ${currentGroup?.settings.minimumAge} años`,
-                fr: `Le sujet doit avoir au moins ${currentGroup?.settings.minimumAge} ans`
+                en: `Subject must be above age of ${minimumAge}`,
+                es: `El sujeto debe tener más de ${minimumAge} años`,
+                fr: `Le sujet doit avoir au moins ${minimumAge} ans`
               }),
               path: ['subjectDateOfBirth']
             });
           }
         })}
-      onSubmit={async ({
-        sessionType,
-        sessionDate,
-        subjectId,
-        subjectFirstName,
-        subjectLastName,
-        subjectDateOfBirth,
-        subjectSex
-      }) => {
-        if (!subjectId) {
+      onSubmit={async (values) => {
+        const { sessionType, sessionDate, subjectFirstName, subjectLastName, subjectDateOfBirth, subjectSex } = values;
+        let { subjectId } = values;
+        if (values.subjectIdentificationMethod === 'CUSTOM_FIELDS') {
+          subjectId = await customFields.deriveSubjectId(values);
+        } else if (!subjectId) {
           subjectId = await generateSubjectHash({
             firstName: subjectFirstName!,
             lastName: subjectLastName!,
@@ -329,7 +369,8 @@ export const StartSessionForm = ({
           subjectId = scopeCustomId(subjectId);
         }
         await onSubmit({
-          date: sessionDate,
+          // Only a retrospective session has a date of its own; an in-person one starts now.
+          date: sessionDate ?? new Date(),
           groupId: currentGroup?.id ?? null,
           username: username ?? null,
           type: sessionType,

@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 
+import type { InstrumentSubmitHandler } from '@opendatacapture/react-core';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { $CreateSessionData, Session } from '@opendatacapture/schemas/session';
 import { act, cleanup, render, screen } from '@testing-library/react';
@@ -15,7 +16,14 @@ type StartSessionFormProps = {
   initialValues: { [key: string]: unknown };
   onSubmit: (data: $CreateSessionData) => Promise<void>;
   readOnly: boolean;
+  subjectIdentificationSettings: unknown;
   username?: string;
+};
+
+type SessionInstrumentStepProps = {
+  instrumentId: string;
+  onBack: () => void;
+  onSubmit: (result: Parameters<InstrumentSubmitHandler>[0]) => Promise<void>;
 };
 
 type Loader = (ctx: {
@@ -23,8 +31,10 @@ type Loader = (ctx: {
 }) => Promise<void>;
 
 type MockState = {
+  fetchedGroup: Group | null;
   isPending: boolean;
   locationState: undefined | { initialValues?: { [key: string]: unknown } };
+  offeredMethods: [string, ...string[]];
   store: {
     currentGroup: Group | null;
     currentSession: null | Session;
@@ -35,13 +45,16 @@ type MockState = {
 
 const mocks = vi.hoisted(() => {
   const state: MockState = {
+    fetchedGroup: null,
     isPending: false,
     locationState: undefined,
+    offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS'],
     store: { currentGroup: null, currentSession: null, currentUser: null, startSession: vi.fn() }
   };
   return {
     ...state,
     mutateAsync: vi.fn(),
+    SessionInstrumentStep: vi.fn((_props: SessionInstrumentStepProps) => <div data-testid="session-instrument-step" />),
     StartSessionForm: vi.fn((_props: StartSessionFormProps) => <form data-testid="start-session-form" />)
   };
 });
@@ -52,8 +65,19 @@ vi.mock('@tanstack/react-router', async (importOriginal) => ({
   useLocation: () => ({ state: mocks.locationState })
 }));
 vi.mock('@/components/StartSessionForm', () => ({ StartSessionForm: mocks.StartSessionForm }));
+vi.mock('@/components/SessionInstrumentStep', () => ({ SessionInstrumentStep: mocks.SessionInstrumentStep }));
 vi.mock('@/hooks/useCreateSessionMutation', () => ({
   useCreateSessionMutation: () => ({ isPending: mocks.isPending, mutateAsync: mocks.mutateAsync })
+}));
+vi.mock('@/hooks/useGroupQuery', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/useGroupQuery')>()),
+  useGroupQuery: (groupId: string | undefined) => ({ data: groupId ? mocks.fetchedGroup : undefined })
+}));
+vi.mock('@/hooks/useSubjectIdentificationSettingsQuery', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/useSubjectIdentificationSettingsQuery')>()),
+  useSubjectIdentificationSettingsQuery: () => ({
+    data: { customFields: CUSTOM_FIELDS, isCustomFieldsLocked: false, offeredMethods: mocks.offeredMethods }
+  })
 }));
 vi.mock('@/hooks/useSubjectCustomIdsQuery', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/hooks/useSubjectCustomIdsQuery')>()),
@@ -66,6 +90,13 @@ vi.mock('@/store', () => ({
 }));
 
 const NOW = new Date('2026-01-01T12:00:00Z');
+
+const CUSTOM_FIELDS = vi.hoisted(() => ({
+  fields: [{ label: { en: 'Animal ID' }, pattern: '[0-9]+' }],
+  iterations: 1000,
+  label: { en: 'Animal information' },
+  salt: '0f'.repeat(32)
+}));
 
 const group: Group = {
   accessibleInstrumentIds: [],
@@ -99,6 +130,8 @@ const formProps = () => mocks.StartSessionForm.mock.lastCall![0];
 
 describe('Route', () => {
   beforeEach(() => {
+    mocks.fetchedGroup = group;
+    mocks.offeredMethods = ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS'];
     mocks.isPending = false;
     mocks.locationState = undefined;
     mocks.store.currentGroup = group;
@@ -129,6 +162,11 @@ describe('Route', () => {
       expect(formProps().readOnly).toBe(true);
     });
 
+    it("should hand the form the instance's custom identifying fields", () => {
+      render(<StartSessionPage />);
+      expect(formProps().subjectIdentificationSettings).toMatchObject({ customFields: CUSTOM_FIELDS });
+    });
+
     it('should suggest the custom ids of the group with their group scope removed', () => {
       render(<StartSessionPage />);
       expect(formProps().customSubjectIds).toEqual(['CUSTOM-1', 'CUSTOM-2']);
@@ -146,6 +184,12 @@ describe('Route', () => {
         sessionType: 'IN_PERSON',
         subjectIdentificationMethod: 'PERSONAL_INFO'
       });
+    });
+
+    it("should open on the first offered method when the group's preferred one is not offered", () => {
+      mocks.offeredMethods = ['CUSTOM_FIELDS'];
+      render(<StartSessionPage />);
+      expect(formProps().initialValues).toMatchObject({ subjectIdentificationMethod: 'CUSTOM_FIELDS' });
     });
 
     it('should default to identifying by custom id when there is no group', () => {
@@ -201,6 +245,115 @@ describe('Route', () => {
     });
   });
 
+  describe('with a session instrument', () => {
+    const details: $CreateSessionData = {
+      date: NOW,
+      groupId: 'group-1',
+      subjectData: { id: 'subject-1' },
+      type: 'IN_PERSON'
+    };
+
+    const answers = {
+      data: { score: 1 },
+      instrumentId: 'form-1',
+      kind: 'FORM'
+    } as Parameters<InstrumentSubmitHandler>[0];
+
+    const stepProps = () => mocks.SessionInstrumentStep.mock.lastCall![0];
+
+    const isDetailsFormHidden = () => screen.getByTestId('start-session-form').parentElement!.className === 'hidden';
+
+    const submitDetails = async (data = details) => {
+      await act(() => formProps().onSubmit(data));
+    };
+
+    beforeEach(() => {
+      mocks.fetchedGroup = { ...group, settings: { ...group.settings, sessionInstrumentId: 'form-1' } };
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("should show the group's session instrument once the details are submitted, without starting the session", async () => {
+      render(<StartSessionPage />);
+      await submitDetails();
+      expect(stepProps().instrumentId).toBe('form-1');
+      expect(isDetailsFormHidden()).toBe(true);
+      expect(mocks.mutateAsync).not.toHaveBeenCalled();
+    });
+
+    it('should return to the details as they were entered when the clinician goes back, starting nothing', async () => {
+      render(<StartSessionPage />);
+      const detailsForm = screen.getByTestId('start-session-form');
+      await submitDetails();
+      act(() => stepProps().onBack());
+      expect(screen.queryByTestId('session-instrument-step')).toBeNull();
+      expect(isDetailsFormHidden()).toBe(false);
+      // The same element, so the form was never remounted and kept what had been typed into it.
+      expect(screen.getByTestId('start-session-form')).toBe(detailsForm);
+      expect(mocks.mutateAsync).not.toHaveBeenCalled();
+    });
+
+    it('should start the session with the answers once the instrument is submitted', async () => {
+      render(<StartSessionPage />);
+      await submitDetails({ ...details, type: 'RETROSPECTIVE' });
+      await act(() => stepProps().onSubmit(answers));
+      expect(mocks.mutateAsync).toHaveBeenCalledWith({
+        ...details,
+        sessionInstrumentAnswers: { data: { score: 1 }, instrumentId: 'form-1' },
+        type: 'RETROSPECTIVE'
+      });
+      expect(mocks.store.startSession).toHaveBeenCalledWith({ ...session, type: 'RETROSPECTIVE' });
+    });
+
+    it('should date an in-person session when the instrument is submitted, since that is when it is created', async () => {
+      render(<StartSessionPage />);
+      await submitDetails();
+      const submittedAt = new Date(NOW.getTime() + 60 * 60 * 1000);
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(submittedAt);
+      await act(() => stepProps().onSubmit(answers));
+      expect(mocks.mutateAsync.mock.lastCall?.[0].date).toStrictEqual(submittedAt);
+    });
+
+    it('should offer the details again, not the instrument, for the next session', async () => {
+      const { rerender } = render(<StartSessionPage />);
+      await submitDetails();
+      await act(() => stepProps().onSubmit(answers));
+      mocks.store.currentSession = session;
+      rerender(<StartSessionPage />);
+      mocks.store.currentSession = null;
+      rerender(<StartSessionPage />);
+      expect(screen.queryByTestId('session-instrument-step')).toBeNull();
+      expect(isDetailsFormHidden()).toBe(false);
+    });
+
+    // The store holds the group from the sign-in token, which predates a session instrument chosen since.
+    it('should require the session instrument the group has now, not the one it had at sign-in', async () => {
+      mocks.store.currentGroup = group;
+      render(<StartSessionPage />);
+      await submitDetails();
+      expect(stepProps().instrumentId).toBe('form-1');
+    });
+
+    it('should start the session at once when the group requires no session instrument', async () => {
+      mocks.fetchedGroup = group;
+      render(<StartSessionPage />);
+      await submitDetails();
+      expect(screen.queryByTestId('session-instrument-step')).toBeNull();
+      expect(mocks.mutateAsync).toHaveBeenCalledWith(details);
+    });
+
+    it('should drop the details entered for another group when the clinician switches group', async () => {
+      const { rerender } = render(<StartSessionPage />);
+      await submitDetails();
+      mocks.store.currentGroup = { ...mocks.store.currentGroup!, id: 'group-2' };
+      rerender(<StartSessionPage />);
+      expect(screen.queryByTestId('session-instrument-step')).toBeNull();
+    });
+  });
+
   describe('loader', () => {
     it('should prefetch the custom ids of the current group', async () => {
       const ensureQueryData = vi.fn(() => Promise.resolve());
@@ -216,6 +369,28 @@ describe('Route', () => {
       await loader({ context: { queryClient: { ensureQueryData } } });
       expect(ensureQueryData).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['subjects', 'custom-ids', undefined] })
+      );
+    });
+
+    it('should prefetch the current group, so its session instrument is known before the details are submitted', async () => {
+      const ensureQueryData = vi.fn(() => Promise.resolve());
+      await loader({ context: { queryClient: { ensureQueryData } } });
+      expect(ensureQueryData).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['group', 'group-1'] }));
+    });
+
+    it('should fetch no group when none is selected', async () => {
+      mocks.store.currentGroup = null;
+      const ensureQueryData = vi.fn(() => Promise.resolve());
+      await loader({ context: { queryClient: { ensureQueryData } } });
+      expect(ensureQueryData).not.toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['group', undefined] }));
+      expect(ensureQueryData).toHaveBeenCalledTimes(2);
+    });
+
+    it('should prefetch the subject identification settings, which the form identifies subjects by', async () => {
+      const ensureQueryData = vi.fn(() => Promise.resolve());
+      await loader({ context: { queryClient: { ensureQueryData } } });
+      expect(ensureQueryData).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['subject-identification-settings'] })
       );
     });
   });

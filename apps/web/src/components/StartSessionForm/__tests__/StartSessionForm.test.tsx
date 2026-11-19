@@ -1,8 +1,9 @@
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type { Group, GroupSettings } from '@opendatacapture/schemas/group';
-import { generateSubjectHash } from '@opendatacapture/subject-utils';
+import type { CustomFieldsDefinition } from '@opendatacapture/schemas/subject-identification';
+import { deriveCustomFieldsSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, getByText, render, screen, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -34,11 +35,22 @@ const groupWithIdPattern = (idValidationRegex: string) => groupWithSettings({ id
 
 const createQueryClient = () => new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
+const customFieldsDefinition: CustomFieldsDefinition = {
+  fields: [
+    { label: { en: 'Animal ID' }, pattern: '[A-Z]{2}[0-9]+', patternErrorMessage: { en: 'Two letters, then digits' } },
+    { label: { en: 'Cage' }, pattern: '[0-9]+' }
+  ],
+  iterations: 1000,
+  label: { en: 'Animal information' },
+  salt: '0f'.repeat(32)
+};
+
 const renderForm = (
   customSubjectIds: string[],
   currentGroup: Group | null = null,
-  method: 'CUSTOM_ID' | 'PERSONAL_INFO' = 'CUSTOM_ID',
-  queryClient = createQueryClient()
+  method: 'CUSTOM_FIELDS' | 'CUSTOM_ID' | 'PERSONAL_INFO' = 'CUSTOM_ID',
+  queryClient = createQueryClient(),
+  definition: CustomFieldsDefinition | null = null
 ) => {
   render(
     <QueryClientProvider client={queryClient}>
@@ -46,6 +58,10 @@ const renderForm = (
         currentGroup={currentGroup}
         customSubjectIds={customSubjectIds}
         readOnly={false}
+        subjectIdentificationSettings={{
+          customFields: definition,
+          offeredMethods: definition ? ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS'] : ['CUSTOM_ID', 'PERSONAL_INFO']
+        }}
         username="admin"
         onSubmit={onSubmit}
       />
@@ -320,7 +336,13 @@ describe('StartSessionForm', () => {
     it('should submit a null username when none is known, rather than an undefined one the API would reject', async () => {
       render(
         <QueryClientProvider client={new QueryClient()}>
-          <StartSessionForm currentGroup={null} customSubjectIds={[]} readOnly={false} onSubmit={onSubmit} />
+          <StartSessionForm
+            currentGroup={null}
+            customSubjectIds={[]}
+            readOnly={false}
+            subjectIdentificationSettings={{ customFields: null, offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO'] }}
+            onSubmit={onSubmit}
+          />
         </QueryClientProvider>
       );
       const form = screen.getByTestId('start-session-form');
@@ -431,12 +453,203 @@ describe('StartSessionForm', () => {
     });
   });
 
+  describe('with custom fields', () => {
+    const renderWithCustomFields = () => {
+      return renderForm([], null, 'CUSTOM_FIELDS', createQueryClient(), customFieldsDefinition);
+    };
+
+    const fillCustomFields = (form: HTMLElement, values: [string, string]) => {
+      values.forEach((value, index) => {
+        fireEvent.change(form.querySelector(`[name="customField${index}"]`)!, { target: { value } });
+      });
+    };
+
+    const methodOptions = (form: HTMLElement) => {
+      const select = form.querySelector<HTMLSelectElement>('select[name="subjectIdentificationMethod"]')!;
+      return Array.from(select.options, (option) => option.value).filter(Boolean);
+    };
+
+    const derivedId = () => deriveCustomFieldsSubjectId(['ab12', '7'], { iterations: 1000, salt: '0f'.repeat(32) });
+
+    it('should offer the method only once its fields are defined', () => {
+      expect(methodOptions(renderForm([]))).toStrictEqual(['CUSTOM_ID', 'PERSONAL_INFO']);
+      cleanup();
+      expect(methodOptions(renderWithCustomFields())).toStrictEqual(['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS']);
+    });
+
+    it("should name the method with the administrator's label and ask for each of their fields", () => {
+      renderWithCustomFields();
+      expect(screen.getAllByText('Animal information').length).toBeGreaterThan(0);
+      expect(screen.getByText('Animal ID')).toBeTruthy();
+      expect(screen.getByText('Cage')).toBeTruthy();
+    });
+
+    it('should identify the subject by the id derived from the fields, sending no name', async () => {
+      const form = renderWithCustomFields();
+      fillCustomFields(form, ['ab12', '7']);
+      await submitAndSettle(form);
+      expect(onSubmit.mock.lastCall?.[0].subjectData).toStrictEqual({
+        dateOfBirth: undefined,
+        firstName: undefined,
+        id: await derivedId(),
+        lastName: undefined,
+        sex: undefined
+      });
+    });
+
+    it('should show the error of each field the values fail', async () => {
+      const form = renderWithCustomFields();
+      fillCustomFields(form, ['12', '']);
+      submit(form);
+      await waitFor(() => {
+        expect(errorMessages()).toEqual([
+          { field: 'customField0', message: 'Two letters, then digits' },
+          { field: 'customField1', message: 'This field is required' }
+        ]);
+      });
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should look the subject up by the derived id once every field is valid, and fill in and lock their details', async () => {
+      existingSubject({ dateOfBirth: '1990-06-15', sex: 'FEMALE' });
+      const form = renderWithCustomFields();
+      fillCustomFields(form, ['ab12', '7']);
+      await waitFor(() => expect(dateOfBirthInput().disabled).toBe(true));
+      expect(get).toHaveBeenCalledWith(`/v1/subjects/${await derivedId()}`, expect.anything());
+      expect(sexTrigger().disabled).toBe(true);
+    });
+
+    it('should not look anyone up while a field is still invalid', async () => {
+      const form = renderWithCustomFields();
+      fillCustomFields(form, ['12', '7']);
+      await act(async () => {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 50);
+        });
+      });
+      expect(get).not.toHaveBeenCalled();
+    });
+  });
+
   describe('session type', () => {
     it('should ask for the assessment date only for a retrospective session, since an in-person one happens today', () => {
       const form = renderForm([]);
       expect(screen.queryByText('Date Assessed')).toBeNull();
       fireEvent.change(form.querySelector('[name="sessionType"]')!, { target: { value: 'RETROSPECTIVE' } });
       expect(screen.getByText('Date Assessed')).toBeTruthy();
+    });
+  });
+
+  describe('timing', () => {
+    const DAY = 24 * 60 * 60 * 1000;
+
+    const pageLoadedAt = Date.now();
+
+    const toDateString = (time: number) => new Date(time).toISOString().slice(0, 10);
+
+    const moveClock = (time: number) => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(time);
+    };
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should date an in-person session at submission, so a session started later in the same page load is not backdated to when the page opened', async () => {
+      const startedAt = pageLoadedAt + 2 * 60 * 60 * 1000;
+      const form = renderForm([]);
+      typeIdentifier('abc');
+      closeIdentifierPopup();
+      moveClock(startedAt);
+      await submitAndSettle(form);
+      expect(onSubmit.mock.lastCall?.[0].date).toStrictEqual(new Date(startedAt));
+    });
+
+    it("should accept a date of birth that reaches the group's minimum age only after the page opened", async () => {
+      const minimumAgeReachedAt = pageLoadedAt - 18 * 31556952000 + 5 * DAY;
+      const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
+      fillPersonalInfo(form, { dateOfBirth: toDateString(minimumAgeReachedAt), firstName: 'Jane' });
+      moveClock(pageLoadedAt + 10 * DAY);
+      await submitAndSettle(form);
+    });
+  });
+
+  describe('retrospective session', () => {
+    // A fixed local date a year ahead, so the picker opens on a known month and a date frozen when
+    // the module loaded would lie before every time used here.
+    const pageOpenedAt = new Date(new Date().getFullYear() + 1, 5, 15, 9, 0, 0);
+
+    const chooseRetrospective = (form: HTMLElement) => {
+      fireEvent.change(form.querySelector('[name="sessionType"]')!, { target: { value: 'RETROSPECTIVE' } });
+    };
+
+    const pickSessionDay = (day: number) => {
+      fireEvent.click(screen.getByTestId('datetime-date-trigger'));
+      fireEvent.click(getByText(screen.getByTestId('datepicker'), String(day)));
+    };
+
+    const enterSessionTime = (time: string) => {
+      fireEvent.change(screen.getByTestId('datetime-time-input'), { target: { value: time } });
+    };
+
+    const renderWithNewIdentifier = () => {
+      const form = renderForm([]);
+      typeIdentifier('abc');
+      closeIdentifierPopup();
+      chooseRetrospective(form);
+      return form;
+    };
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(pageOpenedAt);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should submit the time of day entered for a retrospective session, so the collection time is kept', async () => {
+      renderWithNewIdentifier();
+      pickSessionDay(15);
+      enterSessionTime('08:30:15');
+      fireEvent.click(submitButton());
+      await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+      expect(onSubmit.mock.lastCall?.[0]).toMatchObject({
+        date: new Date(pageOpenedAt.getFullYear(), 5, 15, 8, 30, 15),
+        type: 'RETROSPECTIVE'
+      });
+    });
+
+    it('should accept a retrospective time later than when the page opened once that time has passed', async () => {
+      renderWithNewIdentifier();
+      pickSessionDay(15);
+      enterSessionTime('10:30:00');
+      vi.setSystemTime(new Date(pageOpenedAt.getFullYear(), 5, 15, 11, 0, 0));
+      fireEvent.click(submitButton());
+      await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    });
+
+    it('should reject a retrospective time that has not happened yet', async () => {
+      renderWithNewIdentifier();
+      pickSessionDay(15);
+      enterSessionTime('10:30:00');
+      fireEvent.click(submitButton());
+      await waitFor(() => {
+        expect(errorMessages()).toEqual([{ field: 'sessionDate', message: 'The assessment must be in the past' }]);
+      });
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should reject a retrospective session with no date, rather than dating it when the page loaded', async () => {
+      renderWithNewIdentifier();
+      enterSessionTime('08:30:00');
+      fireEvent.click(submitButton());
+      await waitFor(() => {
+        expect(errorMessages()).toEqual([{ field: 'sessionDate', message: 'This field is required' }]);
+      });
+      expect(onSubmit).not.toHaveBeenCalled();
     });
   });
 

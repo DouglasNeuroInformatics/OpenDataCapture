@@ -13,6 +13,7 @@ import { Sidebar } from '../Sidebar';
 import '@/services/i18n';
 
 type MockStore = {
+  currentGroup: null | { settings: { subjectIdDisplayLength?: null | number } };
   currentSession: null | Session;
   endSession: () => void;
   groupSwitcherPosition: GroupSwitcherPosition;
@@ -26,7 +27,12 @@ type Mocks = {
 };
 
 const mocks = vi.hoisted((): Mocks => {
-  const store: MockStore = { currentSession: null, endSession: vi.fn(), groupSwitcherPosition: 'sidebar' };
+  const store: MockStore = {
+    currentGroup: null,
+    currentSession: null,
+    endSession: vi.fn(),
+    groupSwitcherPosition: 'sidebar'
+  };
   return { isGroupSwitcherVisible: false, navigate: vi.fn(), navItems: [], store };
 });
 
@@ -95,6 +101,7 @@ describe('Sidebar', () => {
   beforeEach(() => {
     mocks.isGroupSwitcherVisible = false;
     mocks.navItems = [globalItems, sessionItems];
+    mocks.store.currentGroup = null;
     mocks.store.currentSession = null;
     mocks.store.groupSwitcherPosition = 'sidebar';
     mocks.navigate.mockReset().mockResolvedValue(undefined);
@@ -205,5 +212,22 @@ describe('Sidebar', () => {
     mocks.store.currentSession = sessionFor(subject({ firstName: 'Jane' }));
     render(<Sidebar />);
     expect(sessionInfo()).toBe('ID: abc');
+  });
+
+  describe('with a subject identified by custom fields', () => {
+    const customFieldsId = `cf_${'a1'.repeat(32)}`;
+
+    it("should shorten the id to the group's display length, as the datahub shows it", () => {
+      mocks.store.currentGroup = { settings: { subjectIdDisplayLength: 12 } };
+      mocks.store.currentSession = sessionFor(subject({ id: customFieldsId }));
+      render(<Sidebar />);
+      expect(sessionInfo()).toBe(`ID: ${customFieldsId.slice(0, 12)}`);
+    });
+
+    it('should shorten the id to nine characters when the group sets no display length', () => {
+      mocks.store.currentSession = sessionFor(subject({ id: customFieldsId }));
+      render(<Sidebar />);
+      expect(sessionInfo()).toBe('ID: cf_a1a1a1');
+    });
   });
 });

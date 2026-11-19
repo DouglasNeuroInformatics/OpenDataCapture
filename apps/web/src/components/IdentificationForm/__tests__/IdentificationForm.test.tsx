@@ -1,6 +1,8 @@
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
 import type { Group } from '@opendatacapture/schemas/group';
 import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
+import type { CustomFieldsDefinition } from '@opendatacapture/schemas/subject-identification';
+import { deriveCustomFieldsSubjectId } from '@opendatacapture/subject-utils';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -14,6 +16,18 @@ const store = vi.hoisted(() => {
 });
 
 const subjectUtils = vi.hoisted(() => ({ generateSubjectHash: vi.fn() }));
+
+const settings = vi.hoisted(() => {
+  const state: { customFields: CustomFieldsDefinition | null; offeredMethods: [string, ...string[]] } = {
+    customFields: null,
+    offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO']
+  };
+  return state;
+});
+
+vi.mock('@/hooks/useSubjectIdentificationSettingsQuery', () => ({
+  useSubjectIdentificationSettingsQuery: () => ({ data: settings })
+}));
 
 vi.mock('@/store', () => ({
   useAppStore: vi.fn((selector: (state: typeof store) => unknown) => selector(store))
@@ -71,6 +85,8 @@ describe('IdentificationForm', () => {
   beforeEach(() => {
     i18n.changeLanguage('en');
     store.currentGroup = null;
+    settings.customFields = null;
+    settings.offeredMethods = ['CUSTOM_ID', 'PERSONAL_INFO'];
     subjectUtils.generateSubjectHash.mockResolvedValue('subject-hash');
   });
 
@@ -119,7 +135,7 @@ describe('IdentificationForm', () => {
 
   it('should scope a custom identifier to the root group when no group is selected', async () => {
     const onSubmit = renderForm();
-    setField('identificationMethod', 'CUSTOM_ID');
+    setField('subjectIdentificationMethod', 'CUSTOM_ID');
     setField('id', 'subject-7');
     submit();
     await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ id: 'root$subject-7' }));
@@ -145,6 +161,50 @@ describe('IdentificationForm', () => {
       firstName: 'Jane',
       lastName: 'Doe',
       sex: 'FEMALE'
+    });
+  });
+
+  // The instance may stop offering the method a group prefers; the lookup still has to open on one.
+  it("should open on the first offered method when the group's preferred one is not offered", () => {
+    settings.offeredMethods = ['CUSTOM_ID'];
+    store.currentGroup = createGroup('PERSONAL_INFO');
+    renderForm();
+    expect(field('id')).toBeTruthy();
+    expect(field('firstName')).toBeNull();
+  });
+
+  describe('with custom fields', () => {
+    beforeEach(() => {
+      settings.customFields = {
+        fields: [{ label: { en: 'Animal ID' }, pattern: '[A-Z]{2}[0-9]+' }],
+        iterations: 1000,
+        label: { en: 'Animal information' },
+        salt: '0f'.repeat(32)
+      };
+      settings.offeredMethods = ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS'];
+      store.currentGroup = createGroup('CUSTOM_FIELDS');
+    });
+
+    it('should ask only for the fields the administrator defined', () => {
+      renderForm();
+      expect(field('customField0')).toBeTruthy();
+      expect(['id', 'firstName', 'lastName', 'dateOfBirth', 'sex'].some((name) => field(name))).toBe(false);
+    });
+
+    it('should identify the subject by the id derived from the fields, as Start Session does', async () => {
+      const onSubmit = renderForm();
+      setField('customField0', 'ab-12');
+      submit();
+      const id = await deriveCustomFieldsSubjectId(['ab-12'], { iterations: 1000, salt: '0f'.repeat(32) });
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ id }));
+    });
+
+    it('should refuse a value the field rejects', async () => {
+      const onSubmit = renderForm();
+      setField('customField0', '12');
+      submit();
+      await waitFor(() => expect(fieldsWithErrors()).toEqual(['customField0']));
+      expect(onSubmit).not.toHaveBeenCalled();
     });
   });
 });

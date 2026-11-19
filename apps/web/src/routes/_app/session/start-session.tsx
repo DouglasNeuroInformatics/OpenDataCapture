@@ -3,16 +3,29 @@ import React, { useEffect, useState } from 'react';
 import { Card, Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { FormTypes } from '@opendatacapture/runtime-core';
+import type { $CreateSessionData, $StartSessionData } from '@opendatacapture/schemas/session';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
 import { createFileRoute, useLocation } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { PageHeader } from '@/components/PageHeader';
+import { SessionInstrumentStep } from '@/components/SessionInstrumentStep';
 import { StartSessionForm } from '@/components/StartSessionForm';
 import type { StartSessionFormData } from '@/components/StartSessionForm';
 import { useCreateSessionMutation } from '@/hooks/useCreateSessionMutation';
+import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
 import { subjectCustomIdsQueryOptions, useSubjectCustomIdsQuery } from '@/hooks/useSubjectCustomIdsQuery';
+import { useSubjectIdentificationMethodOptions } from '@/hooks/useSubjectIdentificationMethodOptions';
+import {
+  subjectIdentificationSettingsQueryOptions,
+  useSubjectIdentificationSettingsQuery
+} from '@/hooks/useSubjectIdentificationSettingsQuery';
 import { useAppStore } from '@/store';
+
+type PendingSession = {
+  details: $CreateSessionData;
+  sessionInstrumentId: string;
+};
 
 const RouteComponent = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
@@ -20,17 +33,22 @@ const RouteComponent = () => {
   const startSession = useAppStore((store) => store.startSession);
   const currentUser = useAppStore((store) => store.currentUser);
   const location = useLocation();
+  const subjectIdentificationSettingsQuery = useSubjectIdentificationSettingsQuery();
+  const { preferMethod } = useSubjectIdentificationMethodOptions(subjectIdentificationSettingsQuery.data);
   const defaultInitialValues = {
     sessionType: 'IN_PERSON',
-    subjectIdentificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'CUSTOM_ID'
+    subjectIdentificationMethod: preferMethod(currentGroup?.settings.defaultIdentificationMethod ?? 'CUSTOM_ID')
   } as const;
   const [initialValues, setInitialValues] = useState<FormTypes.PartialNullableData<StartSessionFormData>>(
     location.state?.initialValues ?? defaultInitialValues
   );
+  const [pendingSession, setPendingSession] = useState<null | PendingSession>(null);
 
   const { t } = useTranslation('session');
   const createSessionMutation = useCreateSessionMutation();
   const subjectCustomIdsQuery = useSubjectCustomIdsQuery({ params: { groupId: currentGroup?.id } });
+  // The store holds the group as it was at sign-in, so a session instrument chosen since is read fresh.
+  const groupQuery = useGroupQuery(currentGroup?.id);
 
   const customSubjectIds = subjectCustomIdsQuery.data.map(removeSubjectIdScope);
 
@@ -40,6 +58,17 @@ const RouteComponent = () => {
     }
   }, [currentSession]);
 
+  // The details name the group they were entered in, so they must not start a session after a switch.
+  useEffect(() => {
+    setPendingSession(null);
+  }, [currentGroup?.id]);
+
+  const createSession = async (data: $StartSessionData) => {
+    const session = await createSessionMutation.mutateAsync(data);
+    setPendingSession(null);
+    startSession({ ...session, type: data.type });
+  };
+
   return (
     <React.Fragment>
       <PageHeader>
@@ -48,15 +77,38 @@ const RouteComponent = () => {
         </Heading>
       </PageHeader>
       {currentSession === null && (
-        <StartSessionForm
-          currentGroup={currentGroup}
-          customSubjectIds={customSubjectIds}
-          initialValues={initialValues}
-          readOnly={currentSession !== null || createSessionMutation.isPending}
-          username={currentUser?.username}
-          onSubmit={async (formData) => {
-            const session = await createSessionMutation.mutateAsync(formData);
-            startSession({ ...session, type: formData.type });
+        // Kept mounted behind the session instrument, so going back finds the details as they were entered.
+        <div className={pendingSession ? 'hidden' : undefined}>
+          <StartSessionForm
+            currentGroup={currentGroup}
+            customSubjectIds={customSubjectIds}
+            initialValues={initialValues}
+            readOnly={currentSession !== null || createSessionMutation.isPending}
+            subjectIdentificationSettings={subjectIdentificationSettingsQuery.data}
+            username={currentUser?.username}
+            onSubmit={async (details) => {
+              const sessionInstrumentId = groupQuery.data?.settings.sessionInstrumentId;
+              if (sessionInstrumentId) {
+                setPendingSession({ details, sessionInstrumentId });
+                return;
+              }
+              await createSession(details);
+            }}
+          />
+        </div>
+      )}
+      {currentSession === null && pendingSession && (
+        <SessionInstrumentStep
+          instrumentId={pendingSession.sessionInstrumentId}
+          onBack={() => setPendingSession(null)}
+          onSubmit={async (result) => {
+            const { details } = pendingSession;
+            await createSession({
+              ...details,
+              // An in-person session is dated when it is created, which is now that its form is submitted.
+              date: details.type === 'IN_PERSON' ? new Date() : details.date,
+              sessionInstrumentAnswers: { data: result.data, instrumentId: result.instrumentId }
+            });
           }}
         />
       )}
@@ -124,6 +176,10 @@ export const Route = createFileRoute('/_app/session/start-session')({
   component: RouteComponent,
   loader: async ({ context }) => {
     const { currentGroup } = useAppStore.getState();
-    await context.queryClient.ensureQueryData(subjectCustomIdsQueryOptions({ params: { groupId: currentGroup?.id } }));
+    await Promise.all([
+      context.queryClient.ensureQueryData(subjectCustomIdsQueryOptions({ params: { groupId: currentGroup?.id } })),
+      context.queryClient.ensureQueryData(subjectIdentificationSettingsQueryOptions()),
+      currentGroup ? context.queryClient.ensureQueryData(groupQueryOptions(currentGroup.id)) : null
+    ]);
   }
 });

@@ -99,6 +99,7 @@ enum GroupType {
 enum SubjectIdentificationMethod {
   CUSTOM_ID
   PERSONAL_INFO
+  CUSTOM_FIELDS
 }
 
 type GroupSettings {
@@ -107,6 +108,8 @@ type GroupSettings {
   idValidationRegexErrorMessage LocalizedString?
   subjectIdDisplayLength        Int?
   minimumAge                    Int?
+  // A form instrument that must be completed to start a session in the group, if any.
+  sessionInstrumentId           String?
 }
 
 // Mirrors $LocalizedString in @opendatacapture/schemas/core; each field is optional so
@@ -520,6 +523,31 @@ type MailTemplate {
   subject LocalizedString?
 }
 
+// One field an administrator defines for identifying subjects. Fields are hashed in the order they
+// are stored, so a field's position is its identity.
+type CustomIdentificationField {
+  description         LocalizedString?
+  label               LocalizedString
+  pattern             String
+  patternErrorMessage LocalizedString?
+}
+
+// The salt and the iteration count are generated with the first definition and never change: every
+// id derived from the fields depends on them, and the values typed into the fields are not stored.
+type CustomFieldsDefinition {
+  fields     CustomIdentificationField[]
+  iterations Int
+  label      LocalizedString
+  salt       String
+}
+
+// An empty list of offered methods is one an administrator never chose, which offers the built-in
+// two; once chosen, at least one is offered.
+type SubjectIdentificationSettings {
+  customFields   CustomFieldsDefinition?
+  offeredMethods SubjectIdentificationMethod[]
+}
+
 model SetupState {
   createdAt                     DateTime        @default(now()) @db.Date
   updatedAt                     DateTime        @updatedAt @db.Date
@@ -533,6 +561,7 @@ model SetupState {
   isSetup                       Boolean
   mailConfig                    MailConfig?
   newUserEmailTemplate          MailTemplate?
+  subjectIdentificationSettings SubjectIdentificationSettings?
   tableColorMode                TableColorMode?
 
   @@map("SetupStateModel")

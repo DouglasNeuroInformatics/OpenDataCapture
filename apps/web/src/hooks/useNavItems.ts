@@ -244,11 +244,6 @@ export function useNavItems() {
                   fr: 'Image de marque'
                 }),
                 url: '/admin/branding'
-              },
-              {
-                icon: MailIcon,
-                label: t({ en: 'Mail Server', es: 'Servidor de correo', fr: 'Serveur de courriel' }),
-                url: '/admin/mail'
               }
             ],
             icon: ServerIcon,

@@ -80,6 +80,10 @@ The default Standard User role does not see Manage Group.
 
     Choose the default identification method and configure the ID validation pattern and validation messages.
 
+6.  **Choose a session instrument, if any**
+
+    A group can require one form to be completed as part of starting every session. Set **Session Instrument** to that form, or to **None**. Only a form the group can access can be chosen, and it must stay accessible while it is the session instrument. When an administrator uploads a new edition of the form, the group requires the new edition.
+
 </Steps>
 
 ## Start a Session
@@ -94,15 +98,19 @@ Use **Start Session** to begin work with a subject.
 
 2.  **Identify the subject**
 
-    ODC supports custom IDs and auto-generated IDs based on personal information. The selected group's settings determine the default method.
+    ODC supports custom IDs, auto-generated IDs based on personal information and, once an administrator has defined them, IDs derived from an instance's own identifying fields (see [Hash-Based Identification](/en/docs/concepts/hash-based-identification/)). The selected group's settings determine the default method.
 
     <Screenshot alt="start session page" name="start-session-hash" />
 
 3.  **Choose the session type**
 
-    Use an in-person session for new data collection. Use a retrospective session when entering data that was collected earlier using another system.
+    Use an in-person session for new data collection; it is dated when it starts. Use a retrospective session when entering data that was collected earlier using another system, and enter the date and time the data was collected.
 
-4.  **Confirm the session is active**
+4.  **Complete the session instrument, if the group has one**
+
+    When the group requires a session instrument, it opens once the session details are submitted. The session starts only when the form is submitted, and its answers are saved as a record of the session. **Back** returns to the session details; leaving saves nothing.
+
+5.  **Confirm the session is active**
 
     After the session starts, ODC shows the active session in the sidebar.
 
@@ -130,7 +138,7 @@ The **Download** menu on Data Hub's Subjects page downloads the records of the l
 
 Use **Upload Data** to import CSV data for form instruments.
 
-Upload Data appears when the instance admin has enabled experimental features (**Enable Uploader** in App Settings) and your account can read subjects and create instrument records. The default Group Manager and Standard User roles satisfy those permissions.
+Upload Data appears when the instance admin has enabled experimental features (**Enable Uploader** on the **Features** tab of **Admin Panel** > **Instance** > **Settings**) and your account can read subjects and create instrument records. The default Group Manager and Standard User roles satisfy those permissions.
 
 For more detail, see [How to Upload Data](/en/docs/guides/how-to-upload-data/).
 

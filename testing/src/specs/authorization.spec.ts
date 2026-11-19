@@ -27,9 +27,7 @@ const ADMIN_ONLY_ROUTES = [
   '/admin/settings',
   '/admin/branding',
   '/admin/instrument-repos',
-  '/admin/audit/logs',
-  // Only asserted negatively (hidden from non-admins), which holds whether or not mail is on.
-  '/admin/mail'
+  '/admin/audit/logs'
 ] as const;
 
 /** Routes with no role gating at all -- reachable by every authenticated role. */
