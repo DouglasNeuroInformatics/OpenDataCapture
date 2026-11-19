@@ -1,10 +1,12 @@
 import { z } from 'zod/v4';
 
 import { mailSettingsQueryOptions } from '@/hooks/useMailSettingsQuery';
+import { subjectIdentificationSettingsQueryOptions } from '@/hooks/useSubjectIdentificationSettingsQuery';
 
 import { FeaturesTab } from './FeaturesTab';
 import { InterfaceTab } from './InterfaceTab';
 import { MailTab } from './MailTab';
+import { SubjectIdentificationTab } from './SubjectIdentificationTab';
 
 import type { SettingsTab } from './types';
 
@@ -31,6 +33,13 @@ export const SETTINGS_TABS = defineSettingsTabs([
     prefetch: (queryClient) => queryClient.ensureQueryData(mailSettingsQueryOptions()),
     saves: 'explicit',
     value: 'mail'
+  },
+  {
+    Content: SubjectIdentificationTab,
+    label: { en: 'Subject Identification', es: 'Identificación de sujetos', fr: 'Identification des sujets' },
+    prefetch: (queryClient) => queryClient.ensureQueryData(subjectIdentificationSettingsQueryOptions()),
+    saves: 'explicit',
+    value: 'subject-identification'
   }
 ]);
 

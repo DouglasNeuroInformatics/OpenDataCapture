@@ -39,6 +39,7 @@ vi.mock('../InterfaceTab', () => ({
   )
 }));
 vi.mock('../MailTab', () => ({ MailTab: mocks.MailTab }));
+vi.mock('../SubjectIdentificationTab', () => ({ SubjectIdentificationTab: () => null }));
 
 const renderSettings = ({
   onTabChange = vi.fn(),
@@ -70,7 +71,7 @@ describe('ApplicationSettings', () => {
     it('should list the tabs by their translated label, so they read alphabetically in every language', () => {
       i18n.changeLanguage('fr');
       renderSettings();
-      expect(tabLabels()).toStrictEqual(['Courriel', 'Fonctionnalités', 'Interface']);
+      expect(tabLabels()).toStrictEqual(['Courriel', 'Fonctionnalités', 'Identification des sujets', 'Interface']);
     });
 
     // In French the first tab by label is not the first written, so this tells the two orders apart.

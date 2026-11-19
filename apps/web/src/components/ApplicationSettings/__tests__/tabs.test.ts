@@ -4,13 +4,18 @@ import { describe, expect, it, vi } from 'vitest';
 import { $ApplicationSettingsSearch, SETTINGS_TABS } from '../tabs';
 
 const mocks = vi.hoisted(() => ({
-  mailSettingsQueryOptions: vi.fn(() => ({ queryKey: ['mail-settings'] }))
+  mailSettingsQueryOptions: vi.fn(() => ({ queryKey: ['mail-settings'] })),
+  subjectIdentificationSettingsQueryOptions: vi.fn(() => ({ queryKey: ['subject-identification-settings'] }))
 }));
 
 vi.mock('@/hooks/useMailSettingsQuery', () => ({ mailSettingsQueryOptions: mocks.mailSettingsQueryOptions }));
+vi.mock('@/hooks/useSubjectIdentificationSettingsQuery', () => ({
+  subjectIdentificationSettingsQueryOptions: mocks.subjectIdentificationSettingsQueryOptions
+}));
 vi.mock('../FeaturesTab', () => ({ FeaturesTab: () => null }));
 vi.mock('../InterfaceTab', () => ({ InterfaceTab: () => null }));
 vi.mock('../MailTab', () => ({ MailTab: () => null }));
+vi.mock('../SubjectIdentificationTab', () => ({ SubjectIdentificationTab: () => null }));
 
 describe('$ApplicationSettingsSearch', () => {
   it('should leave the tab unset for a bare address, so the router does not rewrite it to add one', () => {
@@ -32,5 +37,12 @@ describe('SETTINGS_TABS', () => {
     const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue(undefined);
     await SETTINGS_TABS.find(({ value }) => value === 'mail')?.prefetch?.(queryClient);
     expect(ensureQueryData).toHaveBeenCalledWith({ queryKey: ['mail-settings'] });
+  });
+
+  it('should prefetch the subject identification settings for their tab, so it renders without a waterfall', async () => {
+    const queryClient = new QueryClient();
+    const ensureQueryData = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue(undefined);
+    await SETTINGS_TABS.find(({ value }) => value === 'subject-identification')?.prefetch?.(queryClient);
+    expect(ensureQueryData).toHaveBeenCalledWith({ queryKey: ['subject-identification-settings'] });
   });
 });
