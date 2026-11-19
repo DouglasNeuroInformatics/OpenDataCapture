@@ -6,6 +6,7 @@
     "astro": "astro",
     "build": "astro build",
     "dev": "astro dev",
+    "gen:types": "astro sync",
     "format:translations": "find src/i18n/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
     "lint": "astro check"
   },

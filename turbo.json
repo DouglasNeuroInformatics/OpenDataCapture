@@ -31,6 +31,7 @@
         "@opendatacapture/api#db:generate",
         "@opendatacapture/gateway#db:generate",
         "@opendatacapture/instrument-library#build",
+        "@opendatacapture/outreach#gen:types",
         "@opendatacapture/testing#gen:routes"
       ]
     },

@@ -115,8 +115,10 @@ a lint failure and every run may rewrite the working tree. To check part of the 
 
 `pnpm lint` is `turbo run lint lint:root`. `//#lint:root` depends on `//#generated`, a task with no
 script that names what a tool run over the whole repo reads and source control does not hold: both
-Prisma clients, `testing`'s route types, and `instrument-library`'s build, which reaches `runtime-v1`
-and `runtime-core` through `^build`. `test:e2e` depends on the same task, the gateway's `db:push`, the
+Prisma clients, `testing`'s route types, `apps/outreach`'s content collection types (`gen:types`,
+`astro sync`, into the git-ignored `.astro/`), and `instrument-library`'s build, which reaches
+`runtime-v1` and `runtime-core` through `^build`. Without the content types, the type-check reads every
+`astro:content` import as `any` on a fresh checkout such as CI's. `test:e2e` depends on the same task, the gateway's `db:push`, the
 `build` of gateway, web and playground, whose production builds the suite serves, and `^build`, which
 builds the `playground-url` CLI that `testing/src/specs/playground.spec.ts` runs.
 `dev` and `dev:test` depend on `["^build", "db:generate"]`, to which `apps/gateway/turbo.json` adds
