@@ -58,7 +58,7 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
       - name: Validate
-        run: GATEWAY_DATABASE_URL=file:${TMPDIR}tmp.db pnpm lint
+        run: pnpm lint
   build:
     runs-on: ubuntu-latest
     needs: [configure, validate]

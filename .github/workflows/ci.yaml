@@ -26,6 +26,15 @@ jobs:
           git config --global --add safe.directory /__w/OpenDataCapture/OpenDataCapture
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+      # A pull request reads the caches of its own earlier runs, so a follow-up push reruns only the
+      # turbo tasks whose inputs it changed.
+      - name: Restore Turbo Cache
+        uses: actions/cache@v6
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
       # Run lint and unit tests before the (occasionally flaky) Playwright install so those results
       # aren't blocked by a hung browser download.
       - name: Lint
