@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import { createServer } from 'node:net';
 
 import { PRISMA_CLIENT_TOKEN } from '@douglasneuroinformatics/libnest';
 import type { EmailDeliveryResult } from '@opendatacapture/schemas/mail';
@@ -15,21 +14,12 @@ const PASSWORD = 'DataCapture2025_Test';
 /** Logins come from an address of their own, so they spend none of the default address's throttle budget. */
 const LOGIN_ADDRESS = '192.0.2.70';
 
-/** A loopback port nothing listens on, so a delivery attempt is refused at once rather than timing out. */
-async function findClosedPort(): Promise<number> {
-  const server = createServer();
-  await new Promise<void>((resolve) => {
-    server.listen(0, '127.0.0.1', resolve);
-  });
-  const address = server.address();
-  await new Promise((resolve) => {
-    server.close(resolve);
-  });
-  if (typeof address !== 'object' || address === null) {
-    throw new Error('Expected the probe server to listen on a TCP port');
-  }
-  return address.port;
-}
+/**
+ * A loopback port nothing listens on, so a delivery attempt is refused at once rather than timing out.
+ * Port 1 (tcpmux) lies outside the range the OS assigns to other sockets. A port freed by a probe
+ * server does not: another process can start listening on it before the suite connects.
+ */
+const CLOSED_PORT = 1;
 
 /**
  * The delivery results a caller relies on to fall back to manual delivery, over real HTTP: the
@@ -58,8 +48,6 @@ export default defineSuite('mail delivery', function () {
     expect(response.statusCode).toBe(200);
   };
 
-  let closedPort: number;
-
   beforeAll(async () => {
     const login = await this.app.inject({
       method: 'POST',
@@ -69,13 +57,12 @@ export default defineSuite('mail delivery', function () {
     });
     expect(login.statusCode).toBe(200);
     adminHeaders = { authorization: `Bearer ${login.json<{ accessToken: string }>().accessToken}` };
-    closedPort = await findClosedPort();
-    await setMailConfig(true, closedPort);
+    await setMailConfig(true, CLOSED_PORT);
   });
 
   // Mail is instance-wide, and every later suite assumes it is off.
   afterAll(async () => {
-    await setMailConfig(false, closedPort);
+    await setMailConfig(false, CLOSED_PORT);
   });
 
   afterEach(() => {
