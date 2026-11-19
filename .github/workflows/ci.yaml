@@ -8,6 +8,9 @@ permissions:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    env:
+      # Each run saves the entries it restored plus its own, so without a limit the cache only grows.
+      TURBO_CACHE_MAX_AGE: 7d
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -26,8 +29,8 @@ jobs:
           git config --global --add safe.directory /__w/OpenDataCapture/OpenDataCapture
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
-      # A pull request reads the caches of its own earlier runs, so a follow-up push reruns only the
-      # turbo tasks whose inputs it changed.
+      # A pull request reads the caches of its own earlier runs and the one the Release workflow last
+      # saved on its base branch, so a run repeats only the turbo tasks whose inputs changed.
       - name: Restore Turbo Cache
         uses: actions/cache@v6
         with:
