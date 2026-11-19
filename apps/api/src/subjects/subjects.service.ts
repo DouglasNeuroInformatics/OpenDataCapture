@@ -3,7 +3,7 @@ import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import { $CreateSubjectData } from '@opendatacapture/schemas/subject';
-import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
+import { CUSTOM_FIELDS_SUBJECT_ID_PREFIX, encodeScopedSubjectId } from '@opendatacapture/subject-utils';
 import type { Prisma } from '@prisma/client';
 
 import { accessibleQuery } from '@/auth/ability.utils';
@@ -23,8 +23,14 @@ function idsWithPrefix(prefix: string): Prisma.StringFilter {
   return { gte: prefix, lt: prefix.slice(0, -1) + String.fromCharCode(lastCharCode + 1) };
 }
 
-/** A subject identified by personal information has every one of these fields set. */
+const IDENTIFIED_BY_CUSTOM_FIELDS: Prisma.SubjectWhereInput = { id: idsWithPrefix(CUSTOM_FIELDS_SUBJECT_ID_PREFIX) };
+
+/**
+ * A subject identified by personal information has every one of these fields set. A subject
+ * identified by custom fields stores none of them either, so it is told apart by its id.
+ */
 const IDENTIFIED_BY_CUSTOM_ID: Prisma.SubjectWhereInput = {
+  NOT: IDENTIFIED_BY_CUSTOM_FIELDS,
   OR: PERSONAL_INFO_FIELDS.flatMap((field) => [{ [field]: null }, { [field]: { isSet: false } }])
 };
 
@@ -245,6 +251,14 @@ export class SubjectsService {
       }
     });
     return subjects.map((subject) => subject.id);
+  }
+
+  /**
+   * Whether any subject in the instance, in any group, has an id derived from the custom fields. It
+   * is deliberately unscoped: the definition locks for everyone once anyone has used it.
+   */
+  async hasCustomFieldsSubjects(): Promise<boolean> {
+    return this.subjectModel.exists(IDENTIFIED_BY_CUSTOM_FIELDS);
   }
 
   /**

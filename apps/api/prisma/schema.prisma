@@ -522,6 +522,28 @@ type MailTemplate {
   subject LocalizedString?
 }
 
+// One field an administrator defines for identifying subjects. Fields are hashed in the order they
+// are stored, so a field's position is its identity.
+type CustomIdentificationField {
+  description         LocalizedString?
+  label               LocalizedString
+  pattern             String
+  patternErrorMessage LocalizedString?
+}
+
+// The salt and the iteration count are generated with the first definition and never change: every
+// id derived from the fields depends on them, and the values typed into the fields are not stored.
+type CustomFieldsDefinition {
+  fields     CustomIdentificationField[]
+  iterations Int
+  label      LocalizedString
+  salt       String
+}
+
+type SubjectIdentificationSettings {
+  customFields CustomFieldsDefinition?
+}
+
 model SetupState {
   createdAt                     DateTime        @default(now()) @db.Date
   updatedAt                     DateTime        @updatedAt @db.Date
@@ -535,6 +557,7 @@ model SetupState {
   isSetup                       Boolean
   mailConfig                    MailConfig?
   newUserEmailTemplate          MailTemplate?
+  subjectIdentificationSettings SubjectIdentificationSettings?
   tableColorMode                TableColorMode?
 
   @@map("SetupStateModel")

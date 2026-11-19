@@ -454,6 +454,7 @@ describe('SubjectsService', () => {
       subjectModel.findMany.mockResolvedValueOnce([]);
       await subjectsService.findCustomIds('group-1');
       expect(findManyArgs().where.AND).toContainEqual({
+        NOT: { id: { gte: 'cf_', lt: 'cf`' } },
         OR: [
           { dateOfBirth: null },
           { dateOfBirth: { isSet: false } },
@@ -465,6 +466,15 @@ describe('SubjectsService', () => {
           { sex: { isSet: false } }
         ]
       });
+    });
+  });
+
+  describe('hasCustomFieldsSubjects', () => {
+    // A custom-fields subject stores no name, so only its id tells it apart from a custom id.
+    it('should look for any subject whose id carries the custom-fields prefix, by a lexical range', async () => {
+      subjectModel.exists.mockResolvedValueOnce(true);
+      await expect(subjectsService.hasCustomFieldsSubjects()).resolves.toBe(true);
+      expect(subjectModel.exists).toHaveBeenCalledWith({ id: { gte: 'cf_', lt: 'cf`' } });
     });
   });
 

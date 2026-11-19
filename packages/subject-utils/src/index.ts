@@ -14,7 +14,7 @@ const PERSONAL_INFO_SUBJECT_ID_PATTERN = /^[0-9a-f]{64}$/;
 
 const CUSTOM_FIELDS_SUBJECT_ID_PREFIX = 'cf_';
 
-const CUSTOM_FIELDS_SUBJECT_ID_PATTERN = /^cf_[0-9a-f]{64}$/;
+const CUSTOM_FIELDS_SUBJECT_ID_PATTERN = new RegExp(`^${CUSTOM_FIELDS_SUBJECT_ID_PREFIX}[0-9a-f]{64}$`);
 
 const CUSTOM_FIELDS_SALT_PATTERN = /^[0-9a-f]{64}$/;
 
@@ -148,5 +148,7 @@ export async function deriveCustomFieldsSubjectId(
   );
   return CUSTOM_FIELDS_SUBJECT_ID_PREFIX + encodeLowercaseHex(derivedBits);
 }
+
+export { CUSTOM_FIELDS_SUBJECT_ID_PREFIX };
 
 export { removeSubjectIdScope } from '@opendatacapture/runtime-internal';
