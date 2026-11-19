@@ -19,6 +19,13 @@
       "skillPath": "skills/interview/SKILL.md",
       "computedHash": "92f32340ae3ac0f6b7f345ed07279c60306138b5d12005b2aa2186f8fd1d97f6"
     },
+    "turborepo": {
+      "source": "vercel/turborepo",
+      "commit": "d4dfbcf3824133ccbb467ccbac38b125964b3ad0",
+      "sourceType": "github",
+      "skillPath": "skills/turborepo/SKILL.md",
+      "computedHash": "49bb6427015253ce5d93f15dfa6c9ade3f8528f0fbe54769b6da1e1458f058d4"
+    },
     "writing-normative-prose": {
       "source": "joshunrau/skills",
       "sourceType": "github",
