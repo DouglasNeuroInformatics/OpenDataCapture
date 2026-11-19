@@ -50,7 +50,7 @@ router.get(
       id,
       initialSeriesIndex,
       kind: 'assignment',
-      language: resolveLanguage(req.query.lang),
+      language: resolveLanguage(req.query.lang, req.headers['accept-language']),
       redirectUrl: assignment.redirectUrl ?? undefined,
       target: targetParseResult.data,
       token
@@ -63,7 +63,7 @@ router.get('/', (req, res) => {
   const html = res.locals.loadRoot({
     activeLanguages: getActiveLanguages(),
     kind: 'landing',
-    language: resolveLanguage(req.query.lang)
+    language: resolveLanguage(req.query.lang, req.headers['accept-language'])
   } satisfies RootProps);
   res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
 });
