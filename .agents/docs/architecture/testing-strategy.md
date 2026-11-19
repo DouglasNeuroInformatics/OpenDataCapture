@@ -109,7 +109,8 @@ a lint failure and every run may rewrite the working tree. To check part of the 
 `pnpm lint` is `turbo run lint lint:root`. `//#lint:root` depends on `//#generated`, a task with no
 script that names what a tool run over the whole repo reads and source control does not hold: both
 Prisma clients, `testing`'s route types, and `instrument-library`'s build, which reaches `runtime-v1`
-and `runtime-core` through `^build`. `test:e2e` depends on the same task plus the gateway's `db:push`.
+and `runtime-core` through `^build`. `test:e2e` depends on the same task, the gateway's `db:push`, and
+`^build`, which builds the `playground-url` CLI that `testing/src/specs/playground.spec.ts` runs.
 `dev` and `dev:test` depend on `["^build", "db:generate"]`, to which `apps/gateway/turbo.json` adds
 `db:push`; `build` depends on `["^build", "db:generate"]` and `start` on `build`. `dev`, `dev:test`,
 `start`, `test:e2e` and `db:push` are `cache: false`. A workspace whose task differs from the root

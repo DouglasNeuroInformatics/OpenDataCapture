@@ -44,7 +44,7 @@
     },
     "@opendatacapture/testing#test:e2e": {
       "cache": false,
-      "dependsOn": ["//#generated", "@opendatacapture/gateway#db:push"]
+      "dependsOn": ["^build", "//#generated", "@opendatacapture/gateway#db:push"]
     }
   }
 }
