@@ -1,9 +1,16 @@
 import { sha256 } from '@douglasneuroinformatics/libcrypto';
-import type { ClinicalSubjectIdentificationData, Subject } from '@opendatacapture/schemas/subject';
+import type {
+  ClinicalSubjectIdentificationData,
+  Subject,
+  SubjectIdentificationMethod
+} from '@opendatacapture/schemas/subject';
 import { transliterate } from 'transliteration';
 import type { SetNonNullable } from 'type-fest';
 
 type SubjectPersonalInfo = Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
+
+// libcrypto's sha256 writes each byte as two lowercase hex digits, so no stored name hash has an uppercase letter.
+const PERSONAL_INFO_SUBJECT_ID_PATTERN = /^[0-9a-f]{64}$/;
 
 function parseClinicalSubjectIdentificationData({
   dateOfBirth,
@@ -53,6 +60,18 @@ export function isSubjectWithPersonalInfo<T extends SubjectPersonalInfo>(
 
 export function encodeScopedSubjectId(id: string, options: { groupName: string }) {
   return `${options.groupName.replaceAll(' ', '_')}$${id}`;
+}
+
+export function inferSubjectIdentificationMethod(subjectId: string): SubjectIdentificationMethod {
+  return PERSONAL_INFO_SUBJECT_ID_PATTERN.test(subjectId) ? 'PERSONAL_INFO' : 'CUSTOM_ID';
+}
+
+export function toStoredSubjectId(enteredId: string, options: { groupName: string }): string {
+  // Only a custom id belongs to a group; a name hash names the same subject in every group.
+  if (enteredId.includes('$') || inferSubjectIdentificationMethod(enteredId) !== 'CUSTOM_ID') {
+    return enteredId;
+  }
+  return encodeScopedSubjectId(enteredId, options);
 }
 
 export { removeSubjectIdScope } from '@opendatacapture/runtime-internal';

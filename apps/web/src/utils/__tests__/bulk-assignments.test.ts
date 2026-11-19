@@ -30,7 +30,9 @@ const resolvedIds = async (...args: Parameters<typeof resolveSubjectIds>) => {
   return (await resolveSubjectIds(...args)).matched.map(({ id }) => id);
 };
 
-const resolve = (input: string, maxSubjects = 500) => resolvedIds(parseDelimitedText(input), { maxSubjects });
+const resolve = (input: string, maxSubjects = 500) => {
+  return resolvedIds(parseDelimitedText(input), { groupName: 'Depression Clinic', maxSubjects });
+};
 
 /** The errors carried by a rejected parse, so a test can assert on row numbers and wording. */
 const failureOf = async (run: () => unknown) => {
@@ -126,8 +128,11 @@ describe('parseDelimitedText', () => {
 });
 
 describe('resolveSubjectIds', () => {
-  it('should return ids unchanged in ID mode', async () => {
-    await expect(resolve('subjectId\nsubject-1\nsubject-2')).resolves.toEqual(['subject-1', 'subject-2']);
+  it('should return one stored id per row in ID mode, in file order', async () => {
+    await expect(resolve('subjectId\nsubject-1\nsubject-2')).resolves.toEqual([
+      'Depression_Clinic$subject-1',
+      'Depression_Clinic$subject-2'
+    ]);
   });
 
   it('should derive ids matching real generateSubjectHash output, never a reimplementation of it', async () => {
@@ -252,8 +257,15 @@ describe('resolveSubjectIds', () => {
       ]);
     });
 
-    it('should pass values through unchanged when no group is known', async () => {
-      await expect(resolvedIds(idCsv('ex_111'), { maxSubjects: 10 })).resolves.toEqual(['ex_111']);
+    it('should match an uppercase hex custom identifier to its scoped stored id, since no name hash is uppercase', async () => {
+      const customId = 'A'.repeat(64);
+      await expect(
+        resolvedIds(idCsv(customId), {
+          groupName: 'Depression Clinic',
+          knownSubjectIds: [`Depression_Clinic$${customId}`, 'a'.repeat(64)],
+          maxSubjects: 10
+        })
+      ).resolves.toEqual([`Depression_Clinic$${customId}`]);
     });
 
     it('should match a truncated identifier against known subjects by prefix', async () => {
@@ -303,7 +315,11 @@ describe('resolveSubjectIds', () => {
 
     it('should report personal information the group cannot place by row, never by name', async () => {
       const parsed = parseDelimitedText('firstName,lastName,dateOfBirth,sex\nJean,Tremblay,2000-01-01,M');
-      const resolution = await resolveSubjectIds(parsed, { knownSubjectIds: [], maxSubjects: 10 });
+      const resolution = await resolveSubjectIds(parsed, {
+        groupName: 'Depression Clinic',
+        knownSubjectIds: [],
+        maxSubjects: 10
+      });
       expect(resolution).toEqual({ ambiguousRows: [], matched: [], unknownRows: [2] });
     });
   });

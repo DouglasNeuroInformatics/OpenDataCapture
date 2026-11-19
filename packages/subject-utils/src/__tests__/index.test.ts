@@ -4,8 +4,10 @@ import { describe, expect, it } from 'vitest';
 import {
   encodeScopedSubjectId,
   generateSubjectHash,
+  inferSubjectIdentificationMethod,
   isSubjectWithPersonalInfo,
-  removeSubjectIdScope
+  removeSubjectIdScope,
+  toStoredSubjectId
 } from '../index.js';
 
 const validIdentificationData = {
@@ -14,6 +16,8 @@ const validIdentificationData = {
   lastName: 'Doe',
   sex: 'FEMALE'
 } as const;
+
+const nameHash = '520be817915752b50f418a743a54b692ce8e2a0a3421931598ffad246182568f';
 
 describe('generateSubjectHash', () => {
   it('should hash valid clinical identification data to a deterministic string', async () => {
@@ -166,5 +170,40 @@ describe('encodeScopedSubjectId', () => {
 describe('removeSubjectIdScope', () => {
   it('should re-export the runtime-internal implementation', () => {
     expect(removeSubjectIdScope('My_Group$123')).toBe('123');
+  });
+});
+
+describe('inferSubjectIdentificationMethod', () => {
+  it('should read a bare 64-character lowercase hex digest as a name hash', () => {
+    expect(inferSubjectIdentificationMethod(nameHash)).toBe('PERSONAL_INFO');
+  });
+  it('should read an uppercase digest as a custom id, since a name hash is always lowercase', () => {
+    expect(inferSubjectIdentificationMethod(nameHash.toUpperCase())).toBe('CUSTOM_ID');
+  });
+  it('should read a truncated digest as a custom id', () => {
+    expect(inferSubjectIdentificationMethod(nameHash.slice(0, 63))).toBe('CUSTOM_ID');
+  });
+  it('should read a scoped digest as a custom id, since a name hash is never scoped', () => {
+    expect(inferSubjectIdentificationMethod(`My_Group$${nameHash}`)).toBe('CUSTOM_ID');
+  });
+  it('should read any other value as a custom id', () => {
+    expect(inferSubjectIdentificationMethod('ex_111')).toBe('CUSTOM_ID');
+  });
+});
+
+describe('toStoredSubjectId', () => {
+  it('should scope a custom id to the group, as Start Session stores it', () => {
+    expect(toStoredSubjectId('ex_111', { groupName: 'My Group' })).toBe('My_Group$ex_111');
+  });
+  it('should leave a name hash unscoped, so it names the subject every group shares', () => {
+    expect(toStoredSubjectId(nameHash, { groupName: 'My Group' })).toBe(nameHash);
+  });
+  it('should scope an uppercase digest, which cannot be a name hash', () => {
+    expect(toStoredSubjectId(nameHash.toUpperCase(), { groupName: 'My Group' })).toBe(
+      `My_Group$${nameHash.toUpperCase()}`
+    );
+  });
+  it('should leave a value that already holds a scope alone', () => {
+    expect(toStoredSubjectId('Other_Group$ex_111', { groupName: 'My Group' })).toBe('Other_Group$ex_111');
   });
 });
