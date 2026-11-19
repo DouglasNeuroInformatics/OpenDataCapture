@@ -37,10 +37,21 @@ export class StartSessionPage extends AppPage {
     // The end session nav item opens a dialog rather than navigating, so it carries no route.
   }
 
+  /** One of the fields an administrator defined for identifying subjects, in the order defined. */
+  customField(index: number): Locator {
+    return this.sessionForm.locator(`[name="customField${index}"]`);
+  }
+
   /** Clicks outside the identifier combobox, which closes its popup and commits what was typed. */
   async dismissSubjectIdOptions() {
     // eslint-disable-next-line playwright/prefer-locator -- pageHeader is a Locator; the rule takes any name starting with "page" for a Page
     await this.pageHeader.click();
+  }
+
+  async fillCustomFields(values: string[]) {
+    for (const [index, value] of values.entries()) {
+      await this.customField(index).fill(value);
+    }
   }
 
   async fillCustomIdentifier(customIdentifier: string, sex: string) {

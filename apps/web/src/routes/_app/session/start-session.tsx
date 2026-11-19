@@ -15,6 +15,10 @@ import type { StartSessionFormData } from '@/components/StartSessionForm';
 import { useCreateSessionMutation } from '@/hooks/useCreateSessionMutation';
 import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
 import { subjectCustomIdsQueryOptions, useSubjectCustomIdsQuery } from '@/hooks/useSubjectCustomIdsQuery';
+import {
+  subjectIdentificationSettingsQueryOptions,
+  useSubjectIdentificationSettingsQuery
+} from '@/hooks/useSubjectIdentificationSettingsQuery';
 import { useAppStore } from '@/store';
 
 type PendingSession = {
@@ -42,6 +46,7 @@ const RouteComponent = () => {
   const subjectCustomIdsQuery = useSubjectCustomIdsQuery({ params: { groupId: currentGroup?.id } });
   // The store holds the group as it was at sign-in, so a session instrument chosen since is read fresh.
   const groupQuery = useGroupQuery(currentGroup?.id);
+  const subjectIdentificationSettingsQuery = useSubjectIdentificationSettingsQuery();
 
   const customSubjectIds = subjectCustomIdsQuery.data.map(removeSubjectIdScope);
 
@@ -74,6 +79,7 @@ const RouteComponent = () => {
         <div className={pendingSession ? 'hidden' : undefined}>
           <StartSessionForm
             currentGroup={currentGroup}
+            customFieldsDefinition={subjectIdentificationSettingsQuery.data.customFields}
             customSubjectIds={customSubjectIds}
             initialValues={initialValues}
             readOnly={currentSession !== null || createSessionMutation.isPending}
@@ -170,6 +176,7 @@ export const Route = createFileRoute('/_app/session/start-session')({
     const { currentGroup } = useAppStore.getState();
     await Promise.all([
       context.queryClient.ensureQueryData(subjectCustomIdsQueryOptions({ params: { groupId: currentGroup?.id } })),
+      context.queryClient.ensureQueryData(subjectIdentificationSettingsQueryOptions()),
       currentGroup ? context.queryClient.ensureQueryData(groupQueryOptions(currentGroup.id)) : null
     ]);
   }

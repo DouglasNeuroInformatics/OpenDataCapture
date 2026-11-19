@@ -2,7 +2,11 @@ import { toBasicISOString, toLowerCase } from '@douglasneuroinformatics/libjs';
 import { ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { Branding, LanguageToggle } from '@opendatacapture/react-core';
-import { isSubjectWithPersonalInfo, removeSubjectIdScope } from '@opendatacapture/subject-utils';
+import {
+  inferSubjectIdentificationMethod,
+  isSubjectWithPersonalInfo,
+  removeSubjectIdScope
+} from '@opendatacapture/subject-utils';
 import { useLocation } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'motion/react';
 
@@ -21,10 +25,18 @@ export const Sidebar = () => {
   const isGroupSwitcherVisible = useIsGroupSwitcherVisible();
   const navItems = useNavItems();
   const currentSession = useAppStore((store) => store.currentSession);
+  const currentGroup = useAppStore((store) => store.currentGroup);
   const location = useLocation();
   const { activeLanguages } = useSetupStateQuery().data;
 
   const { t } = useTranslation();
+
+  // A custom-fields id is a 67-character digest, shortened as the datahub shortens it.
+  const formatSubjectId = (subjectId: string) => {
+    return inferSubjectIdentificationMethod(subjectId) === 'CUSTOM_FIELDS'
+      ? subjectId.slice(0, currentGroup?.settings.subjectIdDisplayLength ?? 9)
+      : removeSubjectIdScope(subjectId);
+  };
 
   return (
     <div
@@ -110,7 +122,7 @@ export const Sidebar = () => {
                 <p>
                   {t(
                     { en: 'ID: {}', es: 'ID: {}', fr: 'ID : {}' },
-                    { args: [removeSubjectIdScope(currentSession.subject!.id)] }
+                    { args: [formatSubjectId(currentSession.subject!.id)] }
                   )}
                 </p>
               </div>

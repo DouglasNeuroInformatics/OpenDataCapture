@@ -12,6 +12,7 @@ import '@/services/i18n';
 
 type StartSessionFormProps = {
   currentGroup: Group | null;
+  customFieldsDefinition: unknown;
   customSubjectIds: string[];
   initialValues: { [key: string]: unknown };
   onSubmit: (data: $CreateSessionData) => Promise<void>;
@@ -70,6 +71,10 @@ vi.mock('@/hooks/useGroupQuery', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/hooks/useGroupQuery')>()),
   useGroupQuery: (groupId: string | undefined) => ({ data: groupId ? mocks.fetchedGroup : undefined })
 }));
+vi.mock('@/hooks/useSubjectIdentificationSettingsQuery', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/useSubjectIdentificationSettingsQuery')>()),
+  useSubjectIdentificationSettingsQuery: () => ({ data: { customFields: CUSTOM_FIELDS, isCustomFieldsLocked: false } })
+}));
 vi.mock('@/hooks/useSubjectCustomIdsQuery', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/hooks/useSubjectCustomIdsQuery')>()),
   useSubjectCustomIdsQuery: () => ({ data: ['group-1$CUSTOM-1', 'CUSTOM-2'] })
@@ -81,6 +86,13 @@ vi.mock('@/store', () => ({
 }));
 
 const NOW = new Date('2026-01-01T12:00:00Z');
+
+const CUSTOM_FIELDS = vi.hoisted(() => ({
+  fields: [{ label: { en: 'Animal ID' }, pattern: '[0-9]+' }],
+  iterations: 1000,
+  label: { en: 'Animal information' },
+  salt: '0f'.repeat(32)
+}));
 
 const group: Group = {
   accessibleInstrumentIds: [],
@@ -143,6 +155,11 @@ describe('Route', () => {
       mocks.isPending = true;
       render(<StartSessionPage />);
       expect(formProps().readOnly).toBe(true);
+    });
+
+    it("should hand the form the instance's custom identifying fields", () => {
+      render(<StartSessionPage />);
+      expect(formProps().customFieldsDefinition).toBe(CUSTOM_FIELDS);
     });
 
     it('should suggest the custom ids of the group with their group scope removed', () => {
@@ -354,7 +371,16 @@ describe('Route', () => {
       mocks.store.currentGroup = null;
       const ensureQueryData = vi.fn(() => Promise.resolve());
       await loader({ context: { queryClient: { ensureQueryData } } });
-      expect(ensureQueryData).toHaveBeenCalledOnce();
+      expect(ensureQueryData).not.toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['group', undefined] }));
+      expect(ensureQueryData).toHaveBeenCalledTimes(2);
+    });
+
+    it('should prefetch the subject identification settings, which the form identifies subjects by', async () => {
+      const ensureQueryData = vi.fn(() => Promise.resolve());
+      await loader({ context: { queryClient: { ensureQueryData } } });
+      expect(ensureQueryData).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['subject-identification-settings'] })
+      );
     });
   });
 });

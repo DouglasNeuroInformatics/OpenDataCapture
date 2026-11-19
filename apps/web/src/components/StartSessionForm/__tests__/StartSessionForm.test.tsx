@@ -1,6 +1,7 @@
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type { Group, GroupSettings } from '@opendatacapture/schemas/group';
-import { generateSubjectHash } from '@opendatacapture/subject-utils';
+import type { CustomFieldsDefinition } from '@opendatacapture/schemas/subject-identification';
+import { deriveCustomFieldsSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, cleanup, fireEvent, getByText, render, screen, waitFor } from '@testing-library/react';
 import axios from 'axios';
@@ -34,16 +35,28 @@ const groupWithIdPattern = (idValidationRegex: string) => groupWithSettings({ id
 
 const createQueryClient = () => new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
+const customFieldsDefinition: CustomFieldsDefinition = {
+  fields: [
+    { label: { en: 'Animal ID' }, pattern: '[A-Z]{2}[0-9]+', patternErrorMessage: { en: 'Two letters, then digits' } },
+    { label: { en: 'Cage' }, pattern: '[0-9]+' }
+  ],
+  iterations: 1000,
+  label: { en: 'Animal information' },
+  salt: '0f'.repeat(32)
+};
+
 const renderForm = (
   customSubjectIds: string[],
   currentGroup: Group | null = null,
-  method: 'CUSTOM_ID' | 'PERSONAL_INFO' = 'CUSTOM_ID',
-  queryClient = createQueryClient()
+  method: 'CUSTOM_FIELDS' | 'CUSTOM_ID' | 'PERSONAL_INFO' = 'CUSTOM_ID',
+  queryClient = createQueryClient(),
+  definition: CustomFieldsDefinition | null = null
 ) => {
   render(
     <QueryClientProvider client={queryClient}>
       <StartSessionForm
         currentGroup={currentGroup}
+        customFieldsDefinition={definition}
         customSubjectIds={customSubjectIds}
         readOnly={false}
         username="admin"
@@ -320,7 +333,13 @@ describe('StartSessionForm', () => {
     it('should submit a null username when none is known, rather than an undefined one the API would reject', async () => {
       render(
         <QueryClientProvider client={new QueryClient()}>
-          <StartSessionForm currentGroup={null} customSubjectIds={[]} readOnly={false} onSubmit={onSubmit} />
+          <StartSessionForm
+            currentGroup={null}
+            customFieldsDefinition={null}
+            customSubjectIds={[]}
+            readOnly={false}
+            onSubmit={onSubmit}
+          />
         </QueryClientProvider>
       );
       const form = screen.getByTestId('start-session-form');
@@ -428,6 +447,83 @@ describe('StartSessionForm', () => {
       const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
       fillPersonalInfo(form, { dateOfBirth: '1990-06-15', firstName: 'Jane' });
       await submitAndSettle(form);
+    });
+  });
+
+  describe('with custom fields', () => {
+    const renderWithCustomFields = () =>
+      renderForm([], null, 'CUSTOM_FIELDS', createQueryClient(), customFieldsDefinition);
+
+    const fillCustomFields = (form: HTMLElement, values: [string, string]) => {
+      values.forEach((value, index) => {
+        fireEvent.change(form.querySelector(`[name="customField${index}"]`)!, { target: { value } });
+      });
+    };
+
+    const methodOptions = (form: HTMLElement) => {
+      const select = form.querySelector<HTMLSelectElement>('select[name="subjectIdentificationMethod"]')!;
+      return Array.from(select.options, (option) => option.value).filter(Boolean);
+    };
+
+    const derivedId = () => deriveCustomFieldsSubjectId(['ab12', '7'], { iterations: 1000, salt: '0f'.repeat(32) });
+
+    it('should offer the method only once its fields are defined', () => {
+      expect(methodOptions(renderForm([]))).toStrictEqual(['CUSTOM_ID', 'PERSONAL_INFO']);
+      cleanup();
+      expect(methodOptions(renderWithCustomFields())).toStrictEqual(['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS']);
+    });
+
+    it("should name the method with the administrator's label and ask for each of their fields", () => {
+      renderWithCustomFields();
+      expect(screen.getAllByText('Animal information').length).toBeGreaterThan(0);
+      expect(screen.getByText('Animal ID')).toBeTruthy();
+      expect(screen.getByText('Cage')).toBeTruthy();
+    });
+
+    it('should identify the subject by the id derived from the fields, sending no name', async () => {
+      const form = renderWithCustomFields();
+      fillCustomFields(form, ['ab12', '7']);
+      await submitAndSettle(form);
+      expect(onSubmit.mock.lastCall?.[0].subjectData).toStrictEqual({
+        dateOfBirth: undefined,
+        firstName: undefined,
+        id: await derivedId(),
+        lastName: undefined,
+        sex: undefined
+      });
+    });
+
+    it('should show the error of each field the values fail', async () => {
+      const form = renderWithCustomFields();
+      fillCustomFields(form, ['12', '']);
+      submit(form);
+      await waitFor(() => {
+        expect(errorMessages()).toEqual([
+          { field: 'customField0', message: 'Two letters, then digits' },
+          { field: 'customField1', message: 'This field is required' }
+        ]);
+      });
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should look the subject up by the derived id once every field is valid, and fill in and lock their details', async () => {
+      existingSubject({ dateOfBirth: '1990-06-15', sex: 'FEMALE' });
+      const form = renderWithCustomFields();
+      fillCustomFields(form, ['ab12', '7']);
+      await waitFor(() => expect(dateOfBirthInput().disabled).toBe(true));
+      expect(get).toHaveBeenCalledWith(`/v1/subjects/${await derivedId()}`, expect.anything());
+      expect(sexTrigger().disabled).toBe(true);
+    });
+
+    it('should not look anyone up while a field is still invalid', async () => {
+      const form = renderWithCustomFields();
+      fillCustomFields(form, ['12', '7']);
+      await act(async () => {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 50);
+        });
+      });
+      expect(get).not.toHaveBeenCalled();
     });
   });
 

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { $UpdateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { CreateSeriesInstrumentResult, TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { CustomFieldsDefinition } from '@opendatacapture/schemas/subject-identification';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -13,12 +14,18 @@ import '@/services/i18n';
 type DeleteCallbacks = { onSettled: () => void; onSuccess: () => void };
 
 type Loader = (ctx: {
-  context: { queryClient: { fetchQuery: (options: object) => Promise<unknown> } };
+  context: {
+    queryClient: {
+      ensureQueryData: (options: object) => Promise<unknown>;
+      fetchQuery: (options: object) => Promise<unknown>;
+    };
+  };
 }) => Promise<void>;
 
 const mocks = vi.hoisted(() => ({
   changeGroup: vi.fn(),
   createMutateAsync: vi.fn(),
+  customFields: null as CustomFieldsDefinition | null,
   deleteMutate: vi.fn(),
   /** The group as `GET /v1/groups/:id` returns it; the store's copy dates from sign-in. */
   fetchedGroup: undefined as Group | undefined,
@@ -43,6 +50,10 @@ vi.mock('@/hooks/useDeleteSeriesInstrumentMutation', () => ({
 }));
 vi.mock('@/hooks/useSetupStateQuery', () => ({
   useSetupStateQuery: () => ({ data: { isDemo: mocks.isDemo } })
+}));
+vi.mock('@/hooks/useSubjectIdentificationSettingsQuery', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/useSubjectIdentificationSettingsQuery')>()),
+  useSubjectIdentificationSettingsQuery: () => ({ data: { customFields: mocks.customFields } })
 }));
 vi.mock('@/hooks/useUpdateGroupMutation', () => ({
   useUpdateGroupMutation: () => ({ mutateAsync: mocks.updateMutateAsync })
@@ -196,6 +207,7 @@ const resolveCreate = (result: CreateSeriesInstrumentResult) => mocks.createMuta
 describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.customFields = null;
     mocks.fetchedGroup = undefined;
     mocks.instruments = defaultInstruments();
     mocks.isDemo = false;
@@ -708,6 +720,33 @@ describe('Route', () => {
     });
   });
 
+  describe('default identification method', () => {
+    const methodOptions = () => {
+      const select = document.querySelector<HTMLSelectElement>('select[name="defaultIdentificationMethod"]')!;
+      return Array.from(select.options, (option) => option.textContent).filter(Boolean);
+    };
+
+    it('should not offer custom fields as the default before any are defined', () => {
+      renderPage();
+      expect(methodOptions()).toEqual(['Custom Identifier', 'Personal Information']);
+    });
+
+    it("should offer custom fields under the administrator's label once they are defined, and save them as the default", async () => {
+      mocks.customFields = {
+        fields: [{ label: { en: 'Animal ID' }, pattern: '[0-9]+' }],
+        iterations: 1000,
+        label: { en: 'Animal information' },
+        salt: '0f'.repeat(32)
+      };
+      mocks.store.currentGroup = makeGroup({ settings: { defaultIdentificationMethod: 'CUSTOM_FIELDS' } });
+      renderPage();
+      expect(methodOptions()).toEqual(['Custom Identifier', 'Personal Information', 'Animal information']);
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(mocks.updateMutateAsync.mock.lastCall?.[0].settings?.defaultIdentificationMethod).toBe('CUSTOM_FIELDS');
+    });
+  });
+
   describe('session instrument', () => {
     const requiring = (sessionInstrumentId: string) => {
       return makeGroup({ settings: { defaultIdentificationMethod: 'CUSTOM_ID', sessionInstrumentId } });
@@ -784,17 +823,30 @@ describe('Route', () => {
   });
 
   describe('loader', () => {
-    it('should fetch the current group even when it is cached, since the form saves every setting it is seeded with', async () => {
-      const fetchQuery = vi.fn(() => Promise.resolve());
-      await loader({ context: { queryClient: { fetchQuery } } });
-      expect(fetchQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['group', 'group-1'] }));
+    const queryClient = () => ({
+      ensureQueryData: vi.fn(() => Promise.resolve()),
+      fetchQuery: vi.fn(() => Promise.resolve())
     });
 
-    it('should fetch nothing when no group is selected', async () => {
+    it('should prefetch the subject identification settings, which name the custom-fields method', async () => {
+      const client = queryClient();
+      await loader({ context: { queryClient: client } });
+      expect(client.ensureQueryData).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['subject-identification-settings'] })
+      );
+    });
+
+    it('should fetch the current group even when it is cached, since the form saves every setting it is seeded with', async () => {
+      const client = queryClient();
+      await loader({ context: { queryClient: client } });
+      expect(client.fetchQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['group', 'group-1'] }));
+    });
+
+    it('should fetch no group when none is selected', async () => {
       mocks.store.currentGroup = null;
-      const fetchQuery = vi.fn(() => Promise.resolve());
-      await loader({ context: { queryClient: { fetchQuery } } });
-      expect(fetchQuery).not.toHaveBeenCalled();
+      const client = queryClient();
+      await loader({ context: { queryClient: client } });
+      expect(client.fetchQuery).not.toHaveBeenCalled();
     });
   });
 });

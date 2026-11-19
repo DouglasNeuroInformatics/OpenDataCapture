@@ -2,7 +2,7 @@
 
 Derives and formats clinical subject identifiers. Nine exports: `generateSubjectHash`,
 `encodeScopedSubjectId`, `isSubjectWithPersonalInfo`, `inferSubjectIdentificationMethod`,
-`toStoredSubjectId`, `isCustomFieldsSubjectId`, `normalizeCustomFieldValue`,
+`toStoredSubjectId`, `CUSTOM_FIELDS_SUBJECT_ID_PREFIX`, `normalizeCustomFieldValue`,
 `deriveCustomFieldsSubjectId`, and `removeSubjectIdScope` (re-exported from
 `@opendatacapture/runtime-internal`). Source-only — `exports` is `"./src/index.ts"`, no build step.
 Used by `apps/web`, `apps/api` and `packages/react-core`.

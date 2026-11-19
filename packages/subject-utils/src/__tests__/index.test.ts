@@ -6,7 +6,6 @@ import {
   encodeScopedSubjectId,
   generateSubjectHash,
   inferSubjectIdentificationMethod,
-  isCustomFieldsSubjectId,
   isSubjectWithPersonalInfo,
   normalizeCustomFieldValue,
   removeSubjectIdScope,
@@ -194,6 +193,15 @@ describe('inferSubjectIdentificationMethod', () => {
   it('should read any other value as a custom id', () => {
     expect(inferSubjectIdentificationMethod('ex_111')).toBe('CUSTOM_ID');
   });
+  it('should read cf_ followed by 64 lowercase hex characters as derived from custom fields', () => {
+    expect(inferSubjectIdentificationMethod(customFieldsSubjectId)).toBe('CUSTOM_FIELDS');
+  });
+  it('should read cf_ followed by uppercase hex as a custom id, since derivation never writes it', () => {
+    expect(inferSubjectIdentificationMethod(`cf_${nameHash.toUpperCase()}`)).toBe('CUSTOM_ID');
+  });
+  it('should read cf_ followed by a digest of the wrong length as a custom id', () => {
+    expect(inferSubjectIdentificationMethod(customFieldsSubjectId.slice(0, -1))).toBe('CUSTOM_ID');
+  });
 });
 
 describe('toStoredSubjectId', () => {
@@ -213,21 +221,6 @@ describe('toStoredSubjectId', () => {
   });
   it('should leave a custom-fields id unscoped, so it names the subject every group shares', () => {
     expect(toStoredSubjectId(customFieldsSubjectId, { groupName: 'My Group' })).toBe(customFieldsSubjectId);
-  });
-});
-
-describe('isCustomFieldsSubjectId', () => {
-  it('should accept cf_ followed by 64 lowercase hex characters', () => {
-    expect(isCustomFieldsSubjectId(customFieldsSubjectId)).toBe(true);
-  });
-  it('should reject uppercase hex, which derivation never writes', () => {
-    expect(isCustomFieldsSubjectId(`cf_${nameHash.toUpperCase()}`)).toBe(false);
-  });
-  it('should reject a digest of the wrong length', () => {
-    expect(isCustomFieldsSubjectId(customFieldsSubjectId.slice(0, -1))).toBe(false);
-  });
-  it('should reject a bare digest, which is a name hash', () => {
-    expect(isCustomFieldsSubjectId(nameHash)).toBe(false);
   });
 });
 
@@ -306,9 +299,9 @@ describe('deriveCustomFieldsSubjectId', () => {
       'cf_ee997483bb6ef14ebb034cb15635cf14b8f5a7a5a0487ea6ccd971fc3d281f8f'
     ]);
   });
-  it('should derive an id isCustomFieldsSubjectId accepts', async () => {
+  it('should derive an id read back as derived from custom fields', async () => {
     const id = await deriveCustomFieldsSubjectId(['AB12'], { iterations: 1, salt });
-    expect(isCustomFieldsSubjectId(id)).toBe(true);
+    expect(inferSubjectIdentificationMethod(id)).toBe('CUSTOM_FIELDS');
   });
   it('should refuse a value that normalizes to nothing, rather than hash an empty field', async () => {
     await expect(deriveCustomFieldsSubjectId(['AB12', '--'], { iterations: 1000, salt })).rejects.toThrow(

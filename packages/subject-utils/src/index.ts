@@ -92,20 +92,17 @@ export function encodeScopedSubjectId(id: string, options: { groupName: string }
 }
 
 export function inferSubjectIdentificationMethod(subjectId: string): SubjectIdentificationMethod {
-  return PERSONAL_INFO_SUBJECT_ID_PATTERN.test(subjectId) ? 'PERSONAL_INFO' : 'CUSTOM_ID';
-}
-
-export function isCustomFieldsSubjectId(subjectId: string): boolean {
-  return CUSTOM_FIELDS_SUBJECT_ID_PATTERN.test(subjectId);
+  if (CUSTOM_FIELDS_SUBJECT_ID_PATTERN.test(subjectId)) {
+    return 'CUSTOM_FIELDS';
+  } else if (PERSONAL_INFO_SUBJECT_ID_PATTERN.test(subjectId)) {
+    return 'PERSONAL_INFO';
+  }
+  return 'CUSTOM_ID';
 }
 
 export function toStoredSubjectId(enteredId: string, options: { groupName: string }): string {
   // Only a custom id belongs to a group; a name hash or a custom-fields id names the same subject in every group.
-  if (
-    enteredId.includes('$') ||
-    isCustomFieldsSubjectId(enteredId) ||
-    inferSubjectIdentificationMethod(enteredId) !== 'CUSTOM_ID'
-  ) {
+  if (enteredId.includes('$') || inferSubjectIdentificationMethod(enteredId) !== 'CUSTOM_ID') {
     return enteredId;
   }
   return encodeScopedSubjectId(enteredId, options);

@@ -40,7 +40,7 @@ test.describe('data hub', () => {
     await page.getByTestId('subject-lookup-search-button').click();
 
     const identificationForm = page.getByTestId('identification-form');
-    await identificationForm.locator('[name="identificationMethod"]').selectOption('CUSTOM_ID');
+    await identificationForm.locator('[name="subjectIdentificationMethod"]').selectOption('CUSTOM_ID');
     await identificationForm.locator('[name="id"]').fill(customIdentifier);
     await identificationForm.getByRole('button', { name: 'Submit' }).click();
 

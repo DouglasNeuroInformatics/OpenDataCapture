@@ -14,6 +14,10 @@ import { MAIL_CLIENT_TIMEOUT } from '@opendatacapture/schemas/mail';
 import type { $SendAssignmentEmailData, EmailDeliveryResult } from '@opendatacapture/schemas/mail';
 import type { $CreateSessionData, Session, SessionType } from '@opendatacapture/schemas/session';
 import type { $CreateSubjectData } from '@opendatacapture/schemas/subject';
+import type {
+  $UpdateSubjectIdentificationSettingsData,
+  SubjectIdentificationSettings
+} from '@opendatacapture/schemas/subject-identification';
 import type { $CreateUserData, $UpdateUserPermissionsData, User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
@@ -327,6 +331,17 @@ export class ApiClient {
       this.request.patch(`${API}/groups/${id}`, { data, headers: this.authHeaders }),
       200,
       `update group '${id}'`
+    );
+  }
+
+  /** Replaces the instance's subject identification settings as admin. */
+  async updateSubjectIdentificationSettings(
+    data: $UpdateSubjectIdentificationSettingsData
+  ): Promise<SubjectIdentificationSettings> {
+    return this.expectJson<SubjectIdentificationSettings>(
+      this.request.put(`${API}/subjects/identification/settings`, { data, headers: this.authHeaders }),
+      200,
+      'update subject identification settings'
     );
   }
 

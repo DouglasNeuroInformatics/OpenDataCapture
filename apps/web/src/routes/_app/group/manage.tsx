@@ -18,7 +18,6 @@ import { $RegexString, toInstrumentAuthoringLanguage } from '@opendatacapture/sc
 import type { $UpdateGroupData } from '@opendatacapture/schemas/group';
 import type { $CreateSeriesInstrumentData } from '@opendatacapture/schemas/instrument';
 import { $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
-import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { createFileRoute } from '@tanstack/react-router';
 import { EyeIcon, TrashIcon } from 'lucide-react';
 import type { Promisable } from 'type-fest';
@@ -33,8 +32,13 @@ import { useDeleteSeriesInstrumentMutation } from '@/hooks/useDeleteSeriesInstru
 import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
+import {
+  subjectIdentificationSettingsQueryOptions,
+  useSubjectIdentificationSettingsQuery
+} from '@/hooks/useSubjectIdentificationSettingsQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
+import { getValueForLanguage } from '@/utils/language';
 import { buildSeriesAvailability } from '@/utils/series-availability';
 
 /**
@@ -85,7 +89,7 @@ const expandSelectedSeriesIds = ({
 const NO_SESSION_INSTRUMENT = 'NONE';
 
 type SettingsValues = {
-  defaultIdentificationMethod?: SubjectIdentificationMethod;
+  defaultIdentificationMethod?: string;
   idValidationRegex?: null | string;
   idValidationRegexErrorMessageEn?: null | string;
   idValidationRegexErrorMessageFr?: null | string;
@@ -96,6 +100,8 @@ type SettingsValues = {
 };
 
 type ManageGroupFormProps = {
+  /** The admin's label for the custom fields, or null while none are defined, which leaves the method unavailable. */
+  customFieldsLabel: null | string;
   data: {
     // The titles of every visible instrument, used to enforce unique new series instrument names.
     existingTitles: string[];
@@ -562,7 +568,7 @@ const DeleteInstrumentDialog = ({
   );
 };
 
-const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => {
+const ManageGroupForm = ({ customFieldsLabel, data, onSubmit, readOnly }: ManageGroupFormProps) => {
   const { existingTitles, groupId, hiddenAccessibleIds, initialSelectedIds, instruments, settingsInitialValues } = data;
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
@@ -598,6 +604,12 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
     () => [...instruments.form, ...instruments.interactive, ...instruments.series],
     [instruments]
   );
+
+  const identificationMethodOptions: { [method: string]: string } = {
+    CUSTOM_ID: t('common.customIdentifier'),
+    PERSONAL_INFO: t('common.personalInfo'),
+    ...(customFieldsLabel === null ? {} : { CUSTOM_FIELDS: customFieldsLabel })
+  };
 
   // Only a form the group will be able to access may be required, so the options follow the selection.
   // The list holds the latest edition of each form, so a shared title is two forms, told apart by name.
@@ -753,10 +765,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
               defaultIdentificationMethod: {
                 kind: 'string',
                 label: t('group.manage.defaultSubjectIdMethod'),
-                options: {
-                  CUSTOM_ID: t('common.customIdentifier'),
-                  PERSONAL_INFO: t('common.personalInfo')
-                },
+                options: identificationMethodOptions,
                 variant: 'select'
               },
               idValidationRegex: {
@@ -836,7 +845,7 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
         readOnly={readOnly}
         validationSchema={z
           .object({
-            defaultIdentificationMethod: $SubjectIdentificationMethod.optional(),
+            defaultIdentificationMethod: z.enum(Object.keys(identificationMethodOptions)).optional(),
             idValidationRegex: $RegexString.optional(),
             idValidationRegexErrorMessageEn: z.string().optional(),
             idValidationRegexErrorMessageFr: z.string().optional(),
@@ -887,7 +896,10 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
               })
             ].filter((id) => !deletedIds.has(id)),
             settings: {
-              defaultIdentificationMethod: formData.defaultIdentificationMethod,
+              // The select holds a string, since which methods it offers is known only at runtime.
+              defaultIdentificationMethod: $SubjectIdentificationMethod
+                .optional()
+                .parse(formData.defaultIdentificationMethod),
               idValidationRegex: formData.idValidationRegex,
               idValidationRegexErrorMessage: {
                 en: formData.idValidationRegexErrorMessageEn,
@@ -916,6 +928,8 @@ const RouteComponent = () => {
   // seeded with, so seeding it from that copy would undo any change made since.
   const groupQuery = useGroupQuery(currentGroup?.id);
   const group = groupQuery.data;
+  const subjectIdentificationSettingsQuery = useSubjectIdentificationSettingsQuery();
+  const customFieldsDefinition = subjectIdentificationSettingsQuery.data.customFields;
 
   const availableInstruments = instrumentInfoQuery.data;
 
@@ -1021,6 +1035,9 @@ const RouteComponent = () => {
         Component={ManageGroupForm}
         key={currentGroup?.id}
         props={{
+          customFieldsLabel: customFieldsDefinition
+            ? (getValueForLanguage(customFieldsDefinition.label, resolvedLanguage) ?? '')
+            : null,
           data,
           onSubmit: async (data) => {
             const updatedGroup = await updateGroupMutation.mutateAsync(data);
@@ -1035,11 +1052,12 @@ const RouteComponent = () => {
 
 export const Route = createFileRoute('/_app/group/manage')({
   component: RouteComponent,
-  // Fetched even when cached, since the form is seeded once and saves every setting it was seeded with.
   loader: async ({ context }) => {
     const { currentGroup } = useAppStore.getState();
-    if (currentGroup) {
-      await context.queryClient.fetchQuery(groupQueryOptions(currentGroup.id));
-    }
+    await Promise.all([
+      // Fetched even when cached, since the form is seeded once and saves every setting it was seeded with.
+      currentGroup ? context.queryClient.fetchQuery(groupQueryOptions(currentGroup.id)) : null,
+      context.queryClient.ensureQueryData(subjectIdentificationSettingsQueryOptions())
+    ]);
   }
 });

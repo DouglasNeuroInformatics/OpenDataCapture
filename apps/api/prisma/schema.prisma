@@ -99,6 +99,7 @@ enum GroupType {
 enum SubjectIdentificationMethod {
   CUSTOM_ID
   PERSONAL_INFO
+  CUSTOM_FIELDS
 }
 
 type GroupSettings {
