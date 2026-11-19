@@ -11,8 +11,6 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "format": "oxfmt src",
-    "lint": "tsc && oxlint --fix src",
     "test": "vitest"
   },
   "dependencies": {

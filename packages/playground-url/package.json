@@ -27,8 +27,6 @@
   },
   "scripts": {
     "build": "node scripts/build.js",
-    "format": "oxfmt src",
-    "lint": "tsc && oxlint --fix src",
     "test": "vitest"
   },
   "dependencies": {

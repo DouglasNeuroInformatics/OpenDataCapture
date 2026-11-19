@@ -7,8 +7,6 @@
     ".": "./src/index.js"
   },
   "scripts": {
-    "format": "oxfmt src",
-    "lint": "tsc && oxlint --fix src",
     "test": "vitest"
   },
   "dependencies": {

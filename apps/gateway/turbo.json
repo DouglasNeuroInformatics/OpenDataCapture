@@ -1,0 +1,17 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "db:push": {
+      "cache": false,
+      "dependsOn": ["db:generate"],
+      "env": ["GATEWAY_DATABASE_URL"]
+    },
+    "dev": {
+      "dependsOn": ["$TURBO_EXTENDS$", "db:push"]
+    },
+    "dev:test": {
+      "dependsOn": ["$TURBO_EXTENDS$", "db:push"]
+    }
+  }
+}

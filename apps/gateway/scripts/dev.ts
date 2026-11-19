@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 
-/* eslint-disable no-console */
+/* eslint-disable no-console -- a dev script reports each build to the terminal */
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { getReleaseInfo } from '@opendatacapture/release-info';
 import esbuild from 'esbuild';

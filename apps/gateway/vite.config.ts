@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 
 import runtime from '@opendatacapture/vite-plugin-runtime';
 import tailwindcss from '@tailwindcss/vite';
@@ -13,12 +13,12 @@ export default defineConfig(({ mode }) => ({
     target: 'es2022'
   },
   optimizeDeps: {
+    include: ['react/*', 'react-dom/*'],
     rolldownOptions: {
       transform: {
         target: 'es2022'
       }
-    },
-    include: ['react/*', 'react-dom/*']
+    }
   },
   plugins: [
     react(),

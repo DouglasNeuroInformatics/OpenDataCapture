@@ -1,6 +1,6 @@
-import * as fs from 'fs';
-import * as module from 'module';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as module from 'node:module';
+import * as path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 

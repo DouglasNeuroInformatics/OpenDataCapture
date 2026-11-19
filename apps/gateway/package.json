@@ -12,8 +12,6 @@
     "db:push": "env-cmd --silent -f ../../.env prisma db push --skip-generate",
     "dev": "NODE_ENV=development env-cmd -f ../../.env tsx scripts/dev.ts && env-cmd -f ../../.env node dist/main.js",
     "dev:test": "NODE_ENV=test env-cmd -f ../../.env tsx scripts/dev.ts && env-cmd -f ../../.env node dist/main.js",
-    "format": "oxfmt src",
-    "lint": "tsc && oxlint --fix src",
     "test": "env-cmd -f ../../.env vitest",
     "start": "NODE_ENV=production env-cmd -f ../../.env node dist/main.js"
   },

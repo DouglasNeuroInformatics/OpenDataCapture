@@ -1,0 +1,10 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "gen:routes": {
+      "inputs": ["scripts/gen-routes.ts", "$TURBO_ROOT$/apps/web/src/route-tree.ts"],
+      "outputs": ["src/generated/route.d.ts"]
+    }
+  }
+}

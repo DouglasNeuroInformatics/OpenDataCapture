@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import path from 'path';
+import path from 'node:path';
 
 import { prismaPlugin } from '@douglasneuroinformatics/esbuild-plugin-prisma';
 import { getReleaseInfo } from '@opendatacapture/release-info';
@@ -35,5 +35,5 @@ await esbuild.build({
   tsconfig
 });
 
-// eslint-disable-next-line no-console
+// eslint-disable-next-line no-console -- a build script reports that it finished
 console.log('Done!');

@@ -8,8 +8,6 @@
     "build": "tsc && pnpm exec vite build",
     "deploy": "rsync -r dist/* unrjos@cloud1.douglasneuroinformatics.ca:/home/unrjos/www/playground.opendatacapture.org",
     "dev": "NODE_ENV=development pnpm exec vite",
-    "format": "oxfmt src",
-    "lint": "tsc && oxlint --fix src",
     "test": "env-cmd -f ../../.env vitest"
   },
   "dependencies": {

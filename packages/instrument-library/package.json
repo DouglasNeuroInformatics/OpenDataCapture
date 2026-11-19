@@ -15,8 +15,6 @@
   "scripts": {
     "available": "tsx scripts/available.ts",
     "build": "tsx ../instrument-bundler/src/cli.ts --clean --declaration --outdir dist src",
-    "format": "oxfmt src",
-    "lint": "tsc && oxlint --fix src",
     "test": "vitest"
   },
   "dependencies": {

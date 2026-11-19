@@ -6,9 +6,8 @@
     "astro": "astro",
     "build": "astro build",
     "dev": "astro dev",
-    "format": "oxfmt src",
     "format:translations": "find src/i18n/translations -name '*.json' -exec pnpm exec sort-json {} \\;",
-    "lint": "astro check && oxlint --fix src"
+    "lint": "astro check"
   },
   "dependencies": {
     "@douglasneuroinformatics/libui": "catalog:",

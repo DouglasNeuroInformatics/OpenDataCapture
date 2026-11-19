@@ -1,56 +1,50 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "agentGuidance": false,
-  "globalDependencies": [
-    ".env",
-    "oxfmt.config.ts",
-    "oxlint.config.ts",
-    "packages/oxlint-config/src/**",
-    "tsconfig.json"
-  ],
-  "globalEnv": ["NODE_ENV", "NODE_OPTIONS", "RELEASE_VERSION"],
+  "globalDependencies": ["tsconfig.json"],
+  "globalEnv": ["RELEASE_VERSION"],
+  "globalPassThroughEnv": ["NODE_OPTIONS"],
   "tasks": {
-    // A package-scoped task replaces the generic one rather than merging with it,
-    // so anything the generic build declares must be repeated here.
-    "@opendatacapture/gateway#build": {
-      "dependsOn": ["^build", "db:push"],
-      "outputs": ["dist/**"]
-    },
     "build": {
       "dependsOn": ["^build", "db:generate"],
-      "env": ["API_BASE_URL", "CONTACT_EMAIL", "DOCS_URL", "GITHUB_REPO_URL", "LICENSE_URL", "GATEWAY_ENABLED"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/__tests__/**"],
       "outputs": ["dist/**"]
     },
     "db:generate": {
+      "inputs": ["prisma/schema.prisma"],
       "outputs": ["node_modules/@prisma/generated-client/**"]
     },
-    "@opendatacapture/api#db:generate": {
-      "cache": false
-    },
-    "db:push": {
-      "cache": false,
-      "env": ["GATEWAY_DATABASE_URL"],
-      "dependsOn": ["db:generate"]
-    },
     "dev": {
-      "dependsOn": ["^build", "^db:generate", "db:push"],
+      "cache": false,
+      "dependsOn": ["^build", "db:generate"],
       "persistent": true
     },
     "dev:test": {
-      "dependsOn": ["^build", "^db:generate", "db:push"],
+      "cache": false,
+      "dependsOn": ["^build", "db:generate"],
       "persistent": true
     },
-    "format": {},
-    "lint": {
-      "dependsOn": ["^build", "^db:generate", "db:push"]
+    // What a tool run over the whole repo reads that source control does not hold. The library builds
+    // reach runtime-core and runtime-v1 through ^build.
+    "//#generated": {
+      "dependsOn": [
+        "@opendatacapture/api#db:generate",
+        "@opendatacapture/gateway#db:generate",
+        "@opendatacapture/instrument-library#build",
+        "@opendatacapture/testing#gen:routes"
+      ]
     },
-    "//#lint:root": {},
-    "test:e2e": {
-      "cache": false,
-      "dependsOn": ["^build", "^db:generate", "db:push"]
+    "//#lint:root": {
+      "dependsOn": ["//#generated"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/*.mdx"]
     },
     "start": {
-      "dependsOn": ["^build"]
+      "cache": false,
+      "dependsOn": ["build"]
+    },
+    "@opendatacapture/testing#test:e2e": {
+      "cache": false,
+      "dependsOn": ["//#generated", "@opendatacapture/gateway#db:push"]
     }
   }
 }

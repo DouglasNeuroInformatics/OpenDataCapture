@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
-/* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-empty-object-type -- Env and PrismaClient only inherit, and must be interfaces to merge into libnest's UserTypes */
+/* eslint-disable @typescript-eslint/consistent-type-definitions -- libnest's UserTypes members are augmented by declaration merging, which a type alias cannot do */
+/* eslint-disable @typescript-eslint/no-namespace -- libnest exports UserTypes as a namespace, and augmenting a namespace requires redeclaring it */
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';

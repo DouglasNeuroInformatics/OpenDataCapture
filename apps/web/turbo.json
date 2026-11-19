@@ -1,0 +1,9 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": ["API_BASE_URL", "CONTACT_EMAIL", "DOCS_URL", "GATEWAY_ENABLED", "GITHUB_REPO_URL", "LICENSE_URL"]
+    }
+  }
+}

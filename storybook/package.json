@@ -5,8 +5,6 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "format": "oxfmt config package.json tsconfig.json vite.config.js",
-    "lint": "tsc && oxlint --fix config vite.config.js",
     "storybook": "NODE_OPTIONS='--import=tsx' env-cmd -f ../.env storybook dev -c config --no-open -p 6006"
   },
   "dependencies": {

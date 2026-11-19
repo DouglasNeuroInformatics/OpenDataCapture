@@ -29,9 +29,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "scripts": {
-    "format": "oxfmt bin",
-    "lint": "oxlint --fix bin"
   }
 }

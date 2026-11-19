@@ -1,0 +1,14 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    // src/content links to /docs and /blog, and turbo hashes a link rather than what it points to
+    "build": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/blog/**", "$TURBO_ROOT$/docs/**"]
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/blog/**", "$TURBO_ROOT$/docs/**"]
+    }
+  }
+}

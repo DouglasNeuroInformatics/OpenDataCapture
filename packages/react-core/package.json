@@ -10,8 +10,6 @@
     "./globals.css": "./src/globals.css"
   },
   "scripts": {
-    "format": "oxfmt src",
-    "lint": "tsc && oxlint --fix src",
     "test": "vitest"
   },
   "dependencies": {
