@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { presetMinDate } from '@/utils/collected-filter';
 import { timeframeMinDate } from '@/utils/timeframe';
 
 describe('timeframeMinDate', () => {
@@ -30,5 +31,14 @@ describe('timeframeMinDate', () => {
     vi.setSystemTime(new Date(2027, 2, 15, 12));
     expect(timeframeMinDate('pastYear')).not.toStrictEqual(chosen);
     expect(timeframeMinDate('pastYear')).toStrictEqual(new Date(2026, 2, 15, 12));
+  });
+
+  it.each([
+    ['pastMonth', new Date(2026, 2, 31, 12), new Date(2026, 1, 28, 12)],
+    ['pastYear', new Date(2024, 1, 29, 12), new Date(2023, 1, 28, 12)]
+  ] as const)('should clamp %s consistently with the Collected filter', (key, now, expected) => {
+    vi.setSystemTime(now);
+    expect(timeframeMinDate(key)).toStrictEqual(expected);
+    expect(timeframeMinDate(key)).toStrictEqual(presetMinDate(key));
   });
 });
