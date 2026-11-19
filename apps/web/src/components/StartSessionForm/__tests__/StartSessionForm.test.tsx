@@ -277,6 +277,17 @@ describe('StartSessionForm', () => {
       expect(dateOfBirthInput().disabled).toBe(false);
     });
 
+    // The popup closes on Enter, a click away or a tab, so a clinician who types a returning
+    // subject's id in full never has to pick it from the list.
+    it('should fill in the details when a typed identifier matches an existing subject, as picking it would', async () => {
+      existingSubject({ dateOfBirth: '1990-06-15', sex: 'MALE' });
+      renderForm(['alpha']);
+      typeIdentifier('alpha');
+      closeIdentifierPopup();
+      await waitFor(() => expect(sexTrigger().disabled).toBe(true));
+      expect(dateOfBirthInput().value).toBe('1990-06-15');
+    });
+
     it('should not look up an identifier absent from the options, since no subject can have it', () => {
       renderForm(['alpha']);
       typeIdentifier('gamma');
@@ -386,6 +397,20 @@ describe('StartSessionForm', () => {
         expect(errorMessages()).toEqual([
           { field: 'subjectFirstName', message: 'This field is required' },
           { field: 'subjectDateOfBirth', message: 'This field is required' }
+        ]);
+      });
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should require every personal detail when the form is submitted empty', async () => {
+      const form = renderForm([], null, 'PERSONAL_INFO');
+      submit(form);
+      await waitFor(() => {
+        expect(errorMessages()).toEqual([
+          { field: 'subjectFirstName', message: 'This field is required' },
+          { field: 'subjectLastName', message: 'This field is required' },
+          { field: 'subjectDateOfBirth', message: 'This field is required' },
+          { field: 'subjectSex', message: 'This field is required' }
         ]);
       });
       expect(onSubmit).not.toHaveBeenCalled();

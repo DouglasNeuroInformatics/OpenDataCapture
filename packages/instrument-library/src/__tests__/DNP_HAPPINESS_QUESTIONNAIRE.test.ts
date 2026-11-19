@@ -22,6 +22,10 @@ function getOverallLifeSatisfaction() {
 }
 
 describe('DNP_HAPPINESS_QUESTIONNAIRE', () => {
+  it('should not declare a reset button, so its form offers none', () => {
+    expect(instrument.resetButton).toBeUndefined();
+  });
+
   describe('reasonNotSatisfied', () => {
     it('should stay hidden until the subject has answered whether they are satisfied', () => {
       expect(getDynamicField('reasonNotSatisfied').render({})).toBeNull();

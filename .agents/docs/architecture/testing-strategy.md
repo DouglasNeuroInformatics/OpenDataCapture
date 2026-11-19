@@ -6,15 +6,16 @@ What is tested where, and what CI blocks a merge on. Writing an e2e test is
 
 ## Tiers
 
-| Tier       | Runner     | Where                                                                 | Command              |
-| ---------- | ---------- | --------------------------------------------------------------------- | -------------------- |
-| Unit       | vitest     | `__tests__/<file>.test.ts` beside `<file>.ts`, or a package's `test/` | `pnpm test:coverage` |
-| End-to-end | Playwright | `testing/src/specs/`                                                  | `pnpm test:e2e`      |
-| Type-check | oxlint     | code that fails to compile if the type breaks, e.g. `*.test-d.ts`     | `pnpm lint`          |
+| Tier        | Runner     | Where                                                                 | Command              |
+| ----------- | ---------- | --------------------------------------------------------------------- | -------------------- |
+| Unit        | vitest     | `__tests__/<file>.test.ts` beside `<file>.ts`, or a package's `test/` | `pnpm test:coverage` |
+| Integration | vitest     | `apps/api/test/suites/`, run through `apps/api/test/app.test.ts`      | `pnpm test:coverage` |
+| End-to-end  | Playwright | `testing/src/specs/`                                                  | `pnpm test:e2e`      |
+| Type-check  | oxlint     | code that fails to compile if the type breaks, e.g. `*.test-d.ts`     | `pnpm lint`          |
 
-**There is no integration tier.** `apps/api` unit tests mock the Prisma layer entirely, so Playwright
-is the only code path that touches a real database: a permissions or row-scoping change is untested
-until an e2e spec covers it.
+`apps/api` unit tests mock the Prisma layer entirely. The integration suites boot the real app on an
+in-memory replica set (`apps/api/AGENTS.md` §Tests), so a permissions or row-scoping change is tested
+there, at a few milliseconds a case; an e2e spec is for what needs the browser and the other apps.
 
 ## Scoping a run
 
@@ -23,6 +24,12 @@ Scope a package script with `pnpm --filter @opendatacapture/<pkg> <script>` or t
 from the `name` field in each package's `vitest.config.ts`, e.g. `api`, `web`, `schemas`), or run a
 single file with `pnpm exec vitest path/to/file.test.ts`. A scoped run with `--coverage` measures
 only what it ran against the whole coverage scope, so add `--coverage.thresholds.100=false` to it.
+
+**`pnpm test:coverage` and `pnpm test:e2e` take one lock per machine.** `scripts/with-test-lock.sh`
+holds a directory in the git common directory, which every worktree shares, so a second heavy run —
+from another session or worktree — waits and says whose run it is waiting on, rather than exhausting
+memory or colliding on the e2e ports. A lock whose holder has exited is taken over. `vitest` without
+`--coverage` and the scoped runs above take no lock.
 
 ## A test nothing collects passes silently
 
@@ -108,9 +115,12 @@ a lint failure and every run may rewrite the working tree. To check part of the 
 
 `pnpm lint` is `turbo run lint lint:root`. `//#lint:root` depends on `//#generated`, a task with no
 script that names what a tool run over the whole repo reads and source control does not hold: both
-Prisma clients, `testing`'s route types, and `instrument-library`'s build, which reaches `runtime-v1`
-and `runtime-core` through `^build`. `test:e2e` depends on the same task, the gateway's `db:push`, and
-`^build`, which builds the `playground-url` CLI that `testing/src/specs/playground.spec.ts` runs.
+Prisma clients, `testing`'s route types, `apps/outreach`'s content collection types (`gen:types`,
+`astro sync`, into the git-ignored `.astro/`), and `instrument-library`'s build, which reaches
+`runtime-v1` and `runtime-core` through `^build`. Without the content types, the type-check reads every
+`astro:content` import as `any` on a fresh checkout such as CI's. `test:e2e` depends on the same task, the gateway's `db:push`, the
+`build` of gateway, web and playground, whose production builds the suite serves, and `^build`, which
+builds the `playground-url` CLI that `testing/src/specs/playground.spec.ts` runs.
 `dev` and `dev:test` depend on `["^build", "db:generate"]`, to which `apps/gateway/turbo.json` adds
 `db:push`; `build` depends on `["^build", "db:generate"]` and `start` on `build`. `dev`, `dev:test`,
 `start`, `test:e2e` and `db:push` are `cache: false`. A workspace whose task differs from the root
@@ -137,7 +147,7 @@ counts their functions twice in the merged report.
 
 `.github/workflows/ci.yaml`, one job, on `pull_request` to `main` or a `release/**` branch and
 `workflow_dispatch` only — a push alone runs nothing. In order: `./scripts/generate-env.sh`, `pnpm install --frozen-lockfile`,
-`pnpm lint`, `pnpm test:coverage`, Playwright install (chromium + firefox, capped at 10 minutes, after
+`pnpm lint`, `pnpm test:coverage`, Playwright install (chromium, capped at 10 minutes, after
 lint and unit tests so a hung download cannot hide them), `pnpm test:e2e`. `actions/cache` restores
 `.turbo/cache` before the first of them: a pull request reads the caches its own earlier runs saved
 and the one the Release workflow's `validate` job last saved on its base branch.

@@ -2,7 +2,15 @@ import * as path from 'node:path';
 
 import { defineConfig, devices } from '@playwright/test';
 
-import { apiPort, baseURL, gatewayPort, playgroundPort, webPort, workerCount } from './src/support/env';
+import {
+  apiPort,
+  baseURL,
+  gatewayPort,
+  gatewayRefreshInterval,
+  playgroundPort,
+  webPort,
+  workerCount
+} from './src/support/env';
 
 const webServerDefaults = {
   gracefulShutdown: { signal: 'SIGINT', timeout: 1000 },
@@ -27,45 +35,41 @@ export default defineConfig({
       name: 'chromium',
       testMatch: '**/specs/**/*.spec.ts',
       use: { ...devices['Desktop Chrome'], baseURL, channel: 'chromium', headless: true }
-    },
-    {
-      // Firefox is a cross-browser smoke check: only the `@smoke`-tagged critical flows.
-      dependencies: ['setup'],
-      grep: /@smoke/,
-      name: 'firefox',
-      testMatch: '**/specs/**/*.spec.ts',
-      use: { ...devices['Desktop Firefox'], baseURL, headless: true }
     }
   ],
   reporter: [['html', { open: 'never', outputFolder: path.resolve(import.meta.dirname, '.playwright/report') }]],
   testDir: path.resolve(import.meta.dirname, 'src'),
+  // The gateway, web and playground serve their production builds, which turbo builds before the
+  // suite: a dev server holds every module it has transformed in memory and serves each unbundled.
   webServer: [
     {
       ...webServerDefaults,
       command: 'pnpm dev:test',
       cwd: path.resolve(import.meta.dirname, '../apps/api'),
+      env: { GATEWAY_REFRESH_INTERVAL: String(gatewayRefreshInterval) },
       url: `http://localhost:${apiPort}/v1/setup`
     },
     {
       ...webServerDefaults,
-      command: 'pnpm dev:test',
+      command: 'pnpm start',
       cwd: path.resolve(import.meta.dirname, '../apps/gateway'),
+      env: { GATEWAY_PROD_SERVER_PORT: String(gatewayPort) },
       url: `http://localhost:${gatewayPort}/api/healthcheck`
     },
     {
       ...webServerDefaults,
-      command: 'pnpm dev:test',
+      command: 'pnpm preview',
       cwd: path.resolve(import.meta.dirname, '../apps/web'),
       url: `http://localhost:${webPort}`
     },
     {
       ...webServerDefaults,
-      command: 'pnpm dev',
+      command: 'pnpm preview',
       cwd: path.resolve(import.meta.dirname, '../apps/playground'),
       url: `http://localhost:${playgroundPort}`
     }
   ],
-  // Playwright's own default is half the cores. That many workers log in faster than the API's login
-  // throttle allows partway through the suite, and leave a developer's machine little for anything else.
+  // Playwright's own default is half the cores. Each worker is a Chromium beside the four servers, so
+  // memory runs out long before the cores do: two workers already peak near 7 GB.
   workers: workerCount ?? (process.env.CI ? 1 : 2)
 });

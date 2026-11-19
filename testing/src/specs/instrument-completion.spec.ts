@@ -1,7 +1,10 @@
-import { readFile } from 'node:fs/promises';
+import type { Page } from '@playwright/test';
 
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
+import { HAPPINESS_RECORD } from '../support/constants';
 import { expect, test } from '../support/fixtures';
+
+import type { GetPageModel } from '../support/fixtures';
 
 // Title shown on the instrument card in the showcase (`details.title`), which differs from the
 // title shown while running it (`clientDetails.title`, "Questionnaire on Happiness").
@@ -11,44 +14,61 @@ const INSTRUMENT_TITLE = 'Happiness Questionnaire';
 // sections (select, radio and number inputs), unlike the flat Happiness Questionnaire.
 const DEMOGRAPHICS_INSTRUMENT_TITLE = 'Enhanced Demographics Questionnaire';
 
+/**
+ * Starts a session for a new subject and begins the instrument with this card title. The active
+ * session lives in memory, so every step navigates via the sidebar; a hard navigation would drop
+ * the session and disable these nav buttons.
+ */
+async function beginInstrument(
+  getPageModel: GetPageModel,
+  page: Page,
+  firstName: string,
+  title: string
+): Promise<RenderInstrumentPage> {
+  const startSessionPage = await getPageModel('/session/start-session');
+  await startSessionPage.sessionForm.waitFor({ state: 'visible' });
+  await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
+  await startSessionPage.fillSessionForm(firstName, `Subject${firstName}`, 'Female');
+  await startSessionPage.submitForm();
+  await expect(startSessionPage.successMessage).toBeVisible();
+
+  await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
+  await page.waitForURL('**/instruments/accessible-instruments');
+
+  const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: title }).first();
+  await expect(card).toBeVisible();
+  await card.click();
+
+  const instrumentPage = new RenderInstrumentPage(page);
+  await instrumentPage.begin();
+  return instrumentPage;
+}
+
+/** Opens the current subject's record table on the records of the instrument with this title. */
+async function openSubjectRecords(page: Page, title: string): Promise<void> {
+  // "View Current Subject" targets the active subject's record table directly, which is far more
+  // robust than matching a hashed row in the data hub list.
+  await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
+  await page.waitForURL('**/datahub/subjects/**/table');
+
+  await page.getByRole('combobox').first().click();
+  await page.getByRole('option', { name: title }).click();
+}
+
 test.describe('instrument completion', () => {
-  test('should administer an instrument and surface the record for the subject @smoke', async ({
+  test('should administer an instrument and surface the record for the subject', async ({
     getPageModel,
     page,
     roleAccount,
     uniqueId
   }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-    await startSessionPage.fillSessionForm(`Instrument${uniqueId}`, `Subject${uniqueId}`, 'Female');
-    await startSessionPage.submitForm();
-    await expect(startSessionPage.successMessage).toBeVisible();
-
-    // The active session lives in memory, so every step from here navigates via the sidebar; a
-    // hard navigation would drop the session and disable these nav buttons.
-    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-    await page.waitForURL('**/instruments/accessible-instruments');
-
-    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
-    await expect(card).toBeVisible();
-    await card.click();
-
-    const instrumentPage = new RenderInstrumentPage(page);
-    await instrumentPage.begin();
+    const instrumentPage = await beginInstrument(getPageModel, page, `Instrument${uniqueId}`, INSTRUMENT_TITLE);
     await instrumentPage.completeHappinessQuestionnaire();
     await instrumentPage.submit();
 
     await expect(instrumentPage.summaryHeading).toBeVisible();
 
-    // "View Current Subject" targets the active subject's record table directly, which is far more
-    // robust than matching a hashed row in the data hub list.
-    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
-    await page.waitForURL('**/datahub/subjects/**/table');
-
-    await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: INSTRUMENT_TITLE }).click();
-
+    await openSubjectRecords(page, INSTRUMENT_TITLE);
     await expect(page.getByTestId('data-table-body').getByTestId('data-table-row').first()).toBeVisible();
 
     // The one place the api -> web username contract is exercised end to end. Both unit tiers mock
@@ -59,78 +79,30 @@ test.describe('instrument completion', () => {
     await expect(page.getByTestId('subject-table-cell-username').first()).toHaveText(username);
   });
 
-  // The set is serialized by the renderer, stored by the api, and revived by the web client, so
-  // these are the only tests that cross every hop a z.set() field takes before it is shown.
-  test.describe('z.set() fields', () => {
-    test.beforeEach(async ({ getPageModel, page, uniqueId }) => {
-      const startSessionPage = await getPageModel('/session/start-session');
-      await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-      await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-      await startSessionPage.fillSessionForm(`SetField${uniqueId}`, `Subject${uniqueId}`, 'Female');
-      await startSessionPage.submitForm();
-      await expect(startSessionPage.successMessage).toBeVisible();
-
-      await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-      await page.waitForURL('**/instruments/accessible-instruments');
-
-      const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
-      await expect(card).toBeVisible();
-      await card.click();
-
-      const instrumentPage = new RenderInstrumentPage(page);
-      await instrumentPage.begin();
-      await instrumentPage.completeHappinessQuestionnaireDissatisfied(['Money', 'Friends']);
-      await instrumentPage.submit();
-
-      await expect(instrumentPage.summaryHeading).toBeVisible();
-
-      await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
-      await page.waitForURL('**/datahub/subjects/**/table');
-
-      await page.getByRole('combobox').first().click();
-      await page.getByRole('option', { name: INSTRUMENT_TITLE }).click();
-    });
-
-    test('should show the members of a z.set() field in the subject table rather than [object Set]', async ({
-      page
-    }) => {
-      await expect(page.getByTestId('subject-table-cell-causesOfDissatisfaction').first()).toHaveText('MONEY, FRIENDS');
-    });
-
-    test('should export a z.set() field as the subject table displays it rather than {}', async ({ page }) => {
-      await expect(page.getByTestId('data-table-body').getByTestId('data-table-row').first()).toBeVisible();
-
-      const downloadPromise = page.waitForEvent('download');
-      await page.getByRole('button', { name: 'Download' }).click();
-      await page.getByRole('menuitem', { exact: true, name: 'CSV' }).click();
-      const download = await downloadPromise;
-
-      const csv = (await readFile(await download.path())).toString();
-      expect(csv).toContain('"MONEY, FRIENDS"');
-    });
-  });
-
-  test('should localize required-field errors from a zod v4 validation schema', async ({
+  // The set is serialized by the renderer, stored by the api, and revived by the web client, so this
+  // is the only test that crosses every hop a z.set() field takes before it is shown.
+  test('should show the members of a z.set() field in the subject table rather than [object Set]', async ({
     getPageModel,
     page,
     uniqueId
   }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-    await startSessionPage.fillSessionForm(`Validation${uniqueId}`, `Subject${uniqueId}`, 'Female');
-    await startSessionPage.submitForm();
-    await expect(startSessionPage.successMessage).toBeVisible();
+    const instrumentPage = await beginInstrument(getPageModel, page, `SetField${uniqueId}`, INSTRUMENT_TITLE);
+    await instrumentPage.completeHappinessQuestionnaireDissatisfied(['Money', 'Friends']);
+    await instrumentPage.submit();
 
-    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-    await page.waitForURL('**/instruments/accessible-instruments');
+    await expect(instrumentPage.summaryHeading).toBeVisible();
 
-    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
-    await expect(card).toBeVisible();
-    await card.click();
+    await openSubjectRecords(page, INSTRUMENT_TITLE);
+    await expect(page.getByTestId('subject-table-cell-causesOfDissatisfaction').first()).toHaveText('MONEY, FRIENDS');
+  });
 
-    const instrumentPage = new RenderInstrumentPage(page);
-    await instrumentPage.begin();
+  test('should report validation errors localized and under their own fields, focusing the first', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const instrumentPage = await beginInstrument(getPageModel, page, `Validation${uniqueId}`, INSTRUMENT_TITLE);
+    await expect(instrumentPage.errorSummary).toHaveCount(0);
 
     // The happiness questionnaire is authored against /runtime/v1/zod@3.x/v4, so submitting with
     // nothing filled in exercises the v4 error map that apps/web/src/services/zod.ts registers on
@@ -138,273 +110,16 @@ test.describe('instrument completion', () => {
     // ("Invalid input: ...") renders instead of the localized one.
     await instrumentPage.submit();
 
-    const errorMessages = page.getByTestId('error-message-text');
-    await expect(errorMessages.first()).toBeVisible();
-    for (const message of await errorMessages.allTextContents()) {
+    await expect(instrumentPage.errorMessages.first()).toBeVisible();
+    for (const message of await instrumentPage.errorMessages.allTextContents()) {
       expect(message).toBe('This field is required');
     }
-  });
+    await expect(instrumentPage.errorSummary).toBeVisible();
+    // The first invalid field is a slider, whose focusable element is a Radix thumb rather than an
+    // input, which only a real browser lays out and focuses.
+    await expect(instrumentPage.firstInvalidField).toBeInViewport();
+    await expect(instrumentPage.firstInvalidField.locator(':focus')).toHaveCount(1);
 
-  test('should administer a second instrument with a different mix of question types and surface its record', async ({
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-    await startSessionPage.fillSessionForm(`Demographics${uniqueId}`, `Subject${uniqueId}`, 'Female');
-    await startSessionPage.submitForm();
-    await expect(startSessionPage.successMessage).toBeVisible();
-
-    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-    await page.waitForURL('**/instruments/accessible-instruments');
-
-    const card = page
-      .locator('[data-testid^="instrument-card-"]')
-      .filter({ hasText: DEMOGRAPHICS_INSTRUMENT_TITLE })
-      .first();
-    await expect(card).toBeVisible();
-    await card.click();
-
-    const instrumentPage = new RenderInstrumentPage(page);
-    await instrumentPage.begin();
-    await instrumentPage.completeEnhancedDemographicsQuestionnaire();
-    await instrumentPage.submit();
-
-    await expect(instrumentPage.summaryHeading).toBeVisible();
-
-    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
-    await page.waitForURL('**/datahub/subjects/**/table');
-
-    await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: DEMOGRAPHICS_INSTRUMENT_TITLE }).click();
-
-    await expect(page.getByTestId('data-table-body').getByTestId('data-table-row').first()).toBeVisible();
-  });
-
-  // Records collected in person carry no assignmentId, and MongoDB indexes a missing field as null,
-  // so a unique index on that field would reject the second record here as a duplicate key. See
-  // DATABASE_INDEXES in the api's src/core/prisma.ts.
-  test('should administer the same instrument twice for one subject, neither record having an assignment', async ({
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-    await startSessionPage.fillSessionForm(`Repeat${uniqueId}`, `Subject${uniqueId}`, 'Female');
-    await startSessionPage.submitForm();
-    await expect(startSessionPage.successMessage).toBeVisible();
-
-    for (const _ of [1, 2]) {
-      await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-      await page.waitForURL('**/instruments/accessible-instruments');
-
-      const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
-      await expect(card).toBeVisible();
-      await card.click();
-
-      const instrumentPage = new RenderInstrumentPage(page);
-      await instrumentPage.begin();
-      await instrumentPage.completeHappinessQuestionnaire();
-      await instrumentPage.submit();
-      await expect(instrumentPage.summaryHeading).toBeVisible();
-    }
-
-    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
-    await page.waitForURL('**/datahub/subjects/**/table');
-
-    await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: INSTRUMENT_TITLE }).click();
-
-    await expect(page.getByTestId('data-table-body').getByTestId('data-table-row')).toHaveCount(2);
-  });
-
-  // Clinicians switch between the app and other programs during a visit. The bundle behind an
-  // instrument id never changes, and a refetch that failed — an expired token, say — would hand the
-  // open instrument, and everything entered into it, to the route error boundary.
-  test('should not request the bundle again after the tab is hidden and shown again', async ({
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-    await startSessionPage.fillSessionForm(`Focus${uniqueId}`, `Subject${uniqueId}`, 'Female');
-    await startSessionPage.submitForm();
-    await expect(startSessionPage.successMessage).toBeVisible();
-
-    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-    await page.waitForURL('**/instruments/accessible-instruments');
-
-    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
-    await expect(card).toBeVisible();
-    await card.click();
-
-    const instrumentPage = new RenderInstrumentPage(page);
-    await instrumentPage.begin();
-    await expect(instrumentPage.submitButton).toBeVisible();
-
-    const bundleRequests: string[] = [];
-    page.on('request', (request) => {
-      if (request.url().includes('/v1/instruments/bundle/')) {
-        bundleRequests.push(request.url());
-      }
-    });
-
-    // Headless Chromium keeps the tab visible, so the state is overridden and the event dispatched by
-    // hand. React Query's focusManager listens for visibilitychange on the window, which the event
-    // reaches from the document.
-    const setTabVisibility = (visibilityState: 'hidden' | 'visible') => {
-      return page.evaluate((state) => {
-        Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => state });
-        document.dispatchEvent(new Event('visibilitychange', { bubbles: true }));
-      }, visibilityState);
-    };
-
-    await setTabVisibility('hidden');
-    await setTabVisibility('visible');
-    await page.evaluate(() => {
-      return new Promise((resolve) => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(resolve);
-        });
-      });
-    });
-
-    expect(bundleRequests).toEqual([]);
-    await expect(instrumentPage.submitButton).toBeVisible();
-  });
-
-  test('should show a validation error for a postal code that does not match the expected format', async ({
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-    await startSessionPage.fillSessionForm(`Postal${uniqueId}`, `Subject${uniqueId}`, 'Male');
-    await startSessionPage.submitForm();
-    await expect(startSessionPage.successMessage).toBeVisible();
-
-    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-    await page.waitForURL('**/instruments/accessible-instruments');
-
-    const card = page
-      .locator('[data-testid^="instrument-card-"]')
-      .filter({ hasText: DEMOGRAPHICS_INSTRUMENT_TITLE })
-      .first();
-    await expect(card).toBeVisible();
-    await card.click();
-
-    const instrumentPage = new RenderInstrumentPage(page);
-    await instrumentPage.begin();
-    // Every field on this instrument is optional, so an out-of-format postal code is the only value
-    // filled in, isolating the format error from any required-field error.
-    await instrumentPage.$ref.locator('[name="postalCode"]').fill('invalid');
-    await instrumentPage.submit();
-
-    // This instrument is authored against zod v3, whose own message for a failed regex is the bare
-    // word "Invalid". Asserting the text is what proves the runtime-served v3 instance carries the
-    // shared error map, and that the map does not echo the pattern back at the clinician.
-    await expect(instrumentPage.errorMessages).toBeVisible();
-    await expect(instrumentPage.errorMessages).toHaveText('Does not match the expected format');
-  });
-
-  test('should accept a lowercase postal code and an age at immigration of 0, storing the postal code in uppercase', async ({
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-    await startSessionPage.fillSessionForm(`Lowercase${uniqueId}`, `Subject${uniqueId}`, 'Female');
-    await startSessionPage.submitForm();
-    await expect(startSessionPage.successMessage).toBeVisible();
-
-    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-    await page.waitForURL('**/instruments/accessible-instruments');
-
-    const card = page
-      .locator('[data-testid^="instrument-card-"]')
-      .filter({ hasText: DEMOGRAPHICS_INSTRUMENT_TITLE })
-      .first();
-    await expect(card).toBeVisible();
-    await card.click();
-
-    const instrumentPage = new RenderInstrumentPage(page);
-    await instrumentPage.begin();
-    await instrumentPage.$ref.locator('[name="postalCode"]').fill('h4h 1r3');
-    await instrumentPage.$ref.locator('[name="ageAtImmigration"]').fill('0');
-    await instrumentPage.submit();
-
-    await expect(instrumentPage.summaryHeading).toBeVisible();
-
-    await page.locator('[data-testid^="nav-button-/datahub/subjects/"]').click();
-    await page.waitForURL('**/datahub/subjects/**/table');
-
-    await page.getByRole('combobox').first().click();
-    await page.getByRole('option', { name: DEMOGRAPHICS_INSTRUMENT_TITLE }).click();
-
-    await expect(page.getByTestId('subject-table-cell-postalCode').first()).toHaveText('H4H 1R3');
-    await expect(page.getByTestId('subject-table-cell-ageAtImmigration').first()).toHaveText('0');
-  });
-
-  test('should label the marital status and age-at-immigration questions correctly in English', async ({
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-    await startSessionPage.fillSessionForm(`Labels${uniqueId}`, `Subject${uniqueId}`, 'Female');
-    await startSessionPage.submitForm();
-    await expect(startSessionPage.successMessage).toBeVisible();
-
-    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-    await page.waitForURL('**/instruments/accessible-instruments');
-
-    const card = page
-      .locator('[data-testid^="instrument-card-"]')
-      .filter({ hasText: DEMOGRAPHICS_INSTRUMENT_TITLE })
-      .first();
-    await expect(card).toBeVisible();
-    await card.click();
-
-    const instrumentPage = new RenderInstrumentPage(page);
-    await instrumentPage.begin();
-
-    await expect(instrumentPage.$ref.getByText('Marital Status', { exact: true })).toBeVisible();
-    await expect(instrumentPage.$ref.getByText('Age at Immigration (if applicable)', { exact: true })).toBeVisible();
-  });
-
-  test('should show the missing-reason error under the reason field when a dissatisfied subject leaves it empty', async ({
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-    await startSessionPage.fillSessionForm(`Reason${uniqueId}`, `Subject${uniqueId}`, 'Female');
-    await startSessionPage.submitForm();
-    await expect(startSessionPage.successMessage).toBeVisible();
-
-    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-    await page.waitForURL('**/instruments/accessible-instruments');
-
-    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: INSTRUMENT_TITLE }).first();
-    await expect(card).toBeVisible();
-    await card.click();
-
-    const instrumentPage = new RenderInstrumentPage(page);
-    await instrumentPage.begin();
     await instrumentPage.answerHappinessQuestionnaireDissatisfiedWithoutReason();
     await instrumentPage.submit();
 
@@ -417,41 +132,56 @@ test.describe('instrument completion', () => {
     await expect(instrumentPage.errorMessages).toHaveCount(1);
     await expect(instrumentPage.summaryHeading).toBeHidden();
   });
-});
 
-test.describe('file instrument completion', () => {
-  test('should report a selection over the file limit as too many files, keeping the earlier selection', async ({
+  test('should refuse a malformed postal code, then store a lowercase one in uppercase alongside an age at immigration of 0', async ({
     getPageModel,
     page,
     uniqueId
   }) => {
-    const startSessionPage = await getPageModel('/session/start-session');
-    await startSessionPage.sessionForm.waitFor({ state: 'visible' });
-    await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
-    await startSessionPage.fillSessionForm(`FileLimit${uniqueId}`, `Subject${uniqueId}`, 'Female');
-    await startSessionPage.submitForm();
-    await expect(startSessionPage.successMessage).toBeVisible();
+    const instrumentPage = await beginInstrument(
+      getPageModel,
+      page,
+      `Demographics${uniqueId}`,
+      DEMOGRAPHICS_INSTRUMENT_TITLE
+    );
+    const postalCode = page.locator('[name="postalCode"]');
 
-    await page.getByTestId('nav-button-/instruments/accessible-instruments').click();
-    await page.waitForURL('**/instruments/accessible-instruments');
+    // Every field on this instrument is optional, so an out-of-format postal code is the only value
+    // filled in, isolating the format error from any required-field error. The instrument is
+    // authored against zod v3, whose own message for a failed regex is the bare word "Invalid":
+    // asserting the text is what proves the runtime-served v3 instance carries the shared error map,
+    // and that the map does not echo the pattern back at the clinician.
+    await postalCode.fill('invalid');
+    await instrumentPage.submit();
+    await expect(instrumentPage.errorMessages).toHaveText('Does not match the expected format');
 
-    const card = page.locator('[data-testid^="instrument-card-"]').filter({ hasText: 'Arbitrary File Upload' }).first();
-    await expect(card).toBeVisible();
-    await card.click();
+    await instrumentPage.completeEnhancedDemographicsQuestionnaire();
+    await postalCode.fill('h4h 1r3');
+    await page.locator('[name="ageAtImmigration"]').fill('0');
+    await instrumentPage.submit();
 
-    const instrumentPage = new RenderInstrumentPage(page);
-    await instrumentPage.begin();
+    await expect(instrumentPage.summaryHeading).toBeVisible();
 
-    const dropzone = page.getByTestId('dropzone');
-    const fileInput = dropzone.locator('input[type="file"]');
-    const createUpload = (name: string) => ({ buffer: Buffer.from('content'), mimeType: 'text/plain', name });
+    await openSubjectRecords(page, DEMOGRAPHICS_INSTRUMENT_TITLE);
+    await expect(page.getByTestId('subject-table-cell-postalCode').first()).toHaveText('H4H 1R3');
+    await expect(page.getByTestId('subject-table-cell-ageAtImmigration').first()).toHaveText('0');
+  });
 
-    await fileInput.setInputFiles(createUpload('first.txt'));
-    await expect(dropzone).toContainText('first.txt');
+  // Records collected in person carry no assignmentId, and MongoDB indexes a missing field as null,
+  // so a unique index on that field would reject the second record here as a duplicate key. See
+  // DATABASE_INDEXES in the api's src/core/prisma.ts.
+  test('should store the same instrument twice in one session for one subject, neither record having an assignment', async ({
+    api,
+    uniqueId
+  }) => {
+    const group = await api.createGroup({ name: `Repeat ${uniqueId}` });
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    const session = await api.createSession(group.id, { id: `repeat-${uniqueId}` });
 
-    await fileInput.setInputFiles([createUpload('a.txt'), createUpload('b.txt')]);
-    await expect(page.getByText('Only 1 file can be uploaded here; you selected 2')).toBeVisible();
-    await expect(page.getByText('Unsupported file type')).toBeHidden();
-    await expect(dropzone).toContainText('first.txt');
+    const first = await api.createRecord(group.id, instrumentId, session, HAPPINESS_RECORD);
+    const second = await api.createRecord(group.id, instrumentId, session, HAPPINESS_RECORD);
+
+    expect(second.id).not.toBe(first.id);
+    expect([first.assignmentId ?? null, second.assignmentId ?? null]).toEqual([null, null]);
   });
 });

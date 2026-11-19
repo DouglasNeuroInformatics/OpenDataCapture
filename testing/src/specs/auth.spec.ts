@@ -1,170 +1,81 @@
-import type { Locator } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 import { expect, test } from '../support/fixtures';
 
+function waitForLoginResponse(page: Page) {
+  return page.waitForResponse(
+    (response) => response.url().endsWith('/v1/auth/login') && response.request().method() === 'POST'
+  );
+}
+
 test.describe('authentication', () => {
-  test('should redirect unauthenticated users to the login page @smoke', async ({ page }) => {
+  test('should redirect unauthenticated users to the login page', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveURL('/auth/login');
   });
 
-  test('should log in through the UI @smoke', async ({ api, getPageModel }) => {
-    const group = await api.createGroup();
-    const { credentials } = await api.createUser({ groupIds: [group.id] });
-
-    const loginPage = await getPageModel('/auth/login');
-    await loginPage.fillLoginForm(credentials);
-    await expect(loginPage.$ref).toHaveURL('/dashboard');
-  });
-
-  test('should log in with the username typed in a different case', async ({ api, getPageModel, uniqueId }) => {
-    const group = await api.createGroup();
-    const { credentials } = await api.createUser({ groupIds: [group.id], username: `casing_${uniqueId}` });
-
-    const loginPage = await getPageModel('/auth/login');
-    await loginPage.fillLoginForm({ ...credentials, username: credentials.username.toUpperCase() });
-    await expect(loginPage.$ref).toHaveURL('/dashboard');
-  });
-
-  test.describe('demo instance', () => {
-    test('should show the demo information over the login page as soon as it loads', async ({ getPageModel }) => {
-      const loginPage = await getPageModel('/auth/login');
-      await expect(loginPage.demoDialog).toBeVisible();
-    });
-
-    test('should brand the demo information with the Open Data Capture logo and name', async ({ getPageModel }) => {
-      const loginPage = await getPageModel('/auth/login');
-      await expect(loginPage.demoDialogBranding.locator('svg')).toBeVisible();
-      await expect(loginPage.demoDialogBranding).toHaveText('Open Data Capture');
-    });
-
-    test('should reveal the login form once the demo information is dismissed', async ({ getPageModel }) => {
-      const loginPage = await getPageModel('/auth/login');
-      await expect(loginPage.demoDialog).toBeVisible();
-      await loginPage.dismissDemoDialog();
-
-      const usernameField = loginPage.loginForm.getByLabel('username');
-      await usernameField.click();
-      await expect(usernameField).toBeFocused();
-    });
-
-    // A standard user's dashboard redirects to the start-session form, so pick a group manager, and
-    // the last one, so a button wired to the first row's user would show the wrong username.
-    test('should log in as the demo user whose row is chosen in the demo information', async ({
-      getPageModel,
-      page
-    }) => {
-      const loginPage = await getPageModel('/auth/login');
-      const demoUserRow = loginPage.demoUserRows.filter({ hasText: 'Group Manager' }).last();
-      const username = await demoUserRow.getByRole('cell').first().innerText();
-      await demoUserRow.getByRole('button').click();
-
-      await expect(loginPage.$ref).toHaveURL('/dashboard');
-      await expect(page.getByTestId('user-dropup-trigger')).toHaveText(username);
-    });
-
-    test('should log in from a click on the row itself, not only on its button', async ({ getPageModel, page }) => {
-      const loginPage = await getPageModel('/auth/login');
-      const demoUserRow = loginPage.demoUserRows.filter({ hasText: 'Group Manager' }).last();
-      const usernameCell = demoUserRow.getByRole('cell').first();
-      const username = await usernameCell.innerText();
-      await usernameCell.click();
-
-      await expect(loginPage.$ref).toHaveURL('/dashboard');
-      await expect(page.getByTestId('user-dropup-trigger')).toHaveText(username);
-    });
-
-    test('should highlight only the rows that log in, so the header does not look clickable', async ({
-      getPageModel
-    }) => {
-      const loginPage = await getPageModel('/auth/login');
-      const backgroundColor = (row: Locator) => row.evaluate((element) => getComputedStyle(element).backgroundColor);
-      const restingColor = await backgroundColor(loginPage.demoTableHeaderRow);
-
-      await loginPage.demoTableHeaderRow.hover();
-      expect(await backgroundColor(loginPage.demoTableHeaderRow)).toBe(restingColor);
-
-      await loginPage.demoUserRows.first().hover();
-      expect(await backgroundColor(loginPage.demoUserRows.first())).not.toBe(restingColor);
-    });
-  });
-
-  test.describe('invalid credentials', () => {
-    test('should show an error and stay on the login page for a wrong password', async ({
-      api,
-      getPageModel,
-      page
-    }) => {
-      const group = await api.createGroup();
-      const { credentials } = await api.createUser({ groupIds: [group.id] });
-
-      const loginPage = await getPageModel('/auth/login');
-      await loginPage.fillLoginForm({ password: `wrong-${credentials.password}`, username: credentials.username });
-
-      await expect(page.getByRole('heading', { name: 'Unauthorized' })).toBeVisible();
-      await expect(page).toHaveURL('/auth/login');
-    });
-
-    test('should show an error and stay on the login page for an unknown username', async ({
-      getPageModel,
-      page,
-      uniqueId
-    }) => {
-      const loginPage = await getPageModel('/auth/login');
-      await loginPage.fillLoginForm({ password: `NoSuchAccount${uniqueId}!`, username: `no-such-user-${uniqueId}` });
-
-      await expect(page.getByRole('heading', { name: 'Unauthorized' })).toBeVisible();
-      await expect(page).toHaveURL('/auth/login');
-    });
-
-    test('should not reveal that an account is archived to a wrong password', async ({ api, getPageModel, page }) => {
-      const group = await api.createGroup();
-      const { credentials, user } = await api.createUser({ groupIds: [group.id] });
-      await api.archiveUser(user.id);
-
-      const loginPage = await getPageModel('/auth/login');
-      await loginPage.fillLoginForm({ password: `wrong-${credentials.password}`, username: credentials.username });
-
-      await expect(page.getByRole('heading', { name: 'Unauthorized' })).toBeVisible();
-      await expect(page.getByRole('heading', { name: 'Account Archived' })).toHaveCount(0);
-    });
-  });
-
-  // The web origin's /api proxy adds no X-Forwarded-For of its own, so each address below reaches the api the
-  // way the bundled Caddy forwards a distinct client in production.
-  test('should throttle failed logins per client, so one client exhausting the limit does not lock out another', async ({
-    apiRequestContext,
-    uniqueId
+  // A standard user's dashboard redirects to the start-session form, so pick a group manager, and
+  // the last one, so a button wired to the first row's user would show the wrong username.
+  test('should highlight only the demo rows that log in, and log in as the demo user whose row is chosen', async ({
+    getPageModel,
+    page
   }) => {
-    const attemptLogin = async (clientAddress: string) => {
-      const response = await apiRequestContext.post('/api/v1/auth/login', {
-        data: { password: `NoSuchAccount${uniqueId}!`, username: `no-such-user-${uniqueId}` },
-        headers: { 'x-forwarded-for': clientAddress }
-      });
-      return response.status();
-    };
+    const loginPage = await getPageModel('/auth/login');
+    const backgroundColor = (row: Locator) => row.evaluate((element) => getComputedStyle(element).backgroundColor);
+    const restingColor = await backgroundColor(loginPage.demoTableHeaderRow);
 
-    await expect.poll(() => attemptLogin('203.0.113.1'), { intervals: [0] }).toBe(429);
-    expect(await attemptLogin('198.51.100.77')).toBe(401);
+    await loginPage.demoTableHeaderRow.hover();
+    expect(await backgroundColor(loginPage.demoTableHeaderRow)).toBe(restingColor);
+    await loginPage.demoUserRows.first().hover();
+    expect(await backgroundColor(loginPage.demoUserRows.first())).not.toBe(restingColor);
+
+    const demoUserRow = loginPage.demoUserRows.filter({ hasText: 'Group Manager' }).last();
+    const username = await demoUserRow.getByRole('cell').first().innerText();
+    await demoUserRow.getByRole('button').click();
+
+    await expect(loginPage.$ref).toHaveURL('/dashboard');
+    await expect(page.getByTestId('user-dropup-trigger')).toHaveText(username);
   });
 
-  test('should tell an archived user with the right password that their account is archived', async ({
+  // One account walks every refusal in turn. A notification from an earlier attempt can still be on
+  // screen, so each attempt is read from its own response before the page is checked.
+  test('should refuse a wrong password without revealing an archived account, and name the archive only to the right one', async ({
     api,
     getPageModel,
     page
   }) => {
     const group = await api.createGroup();
     const { credentials, user } = await api.createUser({ groupIds: [group.id] });
-    await api.archiveUser(user.id);
+    const wrongPassword = { password: `wrong-${credentials.password}`, username: credentials.username };
+    const archivedHeading = page.getByRole('heading', { name: 'Account Archived' });
 
     const loginPage = await getPageModel('/auth/login');
-    await loginPage.fillLoginForm(credentials);
+    const refused = waitForLoginResponse(page);
+    await loginPage.fillLoginForm(wrongPassword);
+    expect((await refused).status()).toBe(401);
+    await expect(page.getByRole('heading', { name: 'Unauthorized' })).toBeVisible();
+    await expect(page).toHaveURL('/auth/login');
 
-    await expect(page.getByRole('heading', { name: 'Account Archived' })).toBeVisible();
+    await api.archiveUser(user.id);
+    const refusedWhileArchived = waitForLoginResponse(page);
+    await loginPage.fillLoginForm(wrongPassword);
+    const refusedWhileArchivedResponse = await refusedWhileArchived;
+    expect(refusedWhileArchivedResponse.status()).toBe(401);
+    expect(await refusedWhileArchivedResponse.text()).not.toContain('Archived');
+    await expect(archivedHeading).toHaveCount(0);
+
+    const archived = waitForLoginResponse(page);
+    await loginPage.fillLoginForm(credentials);
+    expect((await archived).status()).toBe(403);
+    await expect(archivedHeading).toBeVisible();
     await expect(page).toHaveURL('/auth/login');
   });
 
-  test('should log out and require re-authentication for protected routes', async ({ api, getPageModel, page }) => {
+  test('should log in through the UI, log out and require re-authentication for protected routes', async ({
+    api,
+    getPageModel,
+    page
+  }) => {
     // Logging in through the real UI form (rather than `getPageModel`, which injects the token via
     // `page.addInitScript`) matters here: an init script re-runs on every navigation, including the
     // hard reload `logout()` does, so it would silently re-authenticate the page and mask the very

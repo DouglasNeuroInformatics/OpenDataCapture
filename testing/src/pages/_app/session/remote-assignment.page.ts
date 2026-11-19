@@ -12,8 +12,6 @@ export class RemoteAssignmentPage extends AppPage {
   /** The dialog's optional field for where the subject is sent once they finish. */
   readonly redirectUrlInput: Locator;
   readonly urlInput: Locator;
-  /** The message libui shows under a field that failed validation. */
-  readonly validationError: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -21,7 +19,6 @@ export class RemoteAssignmentPage extends AppPage {
     this.instrumentShowcase = page.getByTestId('instrument-showcase');
     this.createDialog = page.getByRole('dialog');
     this.redirectUrlInput = this.createDialog.getByLabel('Redirect URL (Optional)');
-    this.validationError = this.createDialog.getByTestId('error-message-text');
     this.urlInput = page.locator('input[readonly]');
     // The copy-to-clipboard button carries no accessible name or testid; it is the only button
     // rendered immediately next to the readonly URL input.
@@ -29,12 +26,6 @@ export class RemoteAssignmentPage extends AppPage {
     this.qrCode = page.locator('canvas');
     // The result panel's own X icon shares the same accessible name, so scope to the footer button.
     this.closeResultButton = page.getByRole('button', { name: 'Close' }).first();
-  }
-
-  async clickFirstInstrumentCard() {
-    const firstCard = this.instrumentShowcase.locator('li').first();
-    await firstCard.waitFor({ state: 'visible' });
-    await firstCard.click();
   }
 
   /** Cards carry a content-hash testid, so match on the visible title instead. */

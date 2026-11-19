@@ -7,6 +7,7 @@ describe('render', () => {
     const { html } = render({ activeLanguages: ['en', 'fr'], kind: 'landing', language: 'en' });
     expect(html).toContain('data-testid="gateway-landing"');
     expect(html).toContain('Welcome');
+    expect(html).toContain('open the secure link you were sent');
   });
 
   it('should render in the language it is given rather than the one the previous request left on the shared translator', () => {
@@ -24,5 +25,17 @@ describe('render', () => {
       token: 'token'
     });
     expect(html).not.toContain('data-testid="gateway-landing"');
+  });
+
+  it('should render an assignment in the language it is given, so the first paint is not swapped after hydration', () => {
+    const { html } = render({
+      activeLanguages: ['en', 'fr'],
+      id: 'assignment-1',
+      kind: 'assignment',
+      language: 'fr',
+      target: { bundle: 'export default {}', id: 'instrument-1', kind: 'FORM' },
+      token: 'token'
+    });
+    expect(html).toContain('Aperçu');
   });
 });

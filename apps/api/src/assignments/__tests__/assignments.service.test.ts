@@ -650,6 +650,17 @@ describe('AssignmentsService', () => {
       expect(gatewayService.deleteRemoteAssignment).not.toHaveBeenCalled();
     });
 
+    it("should scope the existence check to the caller's groups, so a manager outside the group cannot kill its link", async () => {
+      assignmentModel.exists.mockResolvedValueOnce(false);
+      await expect(
+        assignmentsService.updateById('assignment-1', { status: 'CANCELED' }, userAt('GROUP_MANAGER'))
+      ).rejects.toBeInstanceOf(NotFoundException);
+      expect(assignmentModel.exists.mock.lastCall?.[0]).toEqual({
+        AND: [{ OR: [{ groupId: { in: [GROUP_ID] } }] }],
+        id: 'assignment-1'
+      });
+    });
+
     it('should delete the gateway copy of an assignment the caller cancels, so its link stops working', async () => {
       assignmentModel.exists.mockResolvedValueOnce(true);
       assignmentModel.update.mockResolvedValueOnce({ groupId: GROUP_ID, id: 'assignment-1' });

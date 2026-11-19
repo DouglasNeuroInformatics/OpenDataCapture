@@ -5,7 +5,7 @@ import runtime from '@opendatacapture/vite-plugin-runtime';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
-import type { Plugin } from 'vite';
+import type { Plugin, PreviewServer, ViteDevServer } from 'vite';
 
 import type { PlaygroundConfig } from './src/preview/config.ts';
 
@@ -16,17 +16,30 @@ const { version } = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname,
   version: string;
 };
 
-/** Serves `/config.json` as the Caddyfile does in the published image, so both read the same variable. */
-const playgroundConfig = (): Plugin => ({
-  configureServer(server) {
+/**
+ * Serves `/config.json` as the Caddyfile does in the published image, so all three read the same
+ * variable: the dev server, and `vite preview` serving the build to the end-to-end suite.
+ */
+const playgroundConfig = (): Plugin => {
+  const serveConfig = (server: PreviewServer | ViteDevServer) => {
     server.middlewares.use('/config.json', (_request, response) => {
       const config: PlaygroundConfig = { previewOrigin: process.env.PLAYGROUND_PREVIEW_ORIGIN ?? '' };
       response.setHeader('Content-Type', 'application/json');
       response.end(JSON.stringify(config));
     });
-  },
-  name: 'playground-config'
-});
+  };
+  return { configurePreviewServer: serveConfig, configureServer: serveConfig, name: 'playground-config' };
+};
+
+// The preview frame runs on the other loopback name (see `resolvePreviewOrigin`). Left to resolve
+// `localhost` itself, Vite listens on ::1 alone under Node 24, and 127.0.0.1 refuses to connect.
+// Browsers try both addresses for `localhost`, so this serves both names without opening the server
+// to the network the way `host: true` would. `vite preview` serves the build to the end-to-end suite
+// on the same address.
+const server = {
+  host: '127.0.0.1',
+  port: parseInt(process.env.PLAYGROUND_DEV_SERVER_PORT ?? '3750', 10)
+};
 
 export default defineConfig(({ mode }) => ({
   build: {
@@ -64,17 +77,12 @@ export default defineConfig(({ mode }) => ({
     }),
     tailwindcss()
   ],
+  // A preview on any other port would serve the suite nothing, so fail rather than move.
+  preview: { ...server, strictPort: true },
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, 'src')
     }
   },
-  server: {
-    // The preview frame runs on the other loopback name (see `resolvePreviewOrigin`). Left to
-    // resolve `localhost` itself, Vite listens on ::1 alone under Node 24, and 127.0.0.1 refuses to
-    // connect. Browsers try both addresses for `localhost`, so this serves both names without
-    // opening the server to the network the way `host: true` would.
-    host: '127.0.0.1',
-    port: parseInt(process.env.PLAYGROUND_DEV_SERVER_PORT ?? '3750', 10)
-  }
+  server
 }));

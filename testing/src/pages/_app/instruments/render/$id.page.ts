@@ -18,13 +18,8 @@ export class RenderInstrumentPage extends AppPage {
   readonly happinessSatisfiedRadio: Locator;
   /** Asks the clinician to confirm leaving an instrument whose responses have not been submitted. */
   readonly leaveDialog: Locator;
-  /** Rendered only for an instrument declaring `resetButton: true`; libui gives it this aria-label. */
-  readonly resetButton: Locator;
   /** Shown once every item of a series has been administered, in place of a scalar summary. */
   readonly seriesCompletionHeading: Locator;
-  /** The bar shown above each item of a series, with its "Instrument N of M" label. */
-  readonly seriesProgress: Locator;
-  readonly seriesProgressBar: Locator;
   readonly submitButton: Locator;
   readonly summaryHeading: Locator;
 
@@ -34,20 +29,12 @@ export class RenderInstrumentPage extends AppPage {
     this.consentPreamble = page.getByTestId('consent-preamble');
     this.happinessSatisfiedRadio = this.$ref.getByRole('radio', { name: 'Yes' });
     this.leaveDialog = page.getByTestId('blocker-dialog');
-    this.resetButton = page.getByRole('button', { name: 'Reset' });
     this.seriesCompletionHeading = page.getByRole('heading', { name: /Thank You/i });
-    this.seriesProgress = page.getByTestId('series-progress');
-    this.seriesProgressBar = this.seriesProgress.getByRole('progressbar');
     this.submitButton = page.getByRole('button', { name: 'Submit' });
     this.summaryHeading = page.getByRole('heading', { name: /Summary of Results/i });
     this.errorMessages = page.getByTestId('error-message-text');
     this.errorSummary = page.getByTestId('form-error-summary');
     this.firstInvalidField = page.locator('[data-field-group]:has([data-testid="error-message-text"])').first();
-  }
-
-  /** Accepts the General Consent Form by selecting the affirmative radio option. */
-  async acceptConsent(): Promise<void> {
-    await this.$ref.getByRole('radio', { name: /I have read/ }).click();
   }
 
   /**

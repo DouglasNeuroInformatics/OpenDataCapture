@@ -1,8 +1,6 @@
 import { MAX_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/setup';
-import type { TableColorMode } from '@opendatacapture/schemas/setup';
 import type { Page } from '@playwright/test';
 
-import { GroupEmailTemplatesPage } from '../pages/_app/group/email-templates.page';
 import { expect, test } from '../support/fixtures';
 
 /** Every setting on this page autosaves, so the PATCH is the only signal that a change landed. */
@@ -15,30 +13,24 @@ function waitForSetupPatch(page: Page) {
 test.describe('admin settings', () => {
   test.use({ actingRole: 'ADMIN' });
 
-  test('should toggle the uploader feature and reflect it in the sidebar nav', async ({ getPageModel, page }) => {
-    const settingsPage = await getPageModel('/admin/settings');
-
-    // `isExperimentalFeaturesEnabled` is a single instance-wide document (seeded `false`), not a
-    // uniquely-named record, so the toggle is restored at the end rather than left on.
-    const enabled = waitForSetupPatch(page);
-    await settingsPage.uploaderToggle.click();
-    expect((await enabled).ok()).toBe(true);
-    await expect(page.getByTestId('nav-button-/upload')).toBeVisible();
-
-    const disabled = waitForSetupPatch(page);
-    await settingsPage.uploaderToggle.click();
-    expect((await disabled).ok()).toBe(true);
-    await expect(page.getByTestId('nav-button-/upload')).toHaveCount(0);
-  });
-
-  // Not `@smoke`: the setting is one instance-wide value, and outside CI the firefox copy runs alongside
-  // this one, so each would overwrite the other's value between its save and its reload. The value is
-  // random so that it never matches the one already stored, which the settings page would not save.
-  test('should persist the default assignment duration', async ({ getPageModel, page, uniqueId }) => {
+  // Both settings are one instance-wide document rather than a uniquely-named record, so the uploader
+  // is switched back off at the end. The duration is random so that it never matches the one already
+  // stored, which the settings page would not save.
+  test('should save instance settings, applying them at once and keeping them across a reload', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
     const durationDays = 1 + (Number.parseInt(uniqueId, 16) % MAX_ASSIGNMENT_DURATION_DAYS);
+    const uploaderLink = page.getByTestId('nav-button-/upload');
 
     const settingsPage = await getPageModel('/admin/settings');
     await expect(settingsPage.pageHeader).toContainText('Application Settings');
+
+    const enabled = waitForSetupPatch(page);
+    await settingsPage.uploaderToggle.click();
+    expect((await enabled).ok()).toBe(true);
+    await expect(uploaderLink).toBeVisible();
 
     const saved = waitForSetupPatch(page);
     await settingsPage.setDefaultAssignmentDuration(durationDays);
@@ -46,139 +38,11 @@ test.describe('admin settings', () => {
 
     await page.reload();
     await expect(settingsPage.defaultAssignmentDurationInput).toHaveValue(String(durationDays));
-  });
+    await expect(uploaderLink).toBeVisible();
 
-  // Not `@smoke`, for the reason above. `tableColorMode` is one instance-wide document that every table
-  // reads, so it is restored at the end and no other spec may assert how a tag is drawn.
-  test('should redraw status cells in every table color mode', async ({ getPageModel, page }) => {
-    const settingsPage = await getPageModel('/admin/settings');
-
-    const saveModeAndOpenUsers = async (mode: TableColorMode) => {
-      await page.goto('/admin/settings');
-      const saved = waitForSetupPatch(page);
-      await settingsPage.selectTableColorMode(mode);
-      expect((await saved).ok()).toBe(true);
-      await page.goto('/admin/users');
-      return page.getByTestId('user-status-active').first();
-    };
-
-    const text = await saveModeAndOpenUsers('text');
-    await expect(text.getByTestId('color-tag-dot')).toHaveCount(0);
-    await expect(text.getByTestId('color-tag-label')).toHaveCSS('color', 'rgb(21, 128, 61)');
-
-    const none = await saveModeAndOpenUsers('none');
-    await expect(none.getByTestId('color-tag-dot')).toHaveCount(0);
-    await expect(none.getByTestId('color-tag-label')).not.toHaveCSS('color', 'rgb(21, 128, 61)');
-
-    const tags = await saveModeAndOpenUsers('tags');
-    await expect(tags.getByTestId('color-tag-dot')).toHaveCSS('background-color', 'rgb(22, 163, 74)');
-  });
-
-  test.describe('active languages', () => {
-    // `activeLanguages` is one instance-wide document seeded with English and French, so these tests
-    // restore it at the end and must not run concurrently with each other.
-    test.describe.configure({ mode: 'serial' });
-
-    test('should hide the language toggle once only one language is offered', async ({ getPageModel, page }) => {
-      const settingsPage = await getPageModel('/admin/settings');
-
-      await expect(settingsPage.activeLanguageCheckbox('en')).toBeVisible();
-      await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toBeVisible();
-
-      const deactivated = waitForSetupPatch(page);
-      await settingsPage.activeLanguageCheckbox('fr').click();
-      expect((await deactivated).ok()).toBe(true);
-
-      await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toHaveCount(0);
-      // The last remaining language cannot be turned off, so an instance always offers one.
-      await expect(settingsPage.activeLanguageCheckbox('en')).toBeDisabled();
-
-      const restored = waitForSetupPatch(page);
-      await settingsPage.activeLanguageCheckbox('fr').click();
-      expect((await restored).ok()).toBe(true);
-      await expect(page.getByTestId('sidebar').getByTestId('language-toggle')).toBeVisible();
-    });
-
-    test('should move the sidebar to an offered language when the language being read is deactivated', async ({
-      getPageModel,
-      page
-    }) => {
-      const settingsPage = await getPageModel('/admin/settings');
-
-      // The sidebar is the casualty when this goes wrong: it renders the toggle, so it is the ancestor
-      // a correction made from the toggle cannot reach. `Iniciar una sesión` is a namespace string,
-      // translated on any branch. Spanish is restored to inactive at the end, as it is seeded.
-      const sidebar = page.getByTestId('sidebar');
-      const activated = waitForSetupPatch(page);
-      await settingsPage.activeLanguageCheckbox('es').click();
-      expect((await activated).ok()).toBe(true);
-
-      await sidebar.getByTestId('language-toggle').getByRole('button').click();
-      await page.getByRole('menuitem', { name: 'Español' }).click();
-      await expect(sidebar).toContainText('Iniciar una sesión');
-
-      const deactivatedSpanish = waitForSetupPatch(page);
-      await settingsPage.activeLanguageCheckbox('es').click();
-      expect((await deactivatedSpanish).ok()).toBe(true);
-
-      await expect(sidebar).toContainText('Start Session');
-      await expect(sidebar).not.toContainText('Iniciar una sesión');
-    });
-
-    test('should render the admin nav in Spanish once Spanish is activated', async ({ getPageModel, page }) => {
-      const settingsPage = await getPageModel('/admin/settings');
-
-      // Spanish is off by default, so reaching it at all takes activating it first. The admin nav
-      // group and its submenu are inline `t()` strings rather than namespace keys, which is exactly
-      // where a missing Spanish entry hides: the page renders, in English.
-      const activated = waitForSetupPatch(page);
-      await settingsPage.activeLanguageCheckbox('es').click();
-      expect((await activated).ok()).toBe(true);
-
-      await settingsPage.selectLanguage('Español');
-      const sidebar = page.getByTestId('sidebar');
-      // The group headers are `NavGroup`s, not `NavButton`s, so they carry no testid and are matched
-      // by role; their submenu items are `NavButton`s and are matched by theirs.
-      await expect(sidebar.getByRole('button', { name: 'Panel de administración' })).toBeVisible();
-      await expect(sidebar.getByRole('button', { exact: true, name: 'Instancia' })).toBeVisible();
-      await expect(sidebar.getByTestId('nav-button-/admin/settings')).toHaveText('Configuración');
-
-      await settingsPage.selectLanguage('English');
-      const removed = waitForSetupPatch(page);
-      await settingsPage.activeLanguageCheckbox('es').click();
-      expect((await removed).ok()).toBe(true);
-    });
-
-    // Authoring a template in a language the instance does not offer writes copy nothing can send.
-    // It lives here rather than in `group-email-templates.spec.ts` because the tests above turn
-    // Spanish on and off: run in parallel with them, an exact list of options would flake. Being in
-    // this serial block is also why the page is reached with a group manager's token by hand.
-    test('should offer no inactive language in the group email template editor', async ({ authenticateAs, page }) => {
-      await authenticateAs('GROUP_MANAGER');
-      await page.goto('/group/email-templates');
-
-      const templatesPage = new GroupEmailTemplatesPage(page);
-      await templatesPage.createLanguage.click();
-      await expect(templatesPage.openLanguageOptions).toHaveText(['English', 'French']);
-    });
-  });
-
-  // The checkboxes were listed in the canonical `LANGUAGES` order, which in English differs from
-  // alphabetical, so this one assertion tells a sorted list from an unsorted one.
-  test('should list the languages by their translated name', async ({ getPageModel }) => {
-    const settingsPage = await getPageModel('/admin/settings');
-
-    await expect(settingsPage.activeLanguageLabels).toHaveText(['English', 'French', 'Spanish']);
-  });
-
-  test('should apply the group switcher position preference immediately', async ({ getPageModel }) => {
-    const settingsPage = await getPageModel('/admin/settings');
-
-    await settingsPage.groupSwitcherPositionSelect.click();
-    await settingsPage.$ref.getByRole('option', { name: 'Top Right Corner' }).click();
-
-    // This preference is saved to this browser's localStorage and applied immediately, with no
-    // server round trip.
-    await expect(settingsPage.groupSwitcherPositionSelect).toContainText('Top Right Corner');
+    const disabled = waitForSetupPatch(page);
+    await settingsPage.uploaderToggle.click();
+    expect((await disabled).ok()).toBe(true);
+    await expect(uploaderLink).toHaveCount(0);
   });
 });

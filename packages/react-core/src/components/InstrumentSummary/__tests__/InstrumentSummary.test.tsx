@@ -190,6 +190,49 @@ describe('InstrumentSummary', () => {
     expect(screen.getByText('Results')).toBeTruthy();
   });
 
+  it('should leave out a computed measure marked hidden when the instrument shows its measures by default', () => {
+    const instrument: AnyUnilingualFormInstrument = {
+      ...baseInstrument,
+      defaultMeasureVisibility: 'visible',
+      measures: {
+        hiddenMeasure: { kind: 'computed', label: 'Hidden Measure', value: () => 1, visibility: 'hidden' },
+        shownMeasure: { kind: 'computed', label: 'Shown Measure', value: () => 2 }
+      }
+    };
+    render(<InstrumentSummary data={{}} instrument={instrument} timeCollected={Date.now()} />);
+    expect(screen.getByText('Shown Measure')).toBeTruthy();
+    expect(screen.queryByText('Hidden Measure')).toBeNull();
+  });
+
+  it.each([
+    { data: { hasPet: false }, hasPet: false },
+    { data: { hasPet: true, petName: 'Rex' }, hasPet: true }
+  ])(
+    'should list the measure on a dynamic question only once the respondent was shown it (hasPet: $hasPet)',
+    ({ data, hasPet }) => {
+      const instrument: AnyUnilingualFormInstrument = {
+        ...baseInstrument,
+        content: {
+          hasPet: { kind: 'boolean', label: 'Has Pet', variant: 'radio' },
+          petName: {
+            deps: ['hasPet'],
+            kind: 'dynamic',
+            render: (values) => (values.hasPet ? { kind: 'string', label: 'Pet Name', variant: 'input' } : null)
+          }
+        },
+        defaultMeasureVisibility: 'visible',
+        measures: {
+          hasPet: { kind: 'const', label: 'Has Pet Measure', ref: 'hasPet' },
+          petName: { kind: 'const', label: 'Pet Name Measure', ref: 'petName' }
+        },
+        validationSchema: z.object({ hasPet: z.boolean(), petName: z.string().optional() })
+      };
+      render(<InstrumentSummary data={data} instrument={instrument} timeCollected={Date.now()} />);
+      expect(screen.getByText('Has Pet Measure')).toBeTruthy();
+      expect(Boolean(screen.queryByText('Pet Name Measure'))).toBe(hasPet);
+    }
+  );
+
   it('should copy a measure without a value as NA, so the copied summary has no blank lines', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } });

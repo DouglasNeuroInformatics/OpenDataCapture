@@ -13,16 +13,24 @@ const boundingBox = async (locator: Locator) => {
   return box;
 };
 
+/** One row under a header of `columnCount` columns, the first of which is the subject id. */
+const wideCsv = (columnCount: number, uniqueId: string) => {
+  const headers = ['subject_id', ...Array.from({ length: columnCount - 1 }, (_, index) => `extra_${index}`)];
+  const row = [`wide_${uniqueId}`, ...Array.from({ length: columnCount - 1 }, (_, index) => `value_${index}`)];
+  return `${headers.join(',')}\n${row.join(',')}\n`;
+};
+
 /**
- * The wizard through the UI. The API-level guarantees are covered by `bulk-remote-assignments.spec.ts`;
- * this drives the page itself, so nothing is submitted and no assignment is created.
+ * The wizard through the UI, for what only a real browser shows: layout, and the subject picker
+ * filled from the real API. Its steps' behaviour is covered by the component tests in
+ * `apps/web/src/components/BulkRemoteAssignmentWizard/__tests__/`, and the API-level guarantees by
+ * `bulk-remote-assignments.spec.ts`; nothing is submitted here and no assignment is created.
  */
 test.describe('remote assignments wizard', () => {
-  test('should fit the page column, span the stepper across the card, and advance to the instruments step', async ({
-    adminToken,
+  test('should fit the page column, cap a wide column mapping, and advance with the subjects picked', async ({
     api,
     apiRequestContext,
-    authenticateAs,
+    isolatedGroupManager,
     page,
     uniqueId
   }) => {
@@ -32,24 +40,12 @@ test.describe('remote assignments wizard', () => {
     const setupState = (await setupResponse.json()) as { isBulkRemoteAssignmentsEnabled?: boolean };
     expect(setupState.isBulkRemoteAssignmentsEnabled).toBe(true);
 
-    // A dedicated group + manager rather than the cached `GROUP_MANAGER` account: a one-group user
-    // lands on this group, so the picker lists exactly the subjects seeded here.
-    const group = await api.createGroup({ name: `Wizard${uniqueId}` });
-    const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });
+    // A group of its own: a one-group manager lands on it, so the picker lists exactly these subjects.
+    const group = await isolatedGroupManager();
     for (const index of [0, 1]) {
-      const response = await apiRequestContext.post(`${API}/sessions`, {
-        data: {
-          date: new Date().toISOString(),
-          groupId: group.id,
-          subjectData: { id: `wizard_${uniqueId}_${index}` },
-          type: 'IN_PERSON'
-        },
-        headers: { Authorization: `Bearer ${adminToken}` }
-      });
-      expect(response.status(), await response.text()).toBe(201);
+      await api.createSession(group.id, { id: `wizard_${uniqueId}_${index}` });
     }
 
-    await authenticateAs(credentials);
     await page.goto('/group/remote-assignments?mode=create');
     await expect(page).toHaveURL(/\/group\/remote-assignments\?mode=create/);
     const wizardPage = new RemoteAssignmentsPage(page);
@@ -65,168 +61,28 @@ test.describe('remote assignments wizard', () => {
     expect(wizard.width).toBeLessThanOrEqual(container.width);
     expect(breadcrumbs.width).toBeGreaterThanOrEqual(wizard.width * 0.9);
 
-    await wizardPage.selectAllSubjects.click();
-    await wizardPage.useSelectedSubjects.click();
-    await expect(wizardPage.timepointsStep).toBeVisible();
-    await expect(wizardPage.breadcrumb('INSTRUMENTS')).toHaveAttribute('aria-current', 'step');
-    await expect(wizardPage.breadcrumb('SUBJECTS')).toBeEnabled();
-  });
-
-  /** One row under a header of `columnCount` columns, the first of which is the subject id. */
-  const wideCsv = (columnCount: number, uniqueId: string) => {
-    const headers = ['subject_id', ...Array.from({ length: columnCount - 1 }, (_, index) => `extra_${index}`)];
-    const row = [`wide_${uniqueId}`, ...Array.from({ length: columnCount - 1 }, (_, index) => `value_${index}`)];
-    return `${headers.join(',')}\n${row.join(',')}\n`;
-  };
-
-  // A file with many columns grew the mapping table until the step's own controls sat below the
-  // fold, so the frame is capped at 28rem and scrolls within itself instead.
-  test('should cap the column mapping table and scroll it rather than lengthening the step', async ({
-    api,
-    authenticateAs,
-    page,
-    uniqueId
-  }) => {
-    const group = await api.createGroup({ name: `WizardWide${uniqueId}` });
-    const { credentials } = await api.createUser({ basePermissionLevel: 'GROUP_MANAGER', groupIds: [group.id] });
-
-    await authenticateAs(credentials);
-    await page.goto('/group/remote-assignments?mode=create');
-    const wizardPage = new RemoteAssignmentsPage(page);
-    await expect(wizardPage.wizard).toBeVisible();
-
+    // A file with many columns grew the mapping table until the step's own controls sat below the
+    // fold, so the frame is capped at 28rem and scrolls within itself instead.
     await wizardPage.sourceMode('FILE');
-    await wizardPage.uploadFile({
-      buffer: Buffer.from(wideCsv(24, uniqueId)),
-      mimeType: 'text/csv',
-      name: 'wide.csv'
-    });
-
+    await wizardPage.uploadFile({ buffer: Buffer.from(wideCsv(24, uniqueId)), mimeType: 'text/csv', name: 'wide.csv' });
     await expect(wizardPage.mapStep).toBeVisible();
     // One row per column of the file, so the grid is certainly taller than the cap.
     await expect(wizardPage.columnMapping.locator('tbody tr')).toHaveCount(24);
-
     const mapping = await boundingBox(wizardPage.columnMapping);
     expect(mapping.height).toBeLessThanOrEqual(448);
-
     const [scrollHeight, clientHeight] = await wizardPage.columnMapping.evaluate((element) => [
       element.scrollHeight,
       element.clientHeight
     ]);
     expect(scrollHeight).toBeGreaterThan(clientHeight);
-  });
-});
 
-test.describe('remote assignments wizard refusals', () => {
-  // A refusal above the input left the user reading it while looking at a file they had already
-  // chosen, with the button that produced it a screen below.
-  test('should put a refusal directly above the button that produced it', async ({ isolatedGroupManager, page }) => {
-    await isolatedGroupManager();
-    await page.goto('/group/remote-assignments?mode=create');
-    const wizardPage = new RemoteAssignmentsPage(page);
-    await expect(wizardPage.wizard).toBeVisible();
-
-    await wizardPage.pasteSubjects('subjectId\nduplicated-1\nduplicated-1\n');
-    await expect(wizardPage.mapStep).toBeVisible();
-    await wizardPage.confirmMapping.click();
-
-    await expect(wizardPage.errorList).toContainText('Nothing has been created');
-    const [errors, confirm] = await Promise.all([
-      boundingBox(wizardPage.errorList),
-      boundingBox(wizardPage.confirmMapping)
-    ]);
-    expect(errors.y + errors.height).toBeLessThanOrEqual(confirm.y);
-  });
-
-  test('should return to the tab the data came from, with the data still in it', async ({
-    isolatedGroupManager,
-    page
-  }) => {
-    await isolatedGroupManager();
-    await page.goto('/group/remote-assignments?mode=create');
-    const wizardPage = new RemoteAssignmentsPage(page);
-    await expect(wizardPage.wizard).toBeVisible();
-
-    const pasted = 'subjectId\npasted-1\n';
-    await wizardPage.pasteSubjects(pasted);
-    await expect(wizardPage.mapStep).toBeVisible();
     await page.getByRole('button', { name: 'Back' }).click();
-
-    await expect(wizardPage.pasteInput).toBeVisible();
-    await expect(wizardPage.pasteInput).toHaveValue(pasted);
-  });
-
-  // A stray row used to stop the whole batch, and only three steps later, as an identifier the user
-  // never typed: it is named here by its row, and can be left out without redoing the file.
-  test('should hold back review until the redirect URL is https, then show it for review', async ({
-    api,
-    isolatedGroupManager,
-    page
-  }) => {
-    const group = await isolatedGroupManager();
-    await api.createSubject(group.id);
-    await page.goto('/group/remote-assignments?mode=create');
-    const wizardPage = new RemoteAssignmentsPage(page);
-    await expect(wizardPage.wizard).toBeVisible();
-
+    await wizardPage.sourceMode('SELECT');
     await wizardPage.selectAllSubjects.click();
     await wizardPage.useSelectedSubjects.click();
     await expect(wizardPage.timepointsStep).toBeVisible();
-    await wizardPage.addFirstTimepoint();
-
-    await wizardPage.redirectUrlInput.fill('http://example.com/done');
-    await wizardPage.redirectUrlInput.blur();
-    await expect(wizardPage.redirectUrlError).toHaveText('Must start with "https://"');
-    await expect(wizardPage.confirmTimepoints).toBeDisabled();
-
-    await wizardPage.redirectUrlInput.fill('https://example.com/done');
-    await expect(wizardPage.redirectUrlError).toBeHidden();
-    await wizardPage.confirmTimepoints.click();
-    await expect(wizardPage.reviewRedirectUrl).toContainText('https://example.com/done');
-  });
-
-  test('should warn about a row this group cannot place and continue once it is left out', async ({
-    api,
-    isolatedGroupManager,
-    page
-  }) => {
-    const group = await isolatedGroupManager();
-    const subjectId = await api.createSubject(group.id);
-    await page.goto('/group/remote-assignments?mode=create');
-    const wizardPage = new RemoteAssignmentsPage(page);
-    await expect(wizardPage.wizard).toBeVisible();
-
-    await wizardPage.pasteSubjects(`subjectId\n${subjectId}\nstranger-not-in-this-group\n`);
-    await expect(wizardPage.mapStep).toBeVisible();
-    await wizardPage.confirmMapping.click();
-
-    await expect(wizardPage.errorList).toContainText('name a subject this group does not have');
-    await expect(wizardPage.errorList).toContainText('Row 3');
-    await expect(wizardPage.mapStep).toBeVisible();
-
-    await wizardPage.skipUnplaceable.click();
-    await wizardPage.confirmMapping.click();
-
-    await expect(wizardPage.timepointsStep).toBeVisible();
-    // Only the row the group could place travels on. The count is in the step's own description,
-    // which `StepLayout` renders in the card header rather than inside the step body.
-    await expect(page.getByText('all 1 selected subjects')).toBeVisible();
-  });
-});
-
-test.describe('remote assignments wizard parse errors', () => {
-  test('should number a malformed pasted line as it is numbered in the pasted text', async ({
-    authenticateAs,
-    page
-  }) => {
-    await authenticateAs('GROUP_MANAGER');
-    await page.goto('/group/remote-assignments?mode=create');
-    await expect(page.getByTestId('bulk-remote-assignment-wizard')).toBeVisible();
-
-    await page.getByTestId('bulk-source-mode-PASTE').click();
-    await page.getByTestId('bulk-paste-input').fill('subjectId\n"subject-1');
-    await page.getByTestId('bulk-parse-pasted').click();
-
-    await expect(page.getByTestId('bulk-error-list')).toContainText('Row 2: Quoted field unterminated');
+    await expect(page.getByText('all 2 selected subjects')).toBeVisible();
+    await expect(wizardPage.breadcrumb('INSTRUMENTS')).toHaveAttribute('aria-current', 'step');
+    await expect(wizardPage.breadcrumb('SUBJECTS')).toBeEnabled();
   });
 });

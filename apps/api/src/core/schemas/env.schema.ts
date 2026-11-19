@@ -15,6 +15,7 @@ export const $Env = $BaseEnv
     GATEWAY_REFRESH_INTERVAL: $NumberLike.pipe(z.number().positive().int()),
     GATEWAY_SITE_ADDRESS: $UrlLike.optional(),
     GITHUB_TOKEN: z.string().min(1).optional(),
+    PASSWORD_BREACH_CHECK_ENABLED: $BooleanLike.default(true),
     STORAGE_ACCESS_KEY: z.string().min(1).optional(),
     STORAGE_BUCKET: z.string().min(1).optional(),
     STORAGE_ENABLED: $BooleanLike.optional(),

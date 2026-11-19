@@ -40,14 +40,15 @@ export const webPort = requiredNumber('WEB_DEV_SERVER_PORT');
 /** How many tests run at once, where `.env` says; `playwright.config.ts` holds the default. */
 export const workerCount = optionalPositiveInteger('E2E_WORKERS');
 
-/** How often, in milliseconds, the API pulls completed assignments from the gateway. */
-export const gatewayRefreshInterval = requiredNumber('GATEWAY_REFRESH_INTERVAL');
+/**
+ * How often, in milliseconds, the API pulls completed assignments from the gateway. The suite owns
+ * this rather than reading `.env`: `playwright.config.ts` starts the API with it, so a sync is never
+ * the ten seconds a deployment waits.
+ */
+export const gatewayRefreshInterval = 2_000;
 
 // Tests run against the web origin; vite proxies `/api` through to the API server.
 export const baseURL = `http://localhost:${webPort}`;
-
-// The API reference is served from the root of the API itself, which the web proxy does not reach.
-export const apiURL = `http://localhost:${apiPort}`;
 
 // The patient-facing gateway is its own origin; assignment links point here.
 export const gatewayURL = `http://localhost:${gatewayPort}`;

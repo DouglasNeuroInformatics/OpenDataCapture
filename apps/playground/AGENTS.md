@@ -113,7 +113,7 @@ editor's IndexedDB, where the store keeps the API token, or anything else on the
 `PLAYGROUND_PREVIEW_ORIGIN` (a second hostname serving the same `dist/`), read at runtime rather than
 at build time, because one published image serves every deployment: the Caddyfile answers
 `/config.json` from the container's environment, `vite.config.ts`'s `playgroundConfig` plugin does
-the same for a dev server, and `Viewer.tsx` fetches it once and suspends until it arrives
+the same for the dev server and `vite preview`, and `Viewer.tsx` fetches it once and suspends until it arrives
 (`src/preview/config.ts`). A static host with neither must serve that file itself, or the viewer
 throws. `docs/en/2-tutorials/2.4-playground-deployment.md` is the operator's side of this. With the
 variable empty, a dev server uses the other loopback name — `localhost` pairs with `127.0.0.1` —
@@ -173,8 +173,8 @@ base64; the package's CLI leaves them out of the links it prints to keep them sh
 
 The editor/preview split in `src/components/MainContent/MainContent.tsx` gives every
 `react-resizable-panels` size as a percentage string. Version 4 reads a bare number as pixels, so
-`defaultSize={66}` still type-checks and renders, at the wrong size; the split test in
-`testing/src/specs/playground.spec.ts` measures the panes to catch it.
+`defaultSize={66}` still type-checks and renders, at the wrong size;
+`src/components/MainContent/__tests__/MainContent.test.tsx` pins the strings to catch it.
 
 `__APP_VERSION__` and `__GITHUB_REPO_URL__` are the build-time defines, declared in
 `src/vite-env.d.ts` and supplied in `vite.config.ts`; `GITHUB_REPO_URL` must be listed under the
@@ -195,8 +195,8 @@ docblock on its first line and renders with `@testing-library/react`;
 `src/components/Editor/__tests__/MonacoEditor.test.tsx` does, against a mocked `monaco-editor`,
 because Monaco itself does not run under happy-dom. Anything that touches esbuild-wasm, Monaco
 workers or `/runtime/v1` has no test environment here; the frame itself, the origin split, the
-runtime config, the message bridge and the resizable editor/preview split are exercised for real by
-`testing/src/specs/playground.spec.ts`, which Playwright runs against this app's dev server.
+runtime config and the message bridge are exercised for real by
+`testing/src/specs/playground.spec.ts`, which Playwright runs against this app's production build.
 
 Storybook collects `*.stories.tsx` under `src/components/` centrally through
 `storybook/config/main.ts` under the `Playground Components` prefix. See

@@ -223,17 +223,19 @@ describe('BulkRemoteAssignmentWizard', () => {
       expect(wizard.setSourceMode).toHaveBeenCalledWith('FILE');
     });
 
-    it('should hand the source step the selection the wizard holds, so stepping back does not discard it', () => {
-      const wizard = mockWizard('SOURCE');
+    it('should hand the source step the selection and pasted text the wizard holds, so stepping back does not discard them', () => {
+      const wizard = mockWizard('SOURCE', { pastedText: 'subjectId\npasted-1\n' });
       renderWizard();
       expect(propsOf(SourceStep)).toMatchObject({
         groupName: 'Depression Clinic',
         isMailEnabled: false,
         onBack,
         onParsed: wizard.acceptParsed,
+        onPastedChange: wizard.setPastedText,
         onSelectedChange: wizard.setSelectedSubjectIds,
         onStepChange: wizard.goTo,
         onSubjectsSelected: wizard.selectSubjects,
+        pasted: 'subjectId\npasted-1\n',
         selectedIds: wizard.subjectIds,
         subjectIdDisplayLength: 9,
         subjects
@@ -280,7 +282,7 @@ describe('BulkRemoteAssignmentWizard', () => {
 
   describe('timepoints step', () => {
     it('should hand the timepoints step the batch it is building and the preflight state', () => {
-      const wizard = mockWizard('TIMEPOINTS', { isPreflighting: true });
+      const wizard = mockWizard('TIMEPOINTS', { isPreflighting: true, redirectUrl: 'https://example.com/done' });
       renderWizard();
       expect(propsOf(TimepointsStep)).toMatchObject({
         defaultExpiresAt: '2026-11-01',
@@ -288,7 +290,9 @@ describe('BulkRemoteAssignmentWizard', () => {
         isLoading: true,
         onChange: wizard.setTimepoints,
         onConfirm: wizard.confirmTimepoints,
+        onRedirectUrlChange: wizard.setRedirectUrl,
         onStepChange: wizard.goTo,
+        redirectUrl: 'https://example.com/done',
         subjectCount: 2,
         timepoints
       });
@@ -308,7 +312,12 @@ describe('BulkRemoteAssignmentWizard', () => {
         code: 'BULK_ASSIGNMENT_REFUSED',
         issues: [{ kind: 'SUBJECT_UNAVAILABLE', subjectIds: ['Depression_Clinic$001'] }]
       };
-      const wizard = mockWizard('REVIEW', { failure, isSubmitting: true, transportError: true });
+      const wizard = mockWizard('REVIEW', {
+        failure,
+        isSubmitting: true,
+        redirectUrl: 'https://example.com/done',
+        transportError: true
+      });
       renderWizard();
       expect(propsOf(ReviewStep)).toMatchObject({
         describeSubject: wizard.describeSubject,
@@ -316,6 +325,7 @@ describe('BulkRemoteAssignmentWizard', () => {
         isSubmitting: true,
         onStepChange: wizard.goTo,
         onSubmit: wizard.submit,
+        redirectUrl: 'https://example.com/done',
         subjectCount: 2,
         timepoints,
         transportError: true

@@ -105,6 +105,14 @@ describe('capRouter', () => {
       expect(cap.validateToken).not.toHaveBeenCalled();
     });
 
+    it('should refuse an id longer than any assignment id whatever token accompanies it, so the set cannot grow unbounded', async () => {
+      const id = 'x'.repeat(10_000);
+      const response = await post('/verify', { id, token: 'unsolved' });
+      expect(response.status).toBe(400);
+      expect(cap.validateToken).not.toHaveBeenCalled();
+      expect(isAssignmentVerified(id)).toBe(false);
+    });
+
     it('should refuse an invalid token without marking the assignment verified, so a bot cannot submit', async () => {
       cap.validateToken.mockResolvedValueOnce({ success: false });
       const response = await post('/verify', { id: 'assignment-invalid', token: 'bad-token' });

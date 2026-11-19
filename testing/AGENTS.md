@@ -23,9 +23,7 @@ is `.agents/docs/playbooks/add-e2e-test.md`; the tier-by-tier picture is
   testid over there in the same change. Roles and labels are used only where no testid exists.
 - **One database, shared by every worker.** `setup` seeds it once through the UI and `teardown`
   drops it; `fullyParallel` is on. Any data a test creates must be uniquely named — use the
-  `uniqueId` fixture (`Subject${uniqueId}`), never a fixed string. Instance-wide settings cannot be
-  uniquely named, so a test that writes one and reads it back must not be `@smoke`: outside CI
-  (`workers: 1` there) its firefox copy runs alongside the chromium one and overwrites its value.
+  `uniqueId` fixture (`Subject${uniqueId}`), never a fixed string.
 - **`getPageModel` asserts it landed on the route it asked for** (`RootPage.goto` does
   `expect(page).toHaveURL(url)`). When the expected outcome _is_ a redirect, use `authenticateAs`
   plus a raw `page.goto` instead — see the standard-user cases in `src/specs/authorization.spec.ts`.
@@ -91,8 +89,7 @@ Auth is injected as `window.__PLAYWRIGHT_ACCESS_TOKEN__`, which `apps/web`'s
 `appState` is written to localStorage by an autouse fixture, so it applies to a spec that logs in
 through the real form just as much as to one using `authenticateAs`. Left to the app's own defaults,
 the disclaimer dialog and then the walkthrough overlay cover the page and swallow clicks — the
-walkthrough only stays away locally because a developer `.env` tends to set
-`VITE_DEV_DISABLE_TUTORIAL=true`, which `.env.template` (and therefore CI) does not.
+suite serves the production build, which ignores `VITE_DEV_DISABLE_TUTORIAL`.
 
 **Never assert against a value only your `.env` holds.** CI generates `.env` from `.env.template`,
 so anything configurable — `CONTACT_EMAIL`, ports — is read through `src/support/env.ts` rather than
@@ -101,28 +98,22 @@ written as a literal in a spec.
 ## Running
 
 `pnpm test:e2e` from the repo root (turbo), or `pnpm --filter @opendatacapture/testing test:dev` for
-Playwright's UI mode. `playwright.config.ts` starts api, gateway and web itself through each app's
-`pnpm dev:test`, which sets `NODE_ENV=test` and so gives the API an in-memory Mongo replica set — no
-external database, and nothing to start by hand. It also starts the playground through its plain
-`pnpm dev` (it has no backend and no test mode) for `src/specs/playground.spec.ts`, which reaches it
-by absolute URL from `playgroundURL` in `src/support/env.ts`: the playground is not an `apps/web`
+Playwright's UI mode. `playwright.config.ts` starts the API through its `pnpm dev:test`, which sets
+`NODE_ENV=test` and so gives it an in-memory Mongo replica set, and serves the production builds of
+gateway (`pnpm start`), web and playground (`pnpm preview`), which `pnpm test:e2e` builds first and
+`test:dev` does not — no external database, and nothing to start by hand. The playground serves
+`src/specs/playground.spec.ts`, which reaches it by absolute URL from `playgroundURL` in `src/support/env.ts`: the playground is not an `apps/web`
 route, so `src/pages/playground/index.page.ts` extends nothing and is not in `pageModels`. Its
 preview is an iframe on the other loopback name, so the spec drives it through a `FrameLocator`.
-`src/specs/api-docs.spec.ts` likewise reaches the API reference by absolute URL, from `apiURL`: it
-is served from the root of the API, and its Redoc page requests `/spec.json`, which the web origin's
-`/api` proxy does not route.
 
-**The suite runs on two workers, and one on CI.** Playwright's own default of half the cores logs in
-faster than the API's login throttle allows (50 a minute), so tests partway through the suite fail
-with `Login failed … (429)`, and each failure restarts a worker that logs in again. Set `E2E_WORKERS`
+**The suite runs on two workers, and one on CI.** Each worker is a Chromium beside the four servers,
+so memory runs out long before the cores do: two workers already peak near 7 GB. Set `E2E_WORKERS`
 in the root `.env` to change the count; `src/support/env.ts` reads it and throws on anything but a
 positive integer. A shell export loses to `.env` wherever `.env` carries the key, blank included: the
 `test:*` scripts load it through `env-cmd`, whose values win, and `.env.template` carries the key
 blank. For one run, pass `--workers=<n>` after the script instead.
 
-Projects: `setup` (with `teardown` attached), `chromium` (every spec), and `firefox`, which greps
-`/@smoke/`. **Cross-browser coverage exists only for tests whose title contains `@smoke`** — add the
-tag to a critical flow, leave it off everything else.
+Projects: `setup` (with `teardown` attached) and `chromium` (every spec).
 
 There is **no `vitest.config.ts` here and no unit tier**; `pnpm test` never looks at this directory.
 

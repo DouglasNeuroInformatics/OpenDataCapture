@@ -31,6 +31,7 @@
         "@opendatacapture/api#db:generate",
         "@opendatacapture/gateway#db:generate",
         "@opendatacapture/instrument-library#build",
+        "@opendatacapture/outreach#gen:types",
         "@opendatacapture/testing#gen:routes"
       ]
     },
@@ -44,7 +45,14 @@
     },
     "@opendatacapture/testing#test:e2e": {
       "cache": false,
-      "dependsOn": ["^build", "//#generated", "@opendatacapture/gateway#db:push"]
+      "dependsOn": [
+        "^build",
+        "//#generated",
+        "@opendatacapture/gateway#build",
+        "@opendatacapture/gateway#db:push",
+        "@opendatacapture/playground#build",
+        "@opendatacapture/web#build"
+      ]
     }
   }
 }

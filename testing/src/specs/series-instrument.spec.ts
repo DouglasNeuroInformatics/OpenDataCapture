@@ -119,29 +119,4 @@ test.describe('series instrument', () => {
     // records rather than one.
     await expect(page.getByTestId('data-table-body').getByTestId('data-table-row')).toHaveCount(2);
   });
-
-  // A skipProgress series has no interstitial screen, so the bar on each item's form is the only
-  // place the subject can see how far through the series they are.
-  test('should show the position in a skipProgress series on each item it administers', async ({
-    getPageModel,
-    page,
-    uniqueId
-  }) => {
-    const instrumentPage = await openSeries({ getPageModel, page, uniqueId });
-    await expect(instrumentPage.seriesProgress).toBeHidden();
-    await instrumentPage.begin();
-
-    await expect(instrumentPage.seriesProgress).toContainText('Instrument 1 of 2');
-    await expect(instrumentPage.seriesProgressBar).toHaveAttribute('aria-valuenow', '0');
-    await instrumentPage.completeHappinessQuestionnaire();
-    await instrumentPage.submit();
-
-    await expect(instrumentPage.seriesProgress).toContainText('Instrument 2 of 2');
-    await expect(instrumentPage.seriesProgressBar).toHaveAttribute('aria-valuenow', '1');
-    await instrumentPage.completeHappinessQuestionnaire();
-    await instrumentPage.submit();
-
-    await expect(instrumentPage.seriesCompletionHeading).toBeVisible();
-    await expect(instrumentPage.seriesProgress).toBeHidden();
-  });
 });

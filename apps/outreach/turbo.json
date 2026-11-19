@@ -6,6 +6,11 @@
     "build": {
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/blog/**", "$TURBO_ROOT$/docs/**"]
     },
+    // The content collection types the root type-check reads from `.astro/`, which is git-ignored
+    "gen:types": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/blog/**", "$TURBO_ROOT$/docs/**"],
+      "outputs": [".astro/**"]
+    },
     "lint": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/blog/**", "$TURBO_ROOT$/docs/**"]

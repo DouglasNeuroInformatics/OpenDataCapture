@@ -1,6 +1,7 @@
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import { localizeZodErrors } from '@opendatacapture/react-core';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/contact';
 
@@ -31,6 +32,11 @@ describe('Route', () => {
     vi.stubGlobal('open', open);
   });
 
+  // The app installs its localized validation messages at boot, which a rendered route alone skips.
+  beforeAll(async () => {
+    await localizeZodErrors({ targets: ['app'], translator: i18n });
+  });
+
   afterEach(() => {
     cleanup();
     vi.unstubAllGlobals();
@@ -50,6 +56,19 @@ describe('Route', () => {
         '_blank'
       );
     });
+  });
+
+  // The unselected reason raises an issue code that once fell through to zod's untranslated default.
+  it('should report both an unselected reason and a blank message as required', async () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await waitFor(() => {
+      expect(screen.getAllByTestId('error-message-text').map((error) => error.textContent)).toEqual([
+        'This field is required',
+        'This field is required'
+      ]);
+    });
+    expect(open).not.toHaveBeenCalled();
   });
 
   it('should not open an email when the message is blank, so an empty email is never drafted', async () => {

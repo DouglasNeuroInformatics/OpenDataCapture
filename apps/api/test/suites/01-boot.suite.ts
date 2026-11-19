@@ -19,6 +19,17 @@ export default defineSuite('boot', function () {
     });
   });
 
+  // The page itself is Redoc, a script from a CDN, so what the app owns is the page pointing it at
+  // the document every test below checks.
+  describe('GET /', () => {
+    it('should serve the API reference page, rendering the document at /spec.json', async () => {
+      const response = await this.app.inject({ method: 'GET', url: '/' });
+      expect(response.statusCode).toBe(200);
+      expect(response.headers['content-type']).toMatch(/^text\/html/);
+      expect(response.body).toContain('<redoc spec-url="/spec.json">');
+    });
+  });
+
   describe('GET /spec.json', () => {
     const getDocument = async (): Promise<OpenApiDocument> => {
       const response = await this.app.inject({ method: 'GET', url: '/spec.json' });

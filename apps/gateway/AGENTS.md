@@ -150,5 +150,5 @@ on port 0 and call it over real HTTP with `fetch`. The api and cap routers get t
 the end-to-end specs.
 
 Most of the coverage is `testing/src/specs/gateway-assignment.spec.ts`, which drives the real
-two-origin flow through the Cap widget; `testing/src/specs/gateway-landing.spec.ts` covers `/`. See
+two-origin flow through the Cap widget; `testing/src/specs/gateway-landing.spec.ts` covers `/` keeping its language through hydration. See
 `.agents/docs/architecture/testing-strategy.md`.

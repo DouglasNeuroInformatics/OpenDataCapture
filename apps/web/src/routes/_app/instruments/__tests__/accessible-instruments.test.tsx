@@ -7,7 +7,7 @@ import { Route } from '@/routes/_app/instruments/accessible-instruments';
 
 import '@/services/i18n';
 
-type InstrumentInfoStub = { details: { title: string }; id: string; kind: 'FORM' };
+type InstrumentInfoStub = { details: { title: string }; id: string; kind: 'FILE' | 'FORM' };
 
 type MockState = {
   instrumentInfo: InstrumentInfoStub[] | undefined;
@@ -77,6 +77,15 @@ describe('Route', () => {
     render(<AccessibleInstrumentsPage />);
     expect(screen.getByRole('button', { name: 'Allowed' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Excluded' })).toBeNull();
+  });
+
+  // Only the gateway cannot deliver a file instrument's uploads, so the in-person list must not
+  // inherit the remote assignment page's exclusion.
+  it('should offer a file instrument the group may administer, since an in-person session can take its uploads', () => {
+    mocks.instrumentInfo = [{ details: { title: 'File Upload' }, id: 'instrument-3', kind: 'FILE' }];
+    mocks.store.currentGroup = { accessibleInstrumentIds: ['instrument-3'] };
+    render(<AccessibleInstrumentsPage />);
+    expect(screen.getByRole('button', { name: 'File Upload' })).toBeTruthy();
   });
 
   it('should show a loading fallback instead of the showcase while the instruments load', () => {

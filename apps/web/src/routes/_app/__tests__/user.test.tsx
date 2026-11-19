@@ -157,6 +157,12 @@ describe('Route', () => {
     });
   });
 
+  it('should describe the password dialog, so it is announced with more than its title', () => {
+    renderPage();
+    const descriptionId = openPasswordDialog().getAttribute('aria-describedby')!;
+    expect(document.getElementById(descriptionId)?.textContent).toContain('confirm it to save the change');
+  });
+
   it('should reject a weak password without sending it', async () => {
     renderPage();
     submitPasswords(openPasswordDialog(), 'abc', 'abc');

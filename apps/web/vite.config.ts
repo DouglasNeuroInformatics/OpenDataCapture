@@ -22,6 +22,21 @@ export default defineConfig(async ({ command }) => {
     }
   }
 
+  // `vite preview` serves the production build to the end-to-end suite on the same origin, so it
+  // needs the same port and `/api` proxy as the dev server.
+  const server = {
+    port: webPort,
+    proxy: {
+      '/api/': {
+        rewrite: (path: string) => path.replace(/^\/api/, ''),
+        target: {
+          host: 'localhost',
+          port: apiPort
+        }
+      }
+    }
+  };
+
   return {
     build: {
       chunkSizeWarningLimit: 1000,
@@ -60,22 +75,13 @@ export default defineConfig(async ({ command }) => {
       }),
       tailwindcss()
     ],
+    // A preview on any other port would serve the suite nothing, so fail rather than move.
+    preview: { ...server, strictPort: true },
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, 'src')
       }
     },
-    server: {
-      port: webPort,
-      proxy: {
-        '/api/': {
-          rewrite: (path: string) => path.replace(/^\/api/, ''),
-          target: {
-            host: 'localhost',
-            port: apiPort
-          }
-        }
-      }
-    }
+    server
   };
 });

@@ -246,7 +246,8 @@ describe('apiRouter', () => {
     it('should start a series with a leading separator, so the first item is counted as submitted', async () => {
       markAssignmentVerified('series-first');
       const { privateKey } = await createStoredAssignment('series-first', { encryptedData: null, symmetricKey: null });
-      await request('PATCH', '/assignments/series-first', { data: { item: 1 }, kind: 'SERIES' });
+      const response = await request('PATCH', '/assignments/series-first', { data: { item: 1 }, kind: 'SERIES' });
+      expect(response.status).toBe(200);
       const { data } = prisma.remoteAssignmentModel.update.mock.lastCall![0];
       const [emptyData, cipherText] = data.encryptedData.split('$');
       const [emptyKey, symmetricKey] = data.symmetricKey.split('$');

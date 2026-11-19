@@ -2,7 +2,7 @@ import type { $CreateAssignmentData, Assignment } from '@opendatacapture/schemas
 import { AUDIT_LOGS_MAX_PAGE_SIZE } from '@opendatacapture/schemas/audit';
 import type { $AuditLog, $AuditLogAction, $AuditLogsPage } from '@opendatacapture/schemas/audit';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
-import type { Language, Permissions } from '@opendatacapture/schemas/core';
+import type { Permissions } from '@opendatacapture/schemas/core';
 import type { $CreateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type {
@@ -12,14 +12,9 @@ import type {
 } from '@opendatacapture/schemas/instrument-records';
 import { MAIL_CLIENT_TIMEOUT } from '@opendatacapture/schemas/mail';
 import type { $SendAssignmentEmailData, EmailDeliveryResult } from '@opendatacapture/schemas/mail';
-import type {
-  $CreatePermissionSetData,
-  PermissionSet,
-  PermissionSetSummary
-} from '@opendatacapture/schemas/permission-set';
 import type { $CreateSessionData, Session, SessionType } from '@opendatacapture/schemas/session';
 import type { $CreateSubjectData } from '@opendatacapture/schemas/subject';
-import type { $CreateUserData, $UpdateUserData, $UpdateUserPermissionsData, User } from '@opendatacapture/schemas/user';
+import type { $CreateUserData, $UpdateUserPermissionsData, User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
 import { E2E_MAIL_CONFIG, SEEDED_USER_PASSWORD } from './constants';
@@ -113,19 +108,6 @@ export class ApiClient {
     return instrument.id;
   }
 
-  /** Creates a uniquely named permission set holding the given rules. */
-  async createPermissionSet(
-    rules: $CreatePermissionSetData['rules'],
-    overrides: Partial<$CreatePermissionSetData> = {}
-  ): Promise<PermissionSet> {
-    const data: $CreatePermissionSetData = { name: `Permission Set ${randomId()}`, rules, ...overrides };
-    return this.expectJson<PermissionSet>(
-      this.request.post(`${API}/permission-sets`, { data, headers: this.authHeaders }),
-      201,
-      'create permission set'
-    );
-  }
-
   /**
    * Creates one record against a session, the way the app does when an instrument is completed in a
    * sitting. Unlike {@link uploadRecords}, which always writes a RETROSPECTIVE session, this lets a
@@ -214,19 +196,6 @@ export class ApiClient {
     return { credentials: { password, username }, user };
   }
 
-  /**
-   * The languages the instance currently offers. Read rather than assumed because
-   * `admin-settings.spec.ts` turns one on and off, in a worker of its own.
-   */
-  async findActiveLanguages(): Promise<Language[]> {
-    const setupState = await this.expectJson<{ activeLanguages: Language[] }>(
-      this.request.get(`${API}/setup`, { headers: this.authHeaders }),
-      200,
-      'find the active languages'
-    );
-    return setupState.activeLanguages;
-  }
-
   /** Reads a subject's assignments back as admin, to check whether a write by another role took effect. */
   async findAssignments(subjectId: string): Promise<Assignment[]> {
     return this.expectJson<Assignment[]>(
@@ -247,15 +216,6 @@ export class ApiClient {
       `find the '${action}' audit logs`
     );
     return data;
-  }
-
-  /** The ids the start-session form suggests to a user with no group: custom ids scoped to the default group. */
-  async findDefaultGroupSubjectCustomIds(): Promise<string[]> {
-    return this.expectJson<string[]>(
-      this.request.get(`${API}/subjects/default-group/custom-ids`, { headers: this.authHeaders }),
-      200,
-      'find the custom subject ids scoped to the default group'
-    );
   }
 
   /** Reads a group back as admin, to check whether a write by another role actually took effect. */
@@ -291,29 +251,27 @@ export class ApiClient {
     return instrument.id;
   }
 
-  async findPermissionSetById(id: string): Promise<PermissionSetSummary> {
-    return this.expectJson<PermissionSetSummary>(
-      this.request.get(`${API}/permission-sets/${id}`, { headers: this.authHeaders }),
-      200,
-      `find permission set '${id}'`
-    );
+  /**
+   * The id of a seeded instrument, looked up by its English title. A series has no internal name of
+   * its own (its info carries `seriesItems` instead), so this is the lookup that reaches one.
+   */
+  async findInstrumentIdByTitle(title: string): Promise<string> {
+    const instruments = await this.getInstrumentInfo();
+    const instrument = instruments.find(({ details }) => {
+      return (typeof details.title === 'string' ? details.title : details.title.en) === title;
+    });
+    if (!instrument) {
+      throw new Error(`No instrument titled '${title}' among ${instruments.length} returned`);
+    }
+    return instrument.id;
   }
 
-  /** Reads a record back as admin, to check whether a write by another user actually took effect. */
-  async findRecordById(id: string): Promise<InstrumentRecord> {
-    return this.expectJson<InstrumentRecord>(
-      this.request.get(`${API}/instrument-records/${id}`, { headers: this.authHeaders }),
+  /** A subject's records as admin, to check what a write by another origin (the gateway sync) stored. */
+  async findRecordsBySubject(subjectId: string): Promise<InstrumentRecord[]> {
+    return this.expectJson<InstrumentRecord[]>(
+      this.request.get(`${API}/instrument-records`, { headers: this.authHeaders, params: { subjectId } }),
       200,
-      `find instrument record '${id}'`
-    );
-  }
-
-  /** The ids the start-session form suggests for a group: its subjects identified by a custom id. */
-  async findSubjectCustomIds(groupId: string): Promise<string[]> {
-    return this.expectJson<string[]>(
-      this.request.get(`${API}/subjects/groups/${groupId}/custom-ids`, { headers: this.authHeaders }),
-      200,
-      `find the custom subject ids of group '${groupId}'`
+      `find the records of subject '${subjectId}'`
     );
   }
 
@@ -361,27 +319,6 @@ export class ApiClient {
    */
   async setUserPermissions(id: string, permissions: Permissions): Promise<User> {
     return this.putUserPermissions(id, { kind: 'custom', permissions });
-  }
-
-  /** Links a user to a permission set, removing any custom grants they held. */
-  async setUserPermissionSet(id: string, permissionSetId: string): Promise<User> {
-    return this.putUserPermissions(id, { kind: 'permissionSet', permissionSetId });
-  }
-
-  async unarchiveGroup(id: string): Promise<void> {
-    await this.expectOk(
-      this.request.patch(`${API}/groups/${id}/unarchive`, { headers: this.authHeaders }),
-      `unarchive group '${id}'`
-    );
-  }
-
-  /** Updates a user's profile fields, which is everything except their permissions. */
-  async updateUser(id: string, data: Partial<$UpdateUserData>): Promise<User> {
-    const response = await this.request.patch(`${API}/users/${id}`, { data, headers: this.authHeaders });
-    if (!response.ok()) {
-      throw new Error(`Failed to update user '${id}' (${response.status()}): ${await response.text()}`);
-    }
-    return (await response.json()) as User;
   }
 
   /**

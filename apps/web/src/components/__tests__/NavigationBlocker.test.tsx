@@ -70,6 +70,20 @@ describe('NavigationBlocker', () => {
     expect(window.location.pathname).toBe('/');
   });
 
+  it('should navigate without asking while inactive, so leaving a submitted instrument does not prompt', async () => {
+    await renderBlocker(false);
+    act(() => history.push('/elsewhere'));
+    expect(await screen.findByText(DESTINATION_TEXT)).toBeTruthy();
+    expect(screen.queryByTestId('blocker-dialog')).toBeNull();
+  });
+
+  it('should navigate without asking when the navigation ignores blockers, as ending a session does', async () => {
+    await renderBlocker(true);
+    act(() => history.push('/elsewhere', undefined, { ignoreBlocker: true }));
+    expect(await screen.findByText(DESTINATION_TEXT)).toBeTruthy();
+    expect(screen.queryByTestId('blocker-dialog')).toBeNull();
+  });
+
   it('should complete the navigation once the user confirms leaving', async () => {
     await renderBlocker(true);
     act(() => history.push('/elsewhere'));

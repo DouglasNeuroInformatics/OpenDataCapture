@@ -244,6 +244,15 @@ describe('Route', () => {
       expect(listedSubjects()).toEqual(['bob']);
     });
 
+    // The search bar is a form, and a native submit reloaded the page, which drops the in-memory
+    // access token and lands on the login page.
+    it('should cancel a submit of the search bar, so Enter keeps the results and the user signed in', () => {
+      renderDataHub();
+      fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'BOB' } });
+      expect(fireEvent.submit(screen.getByTestId('data-table-search-bar'))).toBe(false);
+      expect(listedSubjects()).toEqual(['bob']);
+    });
+
     it('should never list a subject whose unscoped id is empty', () => {
       mocks.subjects = [subject('ROOT$'), BOB];
       renderDataHub();

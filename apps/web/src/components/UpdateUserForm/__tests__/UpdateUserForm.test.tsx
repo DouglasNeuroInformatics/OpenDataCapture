@@ -85,6 +85,18 @@ describe('UpdateUserForm', () => {
     expect(submittedData()).toMatchObject({ mustResetPassword: false, password: STRONG_PASSWORD });
   });
 
+  // The browser fills these fields with the administrator's own saved credentials, so clearing one is
+  // the ordinary way out of that, and it used to reject the field for being empty.
+  it('should save without a new password once one typed in is cleared again', async () => {
+    const { form } = renderForm();
+    type(form, 'password', STRONG_PASSWORD);
+    type(form, 'password', '');
+    submit();
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(submittedData().password).toBeUndefined();
+    expect(errorMessages()).toEqual([]);
+  });
+
   it('should fill both password fields with a generated passphrase', () => {
     const { form } = renderForm();
     fireEvent.click(screen.getByLabelText('Generate Passphrase'));

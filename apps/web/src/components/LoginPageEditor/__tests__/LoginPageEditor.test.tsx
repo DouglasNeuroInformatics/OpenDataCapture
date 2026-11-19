@@ -90,6 +90,15 @@ describe('LoginPageEditor', () => {
     );
   });
 
+  it('should refuse to save a custom image size left blank, but allow it once the image is hidden', () => {
+    mocks.branding = { logoSize: 'custom' };
+    render(<LoginPageEditor />);
+    const saveButton = screen.getByRole<HTMLButtonElement>('button', { name: 'Save' });
+    expect(saveButton.disabled).toBe(true);
+    fireEvent.click(document.getElementById('showLogo')!);
+    expect(saveButton.disabled).toBe(false);
+  });
+
   it('should open the fullscreen preview from the preview column', () => {
     render(<LoginPageEditor />);
     fireEvent.click(screen.getByRole('button', { name: 'Fullscreen preview' }));

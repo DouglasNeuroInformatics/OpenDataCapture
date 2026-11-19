@@ -1,11 +1,15 @@
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 
 import { generatePlaygroundURL } from '@opendatacapture/playground-url';
+import type { Page } from '@playwright/test';
 
 import { PlaygroundPage } from '../pages/playground/index.page';
 import { playgroundURL } from '../support/env';
 import { expect, test } from '../support/fixtures';
+
+const REPO_ROOT = path.resolve(import.meta.dirname, '../../..');
 
 /**
  * A form whose module scope records where it ran: `ran` on its own document, and `escaped` on the
@@ -37,68 +41,6 @@ export default defineInstrument({
 `;
 }
 
-/**
- * A form that shows its measures by default and has two computed measures, one of them marked hidden,
- * so the summary should list exactly the other one.
- */
-function measureVisibilityInstrumentSource(title: string): string {
-  return `
-import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { z } from '/runtime/v1/zod@3.x';
-
-export default defineInstrument({
-  kind: 'FORM',
-  language: 'en',
-  tags: ['Measures'],
-  internal: { edition: 1, name: 'MEASURE_VISIBILITY' },
-  clientDetails: { estimatedDuration: 1, instructions: ['Submit the form'] },
-  content: { note: { kind: 'string', label: 'Note', variant: 'input' } },
-  defaultMeasureVisibility: 'visible',
-  details: { description: 'Measure visibility', license: 'Apache-2.0', title: '${title}' },
-  measures: {
-    hiddenMeasure: { kind: 'computed', label: 'Hidden Measure', value: () => 1, visibility: 'hidden' },
-    shownMeasure: { kind: 'computed', label: 'Shown Measure', value: () => 2 }
-  },
-  validationSchema: z.object({ note: z.string().optional() })
-});
-`;
-}
-
-/**
- * A form that asks for a pet's name only once the respondent says they have a pet. Both questions
- * carry a labeled measure, so the toggle's measure is always in the summary and the name's only when
- * the question was shown.
- */
-function dynamicMeasureInstrumentSource(title: string): string {
-  return `
-import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { z } from '/runtime/v1/zod@3.x';
-
-export default defineInstrument({
-  kind: 'FORM',
-  language: 'en',
-  tags: ['Measures'],
-  internal: { edition: 1, name: 'DYNAMIC_MEASURE' },
-  clientDetails: { estimatedDuration: 1, instructions: ['Submit the form'] },
-  content: {
-    hasPet: { kind: 'boolean', label: 'Has Pet', variant: 'radio' },
-    petName: {
-      kind: 'dynamic',
-      deps: ['hasPet'],
-      render: (data) => (data.hasPet ? { kind: 'string', label: 'Pet Name', variant: 'input' } : null)
-    }
-  },
-  defaultMeasureVisibility: 'visible',
-  details: { description: 'Dynamic field measure', license: 'Apache-2.0', title: '${title}' },
-  measures: {
-    hasPet: { kind: 'const', label: 'Has Pet Measure', ref: 'hasPet' },
-    petName: { kind: 'const', label: 'Pet Name Measure', ref: 'petName' }
-  },
-  validationSchema: z.object({ hasPet: z.boolean(), petName: z.string().optional() })
-});
-`;
-}
-
 /** A form whose title includes a value imported from a subpath of the scoped runtime-core package. */
 function scopedSubpathInstrumentSource(title: string): string {
   return `
@@ -114,43 +56,6 @@ export default defineInstrument({
   clientDetails: { estimatedDuration: 1, instructions: ['Submit the form'] },
   content: {},
   details: { description: 'Scoped subpath import', license: 'Apache-2.0', title: \`${title} \${FILE_TYPES.images[0]}\` },
-  measures: {},
-  validationSchema: z.object({})
-});
-`;
-}
-
-/** 1×1 PNG. The playground stores binary assets as base64 and decodes them before bundling. */
-const STIM_PNG_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-
-/**
- * An interactive instrument that paints an imported PNG. The extension stays upper case: that is
- * the filename shape the playground bundles when it renders this preview.
- */
-function uppercasePngInstrumentSource(title: string): string {
-  return `
-import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { z } from '/runtime/v1/zod@3.x';
-
-import stim from './stim.PNG';
-
-export default defineInstrument({
-  kind: 'INTERACTIVE',
-  language: 'en',
-  tags: ['Stimulus'],
-  internal: { edition: 1, name: 'UPPERCASE_PNG' },
-  clientDetails: { estimatedDuration: 1, instructions: ['Look at the image'] },
-  content: {
-    render() {
-      const image = document.createElement('img');
-      image.alt = 'Stimulus';
-      image.src = stim;
-      image.width = 32;
-      image.height = 32;
-      document.body.appendChild(image);
-    }
-  },
-  details: { description: 'Upper-case PNG import', license: 'Apache-2.0', title: '${title}' },
   measures: {},
   validationSchema: z.object({})
 });
@@ -194,62 +99,98 @@ export default defineInstrument({
 `;
 }
 
-// The first paint waits on the 13 MB esbuild download and the toolchain boot; the preview then
-// compiles on a 2 s poll, so the whole chain is slower than the suite's default expect timeout.
+const JSPSYCH_EXAMPLE_DIR = path.join(
+  REPO_ROOT,
+  'apps/playground/src/instruments/examples/interactive/Interactive-With-JSPsych'
+);
+
+/**
+ * The JSPsych example, with the waits its timeline spends in real time cut short: a random fixation
+ * of up to 2 s before each of its ten trials, and a 2 s gap after the instructions. Everything the
+ * task submits is left as it is. Throws if the example no longer contains what is replaced, so the
+ * test cannot silently fall back to the full-length timeline.
+ */
+function shortenedJsPsychSource(): string {
+  let source = readFileSync(path.join(JSPSYCH_EXAMPLE_DIR, 'index.ts'), 'utf-8');
+  for (const [from, to] of [
+    [
+      'sampleWithoutReplacement([250, 500, 750, 1000, 1250, 1500, 1750, 2000], 1)',
+      'sampleWithoutReplacement([250], 1)'
+    ],
+    ['post_trial_gap: 2000', 'post_trial_gap: 0']
+  ] as const) {
+    if (!source.includes(from)) {
+      throw new Error(`Expected the JSPsych example to contain '${from}'`);
+    }
+    source = source.replace(from, to);
+  }
+  return source;
+}
+
+/** Runs `action`, which must make the editor raise an `alert`, and returns what the alert said. */
+async function readAlert(page: Page, action: () => Promise<void>): Promise<string> {
+  // The editor reports a submission with `alert`, which blocks the page until it is dismissed.
+  const message = new Promise<string>((resolve) => {
+    page.once('dialog', (dialog) => {
+      resolve(dialog.message());
+      void dialog.dismiss();
+    });
+  });
+  await action();
+  return message;
+}
+
+// The viewer compiles once it sees the editor's files change, on a poll of `refreshInterval`, which
+// defaults to 2 s. The suite sets it lower so that each new instrument is compiled sooner.
+const PREVIEW_REFRESH_INTERVAL = 250;
+
+// The page boots on the 13 MB esbuild download and the toolchain, which together are slower than the
+// suite's default expect timeout.
 const PREVIEW_TIMEOUT = 60_000;
 
+/** The `details.title` of the examples picked from the instrument list, which each preview shows. */
+const EXAMPLE_TITLES = {
+  'Interactive With Legacy Script': 'Interactive Instrument With Legacy Script',
+  'Interactive With Static Assets': 'Interactive Instrument with Static Assets'
+};
+
 test.describe('playground', () => {
-  // Every page here boots esbuild-wasm and Monaco. Four at once, under the rest of the suite, has
-  // starved a browser context of its start-up for longer than the test timeout.
+  // Every playground page boots esbuild-wasm and Monaco and takes about 1 GB, so the tests share one
+  // and load each instrument into it. A share link differs from the page's URL only in its
+  // fragment, which the editor reads on `hashchange`, so opening one does not reload the page. As
+  // the previous test's preview is still on screen until the next instrument compiles, each test
+  // waits for its own instrument's title before acting.
   test.describe.configure({ mode: 'default' });
   test.slow();
 
-  test('should find an instrument by its visible label in the selector', async ({ page }) => {
-    const playground = new PlaygroundPage(page);
-    await playground.goto();
+  let playground: PlaygroundPage;
 
-    await playground.searchInstruments('Form Reference');
-    await expect(playground.instrumentOption('Form Reference')).toBeVisible();
+  test.beforeAll(async ({ browser }) => {
+    test.setTimeout(PREVIEW_TIMEOUT * 2);
+    playground = new PlaygroundPage(await browser.newPage());
+    await playground.goto();
+    await playground.setRefreshInterval(PREVIEW_REFRESH_INTERVAL);
   });
 
-  test('should find nothing for a query only the hidden instrument ids match', async ({ page }) => {
-    const playground = new PlaygroundPage(page);
-    await playground.goto();
-
-    // Every v4 UUID carries a 4 in its version digit, and no built-in label contains one.
-    await playground.searchInstruments('4');
-    await expect(page.getByText('No Instruments Found')).toBeVisible();
+  test.afterAll(async () => {
+    await playground.$ref.close();
   });
 
-  test('should run the preview on an origin other than the editor and render the instrument there @smoke', async ({
-    page
-  }) => {
-    const playground = new PlaygroundPage(page);
-    await playground.goto();
-
+  // This test reads the default instrument the page opened on, so it must run first.
+  test('should run the default instrument on a preview origin of its own, and hand its submission back to the editor', async () => {
     await expect(playground.previewFrame).toBeVisible({ timeout: PREVIEW_TIMEOUT });
     const frameOrigin = new URL((await playground.previewFrame.getAttribute('src'))!).origin;
-    expect(frameOrigin).not.toBe(new URL(page.url()).origin);
+    expect(frameOrigin).not.toBe(new URL(playground.$ref.url()).origin);
 
-    await expect(playground.preview.getByRole('button', { name: 'Begin' })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
-  });
-
-  test('should read the preview origin from the server at load, and refuse one equal to the editor', async ({
-    page
-  }) => {
-    await page.route('**/config.json', (route) => route.fulfill({ json: { previewOrigin: playgroundURL } }));
-    const playground = new PlaygroundPage(page);
-    await playground.goto();
-
-    await expect(page.getByRole('heading', { name: 'Preview Unavailable' })).toBeVisible({
-      timeout: PREVIEW_TIMEOUT
+    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
+    const message = await readAlert(playground.$ref, () => {
+      return playground.preview.getByRole('button', { name: 'Submit' }).click();
     });
-    await expect(playground.previewFrame).toHaveCount(0);
+    expect(message).toContain('The following data will be submitted');
   });
 
-  test("should run a share link's code without letting it reach the editor page", async ({ page, uniqueId }) => {
+  test("should run a share link's code without letting it reach the editor page", async ({ uniqueId }) => {
     const title = `Probe ${uniqueId}`;
-    const playground = new PlaygroundPage(page);
     await playground.goto(
       generatePlaygroundURL({
         baseURL: playgroundURL,
@@ -258,44 +199,15 @@ test.describe('playground', () => {
       })
     );
 
-    await expect(playground.preview.getByRole('button', { name: 'Begin' })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
-    await expect(playground.preview.locator('body')).toHaveAttribute('data-probe', 'ran');
-    await expect(page.locator('body')).not.toHaveAttribute('data-probe', /./);
-  });
-
-  test('should render a share link that imports an upper-case PNG, so the preview shows the stimulus', async ({
-    page,
-    uniqueId
-  }) => {
-    const title = `Upper PNG ${uniqueId}`;
-    const playground = new PlaygroundPage(page);
-    await playground.goto(
-      generatePlaygroundURL({
-        baseURL: playgroundURL,
-        files: [
-          { content: uppercasePngInstrumentSource(title), name: 'index.ts' },
-          { content: STIM_PNG_BASE64, name: 'stim.PNG' }
-        ],
-        label: title
-      })
-    );
-
     await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
-    await playground.preview.getByRole('button', { name: 'Begin' }).click();
-
-    const stimulus = playground.preview
-      .frameLocator('iframe[name="interactive-instrument"]')
-      .getByRole('img', { name: 'Stimulus' });
-    await expect(stimulus).toBeVisible({ timeout: PREVIEW_TIMEOUT });
-    await expect(stimulus).toHaveAttribute('src', `data:image/png;base64,${STIM_PNG_BASE64}`);
+    await expect(playground.preview.locator('body')).toHaveAttribute('data-probe', 'ran');
+    await expect(playground.$ref.locator('body')).not.toHaveAttribute('data-probe', /./);
   });
 
   test('should serve an SVG static asset through the service worker, so the image in its HTML loads', async ({
-    page,
     uniqueId
   }) => {
     const title = `Static SVG ${uniqueId}`;
-    const playground = new PlaygroundPage(page);
     await playground.goto(
       generatePlaygroundURL({
         baseURL: playgroundURL,
@@ -321,174 +233,40 @@ test.describe('playground', () => {
       .toBeGreaterThan(0);
   });
 
-  // An interactive instrument renders in a frame of its own inside the preview, which reads its
-  // parent's document. That only works because the preview is a real origin rather than an opaque
-  // sandbox, which is the reason the preview is served from a second host.
-  test('should render an interactive instrument inside the preview', async ({ page }) => {
-    const playground = new PlaygroundPage(page);
-    await playground.goto();
-    await playground.selectInstrument('Interactive With React');
-
-    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
-
-    const task = playground.preview.frameLocator('iframe[name="interactive-instrument"]');
-    await expect(task.getByRole('heading', { name: 'Vite + React' })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
-  });
-
   // `test:e2e` builds `@opendatacapture/playground-url` first, so its CLI is in `dist`. The React
   // example imports `react.svg`; the CLI used to skip it as binary, so the link failed to compile.
-  test('should render an SVG asset from a link generated by the playground-url CLI', async ({ page }) => {
-    const repoRoot = path.resolve(import.meta.dirname, '../../..');
+  // The task renders in a frame of its own inside the preview, which reads its parent's document:
+  // that only works because the preview is a real origin rather than an opaque sandbox.
+  test('should render the React example and its SVG asset from a link generated by the playground-url CLI', async () => {
     const href = execFileSync(
       process.execPath,
       [
-        path.join(repoRoot, 'packages/playground-url/dist/cli.js'),
-        path.join(repoRoot, 'apps/playground/src/instruments/examples/interactive/Interactive-With-React'),
+        path.join(REPO_ROOT, 'packages/playground-url/dist/cli.js'),
+        path.join(REPO_ROOT, 'apps/playground/src/instruments/examples/interactive/Interactive-With-React'),
         '--base-url',
         playgroundURL
       ],
       { encoding: 'utf-8' }
     ).trim();
-    const playground = new PlaygroundPage(page);
     await playground.goto(href);
 
-    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
+    await expect(playground.preview.getByRole('heading', { name: 'React Click Task' })).toBeVisible({
+      timeout: PREVIEW_TIMEOUT
+    });
+    await playground.preview.getByRole('button', { name: 'Begin' }).click();
 
+    const task = playground.preview.frameLocator('iframe[name="interactive-instrument"]');
+    await expect(task.getByRole('heading', { name: 'Vite + React' })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
     // A visibility check would also pass for an SVG that arrives base64-encoded and renders broken.
-    const logo = playground.preview
-      .frameLocator('iframe[name="interactive-instrument"]')
-      .getByRole('img', { name: 'React logo' });
-    await expect(logo).toBeVisible({ timeout: PREVIEW_TIMEOUT });
+    const logo = task.getByRole('img', { name: 'React logo' });
+    await expect(logo).toBeVisible();
     await expect.poll(() => logo.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
   });
 
-  test('should hand a submission from the preview back to the editor', async ({ page }) => {
-    const playground = new PlaygroundPage(page);
-    await playground.goto();
-
-    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
-    // The editor reports the submission with `alert`, which blocks the page until it is dismissed,
-    // so the click below only returns once the handler has closed it.
-    const messages: string[] = [];
-    page.once('dialog', (dialog) => {
-      messages.push(dialog.message());
-      void dialog.dismiss();
-    });
-    await playground.preview.getByRole('button', { name: 'Submit' }).click();
-
-    await expect.poll(() => messages).toHaveLength(1);
-    expect(messages[0]).toContain('The following data will be submitted');
-  });
-
-  // The preview validates every instrument it renders, and apps/web does too in development. That
-  // validation is what used to strip `visibility` from computed measures, so the default applied.
-  test('should leave a computed measure marked hidden out of the summary', async ({ page, uniqueId }) => {
-    const title = `Measures ${uniqueId}`;
-    const playground = new PlaygroundPage(page);
-    await playground.goto(
-      generatePlaygroundURL({
-        baseURL: playgroundURL,
-        files: [{ content: measureVisibilityInstrumentSource(title), name: 'index.ts' }],
-        label: title
-      })
-    );
-
-    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
-    // Playwright dismisses the editor's submission `alert` on its own when nothing listens for it.
-    await playground.preview.getByRole('button', { name: 'Submit' }).click();
-
-    await expect(playground.preview.getByText('Shown Measure')).toBeVisible();
-    await expect(playground.preview.getByText('Hidden Measure')).toHaveCount(0);
-  });
-
-  test('should leave the measure on a dynamic question the respondent never saw out of the summary', async ({
-    page,
-    uniqueId
-  }) => {
-    const title = `Dynamic Measure ${uniqueId}`;
-    const playground = new PlaygroundPage(page);
-    await playground.goto(
-      generatePlaygroundURL({
-        baseURL: playgroundURL,
-        files: [{ content: dynamicMeasureInstrumentSource(title), name: 'index.ts' }],
-        label: title
-      })
-    );
-
-    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
-    // The radio items carry stable ids (`<name>-true`), unlike their labels, which libui translates.
-    await playground.preview.locator('#hasPet-false').click();
-    await playground.preview.getByRole('button', { name: 'Submit' }).click();
-
-    await expect(playground.preview.getByText('Has Pet Measure')).toBeVisible();
-    await expect(playground.preview.getByText('Pet Name Measure')).toHaveCount(0);
-  });
-
-  test('should list the measure on a dynamic question in the summary once the respondent reveals it', async ({
-    page,
-    uniqueId
-  }) => {
-    const title = `Dynamic Measure ${uniqueId}`;
-    const playground = new PlaygroundPage(page);
-    await playground.goto(
-      generatePlaygroundURL({
-        baseURL: playgroundURL,
-        files: [{ content: dynamicMeasureInstrumentSource(title), name: 'index.ts' }],
-        label: title
-      })
-    );
-
-    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
-    await playground.preview.locator('#hasPet-true').click();
-    await playground.preview.getByLabel('Pet Name', { exact: true }).fill('Rex');
-    await playground.preview.getByRole('button', { name: 'Submit' }).click();
-
-    await expect(playground.preview.getByText('Pet Name Measure')).toBeVisible();
-  });
-
-  // react-resizable-panels reads a bare number as pixels, so a pane size written as `66` rather than
-  // `"66%"` still type-checks and renders, only at the wrong size.
-  test('should split the editor and preview two to one, and stop the editor at a quarter when dragged narrower', async ({
-    page
-  }) => {
-    const playground = new PlaygroundPage(page);
-    await playground.goto();
-    await expect(playground.editorPane).toBeVisible({ timeout: PREVIEW_TIMEOUT });
-    await expect.poll(() => playground.editorShare()).toBeCloseTo(0.66, 1);
-
-    const editor = (await playground.editorPane.boundingBox())!;
-    await playground.dragPaneSeparatorTo(editor.x + editor.width / 2);
-    await expect.poll(() => playground.editorShare()).toBeCloseTo(0.33, 1);
-
-    await playground.dragPaneSeparatorTo(editor.x);
-    await expect.poll(() => playground.editorShare()).toBeCloseTo(0.25, 1);
-  });
-
-  test("should report only the author's syntax error, without an internal bundler TypeError", async ({
-    page,
-    uniqueId
-  }) => {
-    const playground = new PlaygroundPage(page);
-    await playground.goto(
-      generatePlaygroundURL({
-        baseURL: playgroundURL,
-        files: [{ content: "export default { kind: 'FORM', ;", name: 'index.ts' }],
-        label: `Syntax Error ${uniqueId}`
-      })
-    );
-
-    await expect(page.getByRole('heading', { name: 'Failed to Compile' })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
-    await page.getByRole('button', { name: 'Cause' }).click();
-    await expect(page.getByText(/Build failed with 1 error/)).toBeVisible();
-    await expect(page.getByText(/reading 'inputs'/)).toHaveCount(0);
-  });
-
   test('should load a subpath of a scoped runtime package, so its exports reach the instrument', async ({
-    page,
     uniqueId
   }) => {
     const title = `Scoped Subpath ${uniqueId}`;
-    const playground = new PlaygroundPage(page);
     await playground.goto(
       generatePlaygroundURL({
         baseURL: playgroundURL,
@@ -501,45 +279,46 @@ test.describe('playground', () => {
       timeout: PREVIEW_TIMEOUT
     });
   });
-});
 
-test.describe('playground interactive examples', () => {
-  test.describe.configure({ mode: 'default' });
-  test.slow();
-
-  for (const label of ['Interactive With Static Assets', 'Interactive With Legacy Script']) {
-    test(`should submit the ${label} example when its Submit button is clicked`, async ({ page }) => {
-      const playground = new PlaygroundPage(page);
-      await playground.goto();
+  for (const [label, title] of Object.entries(EXAMPLE_TITLES)) {
+    test(`should submit the ${label} example when its Submit button is clicked`, async () => {
       await playground.selectInstrument(label);
 
-      await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
-      const messages: string[] = [];
-      page.once('dialog', (dialog) => {
-        messages.push(dialog.message());
-        void dialog.dismiss();
+      await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({
+        timeout: PREVIEW_TIMEOUT
       });
+      await playground.preview.getByRole('button', { name: 'Begin' }).click();
       const task = playground.preview.frameLocator('iframe[name="interactive-instrument"]');
-      await task.getByRole('button', { name: 'Submit' }).click({ timeout: PREVIEW_TIMEOUT });
-
-      await expect.poll(() => messages).toHaveLength(1);
-      expect(messages[0]).toContain('"message": "Hello"');
+      const message = await readAlert(playground.$ref, () => {
+        return task.getByRole('button', { name: 'Submit' }).click({ timeout: PREVIEW_TIMEOUT });
+      });
+      expect(message).toContain('"message": "Hello"');
     });
   }
 
   // The task only submits once the respondent has pressed through every trial, and the preview
   // reports a submission only if it passes the example's own schema, an array of trials.
-  test('should submit the Interactive With JSPsych example once its timeline finishes', async ({ page }) => {
-    const playground = new PlaygroundPage(page);
-    await playground.goto();
-    await playground.selectInstrument('Interactive With JSPsych');
+  test('should submit the JSPsych example once its timeline finishes', async ({ uniqueId }) => {
+    const title = `JSPsych ${uniqueId}`;
+    await playground.goto(
+      generatePlaygroundURL({
+        baseURL: playgroundURL,
+        files: [
+          { content: shortenedJsPsychSource(), name: 'index.ts' },
+          // The playground holds binary assets as base64, which is what a share link carries.
+          ...['blue.png', 'orange.png'].map((name) => ({
+            content: readFileSync(path.join(JSPSYCH_EXAMPLE_DIR, name)).toString('base64'),
+            name
+          }))
+        ],
+        label: title
+      })
+    );
 
-    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
-    const messages: string[] = [];
-    page.once('dialog', (dialog) => {
-      messages.push(dialog.message());
-      void dialog.dismiss();
+    await expect(playground.preview.getByRole('heading', { name: 'Reaction Time Task' })).toBeVisible({
+      timeout: PREVIEW_TIMEOUT
     });
+    await playground.preview.getByRole('button', { name: 'Begin' }).click();
     const task = playground.preview.frameLocator('iframe[name="interactive-instrument"]');
     const body = task.locator('body');
 
@@ -548,159 +327,18 @@ test.describe('playground interactive examples', () => {
     await expect(task.getByText('In this experiment, a circle will appear')).toBeVisible();
     await body.press('Space');
 
-    // 2 stimuli x 5 repetitions, each shown after a fixation of up to 2 seconds
+    // 2 stimuli x 5 repetitions, each shown after its fixation
     const stimulus = task.locator('#jspsych-image-keyboard-response-stimulus');
     for (let trial = 0; trial < 10; trial++) {
-      await expect(stimulus).toBeVisible({ timeout: 10_000 });
+      await expect(stimulus).toBeVisible();
       await body.press('f');
       await expect(stimulus).toBeHidden();
     }
 
-    await expect(task.getByText('Press any key to complete the experiment.')).toBeVisible({ timeout: 10_000 });
-    await body.press('Space');
-
-    await expect.poll(() => messages).toHaveLength(1);
-    expect(messages[0]).toContain('The following data will be submitted');
+    await expect(task.getByText('Press any key to complete the experiment.')).toBeVisible();
+    const message = await readAlert(playground.$ref, () => body.press('Space'));
+    expect(message).toContain('The following data will be submitted');
     // the dialog text is cut short (the trials embed the stimuli as data URLs), so only its start is checked
-    expect(messages[0]).toContain('"data": [');
-  });
-});
-
-test.describe('playground save button', () => {
-  test.describe.configure({ mode: 'default' });
-  test.slow();
-
-  test('should disable Save after switching from an edited saved instrument to an example', async ({
-    page,
-    uniqueId
-  }) => {
-    const title = `Save ${uniqueId}`;
-    const playground = new PlaygroundPage(page);
-    await playground.goto(
-      generatePlaygroundURL({
-        baseURL: playgroundURL,
-        files: [{ content: measureVisibilityInstrumentSource(title), name: 'index.ts' }],
-        label: title
-      })
-    );
-    await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
-
-    const saveButton = page.locator('button:has(svg.lucide-save)');
-    await page.locator('.monaco-editor .view-lines').click();
-    await page.keyboard.type('// edited');
-    await expect(saveButton).toBeEnabled();
-
-    await playground.selectInstrument('Form Reference');
-    await expect(saveButton).toBeDisabled();
-  });
-});
-
-test.describe('playground editor tabs', () => {
-  test.describe.configure({ mode: 'default' });
-  test.slow();
-
-  test('should keep the active tab selected when a background tab is closed', async ({ page, uniqueId }) => {
-    const title = `Tabs ${uniqueId}`;
-    const playground = new PlaygroundPage(page);
-    await playground.goto(
-      generatePlaygroundURL({
-        baseURL: playgroundURL,
-        files: [
-          { content: measureVisibilityInstrumentSource(title), name: 'index.ts' },
-          { content: 'export const a = 1;', name: 'a.ts' },
-          { content: 'export const b = 2;', name: 'b.ts' }
-        ],
-        label: title
-      })
-    );
-    await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
-
-    await page.locator('button:has(svg.lucide-columns-3)').click();
-    const fileButton = (filename: string) => {
-      return page.locator('button', { has: page.locator(`input[value="${filename}"]`) });
-    };
-    await fileButton('a.ts').click();
-    await fileButton('b.ts').click();
-
-    const tab = (filename: string) => page.locator('button[aria-current]', { hasText: filename });
-    await expect(tab('b.ts')).toHaveAttribute('aria-current', 'true');
-
-    await tab('a.ts').locator('svg.lucide-x').click();
-    await expect(tab('a.ts')).toHaveCount(0);
-    await expect(tab('b.ts')).toHaveAttribute('aria-current', 'true');
-  });
-});
-
-test.describe('playground instrument deletion', () => {
-  test.describe.configure({ mode: 'default' });
-  test.slow();
-
-  test('should show the default template after the selected saved instrument is deleted', async ({
-    page,
-    uniqueId
-  }) => {
-    const title = `Deleted ${uniqueId}`;
-    const playground = new PlaygroundPage(page);
-    await playground.goto(
-      generatePlaygroundURL({
-        baseURL: playgroundURL,
-        files: [{ content: measureVisibilityInstrumentSource(title), name: 'index.ts' }],
-        label: title
-      })
-    );
-    await expect(playground.preview.getByRole('heading', { name: title })).toBeVisible({ timeout: PREVIEW_TIMEOUT });
-
-    await page.locator('button:has(svg.lucide-ellipsis-vertical)').click();
-    await page.getByRole('menuitem', { name: 'Delete Instrument' }).click();
-    await page.getByRole('dialog').getByRole('button', { exact: true, name: 'Delete' }).click();
-
-    await expect(playground.preview.getByRole('heading', { name: '<PLACEHOLDER>' })).toBeVisible({
-      timeout: PREVIEW_TIMEOUT
-    });
-    await expect(playground.preview.getByRole('heading', { name: title })).toHaveCount(0);
-  });
-});
-
-/**
- * A form that leaves measures hidden by default and marks its one measure with the deprecated
- * `hidden: false`, which must still show it as `visibility: 'visible'` would.
- */
-function deprecatedHiddenFalseInstrumentSource(title: string): string {
-  return `
-import { defineInstrument } from '/runtime/v1/@opendatacapture/runtime-core';
-import { z } from '/runtime/v1/zod@3.x';
-
-export default defineInstrument({
-  kind: 'FORM',
-  language: 'en',
-  tags: ['Measures'],
-  internal: { edition: 1, name: 'DEPRECATED_HIDDEN_FALSE' },
-  clientDetails: { estimatedDuration: 1, instructions: ['Submit the form'] },
-  content: { note: { kind: 'string', label: 'Note', variant: 'input' } },
-  details: { description: 'Deprecated hidden flag', license: 'Apache-2.0', title: '${title}' },
-  measures: {
-    legacyMeasure: { hidden: false, kind: 'computed', label: 'Legacy Measure', value: () => 3 }
-  },
-  validationSchema: z.object({ note: z.string().optional() })
-});
-`;
-}
-
-test.describe('playground deprecated measure visibility', () => {
-  test('should show a measure declaring the deprecated hidden: false in the summary', async ({ page, uniqueId }) => {
-    const title = `Deprecated Flag ${uniqueId}`;
-    const playground = new PlaygroundPage(page);
-    await playground.goto(
-      generatePlaygroundURL({
-        baseURL: playgroundURL,
-        files: [{ content: deprecatedHiddenFalseInstrumentSource(title), name: 'index.ts' }],
-        label: title
-      })
-    );
-
-    await playground.preview.getByRole('button', { name: 'Begin' }).click({ timeout: PREVIEW_TIMEOUT });
-    await playground.preview.getByRole('button', { name: 'Submit' }).click();
-
-    await expect(playground.preview.getByText('Legacy Measure', { exact: true })).toBeVisible();
+    expect(message).toContain('"data": [');
   });
 });

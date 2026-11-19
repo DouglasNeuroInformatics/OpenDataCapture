@@ -34,8 +34,8 @@
     "prepare": "husky",
     "start": "turbo run start",
     "test": "pnpm build:exports && env-cmd vitest",
-    "test:coverage": "pnpm build:exports && env-cmd vitest --coverage",
-    "test:e2e": "env-cmd turbo run test:e2e",
+    "test:coverage": "pnpm build:exports && ./scripts/with-test-lock.sh env-cmd vitest --coverage",
+    "test:e2e": "./scripts/with-test-lock.sh env-cmd turbo run test:e2e",
     "ws": "./scripts/workspace.sh $@"
   },
   "devDependencies": {
