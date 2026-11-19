@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { $UpdateGroupData } from '../group.js';
+import { $CreateGroupData, $UpdateGroupData } from '../group.js';
 
 describe('$UpdateGroupData', () => {
   it('should require expectedUpdatedAt when emailTemplates is included', () => {
@@ -25,4 +25,15 @@ describe('$UpdateGroupData', () => {
       expect($UpdateGroupData.parse({ archivedAt, name: 'New Name' })).not.toHaveProperty('archivedAt');
     }
   );
+});
+
+describe('$CreateGroupData', () => {
+  it('should drop a session instrument, so a group is never created requiring one it cannot access', () => {
+    const data = $CreateGroupData.parse({
+      name: 'New Group',
+      settings: { defaultIdentificationMethod: 'CUSTOM_ID', sessionInstrumentId: 'instrument-1' },
+      type: 'RESEARCH'
+    });
+    expect(data.settings).not.toHaveProperty('sessionInstrumentId');
+  });
 });

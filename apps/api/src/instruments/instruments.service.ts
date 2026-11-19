@@ -138,21 +138,6 @@ export class InstrumentsService {
       if (!result.success) {
         throw new UnprocessableEntityException(result.message);
       }
-    } else if (instance.internal.edition > 1) {
-      await this.groupModel.updateMany({
-        data: {
-          accessibleInstrumentIds: {
-            push: [id]
-          }
-        },
-        where: {
-          accessibleInstrumentIds: {
-            has: this.generateScalarInstrumentId({
-              internal: { edition: instance.internal.edition - 1, name: instance.internal.name }
-            })
-          }
-        }
-      });
     }
 
     try {
@@ -172,6 +157,33 @@ export class InstrumentsService {
         throw this.instrumentExistsConflict(id);
       }
       throw err;
+    }
+
+    // Only once the edition is stored, so a failed insert leaves no group requiring a missing instrument.
+    if (instance.kind !== 'SERIES' && instance.internal.edition > 1) {
+      const previousEditionId = this.generateScalarInstrumentId({
+        internal: { edition: instance.internal.edition - 1, name: instance.internal.name }
+      });
+      await this.groupModel.updateMany({
+        data: {
+          accessibleInstrumentIds: {
+            push: [id]
+          }
+        },
+        where: {
+          accessibleInstrumentIds: {
+            has: previousEditionId
+          }
+        }
+      });
+      // A group requiring the previous edition at the start of a session requires this one instead.
+      // The previous edition stays accessible, so a new edition that is not a form leaves it in place.
+      if (instance.kind === 'FORM') {
+        await this.groupModel.updateMany({
+          data: { settings: { update: { sessionInstrumentId: id } } },
+          where: { settings: { is: { sessionInstrumentId: previousEditionId } } }
+        });
+      }
     }
     return { ...instance, id };
   }

@@ -170,6 +170,14 @@ export class SubjectsService {
     return { success: true };
   }
 
+  /**
+   * Unscoped, because a subject in a group the caller cannot read is still the subject with this id,
+   * and only whether it exists leaves the service.
+   */
+  async exists(id: string): Promise<boolean> {
+    return this.subjectModel.exists({ id });
+  }
+
   async find(
     { groupId, hasRecord }: { groupId?: string; hasRecord?: boolean } = {},
     { ability }: EntityOperationOptions = {}

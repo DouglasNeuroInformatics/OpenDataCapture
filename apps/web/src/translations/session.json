@@ -8,9 +8,9 @@
   },
   "dateAssessed": {
     "description": {
-      "en": "If the session took place on a date other than today, you can change it here.",
-      "es": "Si la sesión tuvo lugar en una fecha distinta a hoy, puede modificarla aquí.",
-      "fr": "Si la session a eu lieu à une autre date qu'aujourd'hui, vous pouvez la modifier ici."
+      "en": "The date and time the session took place.",
+      "es": "La fecha y la hora en que tuvo lugar la sesión.",
+      "fr": "La date et l'heure auxquelles la session a eu lieu."
     },
     "label": {
       "en": "Date Assessed",

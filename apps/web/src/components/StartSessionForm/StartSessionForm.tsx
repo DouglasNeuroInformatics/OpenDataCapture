@@ -19,7 +19,9 @@ import { z } from 'zod/v4';
 import { useSubjectDemographicsLookup } from '@/hooks/useSubjectDemographicsLookup';
 import { getValueForLanguage } from '@/utils/language';
 
-const currentDate = new Date();
+const MILLISECONDS_PER_YEAR = 31556952000;
+
+const isNotInFuture = (date: Date) => date <= new Date();
 
 type StartSessionFormValues = FormTypes.PartialData<StartSessionFormData>;
 
@@ -31,7 +33,7 @@ const selectedCustomId = (values: StartSessionFormValues) => {
 };
 
 type StartSessionFormData = {
-  sessionDate: Date;
+  sessionDate?: Date;
   sessionType: 'IN_PERSON' | 'RETROSPECTIVE';
   subjectDateOfBirth?: Date;
   subjectFirstName?: string;
@@ -62,9 +64,6 @@ export const StartSessionForm = ({
   const lookupDemographics = useSubjectDemographicsLookup();
   const [autofilled, setAutofilled] = useState<AutofilledDemographics>({});
   const latestCustomId = useRef('');
-  const minDateOfBirth = currentGroup?.settings.minimumAge
-    ? new Date(currentDate.getTime() - currentGroup.settings.minimumAge * 31556952000)
-    : undefined;
 
   const scopeCustomId = (customId: string) => {
     return encodeScopedSubjectId(customId, { groupName: currentGroup?.name ?? DEFAULT_GROUP_NAME });
@@ -199,7 +198,8 @@ export const StartSessionForm = ({
                   ? {
                       description: t('session.dateAssessed.description'),
                       kind: 'date',
-                      label: t('session.dateAssessed.label')
+                      label: t('session.dateAssessed.label'),
+                      variant: 'datetime'
                     }
                   : null;
               }
@@ -220,7 +220,7 @@ export const StartSessionForm = ({
           subjectFirstName: z.string().optional(),
           subjectLastName: z.string().optional(),
           subjectIdentificationMethod: $SubjectIdentificationMethod,
-          // Every check on the identifier and the date of birth lives in the refinement below: zod v4
+          // Every check on the identifier and the two dates lives in the refinement below: zod v4
           // omits an optional property that failed its own checks from the value it hands the
           // refinement, which then reads the field as missing and adds a contradictory required-field
           // error.
@@ -228,12 +228,24 @@ export const StartSessionForm = ({
           subjectDateOfBirth: z.date().optional(),
           subjectSex: z.enum(['MALE', 'FEMALE']).optional(),
           sessionType: $SessionType.exclude(['REMOTE']),
-          sessionDate: z
-            .date()
-            .max(currentDate, { message: t('session.errors.assessmentMustBeInPast') })
-            .default(currentDate)
+          sessionDate: z.date().optional()
         })
         .superRefine((val, ctx) => {
+          if (val.sessionType === 'RETROSPECTIVE') {
+            if (!val.sessionDate) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t('core.form.requiredField'),
+                path: ['sessionDate']
+              });
+            } else if (!isNotInFuture(val.sessionDate)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t('session.errors.assessmentMustBeInPast'),
+                path: ['sessionDate']
+              });
+            }
+          }
           if (val.subjectIdentificationMethod === 'CUSTOM_ID') {
             if (!val.subjectId) {
               ctx.addIssue({
@@ -287,7 +299,9 @@ export const StartSessionForm = ({
               }
             }
           }
-          if (val.subjectDateOfBirth && val.subjectDateOfBirth > currentDate) {
+          const minimumAge = currentGroup?.settings.minimumAge;
+          const minDateOfBirth = minimumAge ? new Date(Date.now() - minimumAge * MILLISECONDS_PER_YEAR) : undefined;
+          if (val.subjectDateOfBirth && !isNotInFuture(val.subjectDateOfBirth)) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t({
@@ -301,9 +315,9 @@ export const StartSessionForm = ({
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: t({
-                en: `Subject must be above age of ${currentGroup?.settings.minimumAge}`,
-                es: `El sujeto debe tener más de ${currentGroup?.settings.minimumAge} años`,
-                fr: `Le sujet doit avoir au moins ${currentGroup?.settings.minimumAge} ans`
+                en: `Subject must be above age of ${minimumAge}`,
+                es: `El sujeto debe tener más de ${minimumAge} años`,
+                fr: `Le sujet doit avoir au moins ${minimumAge} ans`
               }),
               path: ['subjectDateOfBirth']
             });
@@ -329,7 +343,8 @@ export const StartSessionForm = ({
           subjectId = scopeCustomId(subjectId);
         }
         await onSubmit({
-          date: sessionDate,
+          // Only a retrospective session has a date of its own; an in-person one starts now.
+          date: sessionDate ?? new Date(),
           groupId: currentGroup?.id ?? null,
           username: username ?? null,
           type: sessionType,

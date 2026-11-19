@@ -8,6 +8,10 @@ export class StartSessionPage extends AppPage {
   readonly pageHeader: Locator;
   readonly selectField: Locator;
   readonly sessionForm: Locator;
+  /** Returns from the group's session instrument to the session details. */
+  readonly sessionInstrumentBackButton: Locator;
+  /** The form a group requires as part of starting a session, shown once the details are submitted. */
+  readonly sessionInstrumentStep: Locator;
   /** The hidden native select that carries the value; `sexTrigger` is the control a user sees. */
   readonly sexField: Locator;
   readonly sexTrigger: Locator;
@@ -20,6 +24,8 @@ export class StartSessionPage extends AppPage {
     super(page);
     this.pageHeader = page.getByTestId('page-header');
     this.sessionForm = page.getByTestId('start-session-form');
+    this.sessionInstrumentBackButton = page.getByTestId('session-instrument-back');
+    this.sessionInstrumentStep = page.getByTestId('session-instrument-step');
     this.selectField = page.locator('[name="subjectIdentificationMethod"]');
     this.successMessage = page.getByRole('heading', { name: 'Session Successfully Started' });
     this.errorMessages = page.getByTestId('error-message-text');
@@ -67,16 +73,10 @@ export class StartSessionPage extends AppPage {
     await this.fillSessionDetails(sex);
   }
 
-  /** A retrospective session dated today, without touching the subject's details. */
+  /** A retrospective session dated today at midnight, without touching the subject's details. */
   async fillSessionTiming() {
-    const sessionTypeSelector = this.sessionForm.locator('[name="sessionType"]');
-    const sessionDate = this.sessionForm.locator('[name="sessionDate"]');
-
-    await sessionTypeSelector.selectOption('Retrospective');
-
-    await sessionDate.waitFor({ state: 'visible' });
-    const expectedSessionDate = new Date().toISOString().split('T')[0]!;
-    await sessionDate.fill(expectedSessionDate);
+    await this.selectRetrospective();
+    await this.pickSessionDay(new Date().getDate());
   }
 
   /** The subject's date of birth and sex, leaving the session at its in-person default. */
@@ -85,8 +85,26 @@ export class StartSessionPage extends AppPage {
     await this.sexField.selectOption(sex);
   }
 
+  /** A day of the month the date picker opens on, which is the browser's current month. */
+  async pickSessionDay(day: number) {
+    await this.sessionForm.getByTestId('datetime-date-trigger').click();
+    await this.$ref
+      .getByTestId('datepicker')
+      .getByRole('button', { exact: true, name: String(day) })
+      .click();
+  }
+
   async selectIdentificationMethod(methodName: string) {
     await this.selectField.selectOption(methodName);
+  }
+
+  async selectRetrospective() {
+    await this.sessionForm.locator('[name="sessionType"]').selectOption('Retrospective');
+  }
+
+  /** The time of day of a retrospective session, as `HH:MM:SS`. */
+  async setSessionTime(time: string) {
+    await this.sessionForm.getByTestId('datetime-time-input').fill(time);
   }
 
   /** An identifier already in use by a subject in the current group, offered in the popup. */

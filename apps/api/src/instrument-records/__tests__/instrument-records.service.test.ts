@@ -971,6 +971,28 @@ describe('InstrumentRecordsService', () => {
       expect(projectStage.$project.session.user.username).toBe('$sessionUser.username');
     });
 
+    // `$dateToString` without a format gives a full ISO timestamp, so the time of collection survives
+    // and two records collected on one day stay distinguishable.
+    it('should export the record collection date as the timestamp, not the insertion date', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.exportRecords({}, { ability: createAppAbility([]) });
+
+      const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
+      const projectStage = pipeline.find((stage) => stage.$project);
+      expect(projectStage.$project.date).toStrictEqual({ $dateToString: { date: '$date' } });
+    });
+
+    it('should export the session date with its time of day, so a session started at a known time keeps it', async () => {
+      instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
+
+      await instrumentRecordsService.exportRecords({}, { ability: createAppAbility([]) });
+
+      const [{ pipeline }] = instrumentRecordModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
+      const projectStage = pipeline.find((stage) => stage.$project);
+      expect(projectStage.$project.session.date).toStrictEqual({ $dateToString: { date: '$session.date' } });
+    });
+
     it('should match only the requested group in the aggregation, so a scoped export reads no other group', async () => {
       instrumentRecordModel.aggregateRaw.mockResolvedValueOnce([]);
 
