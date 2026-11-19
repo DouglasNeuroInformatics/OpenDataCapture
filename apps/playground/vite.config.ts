@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import runtime from '@opendatacapture/vite-plugin-runtime';
 import tailwindcss from '@tailwindcss/vite';
@@ -47,13 +47,13 @@ export default defineConfig(({ mode }) => ({
     __GITHUB_REPO_URL__: `'${process.env.GITHUB_REPO_URL ?? '#'}'`
   },
   optimizeDeps: {
+    exclude: ['@swc/wasm-web'],
+    include: ['react/*', 'react-dom/*'],
     rolldownOptions: {
       transform: {
         target: 'es2022'
       }
-    },
-    exclude: ['@swc/wasm-web'],
-    include: ['react/*', 'react-dom/*']
+    }
   },
   plugins: [
     playgroundConfig(),
@@ -75,6 +75,6 @@ export default defineConfig(({ mode }) => ({
     // connect. Browsers try both addresses for `localhost`, so this serves both names without
     // opening the server to the network the way `host: true` would.
     host: '127.0.0.1',
-    port: parseInt(process.env.PLAYGROUND_DEV_SERVER_PORT ?? '3750')
+    port: parseInt(process.env.PLAYGROUND_DEV_SERVER_PORT ?? '3750', 10)
   }
 }));

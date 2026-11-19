@@ -40,7 +40,8 @@
 6. **If the gateway reads it, add it to `apps/gateway/src/config.ts`.** That is a separate Zod schema
    parsing `process.env` at import time; `$Env` never reaches the gateway.
 
-7. **If a build reads it, add it to that task's `env` array in `turbo.json`.** Turbo runs in strict
+7. **If a build reads it, add it to the `env` array of that workspace's `build` task, in its own
+   `turbo.json`** (`apps/web/turbo.json` is the shape). Turbo runs in strict
    env mode: a task sees only `globalEnv` plus its own `env`, so the variable is `undefined` during
    `pnpm build` even though `env-cmd` loaded `.env` before turbo started. `dev`/`start`/`test` scripts
    load `.env` themselves (`env-cmd -f ../../.env`), so only build-time reads need this.
@@ -63,7 +64,7 @@
 ```sh
 grep -n YOUR_KEY .env    # present
 pnpm dev                 # $Env is validated at boot; an invalid value crashes here. Ctrl-C once up
-pnpm lint                # tsc + the no-process.env rule
+pnpm lint                # the type-check + the no-process.env rule
 pnpm test:coverage
 pnpm build               # only this catches a missing turbo.json `env` entry
 ```

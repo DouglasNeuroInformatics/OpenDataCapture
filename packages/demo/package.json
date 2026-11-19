@@ -7,10 +7,6 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "scripts": {
-    "format": "oxfmt src",
-    "lint": "tsc && oxlint --fix src"
-  },
   "dependencies": {
     "@douglasneuroinformatics/libjs": "catalog:",
     "@opendatacapture/schemas": "workspace:*"

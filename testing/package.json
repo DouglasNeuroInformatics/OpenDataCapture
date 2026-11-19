@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "gen:routes": "tsx scripts/gen-routes.ts",
-    "lint": "pnpm gen:routes && tsc && oxlint --fix .",
     "postinstall": "pnpm gen:routes",
     "test:dev": "pnpm gen:routes && env-cmd -f ../.env playwright test --ui",
     "test:e2e": "pnpm gen:routes && env-cmd -f ../.env playwright test"

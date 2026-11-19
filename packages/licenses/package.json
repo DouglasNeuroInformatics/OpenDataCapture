@@ -11,9 +11,5 @@
       "import": "./src/index.js"
     },
     "./package.json": "./package.json"
-  },
-  "scripts": {
-    "format": "oxfmt src",
-    "lint": "tsc && oxlint --fix src"
   }
 }

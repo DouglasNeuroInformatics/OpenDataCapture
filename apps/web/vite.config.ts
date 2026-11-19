@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 
 import { parseNumber } from '@douglasneuroinformatics/libjs';
 import importMetaEnv from '@import-meta-env/unplugin';
@@ -36,12 +36,12 @@ export default defineConfig(async ({ command }) => {
       __RELEASE__: JSON.stringify(await getReleaseInfo())
     },
     optimizeDeps: {
+      include: ['react/*', 'react-dom/*'],
       rolldownOptions: {
         transform: {
           target: 'es2022'
         }
-      },
-      include: ['react/*', 'react-dom/*']
+      }
     },
     plugins: [
       tanstackRouter({

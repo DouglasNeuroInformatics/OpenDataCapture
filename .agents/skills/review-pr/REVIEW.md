@@ -13,7 +13,7 @@ pnpm generate:env
 TURBO_CONCURRENCY=2 pnpm lint
 ```
 
-Review the merge result. PR refs exist only on the upstream repository, not on a fork, hence the URL rather than a remote name. If `refs/pull/<N>/merge` is missing, use `refs/pull/<N>/head` and say so in the evidence. Run `generate:env` inside the worktree and never copy the repo's `.env`, so `db:push` cannot touch the user's dev database. Keep `TURBO_CONCURRENCY=2`: three reviews share the user's machine.
+Review the merge result. PR refs exist only on the upstream repository, not on a fork, hence the URL rather than a remote name. If `refs/pull/<N>/merge` is missing, use `refs/pull/<N>/head` and say so in the evidence. Run `generate:env` inside the worktree and never copy the repo's `.env`, so the `db:push` that turbo's `dev`, `dev:test` and `test:e2e` run cannot touch the user's dev database. Keep `TURBO_CONCURRENCY=2`: three reviews share the user's machine.
 
 - `install` or `generate:env` fails → return BLOCKED (machine) and write nothing.
 - `lint` fails → return BLOCKED (PR) with the errors, and write a reply body to the scratchpad asking the author to update their branch against `main`, ending with `Reviewed at commit <headRefOid>.`

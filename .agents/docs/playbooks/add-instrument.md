@@ -65,5 +65,4 @@ pnpm test:e2e
 ```
 
 `available` listing your title under the right kind proves only that it built; it reaches a demo
-instance only through step 4. `pnpm lint` (`tsc`) needs `runtime/v1/dist`, which is why the build
-comes first.
+instance only through step 4.

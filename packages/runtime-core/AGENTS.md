@@ -27,8 +27,8 @@ testing a change anywhere else.
 `lib/constants.js`, not `dist/`**, and is the only way to reach `FILE_TYPES`, which `src/index.ts`
 does not re-export (`packages/schemas/src/instrument/instrument.file.ts` imports it),
 and `apps/outreach` points typedoc at `lib/index.d.ts` in `astro.config.ts`. Do not delete `lib/`
-from the build, and do not assume a turbo cache hit restores it — `turbo.json` declares
-`outputs: ["dist/**"]` only.
+from the build, or `lib/**` from the `outputs` in `packages/runtime-core/turbo.json`, which is what
+makes a turbo cache hit restore it.
 
 api-extractor reads TSDoc release tags, so a new export needs `/** @public */` (or `@internal` /
 `@alpha`) like its neighbours.
@@ -104,6 +104,5 @@ Two tiers, run by different tools.
   runtime-core source needs it in its `plugins`, as `packages/instrument-library` has.
 - **Types: `src/__tests__/define.test-d.ts` and `src/types/__tests__/instrument.form.test-d.ts`**,
   written with `expectTypeOf` from `expect-type` (a root devDependency). vitest does not collect
-  them; the `tsc --noEmit` half of `pnpm --filter @opendatacapture/runtime-core lint` checks them,
-  because `tsconfig.json` includes all of `src/`. A type change that breaks an assertion is a tsc
-  error — add type cases here rather than a runtime test.
+  them; the type-check in root `pnpm lint` checks them, because `tsconfig.json` includes all of
+  `src/`. A type change that breaks an assertion is a type error — add type cases here rather than a runtime test.

@@ -184,8 +184,7 @@ or `ValidObjectIdPipe` explicitly — see `src/audit/audit.controller.ts` and
 
 Provider is **MongoDB, so there are no migrations**. Nothing is checked in after a schema change
 beyond `schema.prisma` itself, and **nothing in this app runs `prisma db push`**. This workspace
-defines no `db:push` script, so the `db:push` that `dev`, `dev:test`, `lint` and `test:e2e` depend on
-resolves to nothing here; the only workspace that owns one is `apps/gateway`, whose datasource is
+defines no `db:push` script; the only workspace that owns one is `apps/gateway`, whose datasource is
 SQLite. The Dockerfile only builds.
 
 **Indexes are created at startup instead**, by `ensureDatabaseIndexes` in `src/core/prisma.ts`,

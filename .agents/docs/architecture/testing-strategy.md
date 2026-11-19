@@ -10,7 +10,7 @@ What is tested where, and what CI blocks a merge on. Writing an e2e test is
 | ---------- | ---------- | --------------------------------------------------------------------- | -------------------- |
 | Unit       | vitest     | `__tests__/<file>.test.ts` beside `<file>.ts`, or a package's `test/` | `pnpm test:coverage` |
 | End-to-end | Playwright | `testing/src/specs/`                                                  | `pnpm test:e2e`      |
-| Type-check | `tsc`      | code that fails to compile if the type breaks, e.g. `*.test-d.ts`     | `pnpm lint`          |
+| Type-check | oxlint     | code that fails to compile if the type breaks, e.g. `*.test-d.ts`     | `pnpm lint`          |
 
 **There is no integration tier.** `apps/api` unit tests mock the Prisma layer entirely, so Playwright
 is the only code path that touches a real database: a permissions or row-scoping change is untested
@@ -92,24 +92,38 @@ outside the project globs by design.
 
 ## `pnpm lint` is the type-check, and it edits files
 
-Per-package `lint` is `tsc && oxlint --fix src`; there is no separate `typecheck` script, so a type
-error surfaces as a lint failure and every run may rewrite the working tree. Exceptions:
+Root `lint:root` is `oxlint --type-check --fix`: one process lints every file in the repo and reports
+TypeScript's diagnostics for it, each file under its nearest `tsconfig.json`. No workspace has a `lint`
+script except `apps/outreach`, and there is no separate `typecheck` script, so a type error surfaces as
+a lint failure and every run may rewrite the working tree. To check part of the repo, pass a path:
+`pnpm exec oxlint --type-check apps/web`. What that pass does not cover:
 
-| Package                                                       | `lint`                                     |
-| ------------------------------------------------------------- | ------------------------------------------ |
-| `apps/outreach`                                               | `astro check && oxlint --fix src`          |
-| `packages/runtime-core`                                       | `tsc --noEmit && oxlint --fix src`         |
-| `packages/instrument-stubs`, `packages/instrument-guidelines` | oxlint only — **no `tsc`**                 |
-| `testing`                                                     | `pnpm gen:routes && tsc && oxlint --fix .` |
-| `runtime/v1`                                                  | **none**, so never type-checked            |
+| Files                                                             | Checked by                                                                           |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `.astro` templates                                                | `apps/outreach`'s `lint`, which is `astro check`                                     |
+| `vendor/**`, `packages/runtime-bundler/test/fixtures/**`          | nothing: `ignorePatterns` in `oxlint.config.ts`                                      |
+| `packages/instrument-stubs`, `packages/instrument-guidelines/bin` | linted, but neither has a `tsconfig.json`, so the repo's strict options do not apply |
 
 ## Turbo task graph
 
-`lint`, `dev`, `dev:test` and `test:e2e` depend on `["^build", "^db:generate", "db:push"]`; `build`
-on `["^build", "db:generate"]`. `test:e2e` is `cache: false`. **`test` is not a turbo task**: root
-`pnpm test` is `env-cmd vitest`, with no build and no database. `globalDependencies` (`.env`,
-`oxfmt.config.ts`, `oxlint.config.ts`, `packages/oxlint-config/src/**`, `tsconfig.json`) invalidate
-every cached task when touched.
+`pnpm lint` is `turbo run lint lint:root`. `//#lint:root` depends on `//#generated`, a task with no
+script that names what a tool run over the whole repo reads and source control does not hold: both
+Prisma clients, `testing`'s route types, and `instrument-library`'s build, which reaches `runtime-v1`
+and `runtime-core` through `^build`. `test:e2e` depends on the same task, the gateway's `db:push`, and
+`^build`, which builds the `playground-url` CLI that `testing/src/specs/playground.spec.ts` runs.
+`dev` and `dev:test` depend on `["^build", "db:generate"]`, to which `apps/gateway/turbo.json` adds
+`db:push`; `build` depends on `["^build", "db:generate"]` and `start` on `build`. `dev`, `dev:test`,
+`start`, `test:e2e` and `db:push` are `cache: false`. A workspace whose task differs from the root
+definition says so in its own `turbo.json` (`git ls-files '*turbo.json'` lists them).
+
+**`test` is not a turbo task**: root `pnpm test` runs `pnpm build:exports`, which builds the packages
+that export only build output, and then `env-cmd vitest`, with no database.
+
+**A task sees a variable only through `env`.** `.env` is not a `globalDependency`, so editing it
+invalidates nothing; `pnpm build` loads it with `env-cmd` and turbo passes on the keys a task declares.
+Root `tsconfig.json` is the one `globalDependency`, and turbo adds `packages/oxlint-config` to every
+task's hash because the root `package.json` depends on it. `build` hashes neither `*.md` nor
+`__tests__/`, so editing an `AGENTS.md` or a unit test rebuilds nothing downstream.
 
 ## Coverage scope
 
@@ -124,7 +138,9 @@ counts their functions twice in the merged report.
 `.github/workflows/ci.yaml`, one job, on `pull_request` to `main` or a `release/**` branch and
 `workflow_dispatch` only — a push alone runs nothing. In order: `./scripts/generate-env.sh`, `pnpm install --frozen-lockfile`,
 `pnpm lint`, `pnpm test:coverage`, Playwright install (chromium + firefox, capped at 10 minutes, after
-lint and unit tests so a hung download cannot hide them), `pnpm test:e2e`.
+lint and unit tests so a hung download cannot hide them), `pnpm test:e2e`. `actions/cache` restores
+`.turbo/cache` before the first of them: a pull request reads the caches its own earlier runs saved
+and the one the Release workflow's `validate` job last saved on its base branch.
 
 Not gated: knip (`pnpm knip` exists), and formatting — oxfmt runs only in the `.husky/pre-commit`
 hook, which formats rather than verifies.
@@ -147,5 +163,5 @@ Flag these rather than fixing them in passing; each is load-bearing somewhere.
 
 - `turbo.json` declares `db:generate` `outputs: ["node_modules/@prisma/generated-client/**"]`, which
   matches only `apps/gateway`'s schema; `apps/api/prisma/schema.prisma` has its `output` commented
-  out, so `@opendatacapture/api#db:generate` is `cache: false` to stop a cache hit restoring nothing.
-  Changing either half changes what `db:generate` produces.
+  out, so `apps/api/turbo.json` sets its `db:generate` to `cache: false` to stop a cache hit restoring
+  nothing. Changing either half changes what `db:generate` produces.

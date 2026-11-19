@@ -64,10 +64,7 @@ done; `apps/web`'s until step 9.
 ## Verify
 
 ```sh
-pnpm --filter @opendatacapture/react-core lint      # an unresolved `@/…` here means step 6 is unfinished
-pnpm --filter @opendatacapture/web lint
-pnpm --filter @opendatacapture/gateway lint         # meaningful only once step 9 wired the consumer
-pnpm lint && pnpm test:coverage
+pnpm lint && pnpm test:coverage   # an unresolved `@/…` in packages/react-core means step 6 is unfinished
 pnpm test:e2e
 pnpm --filter @opendatacapture/storybook storybook  # listed under React Core; prerequisites in storybook/AGENTS.md
 ```

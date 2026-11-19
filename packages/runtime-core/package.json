@@ -20,8 +20,6 @@
     "build": "rm -rf dist lib && pnpm build:lib && pnpm build:dist",
     "build:dist": "pnpm exec esbuild --bundle --format=esm --target=es2020 --outfile=dist/index.js --platform=browser lib/index.js && api-extractor run -c config/api-extractor.json",
     "build:lib": "tsc -b tsconfig.build.json",
-    "format": "oxfmt src",
-    "lint": "tsc --noEmit && oxlint --fix src",
     "test": "vitest"
   },
   "dependencies": {

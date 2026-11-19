@@ -153,4 +153,4 @@ libui's `t()` needs an initialised i18n, which no app supplies here — call
 `@testing-library/user-event` are **not** installed: assert with `toBeTruthy()`, interact with
 `fireEvent`.
 
-`pnpm --filter @opendatacapture/react-core lint` runs `tsc` then oxlint.
+Root `pnpm lint` type-checks and lints this package; it has no `lint` script of its own.

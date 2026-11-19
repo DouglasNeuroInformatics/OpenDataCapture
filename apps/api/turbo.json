@@ -1,0 +1,14 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    // release-info reads the version a production build embeds from the root package.json
+    "build": {
+      "inputs": ["$TURBO_EXTENDS$", "$TURBO_ROOT$/package.json"]
+    },
+    // prisma/schema.prisma sets no output, so the client lands in pnpm's store, outside what turbo can restore
+    "db:generate": {
+      "cache": false
+    }
+  }
+}

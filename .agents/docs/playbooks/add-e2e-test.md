@@ -44,7 +44,7 @@ starting — `playwright.config.ts` boots api, gateway, web and playground itsel
 ## Verify
 
 ```sh
-pnpm --filter @opendatacapture/testing lint                                      # gen:routes, tsc, oxlint .
+pnpm lint                                                                        # gen:routes, then the whole-repo type-check and lint
 pnpm --filter @opendatacapture/testing test:e2e --list src/specs/<flow>.spec.ts  # your titles, under [chromium]
 pnpm --filter @opendatacapture/testing test:e2e src/specs/<flow>.spec.ts         # one spec; setup still runs
 pnpm test:e2e                                                                    # whole suite, from repo root

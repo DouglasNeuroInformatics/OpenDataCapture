@@ -178,7 +178,7 @@ The editor/preview split in `src/components/MainContent/MainContent.tsx` gives e
 
 `__APP_VERSION__` and `__GITHUB_REPO_URL__` are the build-time defines, declared in
 `src/vite-env.d.ts` and supplied in `vite.config.ts`; `GITHUB_REPO_URL` must be listed under the
-`build` task's `env` in `turbo.json` or turbo's strict env mode hides it from the build. Anything
+`build` task's `env` in `apps/playground/turbo.json` or turbo's strict env mode hides it from the build. Anything
 that differs between deployments belongs in `/config.json` instead.
 
 ## Tests

@@ -16,6 +16,7 @@ const { execMock, gitResult } = vi.hoisted(() => {
 
 vi.mock('child_process', () => ({ default: { exec: execMock } }));
 
+import rootPackage from '../../../../package.json' with { type: 'json' };
 import { getReleaseInfo } from '../index';
 
 function mockGit(branch: { stderr: string; stdout: string }, commit: { stderr: string; stdout: string }) {
@@ -54,12 +55,16 @@ describe('getReleaseInfo', () => {
       vi.stubEnv('NODE_ENV', 'production');
       vi.spyOn(console, 'error').mockImplementation(() => undefined);
     });
+    it("should take the root package.json version if 'RELEASE_VERSION' is unset, so a production build works outside the release pipeline", async () => {
+      vi.stubEnv('RELEASE_VERSION', undefined);
+      await expect(getReleaseInfo()).resolves.toMatchObject({
+        type: 'production',
+        version: rootPackage.version
+      });
+    });
     // A schema failure must surface as the caller-facing "Failed to parse release info" error, not
     // as a raw ZodError: `getReleaseInfo` only converts it if the rejection is awaited inside its
     // own try block, so asserting on the message is what pins the conversion in place.
-    it("should throw a parse error naming the environment if 'RELEASE_VERSION' is undefined", async () => {
-      await expect(getReleaseInfo()).rejects.toThrow("Failed to parse release info for environment 'production'");
-    });
     it("should throw a parse error naming the environment if 'RELEASE_VERSION' is invalid", async () => {
       vi.stubEnv('RELEASE_VERSION', 'foo');
       await expect(getReleaseInfo()).rejects.toThrow("Failed to parse release info for environment 'production'");

@@ -1,7 +1,7 @@
-import * as fs from 'fs/promises';
-import * as os from 'os';
-import * as path from 'path';
-import { pathToFileURL } from 'url';
+import * as fs from 'node:fs/promises';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 

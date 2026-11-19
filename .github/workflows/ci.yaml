@@ -8,6 +8,9 @@ permissions:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    env:
+      # Each run saves the entries it restored plus its own, so without a limit the cache only grows.
+      TURBO_CACHE_MAX_AGE: 7d
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -26,6 +29,15 @@ jobs:
           git config --global --add safe.directory /__w/OpenDataCapture/OpenDataCapture
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+      # A pull request reads the caches of its own earlier runs and the one the Release workflow last
+      # saved on its base branch, so a run repeats only the turbo tasks whose inputs changed.
+      - name: Restore Turbo Cache
+        uses: actions/cache@v6
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
       # Run lint and unit tests before the (occasionally flaky) Playwright install so those results
       # aren't blocked by a hung browser download.
       - name: Lint

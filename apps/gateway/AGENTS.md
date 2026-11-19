@@ -79,8 +79,8 @@ Neither is a record of something that happened here — one is a short-lived gat
 state `apps/api` owns — so persisting either would only add a second copy that can disagree.
 
 `GATEWAY_DATABASE_URL` is an absolute `file:` URL written by `pnpm generate:env`. Turbo runs
-`db:push` before `dev`, `lint`, `test:e2e` and — via the `@opendatacapture/gateway#build` key in
-`turbo.json` — before `build`, so a gateway build needs `GATEWAY_DATABASE_URL` set.
+`db:push` before `dev`, `dev:test` and `test:e2e` (`apps/gateway/turbo.json`). `build` and `pnpm lint`
+need only the generated client, so neither reads `GATEWAY_DATABASE_URL`.
 
 **A deployed gateway applies this schema on every start.** `scripts/run.sh` runs `prisma db push`
 before the server, with a Prisma CLI the `Dockerfile` installs at the version the lockfile resolved.

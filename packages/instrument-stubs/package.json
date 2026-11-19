@@ -11,8 +11,6 @@
     "./series": "./src/series.js"
   },
   "scripts": {
-    "format": "oxfmt src",
-    "lint": "oxlint --fix src",
     "test": "vitest"
   },
   "dependencies": {

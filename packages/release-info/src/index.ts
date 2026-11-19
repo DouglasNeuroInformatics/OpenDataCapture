@@ -28,6 +28,12 @@ async function getGitCommit() {
   return stdout.trim();
 }
 
+async function getRootPackageVersion() {
+  const content = await fs.readFile(path.resolve(import.meta.dirname, '../../../package.json'), 'utf-8');
+  const { version } = JSON.parse(content) as PackageJson;
+  return version!;
+}
+
 export async function getReleaseInfo(): Promise<ReleaseInfo> {
   try {
     if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
@@ -36,16 +42,13 @@ export async function getReleaseInfo(): Promise<ReleaseInfo> {
         buildTime: Date.now(),
         commit: await getGitCommit(),
         type: process.env.NODE_ENV,
-        version: await fs
-          .readFile(path.resolve(import.meta.dirname, '../../../package.json'), 'utf-8')
-          .then((content) => JSON.parse(content) as PackageJson)
-          .then(({ version }) => version!)
+        version: await getRootPackageVersion()
       } satisfies DevelopmentReleaseInfo);
     } else if (process.env.NODE_ENV === 'production') {
       return await $ProductionReleaseInfo.parseAsync({
         buildTime: Date.now(),
         type: 'production',
-        version: process.env.RELEASE_VERSION!
+        version: process.env.RELEASE_VERSION ?? (await getRootPackageVersion())
       } satisfies ProductionReleaseInfo);
     } else {
       throw new Error(`Unexpected value for process.env.NODE_ENV: ${process.env.NODE_ENV}`);

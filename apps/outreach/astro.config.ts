@@ -1,6 +1,6 @@
-import fs from 'fs';
-import module from 'module';
-import path from 'path';
+import fs from 'node:fs';
+import module from 'node:module';
+import path from 'node:path';
 
 import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
@@ -126,7 +126,7 @@ export default defineConfig({
         return function (tree, { data }) {
           const textOnPage = toString(tree);
           const readingTime = getReadingTime(textOnPage);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- remark types `data` as an open record, and Astro documents `astro.frontmatter` without typing it
           (data.astro as any).frontmatter.readingTime = readingTime.minutes;
         };
       }
@@ -140,7 +140,7 @@ export default defineConfig({
     '/fr/docs': '/fr/docs/introduction/home'
   },
   server: {
-    port: parseInt(process.env.OUTREACH_DEV_SERVER_PORT ?? '4000')
+    port: parseInt(process.env.OUTREACH_DEV_SERVER_PORT ?? '4000', 10)
   },
   site: 'https://opendatacapture.org',
   vite: {

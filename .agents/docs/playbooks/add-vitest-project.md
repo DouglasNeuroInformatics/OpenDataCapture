@@ -75,9 +75,6 @@ project, so its test files are collected by nothing and CI stays green. The loud
 ```sh
 pnpm exec vitest list --filesOnly --project <name>   # your file, prefixed [<name>], nothing from outside
 pnpm exec vitest --project <name>
-pnpm lint                                            # from the root; tsc now checks vitest.config.ts
+pnpm lint                                            # now type-checks vitest.config.ts
 pnpm test                                            # the repo-wide file count rises by yours
 ```
-
-Run `pnpm lint` from the root: a package-scoped `lint` skips turbo's `^build` ordering and fails on
-unbuilt dependencies rather than on your config.

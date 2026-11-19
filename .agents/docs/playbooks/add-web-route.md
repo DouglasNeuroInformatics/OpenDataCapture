@@ -56,7 +56,7 @@ run the generator.
    Until then `pnpm lint` fails in two workspaces: TS2345 in `apps/web`, and in `testing`, whose
    `gen:routes` derives the `RouteTo` union from that tree, so your literal is not yet a valid
    `pageModels` key. `gen:routes` reads `route-tree.ts` and never writes it, so it is yours to run
-   (`pnpm --filter @opendatacapture/testing gen:routes`); `testing`'s `lint` and `test:e2e` also run
+   (`pnpm --filter @opendatacapture/testing gen:routes`); `pnpm lint` and `testing`'s `test:e2e` also run
    it first.
 
 10. **Add the tests.** A unit test named after the route file, in a `__tests__/` folder beside it
@@ -66,7 +66,7 @@ run the generator.
 ## Verify
 
 ```sh
-pnpm --filter @opendatacapture/web lint   # TS2345 on your literal alone means the tree is not regenerated yet
+pnpm lint                         # TS2345 on your literal alone means the tree is not regenerated yet
 pnpm exec vitest --project web
 pnpm test:e2e
 ```

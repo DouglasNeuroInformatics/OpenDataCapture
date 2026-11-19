@@ -31,8 +31,8 @@ oxlint error repo-wide.
 
 ## Types
 
-There is **no `tsconfig.json`** and `lint` is `oxlint --fix src` with no `tsc`. Shapes are asserted
-with JSDoc `@type` annotations that nothing in this package checks — a wrong stub surfaces as a
+There is **no `tsconfig.json`**, so root `pnpm lint` lints this package without type-checking it.
+Shapes are asserted with JSDoc `@type` annotations that nothing in this package checks — a wrong stub surfaces as a
 failing `packages/schemas` test or a consumer's `tsc` error.
 
 ## Tests

@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 
-/* eslint-disable no-console */
+/* eslint-disable no-console -- a CLI whose output is the list it prints */
 
-import fs from 'fs/promises';
-import path from 'path';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 import type { AnyInstrument, InstrumentKind } from '@opendatacapture/runtime-v1/@opendatacapture/runtime-core/index.js';
 
