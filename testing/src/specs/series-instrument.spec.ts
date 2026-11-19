@@ -94,6 +94,12 @@ test.describe('series instrument', () => {
     page,
     uniqueId
   }) => {
+    const errors: string[] = [];
+    page.on('console', (message) => {
+      if (message.type() === 'error') {
+        errors.push(message.text());
+      }
+    });
     const instrumentPage = await openSeries({ getPageModel, page, uniqueId });
     await instrumentPage.begin();
     await instrumentPage.completeHappinessQuestionnaire();
@@ -118,6 +124,7 @@ test.describe('series instrument', () => {
     // Each item is stored under its own instrument, so one pass through the series leaves two
     // records rather than one.
     await expect(page.getByTestId('data-table-body').getByTestId('data-table-row')).toHaveCount(2);
+    expect(errors.filter((error) => error.includes("reading 'kind'"))).toStrictEqual([]);
   });
 
   // A skipProgress series has no interstitial screen, so the bar on each item's form is the only

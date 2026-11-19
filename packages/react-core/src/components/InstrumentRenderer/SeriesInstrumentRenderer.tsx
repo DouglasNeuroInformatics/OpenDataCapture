@@ -67,7 +67,7 @@ export const SeriesInstrumentRenderer = ({
   const scalarId = target.items[currentItemIndex]?.id;
 
   const rootState = useInterpretedInstrument<UnilingualSeriesInstrument>(target.bundle);
-  const scalarState = useInterpretedInstrument<AnyUnilingualScalarInstrument>(scalarBundle ?? '');
+  const scalarState = useInterpretedInstrument<AnyUnilingualScalarInstrument>(scalarBundle ?? null);
 
   const [isInstrumentInProgress, setIsInstrumentInProgress] = useState(false);
   const [completion, setCompletion] = useState<null | { itemName?: string; terminated: boolean }>(null);
