@@ -23,19 +23,6 @@ describe('SessionsController', () => {
     sessionsService = moduleRef.get(SessionsService);
   });
 
-  it('should create a session with the caller ability, so the group and user are looked up within it', async () => {
-    const data = {
-      date: new Date('2024-01-01T00:00:00.000Z'),
-      groupId: 'group-1',
-      subjectData: { id: 'subject-1' },
-      type: 'IN_PERSON' as const
-    };
-    sessionsService.create.mockResolvedValue({ id: 'session-1' });
-
-    await expect(sessionsController.create(data, ability)).resolves.toEqual({ id: 'session-1' });
-    expect(sessionsService.create).toHaveBeenCalledWith(data, { ability });
-  });
-
   it('should list the requested group sessions within what the caller may read', async () => {
     const sessions = [{ id: 'session-1' }];
     sessionsService.findAllIncludeUsernames.mockResolvedValue(sessions);

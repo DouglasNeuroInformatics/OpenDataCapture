@@ -12,16 +12,26 @@ import '@/services/i18n';
 
 type DeleteCallbacks = { onSettled: () => void; onSuccess: () => void };
 
+type Loader = (ctx: {
+  context: { queryClient: { fetchQuery: (options: object) => Promise<unknown> } };
+}) => Promise<void>;
+
 const mocks = vi.hoisted(() => ({
   changeGroup: vi.fn(),
   createMutateAsync: vi.fn(),
   deleteMutate: vi.fn(),
+  /** The group as `GET /v1/groups/:id` returns it; the store's copy dates from sign-in. */
+  fetchedGroup: undefined as Group | undefined,
   instruments: undefined as TranslatedInstrumentInfo[] | undefined,
   isDemo: false,
   store: { currentGroup: null as Group | null },
   updateMutateAsync: vi.fn<(data: Partial<$UpdateGroupData>) => Promise<Group>>()
 }));
 
+vi.mock('@/hooks/useGroupQuery', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/useGroupQuery')>()),
+  useGroupQuery: (groupId: null | string | undefined) => ({ data: groupId ? mocks.fetchedGroup : undefined })
+}));
 vi.mock('@/hooks/useInstrumentInfoQuery', () => ({
   useInstrumentInfoQuery: () => ({ data: mocks.instruments })
 }));
@@ -38,11 +48,12 @@ vi.mock('@/hooks/useUpdateGroupMutation', () => ({
   useUpdateGroupMutation: () => ({ mutateAsync: mocks.updateMutateAsync })
 }));
 vi.mock('@/store', () => ({
-  useAppStore: (
-    selector: (store: { changeGroup: typeof mocks.changeGroup; currentGroup: Group | null }) => unknown
-  ) => {
-    return selector({ changeGroup: mocks.changeGroup, currentGroup: mocks.store.currentGroup });
-  }
+  useAppStore: Object.assign(
+    (selector: (store: { changeGroup: typeof mocks.changeGroup; currentGroup: Group | null }) => unknown) => {
+      return selector({ changeGroup: mocks.changeGroup, currentGroup: mocks.store.currentGroup });
+    },
+    { getState: () => ({ currentGroup: mocks.store.currentGroup }) }
+  )
 }));
 vi.mock('@/components/LoadingFallback', () => ({
   LoadingFallback: () => <div data-testid="loading-fallback" />
@@ -65,14 +76,18 @@ vi.mock('@/components/InstrumentPreviewDialog', () => ({
 
 const scalar = ({
   createdAt = null,
+  edition = 1,
   id,
   kind = 'FORM',
+  name = id,
   sourceRepo = null,
   title
 }: {
   createdAt?: Date | null;
+  edition?: number;
   id: string;
   kind?: 'FILE' | 'FORM' | 'INTERACTIVE';
+  name?: string;
   sourceRepo?: null | { id: string; name: null | string };
   title: string;
 }): TranslatedInstrumentInfo => ({
@@ -80,7 +95,7 @@ const scalar = ({
   createdAt,
   details: { authors: null, description: `${title} description`, license: 'MIT', title },
   id,
-  internal: { edition: 1, name: id },
+  internal: { edition, name },
   kind,
   language: 'en',
   sourceRepo,
@@ -139,7 +154,13 @@ const defaultInstruments = () => [
 
 const RouteComponent = Route.options.component!;
 
-const renderPage = () => render(<RouteComponent />);
+const loader = Route.options.loader as Loader;
+
+/** Renders with the server holding the same group as the store, unless a test says otherwise. */
+const renderPage = () => {
+  mocks.fetchedGroup ??= mocks.store.currentGroup ?? undefined;
+  return render(<RouteComponent />);
+};
 
 const rerenderPage = (rerender: (ui: ReactNode) => void) => rerender(<RouteComponent />);
 
@@ -175,6 +196,7 @@ const resolveCreate = (result: CreateSeriesInstrumentResult) => mocks.createMuta
 describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.fetchedGroup = undefined;
     mocks.instruments = defaultInstruments();
     mocks.isDemo = false;
     mocks.store.currentGroup = makeGroup();
@@ -194,6 +216,13 @@ describe('Route', () => {
     it('should show a loading fallback until the instrument info has loaded', () => {
       mocks.instruments = undefined;
       renderPage();
+      expect(screen.getByTestId('loading-fallback')).toBeTruthy();
+      expect(screen.queryByText('Accessible Instruments')).toBeNull();
+    });
+
+    it('should show a loading fallback until the group has been read from the server', () => {
+      mocks.fetchedGroup = undefined;
+      render(<RouteComponent />);
       expect(screen.getByTestId('loading-fallback')).toBeTruthy();
       expect(screen.queryByText('Accessible Instruments')).toBeNull();
     });
@@ -640,6 +669,7 @@ describe('Route', () => {
             idValidationRegex: '^[0-9]+$',
             idValidationRegexErrorMessage: { en: 'Digits only', fr: 'Chiffres seulement' },
             minimumAge: 18,
+            sessionInstrumentId: null,
             subjectIdDisplayLength: 6
           }
         })
@@ -675,6 +705,96 @@ describe('Route', () => {
     it('should not ask for custom validation messages without a validation pattern', () => {
       renderPage();
       expect(screen.queryByText('Custom ID Validation Message (English)')).toBeNull();
+    });
+  });
+
+  describe('session instrument', () => {
+    const requiring = (sessionInstrumentId: string) => {
+      return makeGroup({ settings: { defaultIdentificationMethod: 'CUSTOM_ID', sessionInstrumentId } });
+    };
+
+    const sessionInstrumentOptions = () => {
+      const select = document.querySelector<HTMLSelectElement>('select[name="sessionInstrumentId"]')!;
+      return Array.from(select.options, (option) => option.textContent).filter(Boolean);
+    };
+
+    const savedSessionInstrumentId = () => mocks.updateMutateAsync.mock.lastCall?.[0].settings?.sessionInstrumentId;
+
+    it('should save no session instrument for a group that requires none', async () => {
+      renderPage();
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(savedSessionInstrumentId()).toBeNull();
+    });
+
+    it('should keep the session instrument the group requires', async () => {
+      mocks.store.currentGroup = requiring('form-1');
+      renderPage();
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(savedSessionInstrumentId()).toBe('form-1');
+    });
+
+    it('should offer only the forms the group has selected, since only those can be required', () => {
+      renderPage();
+      expect(sessionInstrumentOptions()).toEqual(['None', 'Happiness Questionnaire']);
+      fireEvent.click(checkbox('Breakfast Survey'));
+      expect(sessionInstrumentOptions()).toEqual(['None', 'Happiness Questionnaire', 'Breakfast Survey']);
+    });
+
+    it('should tell two forms with the same title apart by their names', () => {
+      mocks.instruments = [
+        ...defaultInstruments(),
+        scalar({ id: 'form-3', name: 'HAPPINESS_SHORT', title: 'Happiness Questionnaire' })
+      ];
+      mocks.store.currentGroup = makeGroup({ accessibleInstrumentIds: ['form-1', 'form-3'] });
+      renderPage();
+      expect(sessionInstrumentOptions()).toEqual([
+        'None',
+        'Happiness Questionnaire (form-1)',
+        'Happiness Questionnaire (HAPPINESS_SHORT)'
+      ]);
+    });
+
+    it('should seed the setting from the group the server holds, so a save cannot undo a change made since sign-in', async () => {
+      mocks.store.currentGroup = makeGroup();
+      mocks.fetchedGroup = requiring('form-1');
+      renderPage();
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(savedSessionInstrumentId()).toBe('form-1');
+    });
+
+    it('should refuse to save once the session instrument is no longer selected, rather than lose the group access to it', async () => {
+      mocks.store.currentGroup = requiring('form-1');
+      renderPage();
+      fireEvent.click(checkbox('Happiness Questionnaire'));
+      submitSettings();
+      expect(await screen.findByText(/The session instrument must be one of the group's instruments/)).toBeTruthy();
+      expect(mocks.updateMutateAsync).not.toHaveBeenCalled();
+    });
+
+    it('should accept a session instrument the list does not display but the group can still access', async () => {
+      mocks.store.currentGroup = requiring('missing-1');
+      renderPage();
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(savedSessionInstrumentId()).toBe('missing-1');
+    });
+  });
+
+  describe('loader', () => {
+    it('should fetch the current group even when it is cached, since the form saves every setting it is seeded with', async () => {
+      const fetchQuery = vi.fn(() => Promise.resolve());
+      await loader({ context: { queryClient: { fetchQuery } } });
+      expect(fetchQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['group', 'group-1'] }));
+    });
+
+    it('should fetch nothing when no group is selected', async () => {
+      mocks.store.currentGroup = null;
+      const fetchQuery = vi.fn(() => Promise.resolve());
+      await loader({ context: { queryClient: { fetchQuery } } });
+      expect(fetchQuery).not.toHaveBeenCalled();
     });
   });
 });

@@ -80,6 +80,10 @@ The default Standard User role does not see Manage Group.
 
     Choose the default identification method and configure the ID validation pattern and validation messages.
 
+6.  **Choose a session instrument, if any**
+
+    A group can require one form to be completed as part of starting every session. Set **Session Instrument** to that form, or to **None**. Only a form the group can access can be chosen, and it must stay accessible while it is the session instrument. When an administrator uploads a new edition of the form, the group requires the new edition.
+
 </Steps>
 
 ## Start a Session
@@ -102,7 +106,11 @@ Use **Start Session** to begin work with a subject.
 
     Use an in-person session for new data collection; it is dated when it starts. Use a retrospective session when entering data that was collected earlier using another system, and enter the date and time the data was collected.
 
-4.  **Confirm the session is active**
+4.  **Complete the session instrument, if the group has one**
+
+    When the group requires a session instrument, it opens once the session details are submitted. The session starts only when the form is submitted, and its answers are saved as a record of the session. **Back** returns to the session details; leaving saves nothing.
+
+5.  **Confirm the session is active**
 
     After the session starts, ODC shows the active session in the sidebar.
 

@@ -192,6 +192,14 @@ describe('SubjectsService', () => {
     });
   });
 
+  describe('exists', () => {
+    it('should look the id up in every group, so a subject the caller cannot read still counts', async () => {
+      subjectModel.exists.mockResolvedValueOnce(true);
+      await expect(subjectsService.exists('subject-1')).resolves.toBe(true);
+      expect(subjectModel.exists).toHaveBeenCalledWith({ id: 'subject-1' });
+    });
+  });
+
   describe('find', () => {
     it('should return the array returned by the subject model', async () => {
       subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);

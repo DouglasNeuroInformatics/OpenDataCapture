@@ -16,6 +16,7 @@ import { MailModule } from './mail/mail.module';
 import { PermissionSetsModule } from './permission-sets/permission-sets.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { SetupModule } from './setup/setup.module';
+import { StartSessionModule } from './start-session/start-session.module';
 import { StorageModule } from './storage/storage.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { SummaryModule } from './summary/summary.module';
@@ -79,6 +80,7 @@ export default AppFactory.create({
     }),
     SessionsModule,
     SetupModule,
+    StartSessionModule,
     StorageModule,
     SubjectsModule,
     SummaryModule,

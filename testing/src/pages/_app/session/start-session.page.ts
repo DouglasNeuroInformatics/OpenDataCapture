@@ -8,6 +8,10 @@ export class StartSessionPage extends AppPage {
   readonly pageHeader: Locator;
   readonly selectField: Locator;
   readonly sessionForm: Locator;
+  /** Returns from the group's session instrument to the session details. */
+  readonly sessionInstrumentBackButton: Locator;
+  /** The form a group requires as part of starting a session, shown once the details are submitted. */
+  readonly sessionInstrumentStep: Locator;
   /** The hidden native select that carries the value; `sexTrigger` is the control a user sees. */
   readonly sexField: Locator;
   readonly sexTrigger: Locator;
@@ -20,6 +24,8 @@ export class StartSessionPage extends AppPage {
     super(page);
     this.pageHeader = page.getByTestId('page-header');
     this.sessionForm = page.getByTestId('start-session-form');
+    this.sessionInstrumentBackButton = page.getByTestId('session-instrument-back');
+    this.sessionInstrumentStep = page.getByTestId('session-instrument-step');
     this.selectField = page.locator('[name="subjectIdentificationMethod"]');
     this.successMessage = page.getByRole('heading', { name: 'Session Successfully Started' });
     this.errorMessages = page.getByTestId('error-message-text');

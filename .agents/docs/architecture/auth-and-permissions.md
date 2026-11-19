@@ -50,6 +50,10 @@ route.
 `ADMIN_ONLY` guard; and `InstrumentsService.findBundleById` called without a `currentUser`, which the
 API's gateway module does to resolve an assignment's bundle. That parameter is optional for this
 reason, so a new call site that omits it compiles and reads every group's instruments.
+`StartSessionService` rolls back unscoped: when the record of a session instrument fails to save,
+it deletes the session it just created and, if `SubjectsService.exists` (a boolean, unscoped
+because a scoped lookup would miss a subject in another group) found no subject beforehand, the
+subject too. `SessionsService.createMany` rolls back the same way.
 
 ## Layer 2: row scoping
 

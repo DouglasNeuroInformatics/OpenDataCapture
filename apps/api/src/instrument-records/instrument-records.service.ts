@@ -15,7 +15,7 @@ import {
   UnprocessableEntityException
 } from '@nestjs/common';
 import { translateInstrument } from '@opendatacapture/instrument-utils';
-import type { Json, ScalarInstrument } from '@opendatacapture/runtime-core';
+import type { FormInstrument, InstrumentValidationSchema, Json, ScalarInstrument } from '@opendatacapture/runtime-core';
 import type {
   CreateInstrumentRecordData,
   InstrumentRecord,
@@ -141,15 +141,7 @@ export class InstrumentRecordsService {
     await this.subjectsService.findById(subjectId);
     await this.sessionsService.findById(sessionId);
 
-    const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
-    if (!parseResult.success) {
-      throw new UnprocessableEntityException({
-        error: 'Unprocessable Entity',
-        issues: parseResult.error.issues,
-        message: `Data received for record does not pass validation schema of instrument '${instrument.id}'`,
-        statusCode: 422
-      });
-    }
+    const data = this.parseData(instrument, rawData);
 
     return this.instrumentRecordModel.create({
       data: {
@@ -159,9 +151,9 @@ export class InstrumentRecordsService {
             }
           : undefined,
         computedMeasures: instrument.measures
-          ? this.instrumentMeasuresService.computeMeasures(instrument.measures, parseResult.data)
+          ? this.instrumentMeasuresService.computeMeasures(instrument.measures, data)
           : null,
-        data: this.serializeData(parseResult.data),
+        data: this.serializeData(data),
         date,
         group: groupId
           ? {
@@ -408,6 +400,26 @@ export class InstrumentRecordsService {
       results[measure] = linearRegression(new Float64Array(data[measure]![0]), new Float64Array(data[measure]![1]));
     }
     return results;
+  }
+
+  /** Throws exactly as `create` does for data the instrument's schema rejects. */
+  parseData(
+    instrument: {
+      id: string;
+      validationSchema: InstrumentValidationSchema<FormInstrument.Data> | InstrumentValidationSchema<Json>;
+    },
+    rawData: unknown
+  ) {
+    const parseResult = instrument.validationSchema.safeParse(this.parseJson(rawData));
+    if (!parseResult.success) {
+      throw new UnprocessableEntityException({
+        error: 'Unprocessable Entity',
+        issues: parseResult.error.issues,
+        message: `Data received for record does not pass validation schema of instrument '${instrument.id}'`,
+        statusCode: 422
+      });
+    }
+    return parseResult.data;
   }
 
   /**

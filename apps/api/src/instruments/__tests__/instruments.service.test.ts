@@ -728,6 +728,38 @@ describe('InstrumentsService', () => {
         where: { accessibleInstrumentIds: { has: 'hash:REACTION_TIME-1' } }
       });
     });
+
+    it('should require a new edition of a form at the start of a session wherever the previous edition was required', async () => {
+      virtualizationService.eval.mockReturnValue(okAsync(formInstance('INTAKE', 2)));
+      instrumentModel.exists.mockResolvedValue(false);
+
+      await instrumentsService.create({ bundle: '__BUNDLE__' });
+
+      expect(groupModel.updateMany).toHaveBeenCalledWith({
+        data: { settings: { update: { sessionInstrumentId: 'hash:INTAKE-2' } } },
+        where: { settings: { is: { sessionInstrumentId: 'hash:INTAKE-1' } } }
+      });
+    });
+
+    it('should leave every group on the previous edition when the new one fails to save, so none requires a missing form', async () => {
+      virtualizationService.eval.mockReturnValue(okAsync(formInstance('INTAKE', 2)));
+      instrumentModel.exists.mockResolvedValue(false);
+      instrumentModel.create.mockRejectedValueOnce(new Error('connection reset'));
+
+      await expect(instrumentsService.create({ bundle: '__BUNDLE__' })).rejects.toThrowError('connection reset');
+      expect(groupModel.updateMany).not.toHaveBeenCalled();
+    });
+
+    it('should leave a session instrument on its edition when the new edition is not a form, since only a form can be required', async () => {
+      virtualizationService.eval.mockReturnValue(
+        okAsync({ ...interactiveInstrument, internal: { edition: 2, name: 'REACTION_TIME' } })
+      );
+      instrumentModel.exists.mockResolvedValue(false);
+
+      await instrumentsService.create({ bundle: '__BUNDLE__' });
+
+      expect(groupModel.updateMany).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('generateSeriesInstrumentId', () => {
