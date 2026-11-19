@@ -12,7 +12,10 @@ const update = (
   fields: { [key: string]: unknown }[],
   label: { [key: string]: unknown } = { en: 'Animal information' }
 ) => {
-  return $UpdateSubjectIdentificationSettingsData.safeParse({ customFields: { fields, label } });
+  return $UpdateSubjectIdentificationSettingsData.safeParse({
+    customFields: { fields, label },
+    offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO']
+  });
 };
 
 describe('$UpdateSubjectIdentificationSettingsData', () => {
@@ -21,7 +24,11 @@ describe('$UpdateSubjectIdentificationSettingsData', () => {
   });
 
   it('should accept removing the definition', () => {
-    expect($UpdateSubjectIdentificationSettingsData.safeParse({ customFields: null }).success).toBe(true);
+    const result = $UpdateSubjectIdentificationSettingsData.safeParse({
+      customFields: null,
+      offeredMethods: ['CUSTOM_ID']
+    });
+    expect(result.success).toBe(true);
   });
 
   it('should reject a definition with no field, which would give every subject the same id', () => {
@@ -51,10 +58,36 @@ describe('$UpdateSubjectIdentificationSettingsData', () => {
 
   it('should ignore a salt or iteration count sent by the client, since only the server sets them', () => {
     const result = $UpdateSubjectIdentificationSettingsData.parse({
-      customFields: { fields: [field()], iterations: 1, label: { en: 'Animal information' }, salt: '00' }
+      customFields: { fields: [field()], iterations: 1, label: { en: 'Animal information' }, salt: '00' },
+      offeredMethods: ['CUSTOM_ID']
     });
     expect(result.customFields).not.toHaveProperty('salt');
     expect(result.customFields).not.toHaveProperty('iterations');
+  });
+});
+
+describe('$UpdateSubjectIdentificationSettingsData.offeredMethods', () => {
+  const offer = (
+    offeredMethods: string[],
+    customFields: null | object = { fields: [field()], label: { en: 'Animals' } }
+  ) => {
+    return $UpdateSubjectIdentificationSettingsData.safeParse({ customFields, offeredMethods }).success;
+  };
+
+  it('should require at least one method, or no subject could be identified', () => {
+    expect(offer([])).toBe(false);
+  });
+
+  it('should refuse a method offered twice', () => {
+    expect(offer(['CUSTOM_ID', 'CUSTOM_ID'])).toBe(false);
+  });
+
+  it('should refuse to offer custom fields that are not defined', () => {
+    expect(offer(['CUSTOM_FIELDS'], null)).toBe(false);
+  });
+
+  it('should offer custom fields once they are defined', () => {
+    expect(offer(['CUSTOM_FIELDS'])).toBe(true);
   });
 });
 

@@ -15,6 +15,7 @@ import type { StartSessionFormData } from '@/components/StartSessionForm';
 import { useCreateSessionMutation } from '@/hooks/useCreateSessionMutation';
 import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
 import { subjectCustomIdsQueryOptions, useSubjectCustomIdsQuery } from '@/hooks/useSubjectCustomIdsQuery';
+import { useSubjectIdentificationMethodOptions } from '@/hooks/useSubjectIdentificationMethodOptions';
 import {
   subjectIdentificationSettingsQueryOptions,
   useSubjectIdentificationSettingsQuery
@@ -32,9 +33,11 @@ const RouteComponent = () => {
   const startSession = useAppStore((store) => store.startSession);
   const currentUser = useAppStore((store) => store.currentUser);
   const location = useLocation();
+  const subjectIdentificationSettingsQuery = useSubjectIdentificationSettingsQuery();
+  const { preferMethod } = useSubjectIdentificationMethodOptions(subjectIdentificationSettingsQuery.data);
   const defaultInitialValues = {
     sessionType: 'IN_PERSON',
-    subjectIdentificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'CUSTOM_ID'
+    subjectIdentificationMethod: preferMethod(currentGroup?.settings.defaultIdentificationMethod ?? 'CUSTOM_ID')
   } as const;
   const [initialValues, setInitialValues] = useState<FormTypes.PartialNullableData<StartSessionFormData>>(
     location.state?.initialValues ?? defaultInitialValues
@@ -46,7 +49,6 @@ const RouteComponent = () => {
   const subjectCustomIdsQuery = useSubjectCustomIdsQuery({ params: { groupId: currentGroup?.id } });
   // The store holds the group as it was at sign-in, so a session instrument chosen since is read fresh.
   const groupQuery = useGroupQuery(currentGroup?.id);
-  const subjectIdentificationSettingsQuery = useSubjectIdentificationSettingsQuery();
 
   const customSubjectIds = subjectCustomIdsQuery.data.map(removeSubjectIdScope);
 
@@ -79,10 +81,10 @@ const RouteComponent = () => {
         <div className={pendingSession ? 'hidden' : undefined}>
           <StartSessionForm
             currentGroup={currentGroup}
-            customFieldsDefinition={subjectIdentificationSettingsQuery.data.customFields}
             customSubjectIds={customSubjectIds}
             initialValues={initialValues}
             readOnly={currentSession !== null || createSessionMutation.isPending}
+            subjectIdentificationSettings={subjectIdentificationSettingsQuery.data}
             username={currentUser?.username}
             onSubmit={async (details) => {
               const sessionInstrumentId = groupQuery.data?.settings.sessionInstrumentId;

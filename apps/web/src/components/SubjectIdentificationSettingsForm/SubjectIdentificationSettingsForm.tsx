@@ -1,16 +1,20 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import { Button, Dialog } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Language } from '@opendatacapture/schemas/core';
+import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import { $UpdateSubjectIdentificationSettingsData } from '@opendatacapture/schemas/subject-identification';
 import type { SubjectIdentificationSettings } from '@opendatacapture/schemas/subject-identification';
 import { useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { Loader2Icon } from 'lucide-react';
 
+import { useSubjectIdentificationCountsQuery } from '@/hooks/useSubjectIdentificationCountsQuery';
+import { useSubjectIdentificationMethodOptions } from '@/hooks/useSubjectIdentificationMethodOptions';
 import { subjectIdentificationSettingsQueryOptions } from '@/hooks/useSubjectIdentificationSettingsQuery';
 import { useUpdateSubjectIdentificationSettingsMutation } from '@/hooks/useUpdateSubjectIdentificationSettingsMutation';
+import { sortByLabel } from '@/utils/sort-by-label';
 import {
   toSubjectIdentificationDraft,
   toUpdateSubjectIdentificationSettingsData
@@ -18,6 +22,7 @@ import {
 import type { SubjectIdentificationDraft } from '@/utils/subject-identification-draft';
 
 import { CustomFieldsEditor } from './CustomFieldsEditor';
+import { OfferedMethodsSection } from './OfferedMethodsSection';
 
 export type SubjectIdentificationSettingsFormProps = {
   activeLanguages: readonly Language[];
@@ -38,12 +43,21 @@ export const SubjectIdentificationSettingsForm = ({
   const updateMutation = useUpdateSubjectIdentificationSettingsMutation();
   const [draft, setDraft] = useState<SubjectIdentificationDraft>(() => toSubjectIdentificationDraft(settings));
   const [showErrors, setShowErrors] = useState(false);
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  // The checked body awaiting confirmation, so what is confirmed is exactly what is sent.
+  const [confirmingUpdate, setConfirmingUpdate] = useState<$UpdateSubjectIdentificationSettingsData | null>(null);
 
-  const updateData = toUpdateSubjectIdentificationSettingsData(draft);
-  const isValid = $UpdateSubjectIdentificationSettingsData.safeParse(updateData).success;
+  const parsedUpdateData = $UpdateSubjectIdentificationSettingsData.safeParse(
+    toUpdateSubjectIdentificationSettingsData(draft)
+  );
+  const isValid = parsedUpdateData.success;
 
-  const save = async () => {
+  // A method being turned off strands the subjects it identifies until it is offered again.
+  const methodsTurnedOff = settings.offeredMethods.filter((method) => !draft.offeredMethods.includes(method));
+  const countsQuery = useSubjectIdentificationCountsQuery({ isEnabled: methodsTurnedOff.length > 0 });
+  const { options: methodLabels } = useSubjectIdentificationMethodOptions(settings);
+  const isFirstDefinition = settings.customFields === null && draft.customFields !== null;
+
+  const save = async (updateData: $UpdateSubjectIdentificationSettingsData) => {
     const saveFailedTitle = t({ en: 'Save failed', es: 'Error al guardar', fr: "Échec de l'enregistrement" });
     try {
       await updateMutation.mutateAsync(updateData);
@@ -78,30 +92,65 @@ export const SubjectIdentificationSettingsForm = ({
   };
 
   const handleSave = () => {
-    if (!isValid) {
+    if (!parsedUpdateData.success) {
       setShowErrors(true);
-    } else if (settings.customFields === null && draft.customFields !== null) {
-      setIsConfirmationOpen(true);
+    } else if (isFirstDefinition || methodsTurnedOff.length > 0) {
+      setConfirmingUpdate(parsedUpdateData.data);
     } else {
-      void save();
+      void save(parsedUpdateData.data);
     }
   };
 
-  const handleConfirm = () => {
-    setIsConfirmationOpen(false);
-    void save();
-  };
+  const customFieldsTitle = t({
+    en: 'Custom Identifying Fields',
+    es: 'Campos de identificación personalizados',
+    fr: "Champs d'identification personnalisés"
+  });
+  const offeredMethodsTitle = t({ en: 'Offered Methods', es: 'Métodos ofrecidos', fr: 'Méthodes proposées' });
+  const sections = sortByLabel([
+    {
+      content: (
+        <CustomFieldsEditor
+          activeLanguages={activeLanguages}
+          isDefinitionStored={settings.customFields !== null}
+          isLocked={settings.isCustomFieldsLocked}
+          showErrors={showErrors}
+          title={customFieldsTitle}
+          value={draft.customFields}
+          onChange={(customFields) => {
+            setDraft((current) => ({
+              customFields,
+              // Custom fields can be offered only while they are defined.
+              offeredMethods: customFields
+                ? current.offeredMethods
+                : current.offeredMethods.filter((method) => method !== 'CUSTOM_FIELDS')
+            }));
+          }}
+        />
+      ),
+      key: 'custom-fields',
+      label: customFieldsTitle
+    },
+    {
+      content: (
+        <OfferedMethodsSection
+          customFields={draft.customFields}
+          showErrors={showErrors}
+          title={offeredMethodsTitle}
+          value={draft.offeredMethods}
+          onChange={(offeredMethods) => setDraft((current) => ({ ...current, offeredMethods }))}
+        />
+      ),
+      key: 'offered-methods',
+      label: offeredMethodsTitle
+    }
+  ]);
 
   return (
     <div className="flex flex-col gap-6" data-testid="subject-identification-settings">
-      <CustomFieldsEditor
-        activeLanguages={activeLanguages}
-        isDefinitionStored={settings.customFields !== null}
-        isLocked={settings.isCustomFieldsLocked}
-        showErrors={showErrors}
-        value={draft.customFields}
-        onChange={(customFields) => setDraft((current) => ({ ...current, customFields }))}
-      />
+      {sections.map(({ content, key }) => (
+        <React.Fragment key={key}>{content}</React.Fragment>
+      ))}
       <div className="flex flex-wrap items-center gap-3">
         <Button
           data-testid="subject-identification-save"
@@ -123,44 +172,72 @@ export const SubjectIdentificationSettingsForm = ({
           </p>
         )}
       </div>
-      <Dialog open={isConfirmationOpen} onOpenChange={setIsConfirmationOpen}>
-        <Dialog.Content className="max-w-md" data-testid="subject-identification-confirm-dialog">
-          <Dialog.Header>
-            <Dialog.Title>
-              {t({
-                en: 'Save the identifying fields?',
-                es: '¿Guardar los campos de identificación?',
-                fr: "Enregistrer les champs d'identification ?"
-              })}
-            </Dialog.Title>
-            <Dialog.Description>
-              {t({
-                en: 'Once a subject has been identified with these fields, the field list cannot change: no field can be added, removed or moved, and the definition cannot be removed. Labels, help text, patterns and error messages stay editable.',
-                es: 'Una vez que se haya identificado a un sujeto con estos campos, la lista de campos no podrá cambiar: no se podrá agregar, eliminar ni mover ningún campo, ni eliminar la definición. Las etiquetas, los textos de ayuda, los patrones y los mensajes de error seguirán siendo editables.',
-                fr: "Dès qu'un sujet aura été identifié avec ces champs, la liste des champs ne pourra plus changer : aucun champ ne pourra être ajouté, supprimé ou déplacé, et la définition ne pourra plus être supprimée. Les étiquettes, les textes d'aide, les motifs et les messages d'erreur resteront modifiables."
-              })}
-            </Dialog.Description>
-          </Dialog.Header>
-          <Dialog.Footer>
-            <Button
-              data-testid="subject-identification-cancel-save"
-              type="button"
-              variant="outline"
-              onClick={() => setIsConfirmationOpen(false)}
-            >
-              {t('core.cancel')}
-            </Button>
-            <Button
-              data-testid="subject-identification-confirm-save"
-              type="button"
-              variant="primary"
-              onClick={handleConfirm}
-            >
-              {t('core.save')}
-            </Button>
-          </Dialog.Footer>
-        </Dialog.Content>
-      </Dialog>
+      {confirmingUpdate && (
+        <Dialog open onOpenChange={() => setConfirmingUpdate(null)}>
+          <Dialog.Content className="max-w-md" data-testid="subject-identification-confirm-dialog">
+            <Dialog.Header>
+              <Dialog.Title>
+                {t({
+                  en: 'Save the subject identification settings?',
+                  es: '¿Guardar la configuración de identificación de sujetos?',
+                  fr: "Enregistrer les paramètres d'identification des sujets ?"
+                })}
+              </Dialog.Title>
+              {methodsTurnedOff.length > 0 && (
+                <div className="flex flex-col gap-2 text-sm" data-testid="subject-identification-turn-off-warning">
+                  <p>
+                    {t({
+                      en: 'Staff will not be able to start a session for the subjects these methods identify until the method is offered again:',
+                      es: 'El personal no podrá iniciar una sesión para los sujetos que identifican estos métodos hasta que el método vuelva a ofrecerse:',
+                      fr: 'Le personnel ne pourra plus démarrer de session pour les sujets identifiés par ces méthodes tant que la méthode ne sera pas de nouveau proposée :'
+                    })}
+                  </p>
+                  <ul className="list-disc pl-5">
+                    {methodsTurnedOff.map((method: SubjectIdentificationMethod) => (
+                      <li data-testid={`turn-off-count-${method}`} key={method}>
+                        {t(
+                          { en: '{}: {} subjects', es: '{}: {} sujetos', fr: '{} : {} sujets' },
+                          { args: [methodLabels[method], countsQuery.data?.[method] ?? '…'] }
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {isFirstDefinition && (
+                <Dialog.Description>
+                  {t({
+                    en: 'Once a subject has been identified with these fields, the field list cannot change: no field can be added, removed or moved, and the definition cannot be removed. Labels, help text, patterns and error messages stay editable.',
+                    es: 'Una vez que se haya identificado a un sujeto con estos campos, la lista de campos no podrá cambiar: no se podrá agregar, eliminar ni mover ningún campo, ni eliminar la definición. Las etiquetas, los textos de ayuda, los patrones y los mensajes de error seguirán siendo editables.',
+                    fr: "Dès qu'un sujet aura été identifié avec ces champs, la liste des champs ne pourra plus changer : aucun champ ne pourra être ajouté, supprimé ou déplacé, et la définition ne pourra plus être supprimée. Les étiquettes, les textes d'aide, les motifs et les messages d'erreur resteront modifiables."
+                  })}
+                </Dialog.Description>
+              )}
+            </Dialog.Header>
+            <Dialog.Footer>
+              <Button
+                data-testid="subject-identification-cancel-save"
+                type="button"
+                variant="outline"
+                onClick={() => setConfirmingUpdate(null)}
+              >
+                {t('core.cancel')}
+              </Button>
+              <Button
+                data-testid="subject-identification-confirm-save"
+                type="button"
+                variant="primary"
+                onClick={() => {
+                  setConfirmingUpdate(null);
+                  void save(confirmingUpdate);
+                }}
+              >
+                {t('core.save')}
+              </Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog>
+      )}
     </div>
   );
 };

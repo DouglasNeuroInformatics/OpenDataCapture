@@ -12,11 +12,11 @@ import '@/services/i18n';
 
 type StartSessionFormProps = {
   currentGroup: Group | null;
-  customFieldsDefinition: unknown;
   customSubjectIds: string[];
   initialValues: { [key: string]: unknown };
   onSubmit: (data: $CreateSessionData) => Promise<void>;
   readOnly: boolean;
+  subjectIdentificationSettings: unknown;
   username?: string;
 };
 
@@ -34,6 +34,7 @@ type MockState = {
   fetchedGroup: Group | null;
   isPending: boolean;
   locationState: undefined | { initialValues?: { [key: string]: unknown } };
+  offeredMethods: [string, ...string[]];
   store: {
     currentGroup: Group | null;
     currentSession: null | Session;
@@ -47,6 +48,7 @@ const mocks = vi.hoisted(() => {
     fetchedGroup: null,
     isPending: false,
     locationState: undefined,
+    offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS'],
     store: { currentGroup: null, currentSession: null, currentUser: null, startSession: vi.fn() }
   };
   return {
@@ -73,7 +75,9 @@ vi.mock('@/hooks/useGroupQuery', async (importOriginal) => ({
 }));
 vi.mock('@/hooks/useSubjectIdentificationSettingsQuery', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/hooks/useSubjectIdentificationSettingsQuery')>()),
-  useSubjectIdentificationSettingsQuery: () => ({ data: { customFields: CUSTOM_FIELDS, isCustomFieldsLocked: false } })
+  useSubjectIdentificationSettingsQuery: () => ({
+    data: { customFields: CUSTOM_FIELDS, isCustomFieldsLocked: false, offeredMethods: mocks.offeredMethods }
+  })
 }));
 vi.mock('@/hooks/useSubjectCustomIdsQuery', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/hooks/useSubjectCustomIdsQuery')>()),
@@ -127,6 +131,7 @@ const formProps = () => mocks.StartSessionForm.mock.lastCall![0];
 describe('Route', () => {
   beforeEach(() => {
     mocks.fetchedGroup = group;
+    mocks.offeredMethods = ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS'];
     mocks.isPending = false;
     mocks.locationState = undefined;
     mocks.store.currentGroup = group;
@@ -159,7 +164,7 @@ describe('Route', () => {
 
     it("should hand the form the instance's custom identifying fields", () => {
       render(<StartSessionPage />);
-      expect(formProps().customFieldsDefinition).toBe(CUSTOM_FIELDS);
+      expect(formProps().subjectIdentificationSettings).toMatchObject({ customFields: CUSTOM_FIELDS });
     });
 
     it('should suggest the custom ids of the group with their group scope removed', () => {
@@ -179,6 +184,12 @@ describe('Route', () => {
         sessionType: 'IN_PERSON',
         subjectIdentificationMethod: 'PERSONAL_INFO'
       });
+    });
+
+    it("should open on the first offered method when the group's preferred one is not offered", () => {
+      mocks.offeredMethods = ['CUSTOM_FIELDS'];
+      render(<StartSessionPage />);
+      expect(formProps().initialValues).toMatchObject({ subjectIdentificationMethod: 'CUSTOM_FIELDS' });
     });
 
     it('should default to identifying by custom id when there is no group', () => {

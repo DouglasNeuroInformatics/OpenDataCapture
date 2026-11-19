@@ -11,7 +11,7 @@ import type { Group } from '@opendatacapture/schemas/group';
 import { $SessionType } from '@opendatacapture/schemas/session';
 import type { $CreateSessionData } from '@opendatacapture/schemas/session';
 import type { Sex } from '@opendatacapture/schemas/subject';
-import type { CustomFieldsDefinition } from '@opendatacapture/schemas/subject-identification';
+import type { SubjectIdentificationSettings } from '@opendatacapture/schemas/subject-identification';
 import { encodeScopedSubjectId, generateSubjectHash } from '@opendatacapture/subject-utils';
 import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
@@ -19,6 +19,7 @@ import { z } from 'zod/v4';
 import { useCustomIdentificationFields } from '@/hooks/useCustomIdentificationFields';
 import type { CustomFieldsFormData } from '@/hooks/useCustomIdentificationFields';
 import { useSubjectDemographicsLookup } from '@/hooks/useSubjectDemographicsLookup';
+import { useSubjectIdentificationMethodOptions } from '@/hooks/useSubjectIdentificationMethodOptions';
 import { getValueForLanguage } from '@/utils/language';
 
 const MILLISECONDS_PER_YEAR = 31556952000;
@@ -41,18 +42,18 @@ type StartSessionFormData = CustomFieldsFormData & {
 
 type StartSessionFormProps = {
   currentGroup: Group | null;
-  customFieldsDefinition: CustomFieldsDefinition | null;
   customSubjectIds: string[];
   initialValues?: FormTypes.PartialNullableData<StartSessionFormData>;
   onSubmit: (data: $CreateSessionData) => Promisable<void>;
   readOnly: boolean;
+  subjectIdentificationSettings: Pick<SubjectIdentificationSettings, 'customFields' | 'offeredMethods'>;
   username?: null | string;
 };
 
 export const StartSessionForm = ({
   currentGroup,
-  customFieldsDefinition,
   customSubjectIds,
+  subjectIdentificationSettings,
   username,
   initialValues,
   readOnly,
@@ -62,13 +63,8 @@ export const StartSessionForm = ({
   const lookupDemographics = useSubjectDemographicsLookup();
   const [autofilled, setAutofilled] = useState<AutofilledDemographics>({});
   const latestIdentity = useRef('');
-  const customFields = useCustomIdentificationFields(customFieldsDefinition);
-
-  const methodOptions: { [method: string]: string } = {
-    CUSTOM_ID: t('common.customIdentifier'),
-    PERSONAL_INFO: t('common.personalInfo'),
-    ...(customFields.label === null ? {} : { CUSTOM_FIELDS: customFields.label })
-  };
+  const customFields = useCustomIdentificationFields(subjectIdentificationSettings.customFields);
+  const { options: methodOptions } = useSubjectIdentificationMethodOptions(subjectIdentificationSettings);
 
   const scopeCustomId = (customId: string) => {
     return encodeScopedSubjectId(customId, { groupName: currentGroup?.name ?? DEFAULT_GROUP_NAME });

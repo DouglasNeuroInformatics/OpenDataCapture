@@ -9,12 +9,17 @@ import type { SetNonNullable } from 'type-fest';
 
 type SubjectPersonalInfo = Pick<Subject, 'dateOfBirth' | 'firstName' | 'id' | 'lastName' | 'sex'>;
 
-// libcrypto's sha256 writes each byte as two lowercase hex digits, so no stored name hash has an uppercase letter.
-const PERSONAL_INFO_SUBJECT_ID_PATTERN = /^[0-9a-f]{64}$/;
-
 const CUSTOM_FIELDS_SUBJECT_ID_PREFIX = 'cf_';
 
-const CUSTOM_FIELDS_SUBJECT_ID_PATTERN = new RegExp(`^${CUSTOM_FIELDS_SUBJECT_ID_PREFIX}[0-9a-f]{64}$`);
+/**
+ * The shape of each id derived from what identifies a subject; any other id is a custom id. Checked
+ * in this order. libcrypto's sha256 writes each byte as two lowercase hex digits, so no stored name
+ * hash has an uppercase letter.
+ */
+const DERIVED_SUBJECT_ID_PATTERNS = {
+  CUSTOM_FIELDS: new RegExp(`^${CUSTOM_FIELDS_SUBJECT_ID_PREFIX}[0-9a-f]{64}$`),
+  PERSONAL_INFO: /^[0-9a-f]{64}$/
+} as const satisfies { [K in Exclude<SubjectIdentificationMethod, 'CUSTOM_ID'>]: RegExp };
 
 const CUSTOM_FIELDS_SALT_PATTERN = /^[0-9a-f]{64}$/;
 
@@ -92,9 +97,9 @@ export function encodeScopedSubjectId(id: string, options: { groupName: string }
 }
 
 export function inferSubjectIdentificationMethod(subjectId: string): SubjectIdentificationMethod {
-  if (CUSTOM_FIELDS_SUBJECT_ID_PATTERN.test(subjectId)) {
+  if (DERIVED_SUBJECT_ID_PATTERNS.CUSTOM_FIELDS.test(subjectId)) {
     return 'CUSTOM_FIELDS';
-  } else if (PERSONAL_INFO_SUBJECT_ID_PATTERN.test(subjectId)) {
+  } else if (DERIVED_SUBJECT_ID_PATTERNS.PERSONAL_INFO.test(subjectId)) {
     return 'PERSONAL_INFO';
   }
   return 'CUSTOM_ID';
@@ -146,6 +151,6 @@ export async function deriveCustomFieldsSubjectId(
   return CUSTOM_FIELDS_SUBJECT_ID_PREFIX + encodeLowercaseHex(derivedBits);
 }
 
-export { CUSTOM_FIELDS_SUBJECT_ID_PREFIX };
+export { CUSTOM_FIELDS_SUBJECT_ID_PREFIX, DERIVED_SUBJECT_ID_PATTERNS };
 
 export { removeSubjectIdScope } from '@opendatacapture/runtime-internal';

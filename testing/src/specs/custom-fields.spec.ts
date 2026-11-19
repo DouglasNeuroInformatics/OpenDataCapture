@@ -1,10 +1,13 @@
-import { StartSessionPage } from '../pages/_app/session/start-session.page';
 import { expect, test } from '../support/fixtures';
+
+import type { StartSessionPage } from '../pages/_app/session/start-session.page';
 
 /**
  * The definition is one instance-wide document, and it locks for good the first time any subject is
  * identified with it, so every scenario using it lives in this one serial file. Its first step keeps
- * the number of fields the same on every run, which is what a locked definition still accepts.
+ * the number of fields the same on every run, which is what a locked definition still accepts. Other
+ * specs start sessions with the built-in methods in parallel, so only custom fields are ever turned
+ * off here.
  */
 const DEFINITION = {
   fields: [
@@ -27,8 +30,11 @@ test.describe('custom identifying fields', () => {
     animalId = `ab${Date.now()}`;
   });
 
-  test('should define the fields', async ({ api }) => {
-    const settings = await api.updateSubjectIdentificationSettings({ customFields: DEFINITION });
+  test('should define the fields and offer them', async ({ api }) => {
+    const settings = await api.updateSubjectIdentificationSettings({
+      customFields: DEFINITION,
+      offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS']
+    });
     expect(settings.customFields).toMatchObject(DEFINITION);
   });
 
@@ -77,5 +83,61 @@ test.describe('custom identifying fields', () => {
     await identificationForm.locator('[name="customField1"]').fill('7');
     await identificationForm.getByRole('button', { name: 'Submit' }).click();
     await expect(page).toHaveURL(/\/datahub\/subjects\/cf_[0-9a-f]{64}\/table$/);
+  });
+
+  test.describe('on the settings page', () => {
+    test.use({ actingRole: 'ADMIN' });
+
+    test('should show the field list locked once a subject has been identified with it, with its labels still editable', async ({
+      getPageModel,
+      page
+    }) => {
+      const settingsPage = await getPageModel('/admin/settings');
+      await settingsPage.openTab('subject-identification');
+      await expect(page.getByTestId('custom-fields-lock-status')).toHaveAttribute('data-locked', 'true');
+      await expect(page.getByTestId('custom-fields-add-field')).toHaveCount(0);
+      await expect(page.getByTestId('custom-fields-remove')).toHaveCount(0);
+      await expect(page.getByTestId('custom-field-0-label-en')).toBeEditable();
+    });
+
+    test('should warn how many subjects a built-in method identifies before turning it off', async ({
+      getPageModel,
+      page
+    }) => {
+      const settingsPage = await getPageModel('/admin/settings');
+      await settingsPage.openTab('subject-identification');
+      await page.getByTestId('offered-method-PERSONAL_INFO').click();
+      await page.getByTestId('subject-identification-save').click();
+      await expect(page.getByTestId('turn-off-count-PERSONAL_INFO')).toHaveText(/^Personal Information: \d+ subjects$/);
+      // Confirming would stop every other spec from starting a session by personal information.
+      await page.getByTestId('subject-identification-cancel-save').click();
+    });
+
+    test('should stop offering custom fields in Start Session once they are turned off, and offer them again', async ({
+      getPageModel,
+      page
+    }) => {
+      const settingsPage = await getPageModel('/admin/settings');
+      await settingsPage.openTab('subject-identification');
+      await page.getByTestId('offered-method-CUSTOM_FIELDS').click();
+      await page.getByTestId('subject-identification-save').click();
+      await expect(page.getByTestId('turn-off-count-CUSTOM_FIELDS')).toHaveText(
+        /^Animal information: [1-9]\d* subjects$/
+      );
+      await page.getByTestId('subject-identification-confirm-save').click();
+      await expect(page.getByTestId('subject-identification-confirm-dialog')).toBeHidden();
+
+      const startSessionPage = await getPageModel('/session/start-session');
+      await expect(startSessionPage.selectField.locator('option[value="CUSTOM_FIELDS"]')).toHaveCount(0);
+
+      await settingsPage.goto('/admin/settings');
+      await settingsPage.openTab('subject-identification');
+      await page.getByTestId('offered-method-CUSTOM_FIELDS').click();
+      const saved = page.waitForResponse((response) => {
+        return response.url().endsWith('/v1/subjects/identification/settings') && response.request().method() === 'PUT';
+      });
+      await page.getByTestId('subject-identification-save').click();
+      expect((await saved).ok()).toBe(true);
+    });
   });
 });

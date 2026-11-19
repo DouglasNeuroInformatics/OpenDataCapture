@@ -56,9 +56,12 @@ const renderForm = (
     <QueryClientProvider client={queryClient}>
       <StartSessionForm
         currentGroup={currentGroup}
-        customFieldsDefinition={definition}
         customSubjectIds={customSubjectIds}
         readOnly={false}
+        subjectIdentificationSettings={{
+          customFields: definition,
+          offeredMethods: definition ? ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS'] : ['CUSTOM_ID', 'PERSONAL_INFO']
+        }}
         username="admin"
         onSubmit={onSubmit}
       />
@@ -335,9 +338,9 @@ describe('StartSessionForm', () => {
         <QueryClientProvider client={new QueryClient()}>
           <StartSessionForm
             currentGroup={null}
-            customFieldsDefinition={null}
             customSubjectIds={[]}
             readOnly={false}
+            subjectIdentificationSettings={{ customFields: null, offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO'] }}
             onSubmit={onSubmit}
           />
         </QueryClientProvider>
@@ -451,8 +454,9 @@ describe('StartSessionForm', () => {
   });
 
   describe('with custom fields', () => {
-    const renderWithCustomFields = () =>
-      renderForm([], null, 'CUSTOM_FIELDS', createQueryClient(), customFieldsDefinition);
+    const renderWithCustomFields = () => {
+      return renderForm([], null, 'CUSTOM_FIELDS', createQueryClient(), customFieldsDefinition);
+    };
 
     const fillCustomFields = (form: HTMLElement, values: [string, string]) => {
       values.forEach((value, index) => {

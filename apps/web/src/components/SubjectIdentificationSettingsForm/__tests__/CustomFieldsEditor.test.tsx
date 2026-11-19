@@ -36,6 +36,7 @@ const renderEditor = (
         isDefinitionStored={isDefinitionStored}
         isLocked={isLocked}
         showErrors={showErrors}
+        title="Custom Identifying Fields"
         value={value}
         onChange={(next) => {
           onChange(next);

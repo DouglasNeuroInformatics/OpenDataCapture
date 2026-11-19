@@ -2,7 +2,10 @@ import { $BooleanLike } from '@douglasneuroinformatics/libjs';
 import { ApiOperation, CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
 import { Body, Controller, Delete, Get, Param, Put, Query } from '@nestjs/common';
 import { $UpdateSubjectIdentificationSettingsData } from '@opendatacapture/schemas/subject-identification';
-import type { SubjectIdentificationSettings } from '@opendatacapture/schemas/subject-identification';
+import type {
+  SubjectIdentificationCounts,
+  SubjectIdentificationSettings
+} from '@opendatacapture/schemas/subject-identification';
 import z from 'zod/v4';
 
 import type { AppAbility } from '@/auth/auth.types';
@@ -17,6 +20,16 @@ export class SubjectsController {
     private readonly subjectIdentificationService: SubjectIdentificationService,
     private readonly subjectsService: SubjectsService
   ) {}
+
+  @ApiOperation({
+    description: 'How many subjects each identification method identifies, read from the shape of their ids.',
+    summary: 'Count Subjects by Identification Method'
+  })
+  @Get('identification/counts')
+  @RouteAccess(ADMIN_ONLY)
+  countByIdentificationMethod(): Promise<SubjectIdentificationCounts> {
+    return this.subjectsService.countByIdentificationMethod();
+  }
 
   @ApiOperation({ summary: 'Delete Subject' })
   @Delete(':id')

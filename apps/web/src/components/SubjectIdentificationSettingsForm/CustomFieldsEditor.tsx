@@ -234,6 +234,7 @@ export type CustomFieldsEditorProps = {
   onChange: (value: CustomFieldsDraft | null) => void;
   /** Shows every missing entry as an error, once a save has been refused for one. */
   showErrors: boolean;
+  title: string;
   value: CustomFieldsDraft | null;
 };
 
@@ -244,17 +245,14 @@ export const CustomFieldsEditor = ({
   isLocked,
   onChange,
   showErrors,
+  title,
   value
 }: CustomFieldsEditorProps) => {
   const { t } = useTranslation();
   return (
     <SectionCard data-testid="custom-fields-card">
       <Heading className="mb-1" variant="h4">
-        {t({
-          en: 'Custom Identifying Fields',
-          es: 'Campos de identificación personalizados',
-          fr: "Champs d'identification personnalisés"
-        })}
+        {title}
       </Heading>
       <p className="text-muted-foreground mb-4 text-sm">
         {t({

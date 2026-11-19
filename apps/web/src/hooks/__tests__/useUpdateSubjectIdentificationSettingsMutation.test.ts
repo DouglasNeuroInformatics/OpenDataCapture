@@ -18,7 +18,8 @@ const definition = {
 
 const savedSettings = {
   customFields: { ...definition, iterations: 600_000, salt: 'ab'.repeat(32) },
-  isCustomFieldsLocked: false
+  isCustomFieldsLocked: false,
+  offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO']
 };
 
 function renderUpdateMutation() {
@@ -37,10 +38,10 @@ describe('useUpdateSubjectIdentificationSettingsMutation', () => {
 
   it('should put the settings without raising the default error toast, since the tab says why a save failed', async () => {
     const { result } = renderUpdateMutation();
-    await result.current.mutateAsync({ customFields: definition });
+    await result.current.mutateAsync({ customFields: definition, offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO'] });
     expect(mockAxios.put).toHaveBeenCalledWith(
       '/v1/subjects/identification/settings',
-      { customFields: definition },
+      { customFields: definition, offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO'] },
       { meta: { disableDefaultErrorNotification: true } }
     );
   });
@@ -49,7 +50,7 @@ describe('useUpdateSubjectIdentificationSettingsMutation', () => {
   // saved definition as soon as the first save returns.
   it('should seed the settings cache from the response', async () => {
     const { queryClient, result } = renderUpdateMutation();
-    await result.current.mutateAsync({ customFields: definition });
+    await result.current.mutateAsync({ customFields: definition, offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO'] });
     expect(queryClient.getQueryData(['subject-identification-settings'])).toStrictEqual(savedSettings);
   });
 });

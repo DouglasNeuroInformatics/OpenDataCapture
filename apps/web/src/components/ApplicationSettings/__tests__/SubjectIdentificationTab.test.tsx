@@ -15,7 +15,8 @@ const SETTINGS: SubjectIdentificationSettings = {
     label: { en: 'Animal information' },
     salt: 'ab'.repeat(32)
   },
-  isCustomFieldsLocked: true
+  isCustomFieldsLocked: true,
+  offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO']
 };
 
 const mocks = vi.hoisted(() => ({

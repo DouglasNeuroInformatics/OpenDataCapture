@@ -8,6 +8,7 @@ import type { Promisable } from 'type-fest';
 import { z } from 'zod/v4';
 
 import { useCustomIdentificationFields } from '@/hooks/useCustomIdentificationFields';
+import { useSubjectIdentificationMethodOptions } from '@/hooks/useSubjectIdentificationMethodOptions';
 import { useSubjectIdentificationSettingsQuery } from '@/hooks/useSubjectIdentificationSettingsQuery';
 import { useAppStore } from '@/store';
 
@@ -20,12 +21,9 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
   const { t } = useTranslation();
   const subjectIdentificationSettingsQuery = useSubjectIdentificationSettingsQuery();
   const customFields = useCustomIdentificationFields(subjectIdentificationSettingsQuery.data.customFields);
-
-  const methodOptions: { [method: string]: string } = {
-    CUSTOM_ID: t('common.customIdentifier'),
-    PERSONAL_INFO: t('common.personalInfo'),
-    ...(customFields.label === null ? {} : { CUSTOM_FIELDS: customFields.label })
-  };
+  const { options: methodOptions, preferMethod } = useSubjectIdentificationMethodOptions(
+    subjectIdentificationSettingsQuery.data
+  );
 
   return (
     <Form
@@ -123,7 +121,7 @@ export const IdentificationForm = ({ onSubmit }: IdentificationFormProps) => {
       ]}
       data-testid="identification-form"
       initialValues={{
-        subjectIdentificationMethod: currentGroup?.settings.defaultIdentificationMethod ?? 'PERSONAL_INFO'
+        subjectIdentificationMethod: preferMethod(currentGroup?.settings.defaultIdentificationMethod ?? 'PERSONAL_INFO')
       }}
       submitBtnLabel={t('core.submit')}
       validationSchema={z

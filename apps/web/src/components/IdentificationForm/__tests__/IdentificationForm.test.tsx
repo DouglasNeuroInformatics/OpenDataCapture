@@ -18,12 +18,15 @@ const store = vi.hoisted(() => {
 const subjectUtils = vi.hoisted(() => ({ generateSubjectHash: vi.fn() }));
 
 const settings = vi.hoisted(() => {
-  const state: { customFields: CustomFieldsDefinition | null } = { customFields: null };
+  const state: { customFields: CustomFieldsDefinition | null; offeredMethods: [string, ...string[]] } = {
+    customFields: null,
+    offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO']
+  };
   return state;
 });
 
 vi.mock('@/hooks/useSubjectIdentificationSettingsQuery', () => ({
-  useSubjectIdentificationSettingsQuery: () => ({ data: { customFields: settings.customFields } })
+  useSubjectIdentificationSettingsQuery: () => ({ data: settings })
 }));
 
 vi.mock('@/store', () => ({
@@ -83,6 +86,7 @@ describe('IdentificationForm', () => {
     i18n.changeLanguage('en');
     store.currentGroup = null;
     settings.customFields = null;
+    settings.offeredMethods = ['CUSTOM_ID', 'PERSONAL_INFO'];
     subjectUtils.generateSubjectHash.mockResolvedValue('subject-hash');
   });
 
@@ -160,6 +164,15 @@ describe('IdentificationForm', () => {
     });
   });
 
+  // The instance may stop offering the method a group prefers; the lookup still has to open on one.
+  it("should open on the first offered method when the group's preferred one is not offered", () => {
+    settings.offeredMethods = ['CUSTOM_ID'];
+    store.currentGroup = createGroup('PERSONAL_INFO');
+    renderForm();
+    expect(field('id')).toBeTruthy();
+    expect(field('firstName')).toBeNull();
+  });
+
   describe('with custom fields', () => {
     beforeEach(() => {
       settings.customFields = {
@@ -168,6 +181,7 @@ describe('IdentificationForm', () => {
         label: { en: 'Animal information' },
         salt: '0f'.repeat(32)
       };
+      settings.offeredMethods = ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS'];
       store.currentGroup = createGroup('CUSTOM_FIELDS');
     });
 

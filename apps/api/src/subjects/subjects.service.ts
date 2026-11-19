@@ -2,9 +2,15 @@ import { InjectModel, InjectPrismaClient, LoggingService } from '@douglasneuroin
 import type { Model } from '@douglasneuroinformatics/libnest';
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
-import { $CreateSubjectData } from '@opendatacapture/schemas/subject';
-import { CUSTOM_FIELDS_SUBJECT_ID_PREFIX, encodeScopedSubjectId } from '@opendatacapture/subject-utils';
+import { $CreateSubjectData, $SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
+import type { SubjectIdentificationCounts } from '@opendatacapture/schemas/subject-identification';
+import {
+  CUSTOM_FIELDS_SUBJECT_ID_PREFIX,
+  DERIVED_SUBJECT_ID_PATTERNS,
+  encodeScopedSubjectId
+} from '@opendatacapture/subject-utils';
 import type { Prisma } from '@prisma/client';
+import { z } from 'zod/v4';
 
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { AppAbility } from '@/auth/auth.types';
@@ -65,6 +71,40 @@ export class SubjectsService {
     return this.subjectModel.count({
       where: { AND: [accessibleQuery(ability, 'read', 'Subject'), where] }
     });
+  }
+
+  /**
+   * How many subjects in the instance, in any group, each method identifies, read from the shape of
+   * their ids: a custom-fields subject stores no name, and a custom-id one may store every field a
+   * name hash is made from, so nothing but the id tells the three apart. Unscoped, for the
+   * administrator turning a method off for everyone.
+   */
+  async countByIdentificationMethod(): Promise<SubjectIdentificationCounts> {
+    const rows = await this.subjectModel.aggregateRaw({
+      pipeline: [
+        {
+          $group: {
+            _id: {
+              $switch: {
+                branches: Object.entries(DERIVED_SUBJECT_ID_PATTERNS).map(([method, pattern]) => ({
+                  case: { $regexMatch: { input: '$_id', regex: pattern.source } },
+                  then: method
+                })),
+                default: 'CUSTOM_ID'
+              }
+            },
+            count: { $sum: 1 }
+          }
+        }
+      ]
+    });
+    const counts = z.array(z.object({ _id: $SubjectIdentificationMethod, count: z.number() })).parse(rows);
+    return {
+      CUSTOM_FIELDS: 0,
+      CUSTOM_ID: 0,
+      PERSONAL_INFO: 0,
+      ...Object.fromEntries(counts.map(({ _id, count }) => [_id, count]))
+    };
   }
 
   async create({

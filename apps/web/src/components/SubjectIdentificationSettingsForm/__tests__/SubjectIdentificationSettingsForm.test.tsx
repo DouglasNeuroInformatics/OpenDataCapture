@@ -4,7 +4,7 @@ import type {
   SubjectIdentificationSettings
 } from '@opendatacapture/schemas/subject-identification';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { AxiosError, AxiosHeaders } from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -29,10 +29,17 @@ const storedSettings = (overrides: Partial<SubjectIdentificationSettings> = {}):
     salt: SALT
   },
   isCustomFieldsLocked: false,
+  offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO'],
   ...overrides
 });
 
-const unsetSettings: SubjectIdentificationSettings = { customFields: null, isCustomFieldsLocked: false };
+const unsetSettings: SubjectIdentificationSettings = {
+  customFields: null,
+  isCustomFieldsLocked: false,
+  offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO']
+};
+
+const BUILT_IN_METHODS = ['CUSTOM_ID', 'PERSONAL_INFO'];
 
 const conflictError = () => {
   return new AxiosError('Conflict', 'ERR_BAD_REQUEST', undefined, undefined, {
@@ -68,10 +75,13 @@ const defineOneField = () => {
 describe('SubjectIdentificationSettingsForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockAxios.put.mockImplementation((_url, { customFields }: $UpdateSubjectIdentificationSettingsData) => {
-      const saved = customFields && { ...customFields, iterations: 600_000, salt: SALT };
-      return Promise.resolve({ data: { customFields: saved, isCustomFieldsLocked: false } });
-    });
+    mockAxios.put.mockImplementation(
+      (_url, { customFields, offeredMethods }: $UpdateSubjectIdentificationSettingsData) => {
+        const saved = customFields && { ...customFields, iterations: 600_000, salt: SALT };
+        return Promise.resolve({ data: { customFields: saved, isCustomFieldsLocked: false, offeredMethods } });
+      }
+    );
+    mockAxios.get.mockResolvedValue({ data: { CUSTOM_FIELDS: 0, CUSTOM_ID: 4, PERSONAL_INFO: 7 } });
     useNotificationsStore.setState({ notifications: [] });
   });
 
@@ -96,8 +106,18 @@ describe('SubjectIdentificationSettingsForm', () => {
         customFields: {
           fields: [{ description: null, label: { en: 'Animal ID' }, pattern: '[0-9]+', patternErrorMessage: null }],
           label: { en: 'Animal information' }
-        }
+        },
+        offeredMethods: BUILT_IN_METHODS
       });
+    });
+
+    it('should not save when the confirmation is dismissed', () => {
+      renderForm(unsetSettings);
+      defineOneField();
+      click('subject-identification-save');
+      fireEvent.keyDown(screen.getByTestId('subject-identification-confirm-dialog'), { key: 'Escape' });
+      expect(screen.queryByTestId('subject-identification-confirm-dialog')).toBeNull();
+      expect(mockAxios.put).not.toHaveBeenCalled();
     });
 
     it('should not save when the confirmation is cancelled', () => {
@@ -112,7 +132,9 @@ describe('SubjectIdentificationSettingsForm', () => {
     it('should save without confirmation while still no definition is drafted', async () => {
       renderForm(unsetSettings);
       click('subject-identification-save');
-      await waitFor(() => expect(lastPutBody()).toStrictEqual({ customFields: null }));
+      await waitFor(() => {
+        expect(lastPutBody()).toStrictEqual({ customFields: null, offeredMethods: BUILT_IN_METHODS });
+      });
     });
   });
 
@@ -156,7 +178,9 @@ describe('SubjectIdentificationSettingsForm', () => {
       renderForm(storedSettings());
       click('custom-fields-remove');
       click('subject-identification-save');
-      await waitFor(() => expect(lastPutBody()).toStrictEqual({ customFields: null }));
+      await waitFor(() => {
+        expect(lastPutBody()).toStrictEqual({ customFields: null, offeredMethods: BUILT_IN_METHODS });
+      });
     });
 
     it('should not offer a second save while one is in flight', async () => {
@@ -167,6 +191,77 @@ describe('SubjectIdentificationSettingsForm', () => {
       await waitFor(() => {
         expect(screen.getByTestId<HTMLButtonElement>('subject-identification-save').disabled).toBe(true);
       });
+    });
+  });
+
+  it('should list its sections by their translated label, as every settings tab orders its items', () => {
+    renderForm(storedSettings());
+    const titles = screen.getAllByRole('heading', { name: /^(Custom Identifying Fields|Offered Methods)$/ });
+    expect(titles.map((title) => title.textContent)).toStrictEqual(['Custom Identifying Fields', 'Offered Methods']);
+  });
+
+  describe('offered methods', () => {
+    it('should offer custom fields only once a definition is drafted, since only defined fields can be offered', () => {
+      renderForm(unsetSettings);
+      expect(screen.getByTestId<HTMLButtonElement>('offered-method-CUSTOM_FIELDS').disabled).toBe(true);
+      defineOneField();
+      expect(screen.getByTestId<HTMLButtonElement>('offered-method-CUSTOM_FIELDS').disabled).toBe(false);
+    });
+
+    it("should label custom fields with the drafted method's label", () => {
+      renderForm(storedSettings());
+      expect(screen.getByTestId('offered-methods').textContent).toContain('Animal information');
+    });
+
+    it('should list the methods by their translated label, as every settings tab orders its items', () => {
+      renderForm(storedSettings());
+      const labels = within(screen.getByTestId('offered-methods')).getAllByText(
+        /^(Animal information|Custom Identifier|Personal Information)$/
+      );
+      expect(labels.map((label) => label.textContent)).toStrictEqual([
+        'Animal information',
+        'Custom Identifier',
+        'Personal Information'
+      ]);
+    });
+
+    it('should send the ticked methods, with no confirmation when none is turned off', async () => {
+      renderForm(storedSettings());
+      click('offered-method-CUSTOM_FIELDS');
+      click('subject-identification-save');
+      await waitFor(() => expect(lastNotification()?.type).toBe('success'));
+      expect(lastPutBody()).toMatchObject({ offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS'] });
+    });
+
+    it('should require at least one method, or no subject could be identified', () => {
+      renderForm(storedSettings());
+      click('offered-method-CUSTOM_ID');
+      click('offered-method-PERSONAL_INFO');
+      click('subject-identification-save');
+      expect(screen.getByTestId('offered-methods-error')).toBeTruthy();
+      expect(mockAxios.put).not.toHaveBeenCalled();
+    });
+
+    it('should show how many subjects a method identifies before turning it off, and save it once confirmed', async () => {
+      renderForm(storedSettings());
+      click('offered-method-PERSONAL_INFO');
+      click('subject-identification-save');
+      await waitFor(() => {
+        expect(screen.getByTestId('turn-off-count-PERSONAL_INFO').textContent).toBe('Personal Information: 7 subjects');
+      });
+      expect(mockAxios.get).toHaveBeenCalledWith('/v1/subjects/identification/counts');
+      expect(mockAxios.put).not.toHaveBeenCalled();
+      click('subject-identification-confirm-save');
+      await waitFor(() => expect(lastPutBody()).toMatchObject({ offeredMethods: ['CUSTOM_ID'] }));
+    });
+
+    it('should stop offering custom fields when their definition is removed', async () => {
+      renderForm(storedSettings({ offeredMethods: ['CUSTOM_ID', 'CUSTOM_FIELDS'] }));
+      click('custom-fields-remove');
+      click('subject-identification-save');
+      expect(screen.getByTestId('turn-off-count-CUSTOM_FIELDS')).toBeTruthy();
+      click('subject-identification-confirm-save');
+      await waitFor(() => expect(lastPutBody()).toStrictEqual({ customFields: null, offeredMethods: ['CUSTOM_ID'] }));
     });
   });
 

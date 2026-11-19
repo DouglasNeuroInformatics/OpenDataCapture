@@ -32,13 +32,13 @@ import { useDeleteSeriesInstrumentMutation } from '@/hooks/useDeleteSeriesInstru
 import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
+import { useSubjectIdentificationMethodOptions } from '@/hooks/useSubjectIdentificationMethodOptions';
 import {
   subjectIdentificationSettingsQueryOptions,
   useSubjectIdentificationSettingsQuery
 } from '@/hooks/useSubjectIdentificationSettingsQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
 import { useAppStore } from '@/store';
-import { getValueForLanguage } from '@/utils/language';
 import { buildSeriesAvailability } from '@/utils/series-availability';
 
 /**
@@ -100,8 +100,6 @@ type SettingsValues = {
 };
 
 type ManageGroupFormProps = {
-  /** The admin's label for the custom fields, or null while none are defined, which leaves the method unavailable. */
-  customFieldsLabel: null | string;
   data: {
     // The titles of every visible instrument, used to enforce unique new series instrument names.
     existingTitles: string[];
@@ -112,6 +110,7 @@ type ManageGroupFormProps = {
     instruments: CategorizedInstruments;
     settingsInitialValues: SettingsValues;
   };
+  identificationMethodOptions: { [method: string]: string };
   onSubmit: (data: Partial<$UpdateGroupData>) => Promisable<any>;
   readOnly: boolean;
 };
@@ -568,7 +567,7 @@ const DeleteInstrumentDialog = ({
   );
 };
 
-const ManageGroupForm = ({ customFieldsLabel, data, onSubmit, readOnly }: ManageGroupFormProps) => {
+const ManageGroupForm = ({ data, identificationMethodOptions, onSubmit, readOnly }: ManageGroupFormProps) => {
   const { existingTitles, groupId, hiddenAccessibleIds, initialSelectedIds, instruments, settingsInitialValues } = data;
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
@@ -604,12 +603,6 @@ const ManageGroupForm = ({ customFieldsLabel, data, onSubmit, readOnly }: Manage
     () => [...instruments.form, ...instruments.interactive, ...instruments.series],
     [instruments]
   );
-
-  const identificationMethodOptions: { [method: string]: string } = {
-    CUSTOM_ID: t('common.customIdentifier'),
-    PERSONAL_INFO: t('common.personalInfo'),
-    ...(customFieldsLabel === null ? {} : { CUSTOM_FIELDS: customFieldsLabel })
-  };
 
   // Only a form the group will be able to access may be required, so the options follow the selection.
   // The list holds the latest edition of each form, so a shared title is two forms, told apart by name.
@@ -896,10 +889,13 @@ const ManageGroupForm = ({ customFieldsLabel, data, onSubmit, readOnly }: Manage
               })
             ].filter((id) => !deletedIds.has(id)),
             settings: {
-              // The select holds a string, since which methods it offers is known only at runtime.
-              defaultIdentificationMethod: $SubjectIdentificationMethod
-                .optional()
-                .parse(formData.defaultIdentificationMethod),
+              // Left as seeded, the select may show the first offered method in place of a default the
+              // instance no longer offers, so it is sent only once changed; unsent, the stored one stays.
+              // It holds a string, since which methods it offers is known only at runtime.
+              defaultIdentificationMethod:
+                formData.defaultIdentificationMethod === settingsInitialValues.defaultIdentificationMethod
+                  ? undefined
+                  : $SubjectIdentificationMethod.optional().parse(formData.defaultIdentificationMethod),
               idValidationRegex: formData.idValidationRegex,
               idValidationRegexErrorMessage: {
                 en: formData.idValidationRegexErrorMessageEn,
@@ -929,9 +925,14 @@ const RouteComponent = () => {
   const groupQuery = useGroupQuery(currentGroup?.id);
   const group = groupQuery.data;
   const subjectIdentificationSettingsQuery = useSubjectIdentificationSettingsQuery();
-  const customFieldsDefinition = subjectIdentificationSettingsQuery.data.customFields;
+  const { options: identificationMethodOptions, preferMethod } = useSubjectIdentificationMethodOptions(
+    subjectIdentificationSettingsQuery.data
+  );
 
   const availableInstruments = instrumentInfoQuery.data;
+
+  // A default the instance no longer offers would leave the select empty, so it shows the first offered.
+  const defaultIdentificationMethod = preferMethod(group?.settings.defaultIdentificationMethod);
 
   const data = useMemo(() => {
     if (!availableInstruments || !group) {
@@ -998,7 +999,7 @@ const RouteComponent = () => {
 
     const settings = group.settings;
     const settingsInitialValues: SettingsValues = {
-      defaultIdentificationMethod: settings.defaultIdentificationMethod,
+      defaultIdentificationMethod,
       idValidationRegex: settings.idValidationRegex,
       idValidationRegexErrorMessageEn: settings.idValidationRegexErrorMessage?.en,
       idValidationRegexErrorMessageFr: settings.idValidationRegexErrorMessage?.fr,
@@ -1020,7 +1021,7 @@ const RouteComponent = () => {
       instruments,
       settingsInitialValues
     };
-  }, [availableInstruments, group, resolvedLanguage, t]);
+  }, [availableInstruments, defaultIdentificationMethod, group, resolvedLanguage, t]);
 
   return (
     <React.Fragment>
@@ -1035,10 +1036,8 @@ const RouteComponent = () => {
         Component={ManageGroupForm}
         key={currentGroup?.id}
         props={{
-          customFieldsLabel: customFieldsDefinition
-            ? (getValueForLanguage(customFieldsDefinition.label, resolvedLanguage) ?? '')
-            : null,
           data,
+          identificationMethodOptions,
           onSubmit: async (data) => {
             const updatedGroup = await updateGroupMutation.mutateAsync(data);
             changeGroup(updatedGroup);

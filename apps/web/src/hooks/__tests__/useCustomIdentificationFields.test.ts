@@ -28,15 +28,10 @@ const renderFields = (value: CustomFieldsDefinition | null = definition) => {
 };
 
 describe('useCustomIdentificationFields', () => {
-  it('should offer no method and no field without a definition', () => {
+  it('should offer no field without a definition', () => {
     const fields = renderFields(null);
-    expect(fields.label).toBeNull();
     expect(fields.formFields).toStrictEqual({});
     expect(fields.findErrors({})).toStrictEqual({});
-  });
-
-  it("should label the method with the administrator's label", () => {
-    expect(renderFields().label).toBe('Animal information');
   });
 
   it('should key one field per defined field, in order', () => {
@@ -98,6 +93,17 @@ describe('useCustomIdentificationFields', () => {
 
   it('should order the values as the fields are defined', () => {
     expect(renderFields().orderValues({ customField0: 'ab1', customField1: '7' })).toStrictEqual(['ab1', '7']);
+  });
+
+  it('should order a value not yet entered as empty, keeping every field in its place', () => {
+    expect(renderFields().orderValues({ customField1: '7' })).toStrictEqual(['', '7']);
+  });
+
+  it('should label a field whose label has no text in any language with nothing, rather than fail', () => {
+    const { formFields } = renderFields({ ...definition, fields: [{ label: {}, pattern: '[0-9]+' }] });
+    expect(formFields.customField0?.render({ subjectIdentificationMethod: 'CUSTOM_FIELDS' })).toMatchObject({
+      label: ''
+    });
   });
 
   it("should derive the subject id from the values in order, with the instance's salt and iterations", async () => {

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { $UpdateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { CreateSeriesInstrumentResult, TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import type { CustomFieldsDefinition } from '@opendatacapture/schemas/subject-identification';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -31,6 +32,7 @@ const mocks = vi.hoisted(() => ({
   fetchedGroup: undefined as Group | undefined,
   instruments: undefined as TranslatedInstrumentInfo[] | undefined,
   isDemo: false,
+  offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO'] as [SubjectIdentificationMethod, ...SubjectIdentificationMethod[]],
   store: { currentGroup: null as Group | null },
   updateMutateAsync: vi.fn<(data: Partial<$UpdateGroupData>) => Promise<Group>>()
 }));
@@ -53,7 +55,9 @@ vi.mock('@/hooks/useSetupStateQuery', () => ({
 }));
 vi.mock('@/hooks/useSubjectIdentificationSettingsQuery', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/hooks/useSubjectIdentificationSettingsQuery')>()),
-  useSubjectIdentificationSettingsQuery: () => ({ data: { customFields: mocks.customFields } })
+  useSubjectIdentificationSettingsQuery: () => ({
+    data: { customFields: mocks.customFields, offeredMethods: mocks.offeredMethods }
+  })
 }));
 vi.mock('@/hooks/useUpdateGroupMutation', () => ({
   useUpdateGroupMutation: () => ({ mutateAsync: mocks.updateMutateAsync })
@@ -209,6 +213,7 @@ describe('Route', () => {
     vi.clearAllMocks();
     mocks.customFields = null;
     mocks.fetchedGroup = undefined;
+    mocks.offeredMethods = ['CUSTOM_ID', 'PERSONAL_INFO'];
     mocks.instruments = defaultInstruments();
     mocks.isDemo = false;
     mocks.store.currentGroup = makeGroup();
@@ -677,7 +682,8 @@ describe('Route', () => {
       expect(mocks.updateMutateAsync).toHaveBeenCalledWith(
         expect.objectContaining({
           settings: {
-            defaultIdentificationMethod: 'PERSONAL_INFO',
+            // Unchanged, so the stored one stays.
+            defaultIdentificationMethod: undefined,
             idValidationRegex: '^[0-9]+$',
             idValidationRegexErrorMessage: { en: 'Digits only', fr: 'Chiffres seulement' },
             minimumAge: 18,
@@ -721,6 +727,12 @@ describe('Route', () => {
   });
 
   describe('default identification method', () => {
+    /** Opens the select from the keyboard, since happy-dom dispatches no pointer capture. */
+    const chooseDefaultMethod = (method: string) => {
+      fireEvent.keyDown(screen.getByTestId('defaultIdentificationMethod-select-trigger'), { key: 'Enter' });
+      fireEvent.click(screen.getByTestId(`defaultIdentificationMethod-select-item-${method}`));
+    };
+
     const methodOptions = () => {
       const select = document.querySelector<HTMLSelectElement>('select[name="defaultIdentificationMethod"]')!;
       return Array.from(select.options, (option) => option.textContent).filter(Boolean);
@@ -738,12 +750,31 @@ describe('Route', () => {
         label: { en: 'Animal information' },
         salt: '0f'.repeat(32)
       };
-      mocks.store.currentGroup = makeGroup({ settings: { defaultIdentificationMethod: 'CUSTOM_FIELDS' } });
+      mocks.offeredMethods = ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS'];
       renderPage();
       expect(methodOptions()).toEqual(['Custom Identifier', 'Personal Information', 'Animal information']);
+      chooseDefaultMethod('CUSTOM_FIELDS');
       submitSettings();
       await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
       expect(mocks.updateMutateAsync.mock.lastCall?.[0].settings?.defaultIdentificationMethod).toBe('CUSTOM_FIELDS');
+    });
+  });
+
+  describe('offered methods', () => {
+    it('should offer only the methods the instance offers as the default', () => {
+      mocks.offeredMethods = ['PERSONAL_INFO'];
+      mocks.store.currentGroup = makeGroup({ settings: { defaultIdentificationMethod: 'PERSONAL_INFO' } });
+      renderPage();
+      const select = document.querySelector<HTMLSelectElement>('select[name="defaultIdentificationMethod"]')!;
+      expect(Array.from(select.options, (option) => option.value).filter(Boolean)).toEqual(['PERSONAL_INFO']);
+    });
+
+    it('should keep a default the instance no longer offers when the manager leaves the select as it was', async () => {
+      mocks.offeredMethods = ['PERSONAL_INFO'];
+      renderPage();
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(mocks.updateMutateAsync.mock.lastCall?.[0].settings?.defaultIdentificationMethod).toBeUndefined();
     });
   });
 

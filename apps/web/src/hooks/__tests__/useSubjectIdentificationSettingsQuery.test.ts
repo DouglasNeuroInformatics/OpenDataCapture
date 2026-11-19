@@ -18,7 +18,8 @@ const settings = {
     label: { en: 'Animal information' },
     salt: 'ab'.repeat(32)
   },
-  isCustomFieldsLocked: false
+  isCustomFieldsLocked: false,
+  offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO']
 };
 
 function renderSettingsQuery() {

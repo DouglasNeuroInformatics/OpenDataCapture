@@ -1,4 +1,5 @@
 import type { LocalizedString } from '@opendatacapture/schemas/core';
+import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
 import {
   $CustomFieldsDefinitionData,
   $CustomIdentificationField
@@ -24,6 +25,15 @@ type CustomFieldsDraft = Omit<CustomFieldsDefinitionData, 'fields'> & { fields: 
  */
 type SubjectIdentificationDraft = {
   customFields: CustomFieldsDraft | null;
+  offeredMethods: SubjectIdentificationMethod[];
+};
+
+/**
+ * The body the draft would send, before the schema has checked it: the draft may offer no method
+ * while it is being edited, which the schema refuses.
+ */
+type UncheckedSubjectIdentificationSettingsData = Omit<$UpdateSubjectIdentificationSettingsData, 'offeredMethods'> & {
+  offeredMethods: SubjectIdentificationMethod[];
 };
 
 type CustomFieldIssues = {
@@ -36,11 +46,15 @@ const createCustomFieldDraft = (): CustomFieldDraft => ({ key: crypto.randomUUID
 /** A definition has at least one field, so a new one starts with a field to fill in. */
 const createCustomFieldsDraft = (): CustomFieldsDraft => ({ fields: [createCustomFieldDraft()], label: {} });
 
-const toSubjectIdentificationDraft = ({ customFields }: SubjectIdentificationSettings): SubjectIdentificationDraft => ({
+const toSubjectIdentificationDraft = ({
+  customFields,
+  offeredMethods
+}: SubjectIdentificationSettings): SubjectIdentificationDraft => ({
   customFields: customFields && {
     fields: customFields.fields.map((field) => ({ ...field, key: crypto.randomUUID() })),
     label: customFields.label
-  }
+  },
+  offeredMethods
 });
 
 const omitBlankOptionalText = (value: LocalizedString | null | undefined): LocalizedString | null => {
@@ -48,8 +62,9 @@ const omitBlankOptionalText = (value: LocalizedString | null | undefined): Local
 };
 
 const toUpdateSubjectIdentificationSettingsData = ({
-  customFields
-}: SubjectIdentificationDraft): $UpdateSubjectIdentificationSettingsData => ({
+  customFields,
+  offeredMethods
+}: SubjectIdentificationDraft): UncheckedSubjectIdentificationSettingsData => ({
   customFields: customFields && {
     fields: customFields.fields.map(({ description, label, pattern, patternErrorMessage }) => ({
       description: omitBlankOptionalText(description),
@@ -58,7 +73,8 @@ const toUpdateSubjectIdentificationSettingsData = ({
       patternErrorMessage: omitBlankOptionalText(patternErrorMessage)
     })),
     label: omitBlankLanguages(customFields.label)
-  }
+  },
+  offeredMethods
 });
 
 // The schema decides what is invalid; the editor only decides where to say so.
@@ -80,4 +96,10 @@ export {
   toUpdateSubjectIdentificationSettingsData
 };
 
-export type { CustomFieldDraft, CustomFieldIssues, CustomFieldsDraft, SubjectIdentificationDraft };
+export type {
+  CustomFieldDraft,
+  CustomFieldIssues,
+  CustomFieldsDraft,
+  SubjectIdentificationDraft,
+  UncheckedSubjectIdentificationSettingsData
+};

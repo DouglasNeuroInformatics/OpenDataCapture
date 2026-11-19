@@ -469,6 +469,33 @@ describe('SubjectsService', () => {
     });
   });
 
+  describe('countByIdentificationMethod', () => {
+    it('should count every method, reporting zero for one no subject uses', async () => {
+      subjectModel.aggregateRaw.mockResolvedValueOnce([
+        { _id: 'CUSTOM_ID', count: 4 },
+        { _id: 'PERSONAL_INFO', count: 2 }
+      ]);
+      await expect(subjectsService.countByIdentificationMethod()).resolves.toStrictEqual({
+        CUSTOM_FIELDS: 0,
+        CUSTOM_ID: 4,
+        PERSONAL_INFO: 2
+      });
+    });
+
+    it('should tell the methods apart by the shape of the id, checking a custom-fields id before a name hash', async () => {
+      subjectModel.aggregateRaw.mockResolvedValueOnce([]);
+      await subjectsService.countByIdentificationMethod();
+      const [{ pipeline }] = subjectModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
+      expect(pipeline[0].$group._id.$switch).toStrictEqual({
+        branches: [
+          { case: { $regexMatch: { input: '$_id', regex: '^cf_[0-9a-f]{64}$' } }, then: 'CUSTOM_FIELDS' },
+          { case: { $regexMatch: { input: '$_id', regex: '^[0-9a-f]{64}$' } }, then: 'PERSONAL_INFO' }
+        ],
+        default: 'CUSTOM_ID'
+      });
+    });
+  });
+
   describe('hasCustomFieldsSubjects', () => {
     // A custom-fields subject stores no name, so only its id tells it apart from a custom id.
     it('should look for any subject whose id carries the custom-fields prefix, by a lexical range', async () => {

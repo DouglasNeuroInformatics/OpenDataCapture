@@ -1,5 +1,6 @@
-import { randomUUID } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 
+import { $SubjectIdentificationCounts } from '@opendatacapture/schemas/subject-identification';
 import type { SubjectIdentificationSettings } from '@opendatacapture/schemas/subject-identification';
 import { beforeAll, describe, expect, it } from 'vitest';
 
@@ -11,6 +12,8 @@ const PASSWORD = 'DataCapture2025_Test';
 
 // Its own address, so these logins never count against another suite's throttling budget.
 const LOGIN_ADDRESS = '192.0.2.111';
+
+const BUILT_IN_METHODS = ['CUSTOM_ID', 'PERSONAL_INFO'];
 
 const definition = {
   fields: [
@@ -46,6 +49,18 @@ export default defineSuite('subject identification', function () {
     return this.app.inject({ headers, method: 'PUT', payload, url: '/v1/subjects/identification/settings' });
   };
 
+  const startSession = async (subjectId: string) => {
+    const response = await this.app.inject({
+      headers: standardHeaders,
+      method: 'POST',
+      payload: { date: new Date(), groupId, subjectData: { id: subjectId }, type: 'IN_PERSON' },
+      url: '/v1/sessions'
+    });
+    expect(response.statusCode).toBe(201);
+  };
+
+  const hexDigest = () => randomBytes(32).toString('hex');
+
   beforeAll(async () => {
     adminHeaders = await login('admin');
     const group = await this.app.inject({
@@ -78,22 +93,71 @@ export default defineSuite('subject identification', function () {
     it('should report no definition, unlocked', async () => {
       await expect(getSettings(adminHeaders)).resolves.toStrictEqual({
         customFields: null,
-        isCustomFieldsLocked: false
+        isCustomFieldsLocked: false,
+        offeredMethods: BUILT_IN_METHODS
       });
     });
   });
 
   describe('PUT /v1/subjects/identification/settings', () => {
     it('should refuse anyone but an administrator', async () => {
-      expect((await putSettings(standardHeaders, { customFields: definition })).statusCode).toBe(403);
+      expect(
+        (await putSettings(standardHeaders, { customFields: definition, offeredMethods: BUILT_IN_METHODS })).statusCode
+      ).toBe(403);
     });
 
     it('should store the definition with a salt and iteration count of the server’s choosing', async () => {
-      const response = await putSettings(adminHeaders, { customFields: definition });
+      const response = await putSettings(adminHeaders, { customFields: definition, offeredMethods: BUILT_IN_METHODS });
       expect(response.statusCode).toBe(200);
       const { customFields } = response.json<SubjectIdentificationSettings>();
       expect(customFields).toMatchObject({ ...definition, iterations: 600_000 });
       expect(customFields?.salt).toMatch(/^[0-9a-f]{64}$/);
+    });
+  });
+
+  describe('offered methods', () => {
+    it('should refuse to offer custom fields that are not defined', async () => {
+      const response = await putSettings(adminHeaders, {
+        customFields: null,
+        offeredMethods: ['CUSTOM_ID', 'CUSTOM_FIELDS']
+      });
+      expect(response.statusCode).toBe(400);
+    });
+
+    it('should offer custom fields once they are defined and ticked', async () => {
+      const response = await putSettings(adminHeaders, {
+        customFields: definition,
+        offeredMethods: ['CUSTOM_FIELDS', 'CUSTOM_ID', 'PERSONAL_INFO']
+      });
+      expect(response.json<SubjectIdentificationSettings>().offeredMethods).toStrictEqual([
+        'CUSTOM_ID',
+        'PERSONAL_INFO',
+        'CUSTOM_FIELDS'
+      ]);
+    });
+  });
+
+  describe('GET /v1/subjects/identification/counts', () => {
+    const getCounts = (headers: AuthHeaders) => {
+      return this.app.inject({ headers, method: 'GET', url: '/v1/subjects/identification/counts' });
+    };
+
+    it('should refuse anyone but an administrator', async () => {
+      expect((await getCounts(standardHeaders)).statusCode).toBe(403);
+    });
+
+    // Every suite shares the database, so the counts are compared before and after rather than exactly.
+    it('should count each subject under the method the shape of its id names', async () => {
+      const before = $SubjectIdentificationCounts.parse((await getCounts(adminHeaders)).json());
+      await startSession(hexDigest());
+      await startSession(`Identification$${randomUUID()}`);
+      await startSession(`cf_${hexDigest()}`);
+      const after = $SubjectIdentificationCounts.parse((await getCounts(adminHeaders)).json());
+      expect(after).toStrictEqual({
+        CUSTOM_FIELDS: before.CUSTOM_FIELDS + 1,
+        CUSTOM_ID: before.CUSTOM_ID + 1,
+        PERSONAL_INFO: before.PERSONAL_INFO + 1
+      });
     });
   });
 
@@ -115,18 +179,7 @@ export default defineSuite('subject identification', function () {
 
     beforeAll(async () => {
       salt = (await getSettings(adminHeaders)).customFields!.salt;
-      const session = await this.app.inject({
-        headers: standardHeaders,
-        method: 'POST',
-        payload: {
-          date: new Date(),
-          groupId,
-          subjectData: { id: `cf_${'0'.repeat(64)}` },
-          type: 'IN_PERSON'
-        },
-        url: '/v1/sessions'
-      });
-      expect(session.statusCode).toBe(201);
+      await startSession(`cf_${'0'.repeat(64)}`);
     });
 
     it('should report the definition locked', async () => {
@@ -134,12 +187,16 @@ export default defineSuite('subject identification', function () {
     });
 
     it('should refuse to remove the definition', async () => {
-      expect((await putSettings(adminHeaders, { customFields: null })).statusCode).toBe(409);
+      expect(
+        (await putSettings(adminHeaders, { customFields: null, offeredMethods: BUILT_IN_METHODS })).statusCode
+      ).toBe(409);
     });
 
     it('should refuse to change the number of fields', async () => {
       const fewer = { ...definition, fields: definition.fields.slice(0, 1) };
-      expect((await putSettings(adminHeaders, { customFields: fewer })).statusCode).toBe(409);
+      expect(
+        (await putSettings(adminHeaders, { customFields: fewer, offeredMethods: BUILT_IN_METHODS })).statusCode
+      ).toBe(409);
     });
 
     it('should still accept corrected labels and patterns, keeping the salt', async () => {
@@ -147,7 +204,7 @@ export default defineSuite('subject identification', function () {
         fields: definition.fields.map((field) => ({ ...field, pattern: '[A-Z0-9]+' })),
         label: { en: 'Mouse information' }
       };
-      const response = await putSettings(adminHeaders, { customFields: corrected });
+      const response = await putSettings(adminHeaders, { customFields: corrected, offeredMethods: BUILT_IN_METHODS });
       expect(response.statusCode).toBe(200);
       expect(response.json<SubjectIdentificationSettings>().customFields).toMatchObject({ ...corrected, salt });
     });

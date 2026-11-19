@@ -22,7 +22,8 @@ const settings: SubjectIdentificationSettings = {
     label: { en: 'Animal information' },
     salt: 'ab'.repeat(32)
   },
-  isCustomFieldsLocked: false
+  isCustomFieldsLocked: false,
+  offeredMethods: ['CUSTOM_ID', 'CUSTOM_FIELDS']
 };
 
 const field = (overrides: Partial<CustomFieldDraft> = {}): CustomFieldDraft => ({
@@ -56,22 +57,28 @@ describe('toSubjectIdentificationDraft', () => {
   });
 
   it('should hold no definition when none is stored', () => {
-    expect(toSubjectIdentificationDraft({ customFields: null, isCustomFieldsLocked: false })).toStrictEqual({
-      customFields: null
-    });
+    expect(
+      toSubjectIdentificationDraft({ customFields: null, isCustomFieldsLocked: false, offeredMethods: ['CUSTOM_ID'] })
+    ).toStrictEqual({ customFields: null, offeredMethods: ['CUSTOM_ID'] });
+  });
+
+  it('should hold the offered methods', () => {
+    expect(toSubjectIdentificationDraft(settings).offeredMethods).toStrictEqual(['CUSTOM_ID', 'CUSTOM_FIELDS']);
   });
 });
 
 describe('toUpdateSubjectIdentificationSettingsData', () => {
   it('should send the fields without their keys and with blank languages left out', () => {
     const data = toUpdateSubjectIdentificationSettingsData({
-      customFields: { fields: [field({ label: { en: 'Animal ID', fr: ' ' } })], label: { en: 'Animal', es: '' } }
+      customFields: { fields: [field({ label: { en: 'Animal ID', fr: ' ' } })], label: { en: 'Animal', es: '' } },
+      offeredMethods: ['CUSTOM_ID']
     });
     expect(data).toStrictEqual({
       customFields: {
         fields: [{ description: null, label: { en: 'Animal ID' }, pattern: '[0-9]+', patternErrorMessage: null }],
         label: { en: 'Animal' }
-      }
+      },
+      offeredMethods: ['CUSTOM_ID']
     });
   });
 
@@ -80,7 +87,8 @@ describe('toUpdateSubjectIdentificationSettingsData', () => {
       customFields: {
         fields: [field({ description: { fr: 'Aide' }, patternErrorMessage: { es: 'Error' } })],
         label: {}
-      }
+      },
+      offeredMethods: ['CUSTOM_ID']
     });
     expect(data.customFields?.fields[0]).toMatchObject({
       description: { fr: 'Aide' },
@@ -89,7 +97,12 @@ describe('toUpdateSubjectIdentificationSettingsData', () => {
   });
 
   it('should send a removed definition as null', () => {
-    expect(toUpdateSubjectIdentificationSettingsData({ customFields: null })).toStrictEqual({ customFields: null });
+    expect(
+      toUpdateSubjectIdentificationSettingsData({ customFields: null, offeredMethods: ['CUSTOM_ID'] })
+    ).toStrictEqual({
+      customFields: null,
+      offeredMethods: ['CUSTOM_ID']
+    });
   });
 });
 

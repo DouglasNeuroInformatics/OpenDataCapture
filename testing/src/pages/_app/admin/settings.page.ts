@@ -3,7 +3,7 @@ import type { Locator, Page, Response } from '@playwright/test';
 
 import { AppPage } from '../route.page';
 
-type SettingsTab = 'features' | 'interface' | 'mail';
+type SettingsTab = 'features' | 'interface' | 'mail' | 'subject-identification';
 
 export class AdminSettingsPage extends AppPage {
   readonly defaultAssignmentDurationInput: Locator;

@@ -541,8 +541,11 @@ type CustomFieldsDefinition {
   salt       String
 }
 
+// An empty list of offered methods is one an administrator never chose, which offers the built-in
+// two; once chosen, at least one is offered.
 type SubjectIdentificationSettings {
-  customFields CustomFieldsDefinition?
+  customFields   CustomFieldsDefinition?
+  offeredMethods SubjectIdentificationMethod[]
 }
 
 model SetupState {

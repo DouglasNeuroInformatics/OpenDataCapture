@@ -108,7 +108,6 @@ export function useCustomIdentificationFields(definition: CustomFieldsDefinition
     },
     findErrors,
     formFields,
-    label: definition ? (localize(definition.label) ?? '') : null,
     orderValues,
     shape
   };
