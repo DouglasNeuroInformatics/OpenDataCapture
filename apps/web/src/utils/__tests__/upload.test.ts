@@ -1549,4 +1549,15 @@ describe('reformatInstrumentData', () => {
       username: undefined
     });
   });
+
+  it('should leave a name hash unscoped, so its records join the existing subject rather than a duplicate', () => {
+    const nameHash = '520be817915752b50f418a743a54b692ce8e2a0a3421931598ffad246182568f';
+    expect(
+      reformatInstrumentData({
+        currentGroup: group,
+        data: [{ ...data[0], subjectID: nameHash }],
+        instrument: unilingualFormInstrument.instance
+      }).records
+    ).toMatchObject([{ subjectId: nameHash }]);
+  });
 });
