@@ -139,9 +139,10 @@ that a grantable pair used to reach belongs in the same predicate.
   reads the hash; `AssignmentsService.findPrivateKeyById`, called only by the gateway synchronizer,
   is the only read of the key.
 - **Password policy is `UsersService.validatePassword`**: strength via libpasswd, not equal to the
-  username, and a Have I Been Pwned check that **fails open** when the API is unreachable. Failures
+  username, and a Have I Been Pwned check that **fails open** when the API is unreachable and is
+  skipped when `PASSWORD_BREACH_CHECK_ENABLED=false` (the e2e suite and the api vitest project). Failures
   carry a `code` from `PASSWORD_ERROR_CODES` (`packages/schemas/src/user/user.ts`); the web client
   localizes it, the API does not.
 
 Row scoping is invisible to a unit test with a mocked model, so a change to who can see what needs an
-end-to-end test in `testing/`.
+integration test against the real database in `apps/api/test/suites/` (see `08-authorization.suite.ts`).

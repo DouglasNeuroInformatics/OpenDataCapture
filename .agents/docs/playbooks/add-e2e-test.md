@@ -4,8 +4,10 @@ Conventions and fixtures live in `testing/AGENTS.md`; read it first. This file i
 operations.
 
 **Once per machine:** a repo-root `.env` (`pnpm generate:env`) and the browsers,
-`pnpm --filter @opendatacapture/testing exec playwright install chromium firefox`. Nothing else needs
-starting — `playwright.config.ts` boots api, gateway, web and playground itself.
+`pnpm --filter @opendatacapture/testing exec playwright install chromium`. Nothing else needs
+starting — `playwright.config.ts` boots api, gateway, web and playground itself, serving the last
+build of the last three: `pnpm test:e2e` builds them first, `test:dev` and a bare `playwright test` do
+not.
 
 ## Steps
 
@@ -39,7 +41,9 @@ starting — `playwright.config.ts` boots api, gateway, web and playground itsel
 8. **Set the role and first-run state** with `test.use({ actingRole: 'ADMIN' })` (default
    `GROUP_MANAGER`) and `test.use({ appState: {...} })` (`testing/src/specs/disclaimer.spec.ts`).
 
-9. **Tag `@smoke` only a critical flow**; those are the only tests firefox runs.
+9. **Check whether a cheaper tier proves it first.** A rule in one component, hook or route is a unit
+   test; a query's row scoping is an `apps/api/test/suites/` test. An e2e spec is for what needs the
+   browser and the other apps at once.
 
 ## Verify
 
