@@ -2,7 +2,7 @@ import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type { Group, GroupSettings } from '@opendatacapture/schemas/group';
 import { generateSubjectHash } from '@opendatacapture/subject-utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, getByText, render, screen, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -452,13 +452,6 @@ describe('StartSessionForm', () => {
       vi.setSystemTime(time);
     };
 
-    const enterSessionDate = (form: HTMLElement, date: string) => {
-      const input = form.querySelector<HTMLInputElement>('[name="sessionDate"]')!;
-      fireEvent.focus(input);
-      fireEvent.change(input, { target: { value: date } });
-      fireEvent.blur(input);
-    };
-
     afterEach(() => {
       vi.useRealTimers();
     });
@@ -473,24 +466,90 @@ describe('StartSessionForm', () => {
       expect(onSubmit.mock.lastCall?.[0].date).toStrictEqual(new Date(startedAt));
     });
 
-    it('should accept a retrospective date later than when the page opened once that date has passed', async () => {
-      const form = renderForm([]);
-      typeIdentifier('abc');
-      closeIdentifierPopup();
-      fireEvent.change(form.querySelector('[name="sessionType"]')!, { target: { value: 'RETROSPECTIVE' } });
-      enterSessionDate(form, toDateString(pageLoadedAt + DAY));
-      moveClock(pageLoadedAt + 2 * DAY);
-      fireEvent.click(submitButton());
-      await waitFor(() => expect(onSubmit).toHaveBeenCalled());
-      expect(onSubmit.mock.lastCall?.[0].date).toStrictEqual(new Date(toDateString(pageLoadedAt + DAY)));
-    });
-
     it("should accept a date of birth that reaches the group's minimum age only after the page opened", async () => {
       const minimumAgeReachedAt = pageLoadedAt - 18 * 31556952000 + 5 * DAY;
       const form = renderForm([], groupWithSettings({ minimumAge: 18 }), 'PERSONAL_INFO');
       fillPersonalInfo(form, { dateOfBirth: toDateString(minimumAgeReachedAt), firstName: 'Jane' });
       moveClock(pageLoadedAt + 10 * DAY);
       await submitAndSettle(form);
+    });
+  });
+
+  describe('retrospective session', () => {
+    // A fixed local date a year ahead, so the picker opens on a known month and a date frozen when
+    // the module loaded would lie before every time used here.
+    const pageOpenedAt = new Date(new Date().getFullYear() + 1, 5, 15, 9, 0, 0);
+
+    const chooseRetrospective = (form: HTMLElement) => {
+      fireEvent.change(form.querySelector('[name="sessionType"]')!, { target: { value: 'RETROSPECTIVE' } });
+    };
+
+    const pickSessionDay = (day: number) => {
+      fireEvent.click(screen.getByTestId('datetime-date-trigger'));
+      fireEvent.click(getByText(screen.getByTestId('datepicker'), String(day)));
+    };
+
+    const enterSessionTime = (time: string) => {
+      fireEvent.change(screen.getByTestId('datetime-time-input'), { target: { value: time } });
+    };
+
+    const renderWithNewIdentifier = () => {
+      const form = renderForm([]);
+      typeIdentifier('abc');
+      closeIdentifierPopup();
+      chooseRetrospective(form);
+      return form;
+    };
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(pageOpenedAt);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should submit the time of day entered for a retrospective session, so the collection time is kept', async () => {
+      renderWithNewIdentifier();
+      pickSessionDay(15);
+      enterSessionTime('08:30:15');
+      fireEvent.click(submitButton());
+      await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+      expect(onSubmit.mock.lastCall?.[0]).toMatchObject({
+        date: new Date(pageOpenedAt.getFullYear(), 5, 15, 8, 30, 15),
+        type: 'RETROSPECTIVE'
+      });
+    });
+
+    it('should accept a retrospective time later than when the page opened once that time has passed', async () => {
+      renderWithNewIdentifier();
+      pickSessionDay(15);
+      enterSessionTime('10:30:00');
+      vi.setSystemTime(new Date(pageOpenedAt.getFullYear(), 5, 15, 11, 0, 0));
+      fireEvent.click(submitButton());
+      await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    });
+
+    it('should reject a retrospective time that has not happened yet', async () => {
+      renderWithNewIdentifier();
+      pickSessionDay(15);
+      enterSessionTime('10:30:00');
+      fireEvent.click(submitButton());
+      await waitFor(() => {
+        expect(errorMessages()).toEqual([{ field: 'sessionDate', message: 'The assessment must be in the past' }]);
+      });
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('should reject a retrospective session with no date, rather than dating it when the page loaded', async () => {
+      renderWithNewIdentifier();
+      enterSessionTime('08:30:00');
+      fireEvent.click(submitButton());
+      await waitFor(() => {
+        expect(errorMessages()).toEqual([{ field: 'sessionDate', message: 'This field is required' }]);
+      });
+      expect(onSubmit).not.toHaveBeenCalled();
     });
   });
 

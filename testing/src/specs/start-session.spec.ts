@@ -79,6 +79,30 @@ test.describe('start session', () => {
   });
 });
 
+// The date picker opens on the browser's current month, so the clock is fixed to a known day; the
+// timezone makes the stored instant, which is what the API receives, the same wherever the suite runs.
+test.describe('retrospective session time', () => {
+  test.use({ timezoneId: 'America/Toronto' });
+
+  test('should keep the time of day entered for a retrospective session', async ({ getPageModel, page, uniqueId }) => {
+    await page.clock.install({ time: new Date('2025-06-20T16:00:00Z') });
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.typeSubjectId(`retro-${uniqueId}`);
+    await startSessionPage.dismissSubjectIdOptions();
+    await startSessionPage.selectRetrospective();
+    await startSessionPage.pickSessionDay(10);
+    await startSessionPage.setSessionTime('14:30:00');
+
+    const sessionCreated = page.waitForRequest(
+      (request) => request.url().endsWith('/v1/sessions') && request.method() === 'POST'
+    );
+    await startSessionPage.submitForm();
+    expect((await sessionCreated).postDataJSON()).toMatchObject({ date: '2025-06-10T18:30:00.000Z' });
+    await expect(startSessionPage.successMessage).toBeVisible();
+  });
+});
+
 // A custom id says nothing about the subject behind it, so the form fills in what an existing
 // subject already records. An admin with no group has their custom ids scoped as `root$<id>`.
 test.describe('existing subject details', () => {

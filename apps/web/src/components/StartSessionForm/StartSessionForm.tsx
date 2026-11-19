@@ -33,7 +33,7 @@ const selectedCustomId = (values: StartSessionFormValues) => {
 };
 
 type StartSessionFormData = {
-  sessionDate: Date;
+  sessionDate?: Date;
   sessionType: 'IN_PERSON' | 'RETROSPECTIVE';
   subjectDateOfBirth?: Date;
   subjectFirstName?: string;
@@ -198,7 +198,8 @@ export const StartSessionForm = ({
                   ? {
                       description: t('session.dateAssessed.description'),
                       kind: 'date',
-                      label: t('session.dateAssessed.label')
+                      label: t('session.dateAssessed.label'),
+                      variant: 'datetime'
                     }
                   : null;
               }
@@ -219,7 +220,7 @@ export const StartSessionForm = ({
           subjectFirstName: z.string().optional(),
           subjectLastName: z.string().optional(),
           subjectIdentificationMethod: $SubjectIdentificationMethod,
-          // Every check on the identifier and the date of birth lives in the refinement below: zod v4
+          // Every check on the identifier and the two dates lives in the refinement below: zod v4
           // omits an optional property that failed its own checks from the value it hands the
           // refinement, which then reads the field as missing and adds a contradictory required-field
           // error.
@@ -227,12 +228,24 @@ export const StartSessionForm = ({
           subjectDateOfBirth: z.date().optional(),
           subjectSex: z.enum(['MALE', 'FEMALE']).optional(),
           sessionType: $SessionType.exclude(['REMOTE']),
-          sessionDate: z
-            .date()
-            .refine(isNotInFuture, { message: t('session.errors.assessmentMustBeInPast') })
-            .default(() => new Date())
+          sessionDate: z.date().optional()
         })
         .superRefine((val, ctx) => {
+          if (val.sessionType === 'RETROSPECTIVE') {
+            if (!val.sessionDate) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t('core.form.requiredField'),
+                path: ['sessionDate']
+              });
+            } else if (!isNotInFuture(val.sessionDate)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: t('session.errors.assessmentMustBeInPast'),
+                path: ['sessionDate']
+              });
+            }
+          }
           if (val.subjectIdentificationMethod === 'CUSTOM_ID') {
             if (!val.subjectId) {
               ctx.addIssue({
@@ -330,7 +343,8 @@ export const StartSessionForm = ({
           subjectId = scopeCustomId(subjectId);
         }
         await onSubmit({
-          date: sessionDate,
+          // Only a retrospective session has a date of its own; an in-person one starts now.
+          date: sessionDate ?? new Date(),
           groupId: currentGroup?.id ?? null,
           username: username ?? null,
           type: sessionType,
