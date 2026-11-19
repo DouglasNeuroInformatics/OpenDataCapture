@@ -32,5 +32,5 @@ appearing in two groups silently keeps the last one.
 ## Tests
 
 `pnpm exec vitest --project instrument-utils`. `src/__tests__/` holds one file per module. The
-results summary that `computeInstrumentMeasures` feeds is exercised end to end by
-`testing/src/specs/playground.spec.ts`.
+results summary that `computeInstrumentMeasures` feeds is tested through
+`packages/react-core/src/components/InstrumentSummary/__tests__/InstrumentSummary.test.tsx`.
