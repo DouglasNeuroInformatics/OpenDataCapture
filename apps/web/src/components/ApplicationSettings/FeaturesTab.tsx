@@ -42,45 +42,50 @@ export const FeaturesTab = ({ autosave }: FeaturesTabProps) => {
     label: t({ en: 'Uploader', es: 'Carga de datos', fr: 'Téléversement' })
   };
 
+  // An instance without the gateway can never create a remote assignment, and the server reports
+  // them disabled there whatever was saved, so neither setting could take effect.
+  if (!config.setup.isGatewayEnabled) {
+    return <SettingsCard sections={[uploaderSection]} />;
+  }
+
   const remoteAssignmentsLabel = t({
     en: 'Enable Remote Assignments',
     es: 'Activar las tareas remotas',
     fr: 'Activer les tâches à distance'
   });
-  const remoteAssignmentsRow = {
-    control: (
-      <SettingToggle
-        checked={setupState.isBulkRemoteAssignmentsEnabled ?? true}
-        label={remoteAssignmentsLabel}
-        onCheckedChange={(checked) => autosave({ isBulkRemoteAssignmentsEnabled: checked })}
-      />
-    ),
-    help: t({
-      en: 'When enabled, the group links are collected under a Group Actions menu with an added page for assigning one or more instruments to many subjects at once. When disabled, those links stay where they are.',
-      es: 'Cuando está activada, los enlaces del grupo se reúnen bajo un menú Acciones del grupo con una página adicional para asignar uno o varios instrumentos a muchos sujetos a la vez. Cuando está desactivada, esos enlaces permanecen donde están.',
-      fr: 'Lorsqu’elle est activée, les liens de groupe sont regroupés sous un menu Actions de groupe avec une page permettant d’attribuer un ou plusieurs instruments à plusieurs sujets à la fois. Lorsqu’elle est désactivée, ces liens restent inchangés.'
-    }),
-    label: remoteAssignmentsLabel
-  };
-  const durationRow = {
-    control: <DefaultAssignmentDurationInput autosave={autosave} />,
-    help: t({
-      en: 'The number of days a new remote assignment stays valid by default. This only sets the initial expiry date when creating an assignment, which can still be changed for each one.',
-      es: 'El número de días que una nueva tarea remota permanece válida de forma predeterminada. Esto solo define la fecha de vencimiento inicial al crear una tarea, que se puede cambiar en cada caso.',
-      fr: "Le nombre de jours pendant lesquels une nouvelle tâche à distance reste valide par défaut. Ceci ne définit que la date d'expiration initiale lors de la création d'une tâche, qui peut toujours être modifiée pour chacune."
-    }),
-    label: t({
-      en: 'Default Assignment Validity (Days)',
-      es: 'Validez predeterminada de las tareas (días)',
-      fr: 'Validité par défaut des tâches (jours)'
-    })
-  };
   const remoteAssignmentsSection = {
     content: (
       <SettingRows
-        // The validity only sets the expiry of a remote assignment, which an instance deployed without
-        // the gateway can never create.
-        rows={config.setup.isGatewayEnabled ? [durationRow, remoteAssignmentsRow] : [remoteAssignmentsRow]}
+        rows={[
+          {
+            control: <DefaultAssignmentDurationInput autosave={autosave} />,
+            help: t({
+              en: 'The number of days a new remote assignment stays valid by default. This only sets the initial expiry date when creating an assignment, which can still be changed for each one.',
+              es: 'El número de días que una nueva tarea remota permanece válida de forma predeterminada. Esto solo define la fecha de vencimiento inicial al crear una tarea, que se puede cambiar en cada caso.',
+              fr: "Le nombre de jours pendant lesquels une nouvelle tâche à distance reste valide par défaut. Ceci ne définit que la date d'expiration initiale lors de la création d'une tâche, qui peut toujours être modifiée pour chacune."
+            }),
+            label: t({
+              en: 'Default Assignment Validity (Days)',
+              es: 'Validez predeterminada de las tareas (días)',
+              fr: 'Validité par défaut des tâches (jours)'
+            })
+          },
+          {
+            control: (
+              <SettingToggle
+                checked={setupState.isBulkRemoteAssignmentsEnabled ?? true}
+                label={remoteAssignmentsLabel}
+                onCheckedChange={(checked) => autosave({ isBulkRemoteAssignmentsEnabled: checked })}
+              />
+            ),
+            help: t({
+              en: 'When enabled, the group links are collected under a Group Actions menu with an added page for assigning one or more instruments to many subjects at once. When disabled, those links stay where they are.',
+              es: 'Cuando está activada, los enlaces del grupo se reúnen bajo un menú Acciones del grupo con una página adicional para asignar uno o varios instrumentos a muchos sujetos a la vez. Cuando está desactivada, esos enlaces permanecen donde están.',
+              fr: 'Lorsqu’elle est activée, les liens de groupe sont regroupés sous un menu Actions de groupe avec une page permettant d’attribuer un ou plusieurs instruments à plusieurs sujets à la fois. Lorsqu’elle est désactivée, ces liens restent inchangés.'
+            }),
+            label: remoteAssignmentsLabel
+          }
+        ]}
       />
     ),
     label: t({ en: 'Remote Assignments', es: 'Tareas remotas', fr: 'Tâches à distance' })

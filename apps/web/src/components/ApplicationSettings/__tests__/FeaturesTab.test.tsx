@@ -78,9 +78,10 @@ describe('FeaturesTab', () => {
     expect(screen.getByTestId('default-assignment-duration-input')).toBeTruthy();
   });
 
-  it('should not offer the validity on an instance without the gateway, which cannot create remote assignments', () => {
+  it('should hide remote assignments on an instance without the gateway, where neither setting could take effect', () => {
     mocks.config.setup.isGatewayEnabled = false;
     renderTab();
+    expect(sectionLabels()).toStrictEqual(['Uploader']);
     expect(screen.queryByTestId('default-assignment-duration-input')).toBeNull();
   });
 
