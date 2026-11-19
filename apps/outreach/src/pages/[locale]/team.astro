@@ -3,9 +3,8 @@ import { getCollection } from 'astro:content';
 
 import Headshot from '@/components/common/Headshot.astro';
 import PageHeading from '@/components/common/PageHeading.astro';
-import Page from '@/layouts/Page.astro';
-
 import { useTranslations } from '@/i18n';
+import Page from '@/layouts/Page.astro';
 
 const team = await getCollection('team');
 team.sort((a, b) => {
@@ -17,38 +16,36 @@ team.sort((a, b) => {
   return 0;
 });
 
+const { resolvedLanguage, t } = useTranslations(Astro.url);
+
 export const getStaticPaths = () => {
   return [{ params: { locale: 'en' } }, { params: { locale: 'fr' } }];
 };
-
-const { resolvedLanguage, t } = useTranslations(Astro.url);
 ---
 
 <Page bilingual>
   <PageHeading title={t('team.heading')} />
   <ul class="grid gap-6 md:gap-8 lg:grid-cols-2" id="team-members-list">
-    {
-      team.map(({ data: { fullName, suffix, position, image, description } }) => (
-        <li class="translate-y-6 opacity-0 transition-all duration-500 ease-in-out">
-          <div class="relative grid h-full gap-8 rounded-md border border-slate-300 bg-slate-50 p-5 shadow-xs md:grid-cols-4 md:rounded-none md:border-none md:bg-inherit md:p-0 md:shadow-none lg:grid-cols-3 dark:border-slate-600 dark:bg-slate-800 md:dark:bg-inherit">
-            <div class="absolute top-5 left-5 h-14 w-14 md:static md:flex md:h-auto md:w-auto md:items-center md:justify-center">
-              <Headshot className="md:rounded-lg md:shadow-lg" src={image} alt={fullName} />
-            </div>
-            <div class="flex flex-col md:col-span-3 lg:col-span-2">
-              <div class="mb-2 flex h-14 flex-col justify-between py-2.5 pl-17 md:mb-0 md:py-1.5 md:pl-0">
-                <h5 class="leading-none font-bold tracking-tight md:text-lg">{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h5>
-                <span class="text-sm leading-none font-semibold tracking-tight text-sky-700 md:text-base dark:text-sky-500 md:dark:text-sky-400">
-                  {position[resolvedLanguage]}
-                </span>
-              </div>
-              <p class="py-1.5 text-sm leading-tight font-normal text-slate-700 dark:text-slate-300">
-                {description[resolvedLanguage]}
-              </p>
-            </div>
+    {team.map(({ data: { fullName, suffix, position, image, description } }) => (
+      <li class="translate-y-6 opacity-0 transition-all duration-500 ease-in-out">
+        <div class="relative grid h-full gap-8 rounded-md border border-slate-300 bg-slate-50 p-5 shadow-xs md:grid-cols-4 md:rounded-none md:border-none md:bg-inherit md:p-0 md:shadow-none lg:grid-cols-3 dark:border-slate-600 dark:bg-slate-800 md:dark:bg-inherit">
+          <div class="absolute top-5 left-5 h-14 w-14 md:static md:flex md:h-auto md:w-auto md:items-center md:justify-center">
+            <Headshot className="md:rounded-lg md:shadow-lg" src={image} alt={fullName} />
           </div>
-        </li>
-      ))
-    }
+          <div class="flex flex-col md:col-span-3 lg:col-span-2">
+            <div class="mb-2 flex h-14 flex-col justify-between py-2.5 pl-17 md:mb-0 md:py-1.5 md:pl-0">
+              <h5 class="leading-none font-bold tracking-tight md:text-lg">{`${fullName}${suffix ? `, ${suffix}` : ''}`}</h5>
+              <span class="text-sm leading-none font-semibold tracking-tight text-sky-700 md:text-base dark:text-sky-500 md:dark:text-sky-400">
+                {position[resolvedLanguage]}
+              </span>
+            </div>
+            <p class="py-1.5 text-sm leading-tight font-normal text-slate-700 dark:text-slate-300">
+              {description[resolvedLanguage]}
+            </p>
+          </div>
+        </div>
+      </li>
+    ))}
   </ul>
   <script>
     import { animateUnorderedListEntry } from '@/modules/animate';

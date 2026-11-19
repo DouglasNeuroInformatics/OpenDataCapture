@@ -3,13 +3,13 @@
 Four small helpers (`evaluateInstrument`, `encodeUnicodeToBase64`, `decodeBase64ToUnicode`,
 `removeSubjectIdScope`) plus the interactive-task trio `src/interactive/{iframe.html,bootstrap.js,worker.js}`.
 Private, and **there is no build step** — `exports` points straight at `src/`, with a hand-written
-`src/index.d.ts` beside plain `src/index.js`. Consumed by `instrument-bundler`,
+`src/types.d.ts` beside plain `src/index.js`. Consumed by `instrument-bundler`,
 `instrument-interpreter`, `serve-instrument`, `subject-utils`, and included in
 `runtime/v1/runtime.config.js` so it is also served under `/runtime/v1/...`.
 
 ## Traps
 
-**`evaluateInstrument` is `new Function()`.** Its JSDoc in `src/index.d.ts` carries an all-caps
+**`evaluateInstrument` is `new Function()`.** Its JSDoc in `src/types.d.ts` carries an all-caps
 trusted-input-only warning; that warning is the API contract. Do not widen the set of callers without
 being certain the bundle came from a trusted author.
 
@@ -20,8 +20,8 @@ a service worker (`worker.js`) cannot execute. The three files also reference ea
 path, which only survives verbatim copying. See "The two kinds of export" in
 `packages/runtime-bundler/AGENTS.md`.
 
-**Nothing checks `src/index.d.ts` against `src/index.js`.** The `.js` annotates each export with
-`/** @type {import('./index.d.ts').fn} */`, so a signature change means editing both files.
+**Nothing checks `src/types.d.ts` against `src/index.js`.** The `.js` annotates each export with
+`/** @type {typeof import('./types.d.ts').fn} */`, so a signature change means editing both files.
 
 The served path `/runtime/v1/@opendatacapture/runtime-internal/interactive` is hard-coded twice: as the
 iframe `src` in `packages/react-core/src/components/InteractiveContent/InteractiveContent.tsx`, and as

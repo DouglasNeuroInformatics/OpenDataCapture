@@ -34,7 +34,7 @@ generator** — the user does that manually after route changes.
 scans the directory indiscriminately and warns about any file that does not `export const Route`;
 `routeFileIgnorePattern: '^__tests__$'` in `vite.config.ts` is the only thing keeping it out of the
 test folders. Importing `vitest` or `@testing-library/*` anywhere else under `src/routes/` is an
-eslint error. Put a route's test in a `__tests__/` folder beside it, and a helper in `src/hooks/` or
+oxlint error. Put a route's test in a `__tests__/` folder beside it, and a helper in `src/hooks/` or
 `src/utils/`.
 
 Naming: `__root.tsx` is the root; `_app/` is a pathless layout (contributes no URL segment);
@@ -81,7 +81,7 @@ export const subjectsQueryOptions = ({ params }: { params?: SubjectsQueryParams 
   `src/services/axios.ts`: it retries only idempotent methods on transient errors, under a total
   budget, and drives `ConnectivityBanner` through the store. Opt out of its defaults per-request with
   the `meta` bag (`disableDefaultTimeout`, `disableDefaultErrorNotification`, `disableDefaultAuth`).
-  Only the second half is mechanically enforced — eslint bans `axios.create`, but nothing stops you
+  Only the second half is mechanically enforced — oxlint bans `axios.create`, but nothing stops you
   setting a React Query `retry`, so that one is on you.
 
 ## Forms
@@ -96,7 +96,7 @@ also works and **discards every other field the user has already filled in**.
 Two traps in that prop:
 
 - `FormProps` leaves `TData` uninstantiated in `subscribe.onChange`'s **second** parameter, so
-  `setValues` infers as an error type and `@typescript-eslint/no-unsafe-argument` rejects passing it
+  `setValues` infers as an error type and `typescript/no-unsafe-argument` rejects passing it
   anywhere. Annotate the parameter at the call site.
 - `perfectionist/sort-objects` alphabetizes the `fields` object, which is also its **render order** —
   so `confirmPassword` sorts above `password`. Every form with a password pair carries an explicit
@@ -150,7 +150,7 @@ Note this covers `apps/web`'s own forms too — every schema fed to a libui `For
 `packages/schemas` composes — not only instruments.
 
 `react/jsx-no-literals` makes bare JSX text an **error**. Punctuation and proper nouns are
-allowlisted in `eslint.config.js` and `*.stories.tsx` is exempt; anything else it flags is a string
+allowlisted in `oxlint.config.ts` and `*.stories.tsx` is exempt; anything else it flags is a string
 that needs translating. It is configured `ignoreProps: true`, so a `placeholder`, `aria-label` or
 `title` string lints clean: translate those too. Strings that are genuinely not copy — stack-frame syntax, for example —
 belong in a named variable outside the JSX with a comment saying why, not in the allowlist.
@@ -162,8 +162,8 @@ repo**. `src/styles.css` is a single `@import` of `@opendatacapture/react-core/g
 holds the `@source` directives.
 
 Use `cn` from `@douglasneuroinformatics/libui/utils`; importing `clsx` or `tailwind-merge` directly
-is an eslint error. Prefer semantic libui tokens (`bg-muted`, `text-muted-foreground`) over raw
-colour scales. Class order is fixed by prettier — don't hand-sort.
+is an oxlint error. Prefer semantic libui tokens (`bg-muted`, `text-muted-foreground`) over raw
+colour scales. Class order is fixed by oxfmt — don't hand-sort.
 
 ## Components
 
@@ -185,7 +185,7 @@ add UI that an e2e test will drive.
 ## Tables
 
 A table listing records is `@/components/DataTable`: libui's `DataTable` plus a required `tableName`,
-under which it remembers the page and sort a user leaves it on (eslint rejects importing libui's
+under which it remembers the page and sort a user leaves it on (oxlint rejects importing libui's
 own). A test rendering the same table twice clears `savedTableViews` from `@/services/table-views`
 between renders. libui's plain `Table` is for a small table the
 component lays out itself, such as the rows of inputs in `UserPermissionsEditor` and

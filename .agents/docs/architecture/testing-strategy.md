@@ -34,7 +34,7 @@ project. Before trusting a new test, see it listed and watch it fail on purpose.
 
 ## Vitest projects
 
-Twenty-two, each named after its directory except `runtime/v1` (`runtime-v1`) and `.github` (`github`). Quirks of each live in
+Twenty-three, each named after its directory except `runtime/v1` (`runtime-v1`) and `.github` (`github`). Quirks of each live in
 that package's `AGENTS.md` §Tests. Three run under happy-dom; the rest run in node, where one file
 opts into a DOM with a first-line `// @vitest-environment happy-dom` docblock.
 
@@ -50,6 +50,7 @@ opts into a DOM with a first-line `// @vitest-environment happy-dom` docblock.
 | `instrument-library`     | `packages/instrument-library`     | happy-dom; aliases `/runtime/v1/…` to sources, no build  |
 | `instrument-stubs`       | `packages/instrument-stubs`       | tests are `.test.js`                                     |
 | `instrument-utils`       | `packages/instrument-utils`       |                                                          |
+| `oxlint-config`          | `packages/oxlint-config`          | `RuleTester` from `oxlint/plugins-dev`                   |
 | `playground-url`         | `packages/playground-url`         |                                                          |
 | `react-core`             | `packages/react-core`             | happy-dom                                                |
 | `release-info`           | `packages/release-info`           |                                                          |
@@ -91,15 +92,15 @@ outside the project globs by design.
 
 ## `pnpm lint` is the type-check, and it edits files
 
-Per-package `lint` is `tsc && eslint --fix src`; there is no separate `typecheck` script, so a type
+Per-package `lint` is `tsc && oxlint --fix src`; there is no separate `typecheck` script, so a type
 error surfaces as a lint failure and every run may rewrite the working tree. Exceptions:
 
 | Package                                                       | `lint`                                     |
 | ------------------------------------------------------------- | ------------------------------------------ |
-| `apps/outreach`                                               | `astro check && eslint --fix src`          |
-| `packages/runtime-core`                                       | `tsc --noEmit && eslint --fix src`         |
-| `packages/instrument-stubs`, `packages/instrument-guidelines` | eslint only — **no `tsc`**                 |
-| `testing`                                                     | `pnpm gen:routes && tsc && eslint --fix .` |
+| `apps/outreach`                                               | `astro check && oxlint --fix src`          |
+| `packages/runtime-core`                                       | `tsc --noEmit && oxlint --fix src`         |
+| `packages/instrument-stubs`, `packages/instrument-guidelines` | oxlint only — **no `tsc`**                 |
+| `testing`                                                     | `pnpm gen:routes && tsc && oxlint --fix .` |
 | `runtime/v1`                                                  | **none**, so never type-checked            |
 
 ## Turbo task graph
@@ -107,7 +108,8 @@ error surfaces as a lint failure and every run may rewrite the working tree. Exc
 `lint`, `dev`, `dev:test` and `test:e2e` depend on `["^build", "^db:generate", "db:push"]`; `build`
 on `["^build", "db:generate"]`. `test:e2e` is `cache: false`. **`test` is not a turbo task**: root
 `pnpm test` is `env-cmd vitest`, with no build and no database. `globalDependencies` (`.env`,
-`eslint.config.js`, `tsconfig.json`, `prettier.config.js`) invalidate every cached task when touched.
+`oxfmt.config.ts`, `oxlint.config.ts`, `packages/oxlint-config/src/**`, `tsconfig.json`) invalidate
+every cached task when touched.
 
 ## Coverage scope
 
@@ -124,7 +126,7 @@ counts their functions twice in the merged report.
 `pnpm lint`, `pnpm test:coverage`, Playwright install (chromium + firefox, capped at 10 minutes, after
 lint and unit tests so a hung download cannot hide them), `pnpm test:e2e`.
 
-Not gated: knip (`pnpm knip` exists), and formatting — prettier runs only in the `.husky/pre-commit`
+Not gated: knip (`pnpm knip` exists), and formatting — oxfmt runs only in the `.husky/pre-commit`
 hook, which formats rather than verifies.
 
 `.github/workflows/release.yaml` (push to `main`, dispatch on `release/<major>`) validates with `pnpm lint` only — **no unit or e2e

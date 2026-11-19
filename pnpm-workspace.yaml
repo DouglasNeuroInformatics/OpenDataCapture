@@ -13,6 +13,7 @@ allowBuilds:
   sharp: true
 blockExoticSubdeps: true
 catalog:
+  '@astrojs/compiler-rs': '0.5.3'
   '@casl/ability': '^7.0.1'
   '@commander-js/extra-typings': '~15.0.0'
   '@commitlint/cli': '^21.2.3'
@@ -20,20 +21,21 @@ catalog:
   '@douglasneuroinformatics/esbuild-plugin-prisma': 'latest'
   '@douglasneuroinformatics/libcrypto': '^0.0.6'
   '@douglasneuroinformatics/libjs': ^3.2.1
-  '@douglasneuroinformatics/libpasswd': '^0.0.3'
+  '@douglasneuroinformatics/libpasswd': '^0.0.4'
   '@douglasneuroinformatics/libstats': '^0.2.1'
   '@douglasneuroinformatics/libui': ^6.20.0
   '@douglasneuroinformatics/libui-form-types': ^1.6.0
   '@microsoft/api-extractor': '^7.59.2'
+  '@oxlint/plugins': '1.93.0'
   '@prisma/client': '^6.9.0'
   '@tailwindcss/vite': '4.3.3'
   '@testing-library/dom': '^10.4.2'
   '@testing-library/react': '^16.3.3'
-  '@vitest/eslint-plugin': '^1.6.27'
   axios: ^1.20.0
   commander: '~15.0.0'
   esbuild: '0.28.x'
   esbuild-wasm: '0.28.x'
+  eslint-plugin-perfectionist: '5.9.0'
   eslint-plugin-playwright: '^2.12.1'
   happy-dom: '~20.11.15'
   msgpackr: ^2.1.0
@@ -41,12 +43,18 @@ catalog:
   neverthrow: ^8.2.0
   nodemailer: ^10.0.11
   oxc-parser: '^0.150.0'
+  oxfmt: '0.78.0'
+  oxlint: '1.93.0'
+  oxlint-tsgolint: '7.0.2006'
   conventional-commits-parser: '^7.1.2'
+  prettier: '^3.9.9'
   prisma: '^6.9.0'
+  prisma-json-types-generator: '3.6.2'
   react-dropzone: ^20.1.2
   '@tailwindcss/postcss': '4.3.3'
   tailwindcss: '4.3.3'
   tsx: '4.23.15'
+  typescript: '7.0.x'
   serialize-error: '^13.0.1'
   vite: '^8.3.3'
   zustand: ^5.0.15
@@ -69,6 +77,14 @@ minimumReleaseAge: 10080 # 7 days
 minimumReleaseAgeExclude:
   - '@douglasneuroinformatics/*'
   - find-my-way
+  - type-fest@6.0.1
+# prisma-json-types-generator 3.x parses the generated client with the classic TypeScript compiler API,
+# which typescript@7 no longer ships. The patch under patchedDependencies points its require at this
+# package, which re-exports the TypeScript 6 API. Its 6.x line drops TypeScript, but requires Prisma 7.
+packageExtensions:
+  prisma-json-types-generator@3.6.2:
+    dependencies:
+      '@typescript/typescript6': '6.0.2'
 packages:
   - 'apps/*'
   - 'packages/*'
@@ -76,3 +92,18 @@ packages:
   - 'storybook'
   - 'testing'
   - 'vendor/**/*'
+patchedDependencies:
+  prisma-json-types-generator@3.6.2: patches/prisma-json-types-generator@3.6.2.patch
+# Each entry is a peer range the installed version falls outside of, checked to be harmless.
+peerDependencyRules:
+  allowedVersions:
+    # perfectionist reaches TypeScript only from sort-imports and sort-modules, which oxlint does not run
+    '@typescript-eslint/project-service>typescript': '7'
+    '@typescript-eslint/tsconfig-utils>typescript': '7'
+    '@typescript-eslint/typescript-estree>typescript': '7'
+    '@typescript-eslint/utils>typescript': '7'
+    # the patch above replaces every use of this peer
+    'prisma-json-types-generator>typescript': '7'
+    # apps/outreach resolves both to its TypeScript 6, as it did while the root pinned every workspace to 6
+    'tsconfck>typescript': '6'
+    'zod-to-ts>typescript': '6'

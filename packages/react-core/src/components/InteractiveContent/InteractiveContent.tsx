@@ -16,6 +16,7 @@ import type { Promisable, Simplify } from 'type-fest';
 
 import { LANGUAGE_LABELS } from '../../utils/language';
 
+// eslint-disable-next-line react/function-component-definition -- the named function passed to memo gives the component its display name
 const _InteractiveContent = React.memo<InteractiveContentProps>(function _InteractiveContent({
   bundle,
   defaultFullscreen,
@@ -265,6 +266,7 @@ export type InteractiveContentProps = Simplify<
   }
 >;
 
+// eslint-disable-next-line react/function-component-definition -- the named function passed to memo gives the component its display name
 export const InteractiveContent = React.memo<InteractiveContentProps>(function InteractiveContent(props) {
   return <_InteractiveContent {...props} />;
 });

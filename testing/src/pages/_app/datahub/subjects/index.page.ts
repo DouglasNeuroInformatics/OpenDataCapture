@@ -52,7 +52,14 @@ export class DatahubPage extends AppPage {
   /** Opens the filter menu and picks a collection-date window. */
   async selectCollectedWindow(
     preset:
-      'all' | 'custom' | 'pastMonth' | 'pastSixMonths' | 'pastThreeMonths' | 'pastTwoYears' | 'pastWeek' | 'pastYear'
+      | 'all'
+      | 'custom'
+      | 'pastMonth'
+      | 'pastSixMonths'
+      | 'pastThreeMonths'
+      | 'pastTwoYears'
+      | 'pastWeek'
+      | 'pastYear'
   ) {
     await this.openFilters();
     await this.collectedPresetFilter.selectOption(preset);

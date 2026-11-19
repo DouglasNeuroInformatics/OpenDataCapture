@@ -22,7 +22,7 @@ for unit tests). A diff spanning rows runs each row's checks; any other file mea
    `pnpm lint`, `pnpm test:coverage` and `pnpm test:e2e` in sequence, so a lint failure hides the rest until it
    is fixed. `pnpm test:e2e` needs its browsers installed once per machine
    (`.agents/docs/playbooks/add-e2e-test.md`).
-2. **After it, read `git status`.** `eslint --fix` rewrites as it checks; the rewrites are your own code being
+2. **After it, read `git status`.** `oxlint --fix` rewrites as it checks; the rewrites are your own code being
    sorted, so keep them. TS2345 on a route literal you added is an exception until the user regenerates
    `route-tree.ts` (`.agents/docs/playbooks/add-web-route.md`); revert any `route-tree.ts` diff. Because that
    failure stops `pnpm check` at lint, run `pnpm test:coverage` directly and leave `pnpm test:e2e` for after

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -42,19 +42,21 @@ vi.mock('@/store', () => ({
   useAppStore: (selector: (store: typeof mocks.store) => unknown) => selector(mocks.store)
 }));
 // happy-dom has no layout or animation, so the popover exposes the position it is animated to instead.
-vi.mock('motion/react', async () => {
-  const { forwardRef } = await import('react');
-  type MotionDivProps = { animate?: { x?: number; y?: number }; children: ReactNode; className?: string };
+vi.mock('motion/react', () => {
+  type MotionDivProps = {
+    animate?: { x?: number; y?: number };
+    children: ReactNode;
+    className?: string;
+    ref?: Ref<HTMLDivElement>;
+  };
   return {
     AnimatePresence: ({ children }: { children: ReactNode }) => children,
     motion: {
-      div: forwardRef<HTMLDivElement, MotionDivProps>(function MotionDiv({ animate, children, className }, ref) {
-        return (
-          <div className={className} data-x={animate?.x} data-y={animate?.y} ref={ref}>
-            {children}
-          </div>
-        );
-      })
+      div: ({ animate, children, className, ref }: MotionDivProps) => (
+        <div className={className} data-x={animate?.x} data-y={animate?.y} ref={ref}>
+          {children}
+        </div>
+      )
     }
   };
 });

@@ -17,13 +17,13 @@ one can import it.
 Consumers transpile the source themselves. Nothing here is emitted, so nothing here may depend on a
 compile step running first.
 
-**`import { z } from 'zod/v4'`.** Bare `zod` is an eslint error repo-wide: it resolves to the
+**`import { z } from 'zod/v4'`.** Bare `zod` is an oxlint error repo-wide: it resolves to the
 vendored `vendor/zod@3.x`, whose root export is the v3 API. v3 and v4 are separate schema
 registries and their schemas do not interoperate.
 
 **Relative imports need an explicit `.js` extension** (`from '../core/core.js'`), enforced only in
 this package by `import/extensions: ['error', 'always', { ignorePackages: true }]` in the root
-`eslint.config.js`. Package imports stay extensionless.
+`oxlint.config.ts`. Package imports stay extensionless.
 
 **`import/exports-last` has no autofix.** It reports every export that appears before the last
 non-export statement, so a private helper must be declared _before_ the first export or lint fails

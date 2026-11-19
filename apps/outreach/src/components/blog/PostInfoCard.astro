@@ -7,12 +7,12 @@ import Headshot from '../common/Headshot.astro';
 
 type Props = {
   author: CollectionEntry<'team'>;
+  className?: string;
   datePublished: Date;
   readingTime: number;
-  className?: string;
 };
 
-const { author, datePublished, readingTime, className } = Astro.props;
+const { author, className, datePublished, readingTime } = Astro.props;
 const { resolvedLanguage, t } = useTranslations(Astro.url);
 ---
 
@@ -26,11 +26,9 @@ const { resolvedLanguage, t } = useTranslations(Astro.url);
     </p>
     <div class="flex space-x-1 text-sm text-slate-700 dark:text-slate-300">
       <time datetime={datePublished.toISOString()}>
-        {
-          datePublished.toLocaleDateString(resolvedLanguage, {
-            dateStyle: 'long'
-          })
-        }
+        {datePublished.toLocaleDateString(resolvedLanguage, {
+          dateStyle: 'long'
+        })}
       </time>
       <span aria-hidden="true">&middot;</span>
       <span>{`${Math.round(readingTime)} ${t('blog.minRead')}`}</span>

@@ -17,6 +17,8 @@
     ".github/vitest.config.ts",
     "commitlint.config.ts",
     "knip.ts",
+    "oxfmt.config.ts",
+    "oxlint.config.ts",
     "scripts/*.ts",
     "vitest.config.ts"
   ],

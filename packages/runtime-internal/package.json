@@ -1,15 +1,15 @@
 {
   "name": "@opendatacapture/runtime-internal",
-  "type": "module",
   "version": "0.0.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
   "sideEffects": [
     "**/interactive/*.js"
   ],
-  "private": true,
-  "license": "Apache-2.0",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
+      "types": "./src/types.d.ts",
       "import": "./src/index.js"
     },
     "./interactive/bootstrap.js": "./src/interactive/bootstrap.js",
@@ -18,8 +18,8 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
+    "format": "oxfmt src",
+    "lint": "tsc && oxlint --fix src",
     "test": "vitest"
   },
   "devDependencies": {

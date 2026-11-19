@@ -1,7 +1,7 @@
 {
   "name": "shared-state",
-  "type": "module",
   "version": "0.0.0",
+  "type": "module",
   "exports": {
     ".": {
       "default": "./index.js"

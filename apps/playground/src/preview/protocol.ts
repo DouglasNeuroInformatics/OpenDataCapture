@@ -50,7 +50,8 @@ export const $PreviewMessage = z.discriminatedUnion('type', [
 ]);
 
 export type PreviewOriginResolution =
-  { origin: string; status: 'ok' } | { reason: 'same-origin' | 'unknown-host'; status: 'error' };
+  | { origin: string; status: 'ok' }
+  | { reason: 'same-origin' | 'unknown-host'; status: 'error' };
 
 /**
  * The origin the preview frame is served from, which must differ from the editor's so the code it

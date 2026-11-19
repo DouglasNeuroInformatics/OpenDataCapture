@@ -1,7 +1,13 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "agentGuidance": false,
-  "globalDependencies": [".env", "eslint.config.js", "tsconfig.json", "prettier.config.js"],
+  "globalDependencies": [
+    ".env",
+    "oxfmt.config.ts",
+    "oxlint.config.ts",
+    "packages/oxlint-config/src/**",
+    "tsconfig.json"
+  ],
   "globalEnv": ["NODE_ENV", "NODE_OPTIONS", "RELEASE_VERSION"],
   "tasks": {
     // A package-scoped task replaces the generic one rather than merging with it,

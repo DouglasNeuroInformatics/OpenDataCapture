@@ -32,7 +32,7 @@
    or give it a `.default()`. A cross-field requirement goes in the `.transform((env, ctx) => ...)` at
    the bottom of `$Env` via `ctx.addIssue`; the `STORAGE_ENABLED` block is the pattern.
 
-5. **Read it as `this.configService.get('YOUR_KEY')`.** `process.env` is an eslint error in
+5. **Read it as `this.configService.get('YOUR_KEY')`.** `process.env` is an oxlint error in
    `apps/api/src`; do not add a second exception to
    `src/core/decorators/throttle-login-request.decorator.ts`. To gate a whole module on a boolean, use
    `{ module: XModule, when: 'YOUR_KEY' }` in the `imports` array of `apps/api/src/main.ts`.

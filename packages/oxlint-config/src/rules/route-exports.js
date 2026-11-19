@@ -1,8 +1,11 @@
+/** @import { CreateRule, ESTree } from '@oxlint/plugins' */
+
 const ROUTE_EXPORT = 'Route';
 
-const exportedName = (node) => (node.type === 'Identifier' ? node.name : String(node.value));
+/** @type {(node: ESTree.ModuleExportName) => string} */
+const exportedName = (node) => (node.type === 'Identifier' ? node.name : node.value);
 
-/** @type {import('eslint').Rule.RuleModule} */
+/** @type {CreateRule} */
 export const routeExports = {
   create(context) {
     return {

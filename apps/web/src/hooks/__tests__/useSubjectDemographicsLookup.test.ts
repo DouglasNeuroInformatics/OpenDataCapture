@@ -32,7 +32,8 @@ describe('subjectDemographicsQueryOptions', () => {
   it('should accept a 404 as a valid status, so a new identifier raises no error notification', async () => {
     get.mockResolvedValueOnce({ data: null, status: 404 });
     await runQuery('root$new');
-    const { validateStatus } = get.mock.lastCall?.[1] as { validateStatus: (status: number) => boolean };
+    const [, requestConfig] = get.mock.lastCall ?? [];
+    const { validateStatus } = requestConfig as { validateStatus: (status: number) => boolean };
     expect([validateStatus(200), validateStatus(404), validateStatus(500)]).toStrictEqual([true, true, false]);
   });
 

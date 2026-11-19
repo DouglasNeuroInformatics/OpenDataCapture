@@ -1,11 +1,15 @@
+/** @import { CreateRule, ESTree } from '@oxlint/plugins' */
+
 const CLASS_NAME = 'className';
 
+/** @type {(node: ESTree.Argument) => boolean} */
 const isCallerClassName = (node) => {
   if (node.type === 'Identifier') {
     return node.name === CLASS_NAME;
   }
   return (
     node.type === 'MemberExpression' &&
+    'computed' in node &&
     !node.computed &&
     node.object.type === 'Identifier' &&
     node.object.name === 'props' &&
@@ -13,7 +17,7 @@ const isCallerClassName = (node) => {
   );
 };
 
-/** @type {import('eslint').Rule.RuleModule} */
+/** @type {CreateRule} */
 export const classNameComposition = {
   create(context) {
     return {

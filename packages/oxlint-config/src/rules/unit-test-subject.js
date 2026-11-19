@@ -1,3 +1,5 @@
+/** @import { CreateRule, ESTree } from '@oxlint/plugins' */
+
 import * as path from 'node:path';
 
 const UNIT_TEST_FILENAME = /^(?<subject>.+)\.(?:test|spec)\.[cm]?[jt]sx?$/u;
@@ -8,8 +10,10 @@ const WORKSPACE_SOURCE = /^(?<root>.*[/\\](?:apps|packages|runtime)[/\\][^/\\]+[
 
 const MEMBER_PATH = /^(?:\.[\w$]+)*$/u;
 
+/** @type {(node: ESTree.ModuleExportName | Extract<ESTree.Expression, { type: 'Literal' }>) => string} */
 const exportedName = (node) => (node.type === 'Identifier' ? node.name : String(node.value));
 
+/** @type {(callee: ESTree.Expression) => boolean} */
 const isDescribe = (callee) => {
   if (callee.type === 'MemberExpression') {
     return isDescribe(callee.object);
@@ -20,18 +24,20 @@ const isDescribe = (callee) => {
   return callee.type === 'Identifier' && callee.name === 'describe';
 };
 
+/** @type {(node: ESTree.ImportExpression) => Array<{ imported: string; local?: string }>} */
 const dynamicallyImportedNames = (node) => {
-  const result = node.parent?.type === 'AwaitExpression' ? node.parent : node;
+  const result = node.parent.type === 'AwaitExpression' ? node.parent : node;
   const consumer = result.parent;
   if (
-    consumer?.type === 'MemberExpression' &&
+    consumer.type === 'MemberExpression' &&
     consumer.object === result &&
-    !consumer.computed &&
-    consumer.property.type === 'Identifier'
+    consumer.property.type === 'Identifier' &&
+    'computed' in consumer &&
+    !consumer.computed
   ) {
     return [{ imported: consumer.property.name }];
   }
-  if (consumer?.type !== 'VariableDeclarator' || consumer.id.type !== 'ObjectPattern') {
+  if (consumer.type !== 'VariableDeclarator' || consumer.id.type !== 'ObjectPattern') {
     return [];
   }
   return consumer.id.properties.flatMap((property) => {
@@ -47,7 +53,7 @@ const dynamicallyImportedNames = (node) => {
   });
 };
 
-/** @type {import('eslint').Rule.RuleModule} */
+/** @type {CreateRule} */
 export const unitTestSubject = {
   create(context) {
     const directory = path.dirname(context.filename);
@@ -58,11 +64,15 @@ export const unitTestSubject = {
     const sourceRoot = WORKSPACE_SOURCE.exec(context.filename)?.groups?.root;
     const subjectDirectory = path.dirname(directory);
     const subjectPath = path.join(subjectDirectory, subject);
+    /** @type {Set<string>} */
     const titles = new Set();
+    /** @type {Set<string>} */
     const bindings = new Set();
+    /** @type {Array<ESTree.ImportDeclaration | ESTree.ImportExpression>} */
     const subjectImports = [];
     let importsModule = false;
 
+    /** @type {(specifier: string) => string | undefined} */
     const resolveImport = (specifier) => {
       if (specifier.startsWith('@/') && sourceRoot) {
         return path.join(sourceRoot, specifier.slice(2));
@@ -70,14 +80,16 @@ export const unitTestSubject = {
       return specifier.startsWith('.') ? path.resolve(directory, specifier) : undefined;
     };
 
+    /** @type {(specifier: string) => boolean} */
     const isSubject = (specifier) => {
-      const resolved = typeof specifier === 'string' ? resolveImport(specifier) : undefined;
+      const resolved = resolveImport(specifier);
       if (resolved === undefined) {
         return false;
       }
       return resolved.replace(EXTENSION, '') === subjectPath || (subject === 'index' && resolved === subjectDirectory);
     };
 
+    /** @type {(imported: string | undefined, local: string | undefined) => void} */
     const addName = (imported, local) => {
       if (imported !== undefined && imported !== 'default') {
         titles.add(imported);
@@ -88,6 +100,7 @@ export const unitTestSubject = {
       }
     };
 
+    /** @type {(value: string) => boolean} */
     const isTitle = (value) => {
       const names = importsModule ? [...titles, subject] : [...titles];
       return names.some((name) => value.startsWith(name) && MEMBER_PATH.test(value.slice(name.length)));
@@ -110,7 +123,7 @@ export const unitTestSubject = {
         }
       },
       ImportExpression(node) {
-        if (node.source.type !== 'Literal' || !isSubject(node.source.value)) {
+        if (node.source.type !== 'Literal' || typeof node.source.value !== 'string' || !isSubject(node.source.value)) {
           return;
         }
         subjectImports.push(node);

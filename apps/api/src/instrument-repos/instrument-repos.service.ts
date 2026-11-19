@@ -590,7 +590,8 @@ export class InstrumentReposService implements OnModuleInit {
 
   private recordSync(
     entry: { action: InstrumentRepoSyncAction; repoId: null | string; repoName: string } & (
-      { error: unknown } | { result: RepoImportResult }
+      | { error: unknown }
+      | { result: RepoImportResult }
     )
   ) {
     const { action, repoId, repoName } = entry;

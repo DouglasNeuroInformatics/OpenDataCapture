@@ -48,6 +48,7 @@ const hasRejectionCode = (rejection: FileRejection, code: ErrorCode) => {
   return rejection.errors.some((error) => error.code === code);
 };
 
+// eslint-disable-next-line react/function-component-definition -- the named function passed to memo gives the component its display name
 export const Dropzone = memo<{ index: number }>(function Dropzone({ index }) {
   const { basename, count, label, type } = useFileInstrumentContentStore((store) => {
     return store.props.instrument.content.fileGroups[index]!;

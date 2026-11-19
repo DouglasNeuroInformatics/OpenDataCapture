@@ -1,14 +1,17 @@
-// ESLint splits a directive comment from its description at this separator
+/** @import { CreateRule } from '@oxlint/plugins' */
+
+// ESLint and oxlint split a directive comment from its description at this separator
 const DESCRIPTION_SEPARATOR = /\s-{2,}\s/u;
 
-const DISABLE_DIRECTIVE = /^\s*eslint-disable(?:-line|-next-line)?(?:\s|$)/u;
+const DISABLE_DIRECTIVE = /^\s*(?:eslint|oxlint)-disable(?:-line|-next-line)?(?:\s|$)/u;
 
+/** @type {(comment: string) => string} */
 const descriptionOf = (comment) => {
   const separator = DESCRIPTION_SEPARATOR.exec(comment);
   return separator ? comment.slice(separator.index + separator[0].length).trim() : '';
 };
 
-/** @type {import('eslint').Rule.RuleModule} */
+/** @type {CreateRule} */
 export const requireDisableReason = {
   create(context) {
     return {

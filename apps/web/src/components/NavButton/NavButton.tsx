@@ -10,14 +10,24 @@ type NavButtonProps = Omit<NavItem, 'children' | 'search' | 'url'> & {
   className?: string;
   isActive: boolean;
   onClick?: (path: string, search?: { [key: string]: string }) => void;
+  ref?: React.Ref<HTMLButtonElement>;
   search?: { [key: string]: string };
   url: string;
 };
 
-export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(function NavButton(
-  { activeClassName, className, disabled, icon: Icon, isActive, label, onClick, search, url, ...props },
-  ref
-) {
+export const NavButton = ({
+  activeClassName,
+  className,
+  disabled,
+  icon: Icon,
+  isActive,
+  label,
+  onClick,
+  ref,
+  search,
+  url,
+  ...props
+}: NavButtonProps) => {
   const navigate = useNavigate();
   return (
     <button
@@ -46,4 +56,4 @@ export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(fun
       {label}
     </button>
   );
-});
+};

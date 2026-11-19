@@ -1,21 +1,11 @@
 {
   "name": "@opendatacapture/instrument-bundler",
-  "type": "module",
   "version": "2.6.0",
-  "sideEffects": [
-    "**/cli.ts"
-  ],
   "license": "Apache-2.0",
-  "publishConfig": {
-    "access": "public"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture.git",
     "directory": "packages/instrument-bundler"
-  },
-  "exports": {
-    ".": "./src/index.ts"
   },
   "bin": {
     "instrument-bundler": "./src/cli.ts"
@@ -24,13 +14,20 @@
     "!/src/**/__tests__",
     "/src"
   ],
-  "scripts": {
-    "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
-    "test": "vitest"
+  "type": "module",
+  "sideEffects": [
+    "**/cli.ts"
+  ],
+  "exports": {
+    ".": "./src/index.ts"
   },
-  "peerDependencies": {
-    "tsx": "catalog:"
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "format": "oxfmt src",
+    "lint": "tsc && oxlint --fix src",
+    "test": "vitest"
   },
   "dependencies": {
     "@commander-js/extra-typings": "catalog:",
@@ -48,5 +45,8 @@
   "devDependencies": {
     "@opendatacapture/runtime-v1": "workspace:*",
     "react": "workspace:react__19.x@*"
+  },
+  "peerDependencies": {
+    "tsx": "catalog:"
   }
 }

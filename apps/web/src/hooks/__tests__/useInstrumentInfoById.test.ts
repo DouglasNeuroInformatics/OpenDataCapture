@@ -7,7 +7,8 @@ type InfoQueryParams = { allEditions?: boolean; kind?: string; subjectId?: strin
 
 const mocks = vi.hoisted(() => ({
   data: undefined as
-    undefined | { details: { title: string }; id: string; internal?: { edition: number }; kind: string }[],
+    | undefined
+    | { details: { title: string }; id: string; internal?: { edition: number }; kind: string }[],
   /** What the hook asked the catalog for, captured so the slice can be asserted */
   params: undefined as InfoQueryParams | undefined
 }));

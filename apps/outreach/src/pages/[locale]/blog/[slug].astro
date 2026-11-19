@@ -1,15 +1,25 @@
 ---
-import Page from '@/layouts/Page.astro';
-import { type CollectionEntry, getEntry } from 'astro:content';
+import { getEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
 import PostInfoCard from '@/components/blog/PostInfoCard.astro';
 import PageHeading from '@/components/common/PageHeading.astro';
 import { useTranslations } from '@/i18n';
+import Page from '@/layouts/Page.astro';
 import { getPublishedAltPost, getPublishedPosts } from '@/lib/blog';
 
 type Props = {
-  post: CollectionEntry<'blog'>;
   altPost: CollectionEntry<'blog'> | undefined;
+  post: CollectionEntry<'blog'>;
 };
+
+const { altPost, post } = Astro.props;
+const { altLanguage } = useTranslations(Astro.url);
+const altURL = new URL(`/${altLanguage}/blog/${altPost?.slug ?? ''}`, Astro.url);
+
+const { Content, remarkPluginFrontmatter } = await post.render();
+
+const author = await getEntry(post.data.author);
 
 export const getStaticPaths = async () => {
   const posts = await getPublishedPosts();
@@ -24,14 +34,6 @@ export const getStaticPaths = async () => {
 
   return Promise.all(paths);
 };
-
-const { altPost, post } = Astro.props;
-const { altLanguage } = useTranslations(Astro.url);
-const altURL = new URL(`/${altLanguage}/blog/${altPost?.slug ?? ''}`, Astro.url);
-
-const { Content, remarkPluginFrontmatter } = await post.render();
-
-const author = await getEntry(post.data.author);
 ---
 
 <Page altURL={altURL} meta={{ title: post.data.title, description: post.data.description }}>

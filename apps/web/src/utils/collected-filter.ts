@@ -1,6 +1,13 @@
 /** A named window over the collection date, or an explicit one the user typed */
 type CollectedPreset =
-  'all' | 'custom' | 'pastMonth' | 'pastSixMonths' | 'pastThreeMonths' | 'pastTwoYears' | 'pastWeek' | 'pastYear';
+  | 'all'
+  | 'custom'
+  | 'pastMonth'
+  | 'pastSixMonths'
+  | 'pastThreeMonths'
+  | 'pastTwoYears'
+  | 'pastWeek'
+  | 'pastYear';
 
 type CollectedFilter = {
   max: Date | null;

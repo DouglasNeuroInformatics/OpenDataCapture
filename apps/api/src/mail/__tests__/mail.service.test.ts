@@ -54,10 +54,8 @@ describe('MailService', () => {
 
   /** The password as it would come back out of the database. */
   const persistedPassword = () => {
-    return decryptSecret(
-      (setupStateModel.update.mock.lastCall?.[0] as PersistedUpdate).data.mailConfig.set.password,
-      SECRET_KEY
-    );
+    const [update] = setupStateModel.update.mock.lastCall ?? [];
+    return decryptSecret((update as PersistedUpdate).data.mailConfig.set.password, SECRET_KEY);
   };
 
   beforeEach(async () => {
@@ -160,7 +158,8 @@ describe('MailService', () => {
     it('encrypts the password before it reaches the database', async () => {
       setupStateModel.findFirst.mockResolvedValue({ id: '1', isSetup: true, mailConfig: stored(validConfig) });
       await mailService.updateSettings({ config: { ...validConfig, password: 'new-secret' } });
-      const written = (setupStateModel.update.mock.lastCall?.[0] as PersistedUpdate).data.mailConfig.set.password;
+      const [update] = setupStateModel.update.mock.lastCall ?? [];
+      const written = (update as PersistedUpdate).data.mailConfig.set.password;
       expect(written).not.toBe('new-secret');
       expect(written).not.toContain('new-secret');
       expect(decryptSecret(written, SECRET_KEY)).toBe('new-secret');

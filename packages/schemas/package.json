@@ -1,9 +1,9 @@
 {
   "name": "@opendatacapture/schemas",
-  "type": "module",
   "version": "0.0.0",
-  "sideEffects": false,
   "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
   "exports": {
     "./assignment": "./src/assignment/assignment.ts",
     "./audit": "./src/audit/audit.ts",
@@ -24,8 +24,8 @@
     "./user": "./src/user/user.ts"
   },
   "scripts": {
-    "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
+    "format": "oxfmt src",
+    "lint": "tsc && oxlint --fix src",
     "test": "vitest"
   },
   "dependencies": {

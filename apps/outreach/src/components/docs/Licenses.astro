@@ -5,14 +5,14 @@ import type { ApprovedLicense } from '@opendatacapture/licenses';
 // Keyed by the ApprovedLicense union rather than written as an array: adding a license to the union
 // without listing it here is then a type error, instead of a row that silently goes missing from
 // this page. That is how CC-BY-4.0, FREE-NOS and PUBLIC-DOMAIN previously fell out of the list.
-const approved: Record<ApprovedLicense, true> = {
+const approved: { [K in ApprovedLicense]: true } = {
   '0BSD': true,
   'Apache-2.0': true,
   'BSD-1-Clause': true,
   'BSD-2-Clause': true,
   'BSD-3-Clause': true,
-  'CC-BY-4.0': true,
   'CC0-1.0': true,
+  'CC-BY-4.0': true,
   'FREE-NOS': true,
   ISC: true,
   MIT: true,
@@ -53,21 +53,19 @@ const proprietaryLicenses = Array.from(licenses.entries())
       distribution:
     </p>
     <ul class="tracking-tight">
-      {
-        openApprovedLicenses.map((license) => (
-          <li>
-            <a
-              class="font-bold hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={license.reference}
-              style="text-decoration-line: none;"
-            >
-              {license.name}
-            </a>
-          </li>
-        ))
-      }
+      {openApprovedLicenses.map((license) => (
+        <li>
+          <a
+            class="font-bold hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={license.reference}
+            style="text-decoration-line: none;"
+          >
+            {license.name}
+          </a>
+        </li>
+      ))}
     </ul>
     <p class="text-slate-700 dark:text-slate-300">
       Please note that instruments in the public domain instruments are also permitted.
@@ -80,21 +78,19 @@ const proprietaryLicenses = Array.from(licenses.entries())
       included directly in the Open Data Capture repository.
     </p>
     <ul class="tracking-tight">
-      {
-        openNonApprovedLicenses.map((license) => (
-          <li>
-            <a
-              class="font-bold hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={license.reference}
-              style="text-decoration-line: none;"
-            >
-              {license.name}
-            </a>
-          </li>
-        ))
-      }
+      {openNonApprovedLicenses.map((license) => (
+        <li>
+          <a
+            class="font-bold hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={license.reference}
+            style="text-decoration-line: none;"
+          >
+            {license.name}
+          </a>
+        </li>
+      ))}
     </ul>
   </section>
   <section>
@@ -103,21 +99,19 @@ const proprietaryLicenses = Array.from(licenses.entries())
       The following licenses are considered open source, but have not been reviewed by our team.
     </p>
     <ul class="tracking-tight">
-      {
-        openUnreviewedLicenses.map((license) => (
-          <li>
-            <a
-              class="font-bold hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={license.reference}
-              style="text-decoration-line: none;"
-            >
-              {license.name}
-            </a>
-          </li>
-        ))
-      }
+      {openUnreviewedLicenses.map((license) => (
+        <li>
+          <a
+            class="font-bold hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={license.reference}
+            style="text-decoration-line: none;"
+          >
+            {license.name}
+          </a>
+        </li>
+      ))}
     </ul>
   </section>
   <section>
@@ -127,21 +121,19 @@ const proprietaryLicenses = Array.from(licenses.entries())
       licenses with restrictions on commercial use.
     </p>
     <ul class="tracking-tight">
-      {
-        proprietaryLicenses.map((license) => (
-          <li>
-            <a
-              class="font-bold hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={license.reference}
-              style="text-decoration-line: none;"
-            >
-              {license.name}
-            </a>
-          </li>
-        ))
-      }
+      {proprietaryLicenses.map((license) => (
+        <li>
+          <a
+            class="font-bold hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={license.reference}
+            style="text-decoration-line: none;"
+          >
+            {license.name}
+          </a>
+        </li>
+      ))}
     </ul>
   </section>
 </div>

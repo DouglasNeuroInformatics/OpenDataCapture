@@ -1,11 +1,7 @@
 {
   "name": "@opendatacapture/serve-instrument",
-  "type": "module",
   "version": "2.6.0",
   "license": "Apache-2.0",
-  "publishConfig": {
-    "access": "public"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/DouglasNeuroInformatics/OpenDataCapture.git",
@@ -14,14 +10,15 @@
   "bin": {
     "serve-instrument": "./dist/cli.js"
   },
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "node scripts/build.js",
-    "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
+    "format": "oxfmt src",
+    "lint": "tsc && oxlint --fix src",
     "test": "vitest"
-  },
-  "peerDependencies": {
-    "@opendatacapture/runtime-v1": "workspace:*"
   },
   "dependencies": {
     "chalk": "^6.0.1",
@@ -42,5 +39,8 @@
     "react": "workspace:react__19.x@*",
     "react-dom": "workspace:react-dom__19.x@*",
     "zod": "workspace:zod__3.x@*"
+  },
+  "peerDependencies": {
+    "@opendatacapture/runtime-v1": "workspace:*"
   }
 }

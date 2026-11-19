@@ -45,7 +45,7 @@ src/<feature>/
 There is no repository layer and no `entity/` folder — `Model<'X'>` _is_ the repository.
 
 **A single-segment route can be shadowed by a `:param` route on the same verb.** `perfectionist/sort-classes`
-is an eslint error, so `eslint --fix` orders controller handlers alphabetically — a handler you wrote
+is an oxlint error, so `oxlint --fix` orders controller handlers alphabetically — a handler you wrote
 above `@Get(':id')` does not stay there. Anything that sorts below it, such as a hypothetical
 `@Get('summary')` in `users.controller.ts`, is matched by `:id` instead, and the failure is a
 confusing 404 or cast error rather than a lint or type failure. Give such a route two segments so
@@ -64,7 +64,7 @@ check _which rows_.
 
 **1. Every handler needs `@RouteAccess`.** A handler without one throws
 `InternalServerErrorException` at request time — so the failure mode is a 500, not an accidentally
-public route. This is eslint-enforced. Know what you are choosing:
+public route. This is oxlint-enforced. Know what you are choosing:
 
 | Value                               | Means                                                                                         |
 | ----------------------------------- | --------------------------------------------------------------------------------------------- |
@@ -98,7 +98,7 @@ off it, and its controller forwards `@CurrentUser()` — `src/instruments/instru
 
 `accessibleQuery(undefined, ...)` returns `{}` — **an omitted or undefined ability means no
 restriction**, which reads clinical data across every group. Nothing catches this: not `tsc`, not
-eslint, not a passing test suite. It is the single highest-severity mistake available in this
+oxlint, not a passing test suite. It is the single highest-severity mistake available in this
 codebase, so verify the `where` clause of any query you add or edit.
 
 The defined case has the opposite failure mode: **an ability holding no rule at all for the queried
@@ -220,7 +220,7 @@ in one and not the other type-checks on both sides and fails when a document is 
 ## Configuration
 
 All environment variables are declared in `$Env` (`src/core/schemas/env.schema.ts`) and read through
-`ConfigService`. **Reading `process.env` directly is an eslint error** — the one exception is
+`ConfigService`. **Reading `process.env` directly is an oxlint error** — the one exception is
 `src/core/decorators/throttle-login-request.decorator.ts`, where decorator arguments are evaluated
 before the DI container exists.
 

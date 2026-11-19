@@ -101,7 +101,7 @@ Tailwind v4 via `@tailwindcss/vite`. Two dark-mode attributes coexist: marketing
 syncs them. Style against `data-mode` outside of Starlight.
 
 `cn` comes from the local `src/utils.ts`, which wraps clsx and tailwind-merge directly. That is
-deliberate; the eslint ban on importing those two applies only to `apps/web` and
+deliberate; the oxlint ban on importing those two applies only to `apps/web` and
 `packages/react-core`.
 
 ## No React, no tests
@@ -110,5 +110,8 @@ Every component is `.astro`; there are no React islands and no client framework 
 configured. Do not introduce one without asking.
 
 There is **no `vitest.config.ts` and no test suite in this package** — `pnpm test` does not cover it.
-`pnpm --filter @opendatacapture/outreach lint` runs `astro check && eslint --fix src`, and `astro check`
+`pnpm --filter @opendatacapture/outreach lint` runs `astro check && oxlint --fix src`, and `astro check`
 is the only thing type-checking `.astro` files, so run it after any change here.
+
+`astro check` and typedoc run on this package's own `typescript` 6.0.x devDependency: neither supports
+TypeScript 7, which every other workspace uses.

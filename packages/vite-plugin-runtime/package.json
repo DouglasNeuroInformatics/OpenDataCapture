@@ -1,22 +1,22 @@
 {
   "name": "@opendatacapture/vite-plugin-runtime",
-  "type": "module",
   "version": "0.0.0",
-  "sideEffects": false,
   "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": "./src/index.js"
   },
   "scripts": {
-    "format": "prettier --write src",
-    "lint": "tsc && eslint --fix src",
+    "format": "oxfmt src",
+    "lint": "tsc && oxlint --fix src",
     "test": "vitest"
+  },
+  "dependencies": {
+    "@opendatacapture/runtime-meta": "workspace:*"
   },
   "peerDependencies": {
     "@opendatacapture/runtime-v1": "workspace:*",
     "vite": "catalog:"
-  },
-  "dependencies": {
-    "@opendatacapture/runtime-meta": "workspace:*"
   }
 }

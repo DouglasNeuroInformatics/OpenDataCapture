@@ -1,7 +1,7 @@
 {
   "name": "classic-script",
-  "type": "module",
   "version": "0.0.0",
+  "type": "module",
   "exports": {
     ".": {
       "default": "./index.js"

@@ -1,16 +1,22 @@
 {
   "name": "@opendatacapture/api",
-  "type": "module",
   "version": "0.0.0",
   "private": true,
   "license": "Apache-2.0",
+  "type": "module",
+  "imports": {
+    "#runtime/v1/*": {
+      "development": "../../runtime/v1/dist/*",
+      "default": "./dist/runtime/v1/*"
+    }
+  },
   "scripts": {
     "build": "rm -rf dist && NODE_ENV=production libnest build -c libnest.config.ts",
     "db:generate": "prisma generate --no-hints",
     "dev": "NODE_ENV=development NODE_OPTIONS='--conditions=development' env-cmd -f ../../.env libnest dev -c libnest.config.ts",
     "dev:test": "NODE_ENV=test env-cmd -f ../../.env env STORAGE_ENABLED=true libnest dev -c libnest.config.ts --no-watch",
-    "format": "prettier --write src test",
-    "lint": "tsc && eslint --fix src test",
+    "format": "oxfmt src test",
+    "lint": "tsc && oxlint --fix src test",
     "start": "NODE_ENV=production env-cmd -f ../../.env node dist/app.js",
     "test": "env-cmd -f ../../.env vitest"
   },
@@ -21,7 +27,7 @@
     "@casl/prisma": "^2.0.2",
     "@douglasneuroinformatics/libcrypto": "catalog:",
     "@douglasneuroinformatics/libjs": "catalog:",
-    "@douglasneuroinformatics/libnest": "^10.0.0",
+    "@douglasneuroinformatics/libnest": "^11.0.0",
     "@douglasneuroinformatics/libpasswd": "catalog:",
     "@douglasneuroinformatics/libstats": "catalog:",
     "@faker-js/faker": "^10.6.0",
@@ -65,12 +71,6 @@
     "@types/passport-jwt": "^4.0.1",
     "mongodb-memory-server": "^11.3.0",
     "prisma": "catalog:",
-    "prisma-json-types-generator": "^3.2.2"
-  },
-  "imports": {
-    "#runtime/v1/*": {
-      "development": "../../runtime/v1/dist/*",
-      "default": "./dist/runtime/v1/*"
-    }
+    "prisma-json-types-generator": "catalog:"
   }
 }

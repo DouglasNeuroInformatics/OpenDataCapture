@@ -15,6 +15,7 @@ Read the `AGENTS.md` in the directory you are editing; each covers only that wor
 | Building the library catalog instruments import | `packages/runtime-bundler/AGENTS.md`    |
 | The `defineInstrument` public API               | `packages/runtime-core/AGENTS.md`       |
 | Adding or editing a built-in instrument         | `packages/instrument-library/AGENTS.md` |
+| Lint rules and the custom oxlint plugin         | `packages/oxlint-config/AGENTS.md`      |
 | Pinned library wrappers instruments import      | `vendor/AGENTS.md`                      |
 | The published runtime artifact                  | `runtime/v1/AGENTS.md`                  |
 | End-to-end tests                                | `testing/AGENTS.md`                     |
@@ -33,7 +34,7 @@ isn't one.
 | Topic                                                           | Path                                                |
 | --------------------------------------------------------------- | --------------------------------------------------- |
 | Which workspace depends on which, what is built, what publishes | `.agents/docs/workspace-map.md`                     |
-| The 11 `@douglasneuroinformatics/*` packages this repo consumes | `.agents/docs/packages/index.md`                    |
+| The 9 `@douglasneuroinformatics/*` packages this repo consumes  | `.agents/docs/packages/index.md`                    |
 | Instrument source → bundle → store → interpret → render         | `.agents/docs/architecture/instrument-pipeline.md`  |
 | The six similarly-named `runtime-*` things, and `vendor/`       | `.agents/docs/architecture/runtime-and-vendor.md`   |
 | CASL, `@RouteAccess`, and group scoping                         | `.agents/docs/architecture/auth-and-permissions.md` |
