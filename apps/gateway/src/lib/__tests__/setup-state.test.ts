@@ -42,6 +42,11 @@ describe('resolveLanguage', () => {
     expect(resolveLanguage(undefined, 'fr-CA,fr;q=0.9,en;q=0.8')).toBe('fr');
   });
 
+  it('should fall back to the browser for a link pinned to a language the instance has since turned off', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage('es', 'fr-CA,fr;q=0.9')).toBe('fr');
+  });
+
   it('should prefer the language the link names over the one the browser asks for', () => {
     updateSetupState({ activeLanguages: ['en', 'fr'] });
     expect(resolveLanguage('en', 'fr-CA,fr;q=0.9')).toBe('en');

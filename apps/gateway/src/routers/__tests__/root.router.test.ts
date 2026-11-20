@@ -40,8 +40,8 @@ function storeAssignment(stored: {
   });
 }
 
-async function getRootProps(path: string): Promise<RootProps> {
-  const response = await fetch(`${baseUrl}${path}`);
+async function getRootProps(path: string, headers?: { [key: string]: string }): Promise<RootProps> {
+  const response = await fetch(`${baseUrl}${path}`, { headers });
   return response.json();
 }
 
@@ -109,6 +109,19 @@ describe('rootRouter', () => {
         target,
         token: generateToken('assignment-1')
       });
+    });
+
+    it('should open a link with no language in the language the browser asks for, which is how most links are created', async () => {
+      storeAssignment({});
+      expect(
+        await getRootProps('/assignments/assignment-1', { 'accept-language': 'fr-CA,fr;q=0.9,en;q=0.8' })
+      ).toMatchObject({ language: 'fr' });
+    });
+
+    it('should name Accept-Language as what the page varies on, so a shared cache cannot serve one subject the language of another', async () => {
+      storeAssignment({});
+      const response = await fetch(`${baseUrl}/assignments/assignment-1`);
+      expect(response.headers.get('vary')).toBe('Accept-Language');
     });
 
     it('should hand the page the redirect URL the assignment was created with, so it can send the subject on', async () => {
