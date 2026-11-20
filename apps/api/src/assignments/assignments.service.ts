@@ -23,8 +23,6 @@ import type { EntityOperationOptions } from '@/core/types';
 import { GatewayService } from '@/gateway/gateway.service';
 import { InstrumentsService } from '@/instruments/instruments.service';
 
-import { withLinkLanguage } from './assignments.utils';
-
 /**
  * How many assignments a batch prepares at once. Key generation is CPU-bound, so an unbounded
  * `Promise.all` over 500 subjects would hold the event loop for the whole batch and stall every
@@ -381,7 +379,10 @@ export class AssignmentsService {
         redirectUrl,
         status: 'OUTSTANDING',
         subject: { connect: { id: subjectId } },
-        url: language ? withLinkLanguage(link, language) : link
+        // The language is named on the link only when the assignment is created: a link left
+        // without one is one the subject's own browser decides, and nothing later — an email
+        // written in another language included — overrides that.
+        url: language ? `${link}?lang=${language}` : link
       }
     });
     return { assignment, publicKey };

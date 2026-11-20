@@ -12,15 +12,15 @@ type AdministrationChoice = {
 };
 
 type AdministrationChoiceOptions = {
-  /** Narrows the instrument's own languages, e.g. to those the instance has active. */
-  allowedLanguages?: readonly Language[];
+  /** Narrows the instrument's own languages to those the instance has active. */
+  allowedLanguages: readonly Language[];
   /** Used when the instrument offers it; otherwise the first language it does offer. */
   preferredLanguage: Language;
 };
 
 /** The languages an instrument may be opened in here: its own, narrowed to the instance's active ones. */
-function getLanguageOptions(instrument: TranslatedInstrumentInfo, allowedLanguages?: readonly Language[]): Language[] {
-  return instrument.supportedLanguages.filter((language) => !allowedLanguages || allowedLanguages.includes(language));
+function getLanguageOptions(instrument: TranslatedInstrumentInfo, allowedLanguages: readonly Language[]): Language[] {
+  return instrument.supportedLanguages.filter((language) => allowedLanguages.includes(language));
 }
 
 /**

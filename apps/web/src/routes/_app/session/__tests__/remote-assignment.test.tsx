@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import type { Assignment } from '@opendatacapture/schemas/assignment';
 import type { Session } from '@opendatacapture/schemas/session';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/session/remote-assignment';
@@ -126,9 +126,21 @@ const selectInstrument = () => {
 
 const submitForm = () => fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-/** Waits out the whole submit cycle, so no state update lands after the test has finished. */
-const waitForLink = () => {
-  return waitFor(() => expect(screen.getByRole('link', { name: 'Assignment Link' })).toBeTruthy());
+/**
+ * Waits out the whole submit cycle, so no state update lands after the test has finished.
+ *
+ * The link renders as soon as `mutateAsync` resolves, but the form is `suspendWhileSubmitting`, so
+ * libui holds `isSubmitting` for 500ms more and clears it once this dialog is already gone. Ending
+ * on the link alone leaves that update to fire after the environment is torn down, which surfaces
+ * as an unhandled `window is not defined` charged to whichever file runs next.
+ */
+const waitForLink = async () => {
+  await waitFor(() => expect(screen.getByRole('link', { name: 'Assignment Link' })).toBeTruthy());
+  await act(async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 600);
+    });
+  });
 };
 
 const createAssignment = async () => {

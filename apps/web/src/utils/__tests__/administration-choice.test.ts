@@ -15,12 +15,18 @@ function createInfo(supportedLanguages: string[]): TranslatedInstrumentInfo {
 
 describe('getAdministrationChoice', () => {
   it('should return the preferred language when the instrument offers it', () => {
-    const result = getAdministrationChoice(createInfo(['en', 'fr']), { preferredLanguage: 'fr' });
+    const result = getAdministrationChoice(createInfo(['en', 'fr']), {
+      allowedLanguages: ['en', 'fr'],
+      preferredLanguage: 'fr'
+    });
     expect(result.language).toBe('fr');
   });
 
   it('should fall back to the first offered language when the preferred one is not offered', () => {
-    const result = getAdministrationChoice(createInfo(['fr']), { preferredLanguage: 'en' });
+    const result = getAdministrationChoice(createInfo(['fr']), {
+      allowedLanguages: ['en', 'fr'],
+      preferredLanguage: 'en'
+    });
     expect(result.language).toBe('fr');
   });
 

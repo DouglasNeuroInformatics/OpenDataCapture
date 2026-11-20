@@ -20,22 +20,20 @@ const scale = instrument('scale');
 
 describe('useAdministrationChoice', () => {
   it('should have no choice until an instrument is picked', () => {
-    const { result } = renderHook(() => useAdministrationChoice());
+    const { result } = renderHook(() => useAdministrationChoice(['en', 'fr']));
     expect(result.current.choice).toBeNull();
   });
 
   it('should start a pick with no language, leaving it to the browser that opens the link', () => {
-    const { result } = renderHook(() => useAdministrationChoice());
-    let picked: ReturnType<typeof result.current.pick> | undefined;
+    const { result } = renderHook(() => useAdministrationChoice(['en', 'fr']));
     act(() => {
-      picked = result.current.pick(scale);
+      result.current.pick(scale);
     });
-    expect(picked).toMatchObject({ instrument: { id: 'scale' }, language: undefined });
     expect(result.current.choice).toMatchObject({ instrument: { id: 'scale' }, language: undefined });
   });
 
   it('should keep the language the user chose', () => {
-    const { result } = renderHook(() => useAdministrationChoice());
+    const { result } = renderHook(() => useAdministrationChoice(['en', 'fr']));
     act(() => {
       result.current.pick(scale);
     });
@@ -46,7 +44,7 @@ describe('useAdministrationChoice', () => {
   });
 
   it('should forget a chosen language on the next pick, so it cannot carry to another instrument', () => {
-    const { result } = renderHook(() => useAdministrationChoice());
+    const { result } = renderHook(() => useAdministrationChoice(['en', 'fr']));
     act(() => {
       result.current.pick(scale);
       result.current.setLanguage('fr');
