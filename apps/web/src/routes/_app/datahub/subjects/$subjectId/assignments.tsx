@@ -19,6 +19,7 @@ import { useAssignmentsQuery } from '@/hooks/useAssignmentsQuery';
 import { useInstrument } from '@/hooks/useInstrument';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useUpdateAssignment } from '@/hooks/useUpdateAssignment';
+import { getLinkLanguage } from '@/utils/assignment-link';
 
 const AssignmentSlider: React.FC<{
   assignment: Assignment | null;
@@ -58,6 +59,7 @@ const AssignmentSlider: React.FC<{
             {assignment?.status === 'OUTSTANDING' && (
               <AssignmentEmailForm
                 assignment={assignment}
+                initialLanguage={getLinkLanguage(assignment.url)}
                 instrumentLanguages={instrumentLanguages}
                 key={assignment.id}
               />
