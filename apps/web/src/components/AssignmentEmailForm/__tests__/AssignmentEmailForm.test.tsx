@@ -370,6 +370,16 @@ describe('AssignmentEmailForm', () => {
       expect(mocks.sendEmail).toHaveBeenCalledWith(expect.objectContaining({ language: 'en' }), expect.anything());
     });
 
+    // Otherwise the warning fires on every send with nothing the sender can do but override it,
+    // which is how a warning stops being read.
+    it('asks nothing when no template is authored in the language the link opens in, since there is nothing to resolve', () => {
+      mockGroup('tpl-en', [englishTemplate]);
+      render(<AssignmentEmailForm assignment={pinnedAssignment} instrumentLanguages={['en', 'fr']} />);
+      submit('p@x.org');
+      expect(screen.queryByTestId('confirm-email-language-dialog')).toBeNull();
+      expect(mocks.sendEmail).toHaveBeenCalledWith(expect.objectContaining({ language: 'en' }), expect.anything());
+    });
+
     it('sends nothing when the mismatch is dismissed', () => {
       render(<AssignmentEmailForm assignment={pinnedAssignment} initialLanguage="fr" />);
       chooseEmailLanguage('English');

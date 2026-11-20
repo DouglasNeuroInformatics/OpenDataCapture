@@ -69,8 +69,13 @@ export const AssignmentEmailForm = ({ assignment, initialLanguage, instrumentLan
   // leave the trigger showing a value with no matching item while a different one is posted.
   const language = languageOptions.includes(languageChoice) ? languageChoice : (languageOptions[0] ?? 'en');
 
-  // The link's own language, which the email's does not have to match — so it is worth confirming.
-  const linkLanguage = assignment ? getLinkLanguage(assignment.url) : undefined;
+  // The link's own language, which the email's does not have to match — so it is worth confirming,
+  // but only where the sender could pick it: a template authored in neither of the link's languages
+  // leaves them nothing to resolve, and a warning they can only override is a warning they learn to
+  // ignore.
+  const pinnedLinkLanguage = assignment ? getLinkLanguage(assignment.url) : undefined;
+  const linkLanguage =
+    pinnedLinkLanguage && languageOptions.includes(pinnedLinkLanguage) ? pinnedLinkLanguage : undefined;
 
   const handleSendEmail = () => {
     if (!assignment || !recipient) {
@@ -237,9 +242,9 @@ export const AssignmentEmailForm = ({ assignment, initialLanguage, instrumentLan
           {feedback.message}
         </p>
       )}
-      {linkLanguage && (
+      {linkLanguage && isConfirmingLanguage && (
         <ConfirmEmailLanguageDialog
-          emailLanguage={isConfirmingLanguage ? language : null}
+          emailLanguage={language}
           isPending={sendEmailMutation.isPending}
           linkLanguage={linkLanguage}
           onConfirm={handleSendEmail}
