@@ -81,4 +81,14 @@ describe('resolveLanguage', () => {
     updateSetupState({ activeLanguages: ['en', 'fr'] });
     expect(resolveLanguage(undefined, 'fr;q=high,en;q=0.9')).toBe('fr');
   });
+
+  it('should treat a quality of punctuation alone as the strongest preference rather than dropping the language', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage(undefined, 'fr;q=.,en;q=0.9')).toBe('fr');
+  });
+
+  it('should read a quality the client spells with a capital Q, which HTTP allows', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage(undefined, 'fr;Q=0.1,en;Q=0.9')).toBe('en');
+  });
 });

@@ -6,9 +6,9 @@ import type { RemoteSetupState } from '@opendatacapture/schemas/gateway';
  * The languages an `Accept-Language` header asks for, most wanted first.
  *
  * Only the base language is kept, so `fr-CA` counts as a request for French, and a tag with `q=0`
- * is dropped because that is how a client says it does not want one. An unparseable quality is
+ * is dropped because that is how a client says it does not want one. An unreadable quality is
  * treated as the default of 1 rather than discarded, since a client that sends one still wants the
- * language it named.
+ * language it named. A parameter name is matched either case, as HTTP does not distinguish them.
  */
 const parseAcceptLanguage = (header: string): string[] => {
   return header
@@ -16,9 +16,10 @@ const parseAcceptLanguage = (header: string): string[] => {
     .map((part) => {
       const [tag = '', ...parameters] = part.trim().split(';');
       const quality = parameters
-        .map((parameter) => /^\s*q=(?<value>[\d.]+)\s*$/u.exec(parameter)?.groups?.value)
+        .map((parameter) => /^\s*q=(?<value>[\d.]+)\s*$/iu.exec(parameter)?.groups?.value)
         .find((value) => value !== undefined);
-      return { quality: quality === undefined ? 1 : Number.parseFloat(quality) || 0, tag: tag.trim() };
+      const parsedQuality = quality === undefined ? 1 : Number.parseFloat(quality);
+      return { quality: Number.isNaN(parsedQuality) ? 1 : parsedQuality, tag: tag.trim() };
     })
     .filter(({ quality, tag }) => tag.length > 0 && quality > 0)
     .sort((a, b) => b.quality - a.quality)
