@@ -329,4 +329,71 @@ describe('AssignmentEmailForm', () => {
     submit('q@x.org');
     expect(screen.queryByTestId('assignment-email-feedback')).toBeNull();
   });
+
+  describe('a link pinned to a language', () => {
+    const pinnedAssignment: Assignment = { ...assignment, url: `${assignment.url}?lang=fr` };
+
+    const chooseEmailLanguage = (name: string) => {
+      fireEvent.click(screen.getByTestId('assignment-language'));
+      fireEvent.click(screen.getByRole('option', { name }));
+    };
+
+    it('sends without asking when the email is in the language the link opens in', () => {
+      render(<AssignmentEmailForm assignment={pinnedAssignment} initialLanguage="fr" />);
+      submit('p@x.org');
+      expect(screen.queryByTestId('confirm-email-language-dialog')).toBeNull();
+      expect(mocks.sendEmail).toHaveBeenCalledWith(expect.objectContaining({ language: 'fr' }), expect.anything());
+    });
+
+    it('asks before sending an email in a language the link does not open in', () => {
+      render(<AssignmentEmailForm assignment={pinnedAssignment} initialLanguage="fr" />);
+      chooseEmailLanguage('English');
+      submit('p@x.org');
+      expect(screen.getByTestId('confirm-email-language-dialog')).toBeTruthy();
+      expect(mocks.sendEmail).not.toHaveBeenCalled();
+    });
+
+    it('names both languages, so the sender can see which is which', () => {
+      render(<AssignmentEmailForm assignment={pinnedAssignment} initialLanguage="fr" />);
+      chooseEmailLanguage('English');
+      submit('p@x.org');
+      expect(screen.getByTestId('confirm-email-language-dialog').textContent).toContain(
+        'written in English, but the link opens the instrument in French'
+      );
+    });
+
+    it('sends once the mismatch is confirmed', () => {
+      render(<AssignmentEmailForm assignment={pinnedAssignment} initialLanguage="fr" />);
+      chooseEmailLanguage('English');
+      submit('p@x.org');
+      fireEvent.click(screen.getByTestId('confirm-email-language'));
+      expect(mocks.sendEmail).toHaveBeenCalledWith(expect.objectContaining({ language: 'en' }), expect.anything());
+    });
+
+    // Otherwise the warning fires on every send with nothing the sender can do but override it,
+    // which is how a warning stops being read.
+    it('asks nothing when no template is authored in the language the link opens in, since there is nothing to resolve', () => {
+      mockGroup('tpl-en', [englishTemplate]);
+      render(<AssignmentEmailForm assignment={pinnedAssignment} instrumentLanguages={['en', 'fr']} />);
+      submit('p@x.org');
+      expect(screen.queryByTestId('confirm-email-language-dialog')).toBeNull();
+      expect(mocks.sendEmail).toHaveBeenCalledWith(expect.objectContaining({ language: 'en' }), expect.anything());
+    });
+
+    it('sends nothing when the mismatch is dismissed', () => {
+      render(<AssignmentEmailForm assignment={pinnedAssignment} initialLanguage="fr" />);
+      chooseEmailLanguage('English');
+      submit('p@x.org');
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      expect(screen.queryByTestId('confirm-email-language-dialog')).toBeNull();
+      expect(mocks.sendEmail).not.toHaveBeenCalled();
+    });
+  });
+
+  it('asks nothing of a link with no language, which the browser that opens it decides', () => {
+    render(<AssignmentEmailForm assignment={assignment} />);
+    submit('p@x.org');
+    expect(screen.queryByTestId('confirm-email-language-dialog')).toBeNull();
+    expect(mocks.sendEmail).toHaveBeenCalled();
+  });
 });

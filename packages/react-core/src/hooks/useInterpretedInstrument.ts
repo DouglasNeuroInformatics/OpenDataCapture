@@ -5,6 +5,7 @@ import { InstrumentInterpreter } from '@opendatacapture/instrument-interpreter';
 import type { InterpretOptions } from '@opendatacapture/instrument-interpreter';
 import { translateInstrument } from '@opendatacapture/instrument-utils';
 import type { AnyInstrument, AnyUnilingualInstrument, Language } from '@opendatacapture/runtime-core';
+import type { Language as InterfaceLanguage } from '@opendatacapture/schemas/core';
 
 /** The outcome of interpreting one bundle, kept alongside the bundle that produced it. */
 type Interpretation =
@@ -20,15 +21,18 @@ export type InterpretedInstrumentState<TInstrument extends AnyUnilingualInstrume
  * Interpret an instrument bundle directly in the browser
  *
  * @param bundle - the JavaScript code to be interpreted directly in the browser
- * @returns The instrument generated from the code, translated into the current locale, if possible, otherwise the default
+ * @param language - the language to translate into; defaults to the interface language
+ * @returns The instrument generated from the code, translated into that language, if possible, otherwise the default
  */
 export function useInterpretedInstrument<TInstrument extends AnyUnilingualInstrument = AnyUnilingualInstrument>(
   bundle: string,
-  options?: InterpretOptions
+  options?: InterpretOptions,
+  language?: InterfaceLanguage
 ): InterpretedInstrumentState<TInstrument & { supportedLanguages: Language[] }> {
   const interpreter = useMemo(() => new InstrumentInterpreter(), []);
   const [interpretation, setInterpretation] = useState<Interpretation | null>(null);
   const { resolvedLanguage } = useTranslation();
+  const targetLanguage = language ?? resolvedLanguage;
 
   useEffect(() => {
     // A bundle that resolves after the hook has moved on to another one would otherwise be reported
@@ -66,12 +70,12 @@ export function useInterpretedInstrument<TInstrument extends AnyUnilingualInstru
     }
     return {
       instrument: {
-        ...(translateInstrument(interpretation.instrument, resolvedLanguage) as TInstrument),
+        ...(translateInstrument(interpretation.instrument, targetLanguage) as TInstrument),
         supportedLanguages: Array.isArray(interpretation.instrument.language)
           ? interpretation.instrument.language
           : [interpretation.instrument.language]
       },
       status: 'DONE'
     };
-  }, [bundle, interpretation, resolvedLanguage]);
+  }, [bundle, interpretation, targetLanguage]);
 }

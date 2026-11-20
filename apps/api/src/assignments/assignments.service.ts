@@ -15,6 +15,7 @@ import type {
   BulkAssignmentIssue,
   BulkAssignmentPreflightResult
 } from '@opendatacapture/schemas/assignment';
+import type { Language } from '@opendatacapture/schemas/core';
 
 import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery, forcedAppSubject } from '@/auth/ability.utils';
@@ -76,7 +77,7 @@ export class AssignmentsService {
   }
 
   async create(
-    { expiresAt, groupId, instrumentId, redirectUrl, subjectId }: $CreateAssignmentData,
+    { expiresAt, groupId, instrumentId, language, redirectUrl, subjectId }: $CreateAssignmentData,
     currentUser: RequestUser
   ): Promise<Assignment> {
     if (groupId) {
@@ -96,6 +97,7 @@ export class AssignmentsService {
       expiresAt,
       groupId,
       instrumentId,
+      language,
       redirectUrl,
       subjectId
     });
@@ -350,17 +352,20 @@ export class AssignmentsService {
     expiresAt,
     groupId,
     instrumentId,
+    language,
     redirectUrl,
     subjectId
   }: {
     expiresAt: Date;
     groupId?: null | string;
     instrumentId: string;
+    language?: Language;
     redirectUrl?: string;
     subjectId: string;
   }): Promise<{ assignment: Assignment; publicKey: webcrypto.CryptoKey }> {
     const { privateKey, publicKey } = await HybridCrypto.generateKeyPair();
     const id = crypto.randomUUID();
+    const link = `${this.assignmentBaseUrl}/assignments/${id}`;
     const assignment = await this.assignmentModel.create({
       data: {
         encryptionKeyPair: {
@@ -374,7 +379,10 @@ export class AssignmentsService {
         redirectUrl,
         status: 'OUTSTANDING',
         subject: { connect: { id: subjectId } },
-        url: `${this.assignmentBaseUrl}/assignments/${id}`
+        // The language is named on the link only when the assignment is created: a link left
+        // without one is one the subject's own browser decides, and nothing later — an email
+        // written in another language included — overrides that.
+        url: language ? `${link}?lang=${language}` : link
       }
     });
     return { assignment, publicKey };

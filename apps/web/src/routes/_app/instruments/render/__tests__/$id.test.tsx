@@ -13,6 +13,7 @@ import { Route } from '@/routes/_app/instruments/render/$id';
 import '@/services/i18n';
 
 type InstrumentRendererProps = {
+  language?: string;
   NavigationBlocker?: unknown;
   onSubmit: InstrumentSubmitHandler;
   subject?: Subject;
@@ -24,6 +25,7 @@ type AxiosRequestConfigStub = { onUploadProgress: (event: { loaded: number }) =>
 type MockState = {
   bundle: unknown;
   locationState: { info?: { clientDetails?: { title?: string }; details: { title: string } } };
+  search: { language?: string };
   store: { currentGroup: null | { id: string }; currentSession: null | Session };
 };
 
@@ -31,6 +33,7 @@ const mocks = vi.hoisted(() => {
   const state: MockState = {
     bundle: undefined,
     locationState: {},
+    search: {},
     store: { currentGroup: null, currentSession: null }
   };
   return {
@@ -44,7 +47,13 @@ const mocks = vi.hoisted(() => {
 vi.mock('axios', () => ({ default: mocks.axios }));
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
-  createFileRoute: () => (options: { component: FC }) => ({ options, useParams: () => ({ id: 'instrument-1' }) }),
+  createFileRoute: () => {
+    return (options: { component: FC }) => ({
+      options,
+      useParams: () => ({ id: 'instrument-1' }),
+      useSearch: () => mocks.search
+    });
+  },
   useLocation: () => ({ state: mocks.locationState }),
   useNavigate: () => mocks.navigate
 }));
@@ -99,6 +108,7 @@ describe('Route', () => {
   beforeEach(() => {
     mocks.bundle = { bundle: '__BUNDLE__', id: 'instrument-1', kind: 'FORM' };
     mocks.locationState = { info: { details: { title: 'Details Title' } } };
+    mocks.search = {};
     mocks.store.currentGroup = { id: 'group-1' };
     mocks.store.currentSession = createSession();
     mocks.axios.post.mockResolvedValue({ data: { id: 'record-1' } });
@@ -127,6 +137,17 @@ describe('Route', () => {
     it('should hand the renderer the router-backed NavigationBlocker, so leaving a started instrument asks first', () => {
       render(<InstrumentRenderPage />);
       expect(rendererProps().NavigationBlocker).toBe(NavigationBlocker);
+    });
+
+    it('should run the instrument in the language the clinician chose', () => {
+      mocks.search = { language: 'fr' };
+      render(<InstrumentRenderPage />);
+      expect(rendererProps().language).toBe('fr');
+    });
+
+    it('should leave the instrument in the interface language when none was chosen', () => {
+      render(<InstrumentRenderPage />);
+      expect(rendererProps().language).toBeUndefined();
     });
 
     it('should render without a subject when the session has none', () => {

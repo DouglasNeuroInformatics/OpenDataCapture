@@ -16,6 +16,15 @@ export class AccessibleInstrumentsPage extends AppPage {
     this.searchBox = this.searchBar.locator('input');
   }
 
+  /**
+   * Sets the language a card will be administered in. Options are named in the interface language,
+   * e.g. 'French' for an English reader, and the dropdown appears only where there is a choice.
+   */
+  async chooseCardLanguage(title: string, name: string): Promise<void> {
+    await this.instrumentCard(title).locator('[data-testid^="instrument-language-"]').click();
+    await this.$ref.getByRole('option', { name }).click();
+  }
+
   /** Cards carry a content-hash testid, so match on the visible title instead. */
   instrumentCard(title: string): Locator {
     return this.instrumentShowcase.locator('[data-testid^="instrument-card-"]').filter({ hasText: title }).first();

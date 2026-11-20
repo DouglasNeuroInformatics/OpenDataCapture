@@ -21,6 +21,10 @@ export default {
 export const Default: Story = {
   args: {
     bundle: interactiveInstrument.bundle,
+    language: 'en',
+    onChangeLanguage() {
+      // The host owns the instrument's language; this story holds it fixed.
+    },
     onSubmit({ data }) {
       alert(JSON.stringify(data, null, 2));
     }
