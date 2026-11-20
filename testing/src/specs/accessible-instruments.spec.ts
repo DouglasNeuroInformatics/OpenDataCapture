@@ -2,14 +2,17 @@ import type { Page } from '@playwright/test';
 
 import { AccessibleInstrumentsPage } from '../pages/_app/instruments/accessible-instruments.page';
 import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
-import { StartSessionPage } from '../pages/_app/session/start-session.page';
 import { PHONE_VIEWPORT } from '../support/constants';
 import { expect, test } from '../support/fixtures';
 
-/** Starts a session, then reaches Administer Instrument through the sidebar, which keeps the in-memory session. */
-async function openAdministerWithSession(page: Page, uniqueId: string) {
-  const startSessionPage = new StartSessionPage(page);
-  await startSessionPage.goto('/session/start-session');
+import type { GetPageModel } from '../support/fixtures';
+
+/**
+ * Starts a session, then reaches Administer Instrument through the sidebar: the session lives in
+ * the client's memory, so a hard navigation would drop it and disable the nav buttons.
+ */
+async function openAdministerWithSession(getPageModel: GetPageModel, page: Page, uniqueId: string) {
+  const startSessionPage = await getPageModel('/session/start-session');
   await startSessionPage.sessionForm.waitFor({ state: 'visible' });
   await startSessionPage.selectIdentificationMethod('PERSONAL_INFO');
   await startSessionPage.fillSessionForm(`Administer${uniqueId}`, `Subject${uniqueId}`, 'Female');
@@ -40,12 +43,11 @@ test.describe('accessible instruments on a phone', () => {
 
 test.describe('administering an instrument', () => {
   test('should run the instrument in the language chosen while the rest of the app keeps its own', async ({
-    authenticateAs,
+    getPageModel,
     page,
     uniqueId
   }) => {
-    await authenticateAs('GROUP_MANAGER');
-    const accessibleInstrumentsPage = await openAdministerWithSession(page, uniqueId);
+    const accessibleInstrumentsPage = await openAdministerWithSession(getPageModel, page, uniqueId);
     await accessibleInstrumentsPage.chooseCardLanguage('Happiness Questionnaire', 'French');
     await accessibleInstrumentsPage.instrumentCard('Happiness Questionnaire').click();
 

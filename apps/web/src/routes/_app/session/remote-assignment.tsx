@@ -143,7 +143,7 @@ const RouteComponent = () => {
           }
         }}
       />
-      <Dialog open={isCreateModalOpen && choice !== null} onOpenChange={setIsCreateModalOpen}>
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
         <Dialog.Content
           ref={createDialogRef}
           onOpenAutoFocus={(event) => {

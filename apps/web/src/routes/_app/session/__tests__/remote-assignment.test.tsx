@@ -235,8 +235,7 @@ describe('Route', () => {
       fireEvent.blur(input);
       submitForm();
       expect(await screen.findByText('Expiry date must be in the future')).toBeTruthy();
-      // Settles the form's own submit cycle, so no state update lands after the test has finished.
-      await waitFor(() => expect(mocks.mutateAsync).not.toHaveBeenCalled());
+      expect(mocks.mutateAsync).not.toHaveBeenCalled();
     });
 
     it('should create the assignment, expiring on the chosen day, for the session subject in the current group', async () => {
@@ -280,7 +279,7 @@ describe('Route', () => {
       fireEvent.change(screen.getByLabelText('Redirect URL (Optional)'), { target: { value: 'http://example.com' } });
       submitForm();
       await waitFor(() => expect(screen.getByTestId('error-message-text')).toBeTruthy());
-      await waitFor(() => expect(mocks.mutateAsync).not.toHaveBeenCalled());
+      expect(mocks.mutateAsync).not.toHaveBeenCalled();
     });
 
     it('should create the assignment with the redirect URL given', async () => {

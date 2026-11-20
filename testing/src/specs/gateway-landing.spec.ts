@@ -19,10 +19,8 @@ test.describe('gateway landing page', () => {
   test('should open a link with no language in the language the browser asks for', async ({ browser }) => {
     const frenchContext = await browser.newContext({ locale: 'fr-CA' });
     const frenchPage = await frenchContext.newPage();
-    await expect(async () => {
-      const landing = await frenchPage.goto(gatewayURL);
-      expect(await landing!.text()).toContain('Bienvenue');
-    }).toPass({ timeout: STALE_SETUP_STATE_TIMEOUT });
+    const landing = await frenchPage.goto(gatewayURL);
+    expect(await landing!.text()).toContain('Bienvenue');
     await expect(frenchPage.getByTestId('gateway-landing').getByRole('heading')).toHaveText('Bienvenue');
     await frenchContext.close();
   });
@@ -30,10 +28,8 @@ test.describe('gateway landing page', () => {
   test('should prefer the language the link names over the one the browser asks for', async ({ browser }) => {
     const frenchContext = await browser.newContext({ locale: 'fr-CA' });
     const frenchPage = await frenchContext.newPage();
-    await expect(async () => {
-      const english = await frenchPage.goto(`${gatewayURL}/?lang=en`);
-      expect(await english!.text()).toContain('Welcome');
-    }).toPass({ timeout: STALE_SETUP_STATE_TIMEOUT });
+    const english = await frenchPage.goto(`${gatewayURL}/?lang=en`);
+    expect(await english!.text()).toContain('Welcome');
     await frenchContext.close();
   });
 });

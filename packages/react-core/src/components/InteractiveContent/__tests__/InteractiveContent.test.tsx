@@ -35,7 +35,9 @@ function renderWithLanguageToggle({ enableLanguageLock }: { enableLanguageLock: 
       enableLanguageToggle
       bundle="bundle text"
       enableLanguageLock={enableLanguageLock}
+      language="en"
       supportedLanguages={['en', 'fr']}
+      onChangeLanguage={changeLanguage}
       onSubmit={vi.fn()}
     />
   );
@@ -61,7 +63,15 @@ describe('InteractiveContent', () => {
   });
 
   it('should render the iframe directly when there is at most one supported language', () => {
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
     expect(document.querySelector('iframe[data-bundle="bundle text"]')).toBeTruthy();
   });
 
@@ -70,7 +80,9 @@ describe('InteractiveContent', () => {
       <InteractiveContent
         enableLanguageSelect
         bundle="bundle text"
+        language="en"
         supportedLanguages={['en', 'fr']}
+        onChangeLanguage={changeLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -83,7 +95,9 @@ describe('InteractiveContent', () => {
       <InteractiveContent
         enableLanguageSelect
         bundle="bundle text"
+        language="en"
         supportedLanguages={['en', 'fr']}
+        onChangeLanguage={changeLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -94,7 +108,15 @@ describe('InteractiveContent', () => {
 
   it("should call onSubmit with the event's parsed JSON detail when the bundle dispatches 'done'", async () => {
     const onSubmit = vi.fn();
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={onSubmit} />);
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={onSubmit}
+      />
+    );
     await act(async () => {
       dispatch('done', { message: 'Hello' });
       await Promise.resolve();
@@ -103,7 +125,15 @@ describe('InteractiveContent', () => {
   });
 
   it("should change the language when the bundle dispatches a 'changeLanguage' event for a supported language", () => {
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
     act(() => {
       dispatch('changeLanguage', 'fr');
     });
@@ -111,7 +141,15 @@ describe('InteractiveContent', () => {
   });
 
   it("should notify an error rather than change the language when 'changeLanguage' requests an unsupported language", () => {
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
     act(() => {
       dispatch('changeLanguage', 'klingon');
     });
@@ -121,7 +159,14 @@ describe('InteractiveContent', () => {
 
   it('should open the lock dialog instead of changing language when the language is locked', () => {
     render(
-      <InteractiveContent enableLanguageLock bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />
+      <InteractiveContent
+        enableLanguageLock
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
     );
     act(() => {
       dispatch('changeLanguage', 'fr');
@@ -131,7 +176,15 @@ describe('InteractiveContent', () => {
   });
 
   it("should update the theme when the bundle dispatches a valid 'changeTheme' event", () => {
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
     act(() => {
       dispatch('changeTheme', 'dark');
     });
@@ -140,7 +193,15 @@ describe('InteractiveContent', () => {
 
   it("should log an error rather than update the theme when 'changeTheme' carries an invalid value", () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
     act(() => {
       dispatch('changeTheme', 'sepia');
     });
@@ -149,16 +210,19 @@ describe('InteractiveContent', () => {
   });
 
   it("should forward an 'addNotification' event's detail to the notifications store", () => {
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
     act(() => {
       dispatch('addNotification', { message: 'From the bundle', type: 'success' });
     });
     expect(addNotification).toHaveBeenCalledWith({ message: 'From the bundle', type: 'success' });
-  });
-
-  it('should run the iframe in the interface language when the host holds no language', () => {
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
-    expect(screen.getByTitle('Open Data Capture - Interactive Instrument').getAttribute('lang')).toBe('en');
   });
 
   it('should run the iframe in the language the host holds, whatever the interface language', () => {
@@ -193,7 +257,15 @@ describe('InteractiveContent', () => {
   });
 
   it('should zoom the iframe in and out within its lower bound', () => {
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
     expect(screen.getByText('100%')).toBeTruthy();
     const [zoomOut, zoomIn] = screen.getAllByRole('button');
     fireEvent.click(zoomIn!);
@@ -212,7 +284,9 @@ describe('InteractiveContent', () => {
       <InteractiveContent
         enableLanguageToggle
         bundle="bundle text"
+        language="en"
         supportedLanguages={['en', 'fr']}
+        onChangeLanguage={changeLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -221,7 +295,14 @@ describe('InteractiveContent', () => {
 
   it('should close the lock dialog when its OK button is clicked', () => {
     render(
-      <InteractiveContent enableLanguageLock bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />
+      <InteractiveContent
+        enableLanguageLock
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
     );
     act(() => {
       dispatch('changeLanguage', 'fr');
@@ -247,26 +328,57 @@ describe('InteractiveContent', () => {
   it('should enter fullscreen on mount when the instrument asks to start fullscreen', () => {
     installFullscreen(null);
     render(
-      <InteractiveContent defaultFullscreen bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />
+      <InteractiveContent
+        defaultFullscreen
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
     );
     expect(requestFullscreen.mock.contexts[0]).toBe(document.querySelector('iframe'));
   });
 
   it('should not enter fullscreen on mount unless the instrument asks to', () => {
     installFullscreen(null);
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
     expect(requestFullscreen).not.toHaveBeenCalled();
   });
 
   it('should put the iframe in fullscreen from the fullscreen button when nothing is fullscreen', () => {
     installFullscreen(null);
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
     fireEvent.click(screen.getAllByRole('button')[2]!);
     expect(requestFullscreen.mock.contexts[0]).toBe(document.querySelector('iframe'));
   });
 
   it('should leave fullscreen from the fullscreen button when already fullscreen', () => {
-    render(<InteractiveContent bundle="bundle text" supportedLanguages={['en']} onSubmit={vi.fn()} />);
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en']}
+        onChangeLanguage={changeLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
     installFullscreen(document.querySelector('iframe'));
     fireEvent.click(screen.getAllByRole('button')[2]!);
     expect(exitFullscreen).toHaveBeenCalledOnce();
