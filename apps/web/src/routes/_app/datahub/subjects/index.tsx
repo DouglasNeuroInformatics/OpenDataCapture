@@ -20,6 +20,7 @@ import { IdentificationForm } from '@/components/IdentificationForm';
 import { PageHeader } from '@/components/PageHeader';
 import { SearchSubmitGuard } from '@/components/SearchSubmitGuard';
 import { SortableHeader } from '@/components/SortableHeader';
+import { subjectIdentificationSettingsQueryOptions } from '@/hooks/useSubjectIdentificationSettingsQuery';
 import { subjectRecordSummaryQueryOptions, useSubjectRecordSummaryQuery } from '@/hooks/useSubjectRecordSummaryQuery';
 import { subjectsQueryOptions, useSubjectsQuery } from '@/hooks/useSubjectsQuery';
 import { useAppStore } from '@/store';
@@ -587,7 +588,8 @@ export const Route = createFileRoute('/_app/datahub/subjects/')({
     const { currentGroup } = useAppStore.getState();
     await Promise.all([
       context.queryClient.ensureQueryData(subjectsQueryOptions({ params: { groupId: currentGroup?.id } })),
-      context.queryClient.ensureQueryData(subjectRecordSummaryQueryOptions({ params: { groupId: currentGroup?.id } }))
+      context.queryClient.ensureQueryData(subjectRecordSummaryQueryOptions({ params: { groupId: currentGroup?.id } })),
+      context.queryClient.ensureQueryData(subjectIdentificationSettingsQueryOptions())
     ]);
   }
 });

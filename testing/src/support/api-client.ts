@@ -3,7 +3,7 @@ import { AUDIT_LOGS_MAX_PAGE_SIZE } from '@opendatacapture/schemas/audit';
 import type { $AuditLog, $AuditLogAction, $AuditLogsPage } from '@opendatacapture/schemas/audit';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Permissions } from '@opendatacapture/schemas/core';
-import type { $CreateGroupData, Group } from '@opendatacapture/schemas/group';
+import type { $CreateGroupData, $UpdateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type {
   $CreateInstrumentRecordData,
@@ -14,6 +14,10 @@ import { MAIL_CLIENT_TIMEOUT } from '@opendatacapture/schemas/mail';
 import type { $SendAssignmentEmailData, EmailDeliveryResult } from '@opendatacapture/schemas/mail';
 import type { $CreateSessionData, Session, SessionType } from '@opendatacapture/schemas/session';
 import type { $CreateSubjectData } from '@opendatacapture/schemas/subject';
+import type {
+  $UpdateSubjectIdentificationSettingsData,
+  SubjectIdentificationSettings
+} from '@opendatacapture/schemas/subject-identification';
 import type { $CreateUserData, $UpdateUserPermissionsData, User } from '@opendatacapture/schemas/user';
 import type { APIRequestContext } from '@playwright/test';
 
@@ -319,6 +323,26 @@ export class ApiClient {
    */
   async setUserPermissions(id: string, permissions: Permissions): Promise<User> {
     return this.putUserPermissions(id, { kind: 'custom', permissions });
+  }
+
+  /** Updates a group as admin, for settings a spec needs in place before a user signs in to it. */
+  async updateGroup(id: string, data: $UpdateGroupData): Promise<Group> {
+    return this.expectJson<Group>(
+      this.request.patch(`${API}/groups/${id}`, { data, headers: this.authHeaders }),
+      200,
+      `update group '${id}'`
+    );
+  }
+
+  /** Replaces the instance's subject identification settings as admin. */
+  async updateSubjectIdentificationSettings(
+    data: $UpdateSubjectIdentificationSettingsData
+  ): Promise<SubjectIdentificationSettings> {
+    return this.expectJson<SubjectIdentificationSettings>(
+      this.request.put(`${API}/subjects/identification/settings`, { data, headers: this.authHeaders }),
+      200,
+      'update subject identification settings'
+    );
   }
 
   /**

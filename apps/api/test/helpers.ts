@@ -62,17 +62,20 @@ export function defineSuite(name: string, fn: (this: TestSuiteThis) => Promise<v
 /**
  * A form with one number field, as the bundle the api stores. A bundle normally imports zod from
  * `/runtime/v1`, which does not resolve under vitest (#1653), so this one imports the api's own zod
- * by its file URL. The instrument id derives from `name`, so each bundle needs a name of its own.
- * `measured` makes the score a measure, which is what an export writes a row for.
+ * by its file URL. The instrument id derives from `name` and `edition`, so each bundle needs a name of
+ * its own. `measured` makes the score a measure, which is what an export writes a row for.
  */
-export function scoreFormBundle(name: string, { measured = false }: { measured?: boolean } = {}) {
+export function scoreFormBundle(
+  name: string,
+  { edition = 1, measured = false }: { edition?: number; measured?: boolean } = {}
+) {
   return `(async () => {
     const { z } = await import(${JSON.stringify(import.meta.resolve('zod/v4'))});
     return {
       __runtimeVersion: 1,
       content: { score: { kind: 'number', label: 'Score', variant: 'input' } },
       details: { description: 'A form with one number field', license: 'Apache-2.0', title: ${JSON.stringify(name)} },
-      internal: { edition: 1, name: ${JSON.stringify(name)} },
+      internal: { edition: ${edition}, name: ${JSON.stringify(name)} },
       kind: 'FORM',
       language: 'en',
       measures: ${measured ? "{ score: { kind: 'const', label: 'Score', ref: 'score' } }" : 'null'},

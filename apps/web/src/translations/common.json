@@ -239,9 +239,9 @@
   "subjectIdentification": {
     "firstName": {
       "description": {
-        "en": "The subject's first name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as a fixed ASCII transliteration.",
-        "es": "El nombre del sujeto, según su certificado de nacimiento. A efectos de identificación, se eliminan los espacios en blanco, los caracteres especiales y los acentos, y los caracteres acentuados se tratan como una transliteración ASCII fija.",
-        "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance. Pour les besoins de l'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme une translittération ASCII fixe."
+        "en": "The subject's first name, as provided by their birth certificate. For identification, accents, letter case and plain hyphens (-) are ignored, but spaces (even at the start or end), apostrophes and all other punctuation count, so enter the name the same way every time.",
+        "es": "El nombre del sujeto, según su certificado de nacimiento. A efectos de identificación, se ignoran los acentos, las mayúsculas y minúsculas y los guiones simples (-), pero cuentan los espacios (incluso al principio o al final), los apóstrofos y cualquier otro signo de puntuación, así que escriba el nombre siempre de la misma manera.",
+        "fr": "Le prénom du sujet, tel qu'il figure dans son acte de naissance. Pour l'identification, les accents, les majuscules et minuscules et les traits d'union simples (-) sont ignorés, mais les espaces (même au début ou à la fin), les apostrophes et toute autre ponctuation comptent : saisissez donc le prénom toujours de la même façon."
       },
       "label": {
         "en": "First Name",
@@ -251,9 +251,9 @@
     },
     "lastName": {
       "description": {
-        "en": "The subject's last name, as provided by their birth certificate. For the purpose of identification, white space, special characters, and accents are removed, with accented characters treated as their ASCII equivalents.",
-        "es": "El apellido del sujeto, según su certificado de nacimiento. A efectos de identificación, se eliminan los espacios en blanco, los caracteres especiales y los acentos, y los caracteres acentuados se tratan como sus equivalentes ASCII.",
-        "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance. Aux fins d'identification, les espaces blancs, les caractères spéciaux et les accents sont supprimés, les caractères accentués étant traités comme leurs équivalents ASCII."
+        "en": "The subject's last name, as provided by their birth certificate. For identification, accents, letter case and plain hyphens (-) are ignored, but spaces (even at the start or end), apostrophes and all other punctuation count, so enter the name the same way every time.",
+        "es": "El apellido del sujeto, según su certificado de nacimiento. A efectos de identificación, se ignoran los acentos, las mayúsculas y minúsculas y los guiones simples (-), pero cuentan los espacios (incluso al principio o al final), los apóstrofos y cualquier otro signo de puntuación, así que escriba el apellido siempre de la misma manera.",
+        "fr": "Le nom de famille du sujet, tel qu'il figure dans son acte de naissance. Pour l'identification, les accents, les majuscules et minuscules et les traits d'union simples (-) sont ignorés, mais les espaces (même au début ou à la fin), les apostrophes et toute autre ponctuation comptent : saisissez donc le nom toujours de la même façon."
       },
       "label": {
         "en": "Last Name",

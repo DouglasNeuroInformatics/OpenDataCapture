@@ -1284,7 +1284,7 @@ importers:
         specifier: workspace:*
         version: link:../schemas
       transliteration:
-        specifier: ^2.3.5
+        specifier: 2.6.1
         version: 2.6.1
     devDependencies:
       type-fest:

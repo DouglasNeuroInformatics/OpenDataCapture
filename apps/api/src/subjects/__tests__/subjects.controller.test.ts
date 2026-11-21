@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { createAppAbility } from '@/auth/ability.utils';
 
+import { SubjectIdentificationService } from '../subject-identification.service';
 import { SubjectsController } from '../subjects.controller';
 import { SubjectsService } from '../subjects.service';
 
@@ -22,15 +23,44 @@ function getDeleteIdPipe(): ParseSchemaPipe<string> {
 
 describe('SubjectsController', () => {
   let subjectsController: SubjectsController;
+  let subjectIdentificationService: MockedInstance<SubjectIdentificationService>;
   let subjectsService: MockedInstance<SubjectsService>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [SubjectsController],
-      providers: [MockFactory.createForService(SubjectsService)]
+      providers: [
+        MockFactory.createForService(SubjectIdentificationService),
+        MockFactory.createForService(SubjectsService)
+      ]
     }).compile();
     subjectsController = moduleRef.get(SubjectsController);
+    subjectIdentificationService = moduleRef.get(SubjectIdentificationService);
     subjectsService = moduleRef.get(SubjectsService);
+  });
+
+  it('should count the subjects of each identification method', async () => {
+    const counts = { CUSTOM_FIELDS: 1, CUSTOM_ID: 2, PERSONAL_INFO: 3 };
+    subjectsService.countByIdentificationMethod.mockResolvedValueOnce(counts);
+    await expect(subjectsController.countByIdentificationMethod()).resolves.toBe(counts);
+  });
+
+  it('should return the subject identification settings', async () => {
+    const settings = { customFields: null, isCustomFieldsLocked: false, offeredMethods: ['CUSTOM_ID' as const] };
+    subjectIdentificationService.getSettings.mockResolvedValueOnce(settings);
+    await expect(subjectsController.getIdentificationSettings()).resolves.toBe(settings);
+  });
+
+  it('should update the subject identification settings', async () => {
+    const settings = { customFields: null, isCustomFieldsLocked: false, offeredMethods: ['CUSTOM_ID' as const] };
+    subjectIdentificationService.updateSettings.mockResolvedValueOnce(settings);
+    await expect(
+      subjectsController.updateIdentificationSettings({ customFields: null, offeredMethods: ['CUSTOM_ID'] })
+    ).resolves.toBe(settings);
+    expect(subjectIdentificationService.updateSettings).toHaveBeenCalledWith({
+      customFields: null,
+      offeredMethods: ['CUSTOM_ID']
+    });
   });
 
   it('should delete a subject within what the caller may delete, forcing when asked', async () => {

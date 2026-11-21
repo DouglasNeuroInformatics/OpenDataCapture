@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 
 import type { $UpdateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { CreateSeriesInstrumentResult, TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { SubjectIdentificationMethod } from '@opendatacapture/schemas/subject';
+import type { CustomFieldsDefinition } from '@opendatacapture/schemas/subject-identification';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -12,16 +14,33 @@ import '@/services/i18n';
 
 type DeleteCallbacks = { onSettled: () => void; onSuccess: () => void };
 
+type Loader = (ctx: {
+  context: {
+    queryClient: {
+      ensureQueryData: (options: object) => Promise<unknown>;
+      fetchQuery: (options: object) => Promise<unknown>;
+    };
+  };
+}) => Promise<void>;
+
 const mocks = vi.hoisted(() => ({
   changeGroup: vi.fn(),
   createMutateAsync: vi.fn(),
+  customFields: null as CustomFieldsDefinition | null,
   deleteMutate: vi.fn(),
+  /** The group as `GET /v1/groups/:id` returns it; the store's copy dates from sign-in. */
+  fetchedGroup: undefined as Group | undefined,
   instruments: undefined as TranslatedInstrumentInfo[] | undefined,
   isDemo: false,
+  offeredMethods: ['CUSTOM_ID', 'PERSONAL_INFO'] as [SubjectIdentificationMethod, ...SubjectIdentificationMethod[]],
   store: { currentGroup: null as Group | null },
   updateMutateAsync: vi.fn<(data: Partial<$UpdateGroupData>) => Promise<Group>>()
 }));
 
+vi.mock('@/hooks/useGroupQuery', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/useGroupQuery')>()),
+  useGroupQuery: (groupId: null | string | undefined) => ({ data: groupId ? mocks.fetchedGroup : undefined })
+}));
 vi.mock('@/hooks/useInstrumentInfoQuery', () => ({
   useInstrumentInfoQuery: () => ({ data: mocks.instruments })
 }));
@@ -34,15 +53,22 @@ vi.mock('@/hooks/useDeleteSeriesInstrumentMutation', () => ({
 vi.mock('@/hooks/useSetupStateQuery', () => ({
   useSetupStateQuery: () => ({ data: { isDemo: mocks.isDemo } })
 }));
+vi.mock('@/hooks/useSubjectIdentificationSettingsQuery', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/useSubjectIdentificationSettingsQuery')>()),
+  useSubjectIdentificationSettingsQuery: () => ({
+    data: { customFields: mocks.customFields, offeredMethods: mocks.offeredMethods }
+  })
+}));
 vi.mock('@/hooks/useUpdateGroupMutation', () => ({
   useUpdateGroupMutation: () => ({ mutateAsync: mocks.updateMutateAsync })
 }));
 vi.mock('@/store', () => ({
-  useAppStore: (
-    selector: (store: { changeGroup: typeof mocks.changeGroup; currentGroup: Group | null }) => unknown
-  ) => {
-    return selector({ changeGroup: mocks.changeGroup, currentGroup: mocks.store.currentGroup });
-  }
+  useAppStore: Object.assign(
+    (selector: (store: { changeGroup: typeof mocks.changeGroup; currentGroup: Group | null }) => unknown) => {
+      return selector({ changeGroup: mocks.changeGroup, currentGroup: mocks.store.currentGroup });
+    },
+    { getState: () => ({ currentGroup: mocks.store.currentGroup }) }
+  )
 }));
 vi.mock('@/components/LoadingFallback', () => ({
   LoadingFallback: () => <div data-testid="loading-fallback" />
@@ -65,14 +91,18 @@ vi.mock('@/components/InstrumentPreviewDialog', () => ({
 
 const scalar = ({
   createdAt = null,
+  edition = 1,
   id,
   kind = 'FORM',
+  name = id,
   sourceRepo = null,
   title
 }: {
   createdAt?: Date | null;
+  edition?: number;
   id: string;
   kind?: 'FILE' | 'FORM' | 'INTERACTIVE';
+  name?: string;
   sourceRepo?: null | { id: string; name: null | string };
   title: string;
 }): TranslatedInstrumentInfo => ({
@@ -80,7 +110,7 @@ const scalar = ({
   createdAt,
   details: { authors: null, description: `${title} description`, license: 'MIT', title },
   id,
-  internal: { edition: 1, name: id },
+  internal: { edition, name },
   kind,
   language: 'en',
   sourceRepo,
@@ -139,7 +169,13 @@ const defaultInstruments = () => [
 
 const RouteComponent = Route.options.component!;
 
-const renderPage = () => render(<RouteComponent />);
+const loader = Route.options.loader as Loader;
+
+/** Renders with the server holding the same group as the store, unless a test says otherwise. */
+const renderPage = () => {
+  mocks.fetchedGroup ??= mocks.store.currentGroup ?? undefined;
+  return render(<RouteComponent />);
+};
 
 const rerenderPage = (rerender: (ui: ReactNode) => void) => rerender(<RouteComponent />);
 
@@ -175,6 +211,9 @@ const resolveCreate = (result: CreateSeriesInstrumentResult) => mocks.createMuta
 describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.customFields = null;
+    mocks.fetchedGroup = undefined;
+    mocks.offeredMethods = ['CUSTOM_ID', 'PERSONAL_INFO'];
     mocks.instruments = defaultInstruments();
     mocks.isDemo = false;
     mocks.store.currentGroup = makeGroup();
@@ -194,6 +233,13 @@ describe('Route', () => {
     it('should show a loading fallback until the instrument info has loaded', () => {
       mocks.instruments = undefined;
       renderPage();
+      expect(screen.getByTestId('loading-fallback')).toBeTruthy();
+      expect(screen.queryByText('Accessible Instruments')).toBeNull();
+    });
+
+    it('should show a loading fallback until the group has been read from the server', () => {
+      mocks.fetchedGroup = undefined;
+      render(<RouteComponent />);
       expect(screen.getByTestId('loading-fallback')).toBeTruthy();
       expect(screen.queryByText('Accessible Instruments')).toBeNull();
     });
@@ -636,10 +682,12 @@ describe('Route', () => {
       expect(mocks.updateMutateAsync).toHaveBeenCalledWith(
         expect.objectContaining({
           settings: {
-            defaultIdentificationMethod: 'PERSONAL_INFO',
+            // Unchanged, so the stored one stays.
+            defaultIdentificationMethod: undefined,
             idValidationRegex: '^[0-9]+$',
             idValidationRegexErrorMessage: { en: 'Digits only', fr: 'Chiffres seulement' },
             minimumAge: 18,
+            sessionInstrumentId: null,
             subjectIdDisplayLength: 6
           }
         })
@@ -675,6 +723,161 @@ describe('Route', () => {
     it('should not ask for custom validation messages without a validation pattern', () => {
       renderPage();
       expect(screen.queryByText('Custom ID Validation Message (English)')).toBeNull();
+    });
+  });
+
+  describe('default identification method', () => {
+    /** Opens the select from the keyboard, since happy-dom dispatches no pointer capture. */
+    const chooseDefaultMethod = (method: string) => {
+      fireEvent.keyDown(screen.getByTestId('defaultIdentificationMethod-select-trigger'), { key: 'Enter' });
+      fireEvent.click(screen.getByTestId(`defaultIdentificationMethod-select-item-${method}`));
+    };
+
+    const methodOptions = () => {
+      const select = document.querySelector<HTMLSelectElement>('select[name="defaultIdentificationMethod"]')!;
+      return Array.from(select.options, (option) => option.textContent).filter(Boolean);
+    };
+
+    it('should not offer custom fields as the default before any are defined', () => {
+      renderPage();
+      expect(methodOptions()).toEqual(['Custom Identifier', 'Personal Information']);
+    });
+
+    it("should offer custom fields under the administrator's label once they are defined, and save them as the default", async () => {
+      mocks.customFields = {
+        fields: [{ label: { en: 'Animal ID' }, pattern: '[0-9]+' }],
+        iterations: 1000,
+        label: { en: 'Animal information' },
+        salt: '0f'.repeat(32)
+      };
+      mocks.offeredMethods = ['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS'];
+      renderPage();
+      expect(methodOptions()).toEqual(['Custom Identifier', 'Personal Information', 'Animal information']);
+      chooseDefaultMethod('CUSTOM_FIELDS');
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(mocks.updateMutateAsync.mock.lastCall?.[0].settings?.defaultIdentificationMethod).toBe('CUSTOM_FIELDS');
+    });
+  });
+
+  describe('offered methods', () => {
+    it('should offer only the methods the instance offers as the default', () => {
+      mocks.offeredMethods = ['PERSONAL_INFO'];
+      mocks.store.currentGroup = makeGroup({ settings: { defaultIdentificationMethod: 'PERSONAL_INFO' } });
+      renderPage();
+      const select = document.querySelector<HTMLSelectElement>('select[name="defaultIdentificationMethod"]')!;
+      expect(Array.from(select.options, (option) => option.value).filter(Boolean)).toEqual(['PERSONAL_INFO']);
+    });
+
+    it('should keep a default the instance no longer offers when the manager leaves the select as it was', async () => {
+      mocks.offeredMethods = ['PERSONAL_INFO'];
+      renderPage();
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(mocks.updateMutateAsync.mock.lastCall?.[0].settings?.defaultIdentificationMethod).toBeUndefined();
+    });
+  });
+
+  describe('session instrument', () => {
+    const requiring = (sessionInstrumentId: string) => {
+      return makeGroup({ settings: { defaultIdentificationMethod: 'CUSTOM_ID', sessionInstrumentId } });
+    };
+
+    const sessionInstrumentOptions = () => {
+      const select = document.querySelector<HTMLSelectElement>('select[name="sessionInstrumentId"]')!;
+      return Array.from(select.options, (option) => option.textContent).filter(Boolean);
+    };
+
+    const savedSessionInstrumentId = () => mocks.updateMutateAsync.mock.lastCall?.[0].settings?.sessionInstrumentId;
+
+    it('should save no session instrument for a group that requires none', async () => {
+      renderPage();
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(savedSessionInstrumentId()).toBeNull();
+    });
+
+    it('should keep the session instrument the group requires', async () => {
+      mocks.store.currentGroup = requiring('form-1');
+      renderPage();
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(savedSessionInstrumentId()).toBe('form-1');
+    });
+
+    it('should offer only the forms the group has selected, since only those can be required', () => {
+      renderPage();
+      expect(sessionInstrumentOptions()).toEqual(['None', 'Happiness Questionnaire']);
+      fireEvent.click(checkbox('Breakfast Survey'));
+      expect(sessionInstrumentOptions()).toEqual(['None', 'Happiness Questionnaire', 'Breakfast Survey']);
+    });
+
+    it('should tell two forms with the same title apart by their names', () => {
+      mocks.instruments = [
+        ...defaultInstruments(),
+        scalar({ id: 'form-3', name: 'HAPPINESS_SHORT', title: 'Happiness Questionnaire' })
+      ];
+      mocks.store.currentGroup = makeGroup({ accessibleInstrumentIds: ['form-1', 'form-3'] });
+      renderPage();
+      expect(sessionInstrumentOptions()).toEqual([
+        'None',
+        'Happiness Questionnaire (form-1)',
+        'Happiness Questionnaire (HAPPINESS_SHORT)'
+      ]);
+    });
+
+    it('should seed the setting from the group the server holds, so a save cannot undo a change made since sign-in', async () => {
+      mocks.store.currentGroup = makeGroup();
+      mocks.fetchedGroup = requiring('form-1');
+      renderPage();
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(savedSessionInstrumentId()).toBe('form-1');
+    });
+
+    it('should refuse to save once the session instrument is no longer selected, rather than lose the group access to it', async () => {
+      mocks.store.currentGroup = requiring('form-1');
+      renderPage();
+      fireEvent.click(checkbox('Happiness Questionnaire'));
+      submitSettings();
+      expect(await screen.findByText(/The session instrument must be one of the group's instruments/)).toBeTruthy();
+      expect(mocks.updateMutateAsync).not.toHaveBeenCalled();
+    });
+
+    it('should accept a session instrument the list does not display but the group can still access', async () => {
+      mocks.store.currentGroup = requiring('missing-1');
+      renderPage();
+      submitSettings();
+      await waitFor(() => expect(mocks.updateMutateAsync).toHaveBeenCalled());
+      expect(savedSessionInstrumentId()).toBe('missing-1');
+    });
+  });
+
+  describe('loader', () => {
+    const queryClient = () => ({
+      ensureQueryData: vi.fn(() => Promise.resolve()),
+      fetchQuery: vi.fn(() => Promise.resolve())
+    });
+
+    it('should prefetch the subject identification settings, which name the custom-fields method', async () => {
+      const client = queryClient();
+      await loader({ context: { queryClient: client } });
+      expect(client.ensureQueryData).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['subject-identification-settings'] })
+      );
+    });
+
+    it('should fetch the current group even when it is cached, since the form saves every setting it is seeded with', async () => {
+      const client = queryClient();
+      await loader({ context: { queryClient: client } });
+      expect(client.fetchQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['group', 'group-1'] }));
+    });
+
+    it('should fetch no group when none is selected', async () => {
+      mocks.store.currentGroup = null;
+      const client = queryClient();
+      await loader({ context: { queryClient: client } });
+      expect(client.fetchQuery).not.toHaveBeenCalled();
     });
   });
 });

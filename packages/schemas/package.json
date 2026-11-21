@@ -20,6 +20,7 @@
     "./setup": "./src/setup/setup.ts",
     "./storage": "./src/storage/storage.ts",
     "./subject": "./src/subject/subject.ts",
+    "./subject-identification": "./src/subject-identification/subject-identification.ts",
     "./summary": "./src/summary/summary.ts",
     "./user": "./src/user/user.ts"
   },

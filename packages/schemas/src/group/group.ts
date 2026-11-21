@@ -8,6 +8,7 @@ const $GroupSettings = z.object({
   idValidationRegex: $RegexString.nullish(),
   idValidationRegexErrorMessage: $LocalizedString.nullish(),
   minimumAge: z.number().int().positive().nullish(),
+  sessionInstrumentId: z.string().nullish(),
   subjectIdDisplayLength: z.number().nullish()
 });
 
@@ -50,7 +51,9 @@ export const $Group = $BaseModel.extend({
 export type $CreateGroupData = z.infer<typeof $CreateGroupData>;
 export const $CreateGroupData = z.object({
   name: z.string().min(1),
-  settings: $GroupSettings.optional(),
+  // The session instrument must be one the group can access, which is checked only when a group is
+  // updated, so a group is created without one.
+  settings: $GroupSettings.omit({ sessionInstrumentId: true }).optional(),
   type: $GroupType
 });
 

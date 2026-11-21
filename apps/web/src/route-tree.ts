@@ -19,7 +19,6 @@ import { Route as AppUserRouteImport } from './routes/_app/user'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AppAdminInstrumentsRouteImport } from './routes/_app/admin/instruments'
-import { Route as AppAdminMailRouteImport } from './routes/_app/admin/mail'
 import { Route as AppAdminSettingsRouteImport } from './routes/_app/admin/settings'
 import { Route as AppDatahubIndexRouteImport } from './routes/_app/datahub/index'
 import { Route as AppGroupEmailTemplatesRouteImport } from './routes/_app/group/email-templates'
@@ -102,11 +101,6 @@ const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
 const AppAdminInstrumentsRoute = AppAdminInstrumentsRouteImport.update({
   id: '/admin/instruments',
   path: '/admin/instruments',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppAdminMailRoute = AppAdminMailRouteImport.update({
-  id: '/admin/mail',
-  path: '/admin/mail',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppAdminSettingsRoute = AppAdminSettingsRouteImport.update({
@@ -308,7 +302,6 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/admin/instruments': typeof AppAdminInstrumentsRoute
-  '/admin/mail': typeof AppAdminMailRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/group/manage': typeof AppGroupManageRoute
@@ -354,7 +347,6 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/': typeof AppIndexRoute
   '/admin/instruments': typeof AppAdminInstrumentsRoute
-  '/admin/mail': typeof AppAdminMailRoute
   '/admin/settings': typeof AppAdminSettingsRoute
   '/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/group/manage': typeof AppGroupManageRoute
@@ -401,7 +393,6 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/_app/': typeof AppIndexRoute
   '/_app/admin/instruments': typeof AppAdminInstrumentsRoute
-  '/_app/admin/mail': typeof AppAdminMailRoute
   '/_app/admin/settings': typeof AppAdminSettingsRoute
   '/_app/group/email-templates': typeof AppGroupEmailTemplatesRoute
   '/_app/group/manage': typeof AppGroupManageRoute
@@ -449,7 +440,6 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/admin/instruments'
-    | '/admin/mail'
     | '/admin/settings'
     | '/group/email-templates'
     | '/group/manage'
@@ -495,7 +485,6 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/'
     | '/admin/instruments'
-    | '/admin/mail'
     | '/admin/settings'
     | '/group/email-templates'
     | '/group/manage'
@@ -541,7 +530,6 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/_app/'
     | '/_app/admin/instruments'
-    | '/_app/admin/mail'
     | '/_app/admin/settings'
     | '/_app/group/email-templates'
     | '/_app/group/manage'
@@ -655,13 +643,6 @@ declare module '@tanstack/react-router' {
       path: '/admin/instruments'
       fullPath: '/admin/instruments'
       preLoaderRoute: typeof AppAdminInstrumentsRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/admin/mail': {
-      id: '/_app/admin/mail'
-      path: '/admin/mail'
-      fullPath: '/admin/mail'
-      preLoaderRoute: typeof AppAdminMailRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/admin/settings': {
@@ -957,7 +938,6 @@ interface AppRouteRouteChildren {
   AppUserRoute: typeof AppUserRoute
   AppIndexRoute: typeof AppIndexRoute
   AppAdminInstrumentsRoute: typeof AppAdminInstrumentsRoute
-  AppAdminMailRoute: typeof AppAdminMailRoute
   AppAdminSettingsRoute: typeof AppAdminSettingsRoute
   AppGroupEmailTemplatesRoute: typeof AppGroupEmailTemplatesRoute
   AppGroupManageRoute: typeof AppGroupManageRoute
@@ -994,7 +974,6 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppUserRoute: AppUserRoute,
   AppIndexRoute: AppIndexRoute,
   AppAdminInstrumentsRoute: AppAdminInstrumentsRoute,
-  AppAdminMailRoute: AppAdminMailRoute,
   AppAdminSettingsRoute: AppAdminSettingsRoute,
   AppGroupEmailTemplatesRoute: AppGroupEmailTemplatesRoute,
   AppGroupManageRoute: AppGroupManageRoute,

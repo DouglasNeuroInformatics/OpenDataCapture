@@ -3,7 +3,7 @@ import { z } from 'zod/v4';
 import { $BaseModel, $DateLike } from '../core/core.js';
 
 export type SubjectIdentificationMethod = z.infer<typeof $SubjectIdentificationMethod>;
-export const $SubjectIdentificationMethod = z.enum(['CUSTOM_ID', 'PERSONAL_INFO']);
+export const $SubjectIdentificationMethod = z.enum(['CUSTOM_ID', 'PERSONAL_INFO', 'CUSTOM_FIELDS']);
 
 export type Sex = z.infer<typeof $Sex>;
 export const $Sex = z.enum(['MALE', 'FEMALE']);

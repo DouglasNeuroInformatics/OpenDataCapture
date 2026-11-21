@@ -19,16 +19,17 @@ that they may read _some_ subject; the `where` decides whether they may read _th
 one; the guard turns a missing one into a 500. Nothing checks the value. Routes whose declaration is not the ordinary
 `{ action, subject }` on the model they serve:
 
-| Route                             | Declaration                                   | Why it is safe                                                                                                                   |
-| --------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `POST /v1/auth/login`             | `'public'`                                    | `@ThrottleLoginRequest()`; credentials checked in `AuthService.login`.                                                           |
-| `GET /v1/setup`                   | `'public'`                                    | Returns only `SetupState`.                                                                                                       |
-| `POST /v1/setup`                  | `'public'`                                    | **`SetupService.initApp` drops the whole database.** It refuses only when `isSetup` is true and `NODE_ENV` is not `development`. |
-| `DELETE /v1/setup`                | `{ action: 'delete', subject: 'all' }`        | Also refuses unless `NODE_ENV === 'test'`.                                                                                       |
-| `GET /v1/gateway/healthcheck`     | `[]`                                          | Any login token. The module loads only when `GATEWAY_ENABLED`.                                                                   |
-| `POST /v1/instruments`            | `{ action: 'manage', subject: 'Instrument' }` | No base level grants it, so admin-only in practice. The one `@AcceptsInstrumentToken()` route (below).                           |
-| `PATCH /v1/users/self-update/:id` | `{ action: 'read', subject: 'User' }`         | Deliberately weak; `UsersService.updateSelfById` refuses unless `id === currentUser.id`.                                         |
-| `GET /v1/summary`                 | five `read` rules                             | The only multi-element array; all five must pass.                                                                                |
+| Route                                      | Declaration                                   | Why it is safe                                                                                                                                                                                                   |
+| ------------------------------------------ | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /v1/auth/login`                      | `'public'`                                    | `@ThrottleLoginRequest()`; credentials checked in `AuthService.login`.                                                                                                                                           |
+| `GET /v1/setup`                            | `'public'`                                    | Returns only `SetupState`.                                                                                                                                                                                       |
+| `POST /v1/setup`                           | `'public'`                                    | **`SetupService.initApp` drops the whole database.** It refuses only when `isSetup` is true and `NODE_ENV` is not `development`.                                                                                 |
+| `DELETE /v1/setup`                         | `{ action: 'delete', subject: 'all' }`        | Also refuses unless `NODE_ENV === 'test'`.                                                                                                                                                                       |
+| `GET /v1/gateway/healthcheck`              | `[]`                                          | Any login token. The module loads only when `GATEWAY_ENABLED`.                                                                                                                                                   |
+| `POST /v1/instruments`                     | `{ action: 'manage', subject: 'Instrument' }` | No base level grants it, so admin-only in practice. The one `@AcceptsInstrumentToken()` route (below).                                                                                                           |
+| `PATCH /v1/users/self-update/:id`          | `{ action: 'read', subject: 'User' }`         | Deliberately weak; `UsersService.updateSelfById` refuses unless `id === currentUser.id`.                                                                                                                         |
+| `GET /v1/summary`                          | five `read` rules                             | The only multi-element array; all five must pass.                                                                                                                                                                |
+| `GET /v1/subjects/identification/settings` | `{ action: 'read', subject: 'Subject' }`      | Serves the instance's `SetupState` definition of custom identifying fields, salt included, because the browser of anyone who identifies subjects derives their ids from it. Never on the public `GET /v1/setup`. |
 
 Adding a fourth `'public'` route or a second `[]` is a security decision: raise it rather than
 deciding alone.
@@ -40,7 +41,7 @@ route, `POST /v1/groups` per #1468, and `PATCH /v1/groups/:id/archive` and `/una
 replaced a `DELETE /v1/groups/:id` that a group manager's `manage Group` reached; `$UpdateGroupData`
 omits `archivedAt`, so `PATCH /v1/groups/:id` cannot archive either), and where the data crosses
 groups with nothing to scope it by (audit logs, the instrument series overview, every repository's
-sync log, mail settings). Most handlers carry their reason in a comment;
+sync log, mail settings, the count of subjects by identification method). Most handlers carry their reason in a comment;
 `grep -rn 'RouteAccess(ADMIN_ONLY)' apps/api/src` lists them. `UsersService` refuses an admin
 archiving, disabling or demoting their own account, so the last admin cannot lock every `ADMIN_ONLY`
 route.
@@ -50,6 +51,13 @@ route.
 `ADMIN_ONLY` guard; and `InstrumentsService.findBundleById` called without a `currentUser`, which the
 API's gateway module does to resolve an assignment's bundle. That parameter is optional for this
 reason, so a new call site that omits it compiles and reads every group's instruments.
+`StartSessionService` rolls back unscoped: when the record of a session instrument fails to save,
+it deletes the session it just created and, if `SubjectsService.exists` (a boolean, unscoped
+because a scoped lookup would miss a subject in another group) found no subject beforehand, the
+subject too. `SessionsService.createMany` rolls back the same way. `SubjectsService.hasCustomFieldsSubjects`
+(whether any id has the `cf_` prefix, which locks the instance-wide definition; only a boolean leaves
+it) and `SubjectsService.countByIdentificationMethod` (every group's subjects, behind `ADMIN_ONLY`)
+read across groups on purpose.
 
 ## Layer 2: row scoping
 

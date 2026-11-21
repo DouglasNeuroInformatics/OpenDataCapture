@@ -1,16 +1,35 @@
 import { $BooleanLike } from '@douglasneuroinformatics/libjs';
 import { ApiOperation, CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
-import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Put, Query } from '@nestjs/common';
+import { $UpdateSubjectIdentificationSettingsData } from '@opendatacapture/schemas/subject-identification';
+import type {
+  SubjectIdentificationCounts,
+  SubjectIdentificationSettings
+} from '@opendatacapture/schemas/subject-identification';
 import z from 'zod/v4';
 
 import type { AppAbility } from '@/auth/auth.types';
-import { RouteAccess } from '@/core/decorators/route-access.decorator';
+import { ADMIN_ONLY, RouteAccess } from '@/core/decorators/route-access.decorator';
 
+import { SubjectIdentificationService } from './subject-identification.service';
 import { SubjectsService } from './subjects.service';
 
 @Controller('subjects')
 export class SubjectsController {
-  constructor(private readonly subjectsService: SubjectsService) {}
+  constructor(
+    private readonly subjectIdentificationService: SubjectIdentificationService,
+    private readonly subjectsService: SubjectsService
+  ) {}
+
+  @ApiOperation({
+    description: 'How many subjects each identification method identifies, read from the shape of their ids.',
+    summary: 'Count Subjects by Identification Method'
+  })
+  @Get('identification/counts')
+  @RouteAccess(ADMIN_ONLY)
+  countByIdentificationMethod(): Promise<SubjectIdentificationCounts> {
+    return this.subjectsService.countByIdentificationMethod();
+  }
 
   @ApiOperation({ summary: 'Delete Subject' })
   @Delete(':id')
@@ -54,5 +73,26 @@ export class SubjectsController {
   @RouteAccess({ action: 'read', subject: 'Subject' })
   findDefaultGroupCustomIds(@CurrentUser('ability') ability: AppAbility) {
     return this.subjectsService.findDefaultGroupCustomIds({ ability });
+  }
+
+  // Two segments, so `@Get(':id')` cannot capture the path whatever order the handlers are in.
+  @ApiOperation({
+    description:
+      'Every user who can read subjects can read the settings, salt included: the browser derives a custom-fields id itself, so the values typed never reach the server.',
+    summary: 'Get Subject Identification Settings'
+  })
+  @Get('identification/settings')
+  @RouteAccess({ action: 'read', subject: 'Subject' })
+  getIdentificationSettings(): Promise<SubjectIdentificationSettings> {
+    return this.subjectIdentificationService.getSettings();
+  }
+
+  @ApiOperation({ summary: 'Update Subject Identification Settings' })
+  @Put('identification/settings')
+  @RouteAccess(ADMIN_ONLY)
+  updateIdentificationSettings(
+    @Body() data: $UpdateSubjectIdentificationSettingsData
+  ): Promise<SubjectIdentificationSettings> {
+    return this.subjectIdentificationService.updateSettings(data);
   }
 }

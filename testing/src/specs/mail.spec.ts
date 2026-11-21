@@ -24,9 +24,10 @@ test.describe('mail settings', () => {
   // The whole save path — validate, persist, re-seed from the response — while the secret
   // itself never round-trips back to the browser.
   test('should save a valid configuration without ever rendering the stored password', async ({ getPageModel }) => {
-    const mailPage = await getPageModel('/admin/mail');
-    await mailPage.enableMail();
-    await mailPage.fillServerConfig({
+    const settingsPage = await getPageModel('/admin/settings');
+    await settingsPage.openTab('mail');
+    await settingsPage.enableMail();
+    await settingsPage.fillMailServerConfig({
       host: 'smtp.saved.test',
       password: 'hunter2',
       port: '2525',
@@ -34,18 +35,22 @@ test.describe('mail settings', () => {
       username: 'saver'
     });
 
-    await mailPage.saveConfig.click();
-    await expect(mailPage.$ref.getByRole('heading', { name: 'Success' }).last()).toBeVisible();
+    // Turning mail on raised a success notification of its own, so only the response says this save landed.
+    const saved = settingsPage.waitForMailSave();
+    await settingsPage.mailSaveConfig.click();
+    expect((await saved).ok()).toBe(true);
 
-    // The reload proves the save reached the database, not merely component state.
-    await mailPage.$ref.reload();
-    await mailPage.enableMail();
-    await expect(mailPage.host).toHaveValue('smtp.saved.test');
-    await expect(mailPage.username).toHaveValue('saver');
-    await expect(mailPage.port).toHaveValue('2525');
-    await expect(mailPage.password).toHaveAttribute('type', 'password');
-    await expect(mailPage.password).not.toHaveValue('hunter2');
-    await expect(mailPage.$ref.locator('body')).not.toContainText('hunter2');
+    // The reload proves the save reached the database, not merely component state. It reopens the
+    // mail tab without a click, because the chosen tab is held in the address.
+    await settingsPage.$ref.reload();
+    await expect(settingsPage.tabPanel('mail')).toBeVisible();
+    await settingsPage.enableMail();
+    await expect(settingsPage.mailHost).toHaveValue('smtp.saved.test');
+    await expect(settingsPage.mailUsername).toHaveValue('saver');
+    await expect(settingsPage.mailPort).toHaveValue('2525');
+    await expect(settingsPage.mailPassword).toHaveAttribute('type', 'password');
+    await expect(settingsPage.mailPassword).not.toHaveValue('hunter2');
+    await expect(settingsPage.$ref.locator('body')).not.toContainText('hunter2');
   });
 });
 
@@ -58,21 +63,22 @@ test.describe('mail delivery', () => {
     await api.setMailEnabled(false);
   });
 
-  test.describe('admin mail page', () => {
+  test.describe('admin mail settings', () => {
     test.use({ actingRole: 'ADMIN' });
 
     test('should report a failed connection test in the reader’s language, not raw SMTP prose', async ({
       getPageModel
     }) => {
-      const mailPage = await getPageModel('/admin/mail');
+      const settingsPage = await getPageModel('/admin/settings');
+      await settingsPage.openTab('mail');
 
-      await mailPage.testConnection.click();
+      await settingsPage.mailTestConnection.click();
 
       // `smtp.invalid.test` cannot resolve, so this exercises the whole failure path: nodemailer
       // error -> MailErrorCode -> localized copy. A raw driver message would leak "ENOTFOUND".
-      const notification = mailPage.$ref.getByText(/could not be found|check and reconfigure/i);
+      const notification = settingsPage.$ref.getByText(/could not be found|check and reconfigure/i);
       await expect(notification.first()).toBeVisible({ timeout: 40_000 });
-      await expect(mailPage.$ref.locator('body')).not.toContainText('ENOTFOUND');
+      await expect(settingsPage.$ref.locator('body')).not.toContainText('ENOTFOUND');
     });
   });
 

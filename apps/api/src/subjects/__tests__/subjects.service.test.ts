@@ -192,6 +192,14 @@ describe('SubjectsService', () => {
     });
   });
 
+  describe('exists', () => {
+    it('should look the id up in every group, so a subject the caller cannot read still counts', async () => {
+      subjectModel.exists.mockResolvedValueOnce(true);
+      await expect(subjectsService.exists('subject-1')).resolves.toBe(true);
+      expect(subjectModel.exists).toHaveBeenCalledWith({ id: 'subject-1' });
+    });
+  });
+
   describe('find', () => {
     it('should return the array returned by the subject model', async () => {
       subjectModel.findMany.mockResolvedValueOnce([{ id: '123' }]);
@@ -446,6 +454,7 @@ describe('SubjectsService', () => {
       subjectModel.findMany.mockResolvedValueOnce([]);
       await subjectsService.findCustomIds('group-1');
       expect(findManyArgs().where.AND).toContainEqual({
+        NOT: { id: { gte: 'cf_', lt: 'cf`' } },
         OR: [
           { dateOfBirth: null },
           { dateOfBirth: { isSet: false } },
@@ -457,6 +466,42 @@ describe('SubjectsService', () => {
           { sex: { isSet: false } }
         ]
       });
+    });
+  });
+
+  describe('countByIdentificationMethod', () => {
+    it('should count every method, reporting zero for one no subject uses', async () => {
+      subjectModel.aggregateRaw.mockResolvedValueOnce([
+        { _id: 'CUSTOM_ID', count: 4 },
+        { _id: 'PERSONAL_INFO', count: 2 }
+      ]);
+      await expect(subjectsService.countByIdentificationMethod()).resolves.toStrictEqual({
+        CUSTOM_FIELDS: 0,
+        CUSTOM_ID: 4,
+        PERSONAL_INFO: 2
+      });
+    });
+
+    it('should tell the methods apart by the shape of the id, checking a custom-fields id before a name hash', async () => {
+      subjectModel.aggregateRaw.mockResolvedValueOnce([]);
+      await subjectsService.countByIdentificationMethod();
+      const [{ pipeline }] = subjectModel.aggregateRaw.mock.lastCall as [{ pipeline: any[] }];
+      expect(pipeline[0].$group._id.$switch).toStrictEqual({
+        branches: [
+          { case: { $regexMatch: { input: '$_id', regex: '^cf_[0-9a-f]{64}$' } }, then: 'CUSTOM_FIELDS' },
+          { case: { $regexMatch: { input: '$_id', regex: '^[0-9a-f]{64}$' } }, then: 'PERSONAL_INFO' }
+        ],
+        default: 'CUSTOM_ID'
+      });
+    });
+  });
+
+  describe('hasCustomFieldsSubjects', () => {
+    // A custom-fields subject stores no name, so only its id tells it apart from a custom id.
+    it('should look for any subject whose id carries the custom-fields prefix, by a lexical range', async () => {
+      subjectModel.exists.mockResolvedValueOnce(true);
+      await expect(subjectsService.hasCustomFieldsSubjects()).resolves.toBe(true);
+      expect(subjectModel.exists).toHaveBeenCalledWith({ id: { gte: 'cf_', lt: 'cf`' } });
     });
   });
 

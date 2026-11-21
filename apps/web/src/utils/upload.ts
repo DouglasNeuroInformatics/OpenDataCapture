@@ -6,7 +6,7 @@ import type { AnyUnilingualFormInstrument, FormTypes, Json } from '@opendatacapt
 import type { Group } from '@opendatacapture/schemas/group';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { UploadInstrumentRecordsData } from '@opendatacapture/schemas/instrument-records';
-import { encodeScopedSubjectId } from '@opendatacapture/subject-utils';
+import { toStoredSubjectId } from '@opendatacapture/subject-utils';
 import { mapValues } from 'lodash-es';
 import { parse, unparse } from 'papaparse';
 import type { Merge } from 'type-fest';
@@ -1302,7 +1302,7 @@ export function reformatInstrumentData({
     const createdRecord = {
       data: restOfData as Json,
       date: dataDate as Date,
-      subjectId: encodeScopedSubjectId(dataSubjectId as string, {
+      subjectId: toStoredSubjectId(dataSubjectId as string, {
         groupName: currentGroup?.name ?? 'root'
       })
     };

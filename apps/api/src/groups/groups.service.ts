@@ -9,13 +9,15 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { AuditLogger } from '@/audit/audit.logger';
 import { accessibleQuery } from '@/auth/ability.utils';
 import type { EntityOperationOptions } from '@/core/types';
+import { InstrumentsService } from '@/instruments/instruments.service';
 
 @Injectable()
 export class GroupsService {
   constructor(
     @InjectModel('Group') private readonly groupModel: Model<'Group'>,
     @InjectModel('Instrument') private readonly instrumentModel: Model<'Instrument'>,
-    private readonly auditLogger: AuditLogger
+    private readonly auditLogger: AuditLogger,
+    private readonly instrumentsService: InstrumentsService
   ) {}
 
   async archiveById(id: string, currentUser: RequestUser) {
@@ -124,6 +126,15 @@ export class GroupsService {
       });
       validInstrumentIds = existingInstruments.map(({ id }) => id);
     }
+    await this.validateSessionInstrument(
+      {
+        accessibleInstrumentIds: validInstrumentIds ?? group.accessibleInstrumentIds,
+        groupId: id,
+        sessionInstrumentId: settings?.sessionInstrumentId,
+        storedSessionInstrumentId: group.settings.sessionInstrumentId
+      },
+      { ability }
+    );
 
     try {
       return await this.groupModel.update({
@@ -202,6 +213,45 @@ export class GroupsService {
     const nextActiveId = activeId === undefined ? group.activeAssignmentEmailTemplateId : activeId;
     if (nextActiveId && !templates.some((template) => template.id === nextActiveId)) {
       throw new BadRequestException(`No email template with id '${nextActiveId}' exists in this group`);
+    }
+  }
+
+  /**
+   * Every update is checked, not only one naming the session instrument: removing the instrument from
+   * the group's accessible list would otherwise leave every Start Session in the group requiring a
+   * form no one in it can open.
+   */
+  private async validateSessionInstrument(
+    {
+      accessibleInstrumentIds,
+      groupId,
+      sessionInstrumentId,
+      storedSessionInstrumentId
+    }: {
+      accessibleInstrumentIds: string[];
+      groupId: string;
+      sessionInstrumentId: null | string | undefined;
+      storedSessionInstrumentId: null | string | undefined;
+    },
+    options: EntityOperationOptions
+  ): Promise<void> {
+    // `undefined` leaves the stored value alone; `null` removes it.
+    const nextSessionInstrumentId = sessionInstrumentId === undefined ? storedSessionInstrumentId : sessionInstrumentId;
+    if (!nextSessionInstrumentId) {
+      return;
+    }
+    if (!accessibleInstrumentIds.includes(nextSessionInstrumentId)) {
+      throw new BadRequestException(
+        nextSessionInstrumentId === storedSessionInstrumentId
+          ? `The group's Session Instrument must be one of its accessible instruments: set the Session Instrument to another form, or to none, before removing instrument '${nextSessionInstrumentId}'`
+          : `The group's Session Instrument must be one of its accessible instruments, and instrument '${nextSessionInstrumentId}' is not`
+      );
+    }
+    if (nextSessionInstrumentId !== storedSessionInstrumentId) {
+      const instrument = await this.instrumentsService.findById(nextSessionInstrumentId, options, [groupId]);
+      if (instrument.kind !== 'FORM') {
+        throw new BadRequestException(`The group's Session Instrument must be a form, not '${instrument.kind}'`);
+      }
     }
   }
 }

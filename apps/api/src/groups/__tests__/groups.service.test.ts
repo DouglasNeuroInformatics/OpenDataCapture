@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { AuditLogger } from '@/audit/audit.logger';
 import { createAppAbility } from '@/auth/ability.utils';
+import { InstrumentsService } from '@/instruments/instruments.service';
 
 import { GroupsService } from '../groups.service';
 
@@ -30,6 +31,7 @@ describe('GroupsService', () => {
   let groupsService: GroupsService;
   let groupModel: MockedInstance<Model<'Group'>>;
   let instrumentModel: MockedInstance<Model<'Instrument'>>;
+  let instrumentsService: MockedInstance<InstrumentsService>;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -37,13 +39,15 @@ describe('GroupsService', () => {
         GroupsService,
         MockFactory.createForModelToken(getModelToken('Group')),
         MockFactory.createForModelToken(getModelToken('Instrument')),
-        MockFactory.createForService(AuditLogger)
+        MockFactory.createForService(AuditLogger),
+        MockFactory.createForService(InstrumentsService)
       ]
     }).compile();
     auditLogger = moduleRef.get(AuditLogger);
     groupModel = moduleRef.get(getModelToken('Group'));
     instrumentModel = moduleRef.get(getModelToken('Instrument'));
     groupsService = moduleRef.get(GroupsService);
+    instrumentsService = moduleRef.get(InstrumentsService);
     instrumentModel.findMany.mockResolvedValue([]);
   });
 
@@ -332,6 +336,72 @@ describe('GroupsService', () => {
       groupModel.exists.mockResolvedValueOnce(true);
       await expect(groupsService.updateById('123', { name: 'Taken Name' })).rejects.toBeInstanceOf(ConflictException);
       expect(groupModel.exists).toHaveBeenCalledWith({ name: 'Taken Name' });
+    });
+  });
+
+  describe('updateById with a session instrument', () => {
+    const groupRequiring = (sessionInstrumentId: null | string) => ({
+      accessibleInstrumentIds: ['form-1', 'form-2'],
+      name: 'Test Group',
+      settings: { sessionInstrumentId }
+    });
+
+    const accessibleInstruments = (...ids: string[]) => {
+      instrumentModel.findMany.mockResolvedValueOnce(ids.map((id) => ({ id })));
+    };
+
+    it("should refuse an update dropping the session instrument from the group's instruments, even one not naming the setting", async () => {
+      groupModel.findFirst.mockResolvedValueOnce(groupRequiring('form-1'));
+      accessibleInstruments('form-2');
+      await expect(groupsService.updateById('123', { accessibleInstrumentIds: ['form-2'] })).rejects.toThrow(
+        /before removing instrument 'form-1'/
+      );
+      expect(groupModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should refuse a session instrument the group cannot access, saying so rather than asking to remove it', async () => {
+      groupModel.findFirst.mockResolvedValueOnce(groupRequiring(null));
+      const update = groupsService.updateById('123', { settings: { sessionInstrumentId: 'form-3' } });
+      await expect(update).rejects.toBeInstanceOf(BadRequestException);
+      await expect(update).rejects.toThrow(/instrument 'form-3' is not$/);
+      expect(groupModel.update).not.toHaveBeenCalled();
+    });
+
+    it('should refuse a session instrument that is not a form, since only a form is rendered when a session starts', async () => {
+      groupModel.findFirst.mockResolvedValueOnce(groupRequiring(null));
+      instrumentsService.findById.mockResolvedValueOnce({ kind: 'INTERACTIVE' });
+      await expect(
+        groupsService.updateById('123', { settings: { sessionInstrumentId: 'form-1' } })
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(groupModel.update).not.toHaveBeenCalled();
+    });
+
+    it("should look the new session instrument up within the caller's ability and the group", async () => {
+      const ability = createAppAbility([{ action: 'manage', subject: 'all' }]);
+      groupModel.findFirst.mockResolvedValueOnce(groupRequiring(null));
+      instrumentsService.findById.mockResolvedValueOnce({ kind: 'FORM' });
+      await groupsService.updateById('123', { settings: { sessionInstrumentId: 'form-1' } }, { ability });
+      expect(instrumentsService.findById).toHaveBeenCalledWith('form-1', { ability }, ['123']);
+      expect(groupModel.update.mock.lastCall?.[0]).toMatchObject({
+        data: { settings: { sessionInstrumentId: 'form-1' } }
+      });
+    });
+
+    it('should accept dropping the session instrument from the group once the setting is cleared in the same update', async () => {
+      groupModel.findFirst.mockResolvedValueOnce(groupRequiring('form-1'));
+      accessibleInstruments('form-2');
+      await groupsService.updateById('123', {
+        accessibleInstrumentIds: ['form-2'],
+        settings: { sessionInstrumentId: null }
+      });
+      expect(groupModel.update.mock.lastCall?.[0]).toMatchObject({ data: { settings: { sessionInstrumentId: null } } });
+    });
+
+    it('should not look the session instrument up again when the update leaves it as it was', async () => {
+      groupModel.findFirst.mockResolvedValueOnce(groupRequiring('form-1'));
+      await groupsService.updateById('123', { settings: { sessionInstrumentId: 'form-1' } });
+      expect(instrumentsService.findById).not.toHaveBeenCalled();
+      expect(groupModel.update).toHaveBeenCalled();
     });
   });
 

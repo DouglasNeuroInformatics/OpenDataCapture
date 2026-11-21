@@ -1,3 +1,4 @@
+import { RenderInstrumentPage } from '../pages/_app/instruments/render/$id.page';
 import { StartSessionPage } from '../pages/_app/session/start-session.page';
 import { expect, test } from '../support/fixtures';
 
@@ -52,6 +53,103 @@ test.describe('start session', () => {
     await startSessionPage.dismissSubjectIdOptions();
     await expect(startSessionPage.subjectIdField).toHaveValue(`custom-${uniqueId}`);
     await startSessionPage.submitForm();
+    await expect(startSessionPage.successMessage).toBeVisible();
+  });
+
+  // The form used to compute the session date once, when its code first loaded, so every in-person
+  // session started later in the same page load was backdated to that moment.
+  test('should date an in-person session when it is submitted, not when the page opened', async ({
+    getPageModel,
+    page,
+    uniqueId
+  }) => {
+    const openedAt = new Date();
+    await page.clock.install({ time: openedAt });
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.typeSubjectId(`timed-${uniqueId}`);
+    await startSessionPage.dismissSubjectIdOptions();
+    await page.clock.fastForward('02:00:00');
+
+    const sessionCreated = page.waitForResponse(
+      (response) => response.url().endsWith('/v1/sessions') && response.request().method() === 'POST'
+    );
+    await startSessionPage.submitForm();
+    const session = (await (await sessionCreated).json()) as { date: string };
+    expect(new Date(session.date).getTime()).toBeGreaterThanOrEqual(openedAt.getTime() + 2 * 60 * 60 * 1000);
+  });
+});
+
+// A group can require one form to be completed as part of starting a session. The session is created
+// only once that form is submitted, so going back to the details creates nothing.
+test.describe('session instrument', () => {
+  test("should start a session only once the group's session instrument is submitted, recording its answers", async ({
+    api,
+    authenticateAs,
+    page,
+    uniqueId
+  }) => {
+    const group = await api.createGroup({ settings: { defaultIdentificationMethod: 'CUSTOM_ID' } });
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    await api.updateGroup(group.id, { settings: { sessionInstrumentId: instrumentId } });
+    const { credentials } = await api.createUser({ basePermissionLevel: 'STANDARD', groupIds: [group.id] });
+    await authenticateAs(credentials);
+
+    const sessionRequests: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().endsWith('/v1/sessions') && request.method() === 'POST') {
+        sessionRequests.push(request.url());
+      }
+    });
+
+    const startSessionPage = new StartSessionPage(page);
+    await startSessionPage.goto('/session/start-session');
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.typeSubjectId(`intake-${uniqueId}`);
+    await startSessionPage.dismissSubjectIdOptions();
+    await startSessionPage.submitForm();
+    await expect(startSessionPage.sessionInstrumentStep).toBeVisible();
+
+    await startSessionPage.sessionInstrumentBackButton.click();
+    await expect(startSessionPage.subjectIdField).toHaveValue(`intake-${uniqueId}`);
+    expect(sessionRequests).toHaveLength(0);
+    await startSessionPage.submitForm();
+
+    const instrumentPage = new RenderInstrumentPage(page);
+    await instrumentPage.begin();
+    await instrumentPage.completeHappinessQuestionnaire();
+    const sessionCreated = page.waitForResponse(
+      (response) => response.url().endsWith('/v1/sessions') && response.request().method() === 'POST'
+    );
+    await instrumentPage.submit();
+    const session = (await (await sessionCreated).json()) as { id: string; subjectId: string };
+    await expect(startSessionPage.successMessage).toBeVisible();
+
+    const records = await api.findRecordsBySubject(session.subjectId);
+    expect(records).toMatchObject([{ instrumentId, sessionId: session.id }]);
+  });
+});
+
+// The date picker opens on the browser's current month, so the clock is fixed to a known day; the
+// timezone makes the stored instant, which is what the API receives, the same wherever the suite runs.
+test.describe('retrospective session time', () => {
+  test.use({ timezoneId: 'America/Toronto' });
+
+  test('should keep the time of day entered for a retrospective session', async ({ getPageModel, page, uniqueId }) => {
+    await page.clock.install({ time: new Date('2025-06-20T16:00:00Z') });
+    const startSessionPage = await getPageModel('/session/start-session');
+    await startSessionPage.selectIdentificationMethod('CUSTOM_ID');
+    await startSessionPage.typeSubjectId(`retro-${uniqueId}`);
+    await startSessionPage.dismissSubjectIdOptions();
+    await startSessionPage.selectRetrospective();
+    await startSessionPage.pickSessionDay(10);
+    await startSessionPage.setSessionTime('14:30:00');
+
+    const sessionCreated = page.waitForRequest(
+      (request) => request.url().endsWith('/v1/sessions') && request.method() === 'POST'
+    );
+    await startSessionPage.submitForm();
+    expect((await sessionCreated).postDataJSON()).toMatchObject({ date: '2025-06-10T18:30:00.000Z' });
     await expect(startSessionPage.successMessage).toBeVisible();
   });
 });
