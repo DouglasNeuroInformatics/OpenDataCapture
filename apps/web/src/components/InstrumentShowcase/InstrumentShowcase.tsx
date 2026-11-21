@@ -3,8 +3,11 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ListboxDropdown, SearchBar } from '@douglasneuroinformatics/libui/components';
 import type { ListboxDropdownOption } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import type { Language } from '@opendatacapture/schemas/core';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { AnimatePresence, motion } from 'motion/react';
+
+import { getAdministrationChoice } from '@/utils/administration-choice';
 
 import { InstrumentCard } from '../InstrumentCard';
 import { InstrumentKindDropdown } from './InstrumentKindDropdown';
@@ -13,11 +16,17 @@ import { InstrumentLanguageDropdown } from './InstrumentLanguageDropdown';
 import type { InstrumentShowcaseKindOption } from './InstrumentKindDropdown';
 import type { InstrumentShowcaseLanguageOption } from './InstrumentLanguageDropdown';
 
+/**
+ * The instruments a user may pick. Given `allowedLanguages`, each card offers the languages it may
+ * be opened in — narrowed to those — and hands the chosen one to `onSelect`, so a choice costs the
+ * user no extra step. Without them no card offers a language and `onSelect` receives none.
+ */
 export const InstrumentShowcase: React.FC<{
+  allowedLanguages?: readonly Language[];
   data: TranslatedInstrumentInfo[];
-  onSelect: (instrument: TranslatedInstrumentInfo) => void;
-}> = ({ data: availableInstruments, onSelect }) => {
-  const { t } = useTranslation();
+  onSelect: (instrument: TranslatedInstrumentInfo, language?: Language) => void;
+}> = ({ allowedLanguages, data: availableInstruments, onSelect }) => {
+  const { resolvedLanguage, t } = useTranslation();
   const [filteredInstruments, setFilteredInstruments] = useState<TranslatedInstrumentInfo[]>(
     availableInstruments.toSorted((a, b) => a.details.title.localeCompare(b.details.title))
   );
@@ -26,7 +35,22 @@ export const InstrumentShowcase: React.FC<{
   const [selectedTags, setSelectedTags] = useState<ListboxDropdownOption[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const [chosenLanguages, setChosenLanguages] = useState<{ [instrumentId: string]: Language }>({});
   const listRef = useRef<HTMLUListElement>(null);
+
+  const languageChoice = useCallback(
+    (instrument: TranslatedInstrumentInfo) => {
+      if (!allowedLanguages) {
+        return null;
+      }
+      const { language, languageOptions } = getAdministrationChoice(instrument, {
+        allowedLanguages,
+        preferredLanguage: resolvedLanguage
+      });
+      return { language: chosenLanguages[instrument.id] ?? language, languageOptions };
+    },
+    [allowedLanguages, chosenLanguages, resolvedLanguage]
+  );
 
   useEffect(() => {
     const updatedFilteredInstruments = availableInstruments.filter(({ details, kind, supportedLanguages, tags }) => {
@@ -71,7 +95,7 @@ export const InstrumentShowcase: React.FC<{
         event.preventDefault();
         const instrument = filteredInstruments[highlightedIndex];
         if (instrument) {
-          onSelect(instrument);
+          onSelect(instrument, languageChoice(instrument)?.language);
         }
         return;
       }
@@ -86,7 +110,7 @@ export const InstrumentShowcase: React.FC<{
         setHighlightedIndex((prev) => Math.max(prev - 1, 0));
       }
     },
-    [filteredInstruments, highlightedIndex, onSelect]
+    [filteredInstruments, highlightedIndex, languageChoice, onSelect]
   );
 
   return (
@@ -125,6 +149,7 @@ export const InstrumentShowcase: React.FC<{
       <ul className="flex flex-col gap-5" ref={listRef}>
         <AnimatePresence mode="popLayout">
           {filteredInstruments.map((instrument, i) => {
+            const choice = languageChoice(instrument);
             return (
               <motion.li
                 layout
@@ -138,7 +163,12 @@ export const InstrumentShowcase: React.FC<{
                 <InstrumentCard
                   highlighted={i === highlightedIndex}
                   instrument={instrument}
-                  onClick={() => onSelect(instrument)}
+                  language={choice?.language}
+                  languageOptions={choice?.languageOptions}
+                  onClick={() => onSelect(instrument, choice?.language)}
+                  onLanguageChange={(language) => {
+                    setChosenLanguages((previous) => ({ ...previous, [instrument.id]: language }));
+                  }}
                 />
               </motion.li>
             );

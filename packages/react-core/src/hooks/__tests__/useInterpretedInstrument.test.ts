@@ -138,4 +138,22 @@ describe('useInterpretedInstrument', () => {
       'fr'
     ]);
   });
+
+  it('should translate into the language asked for rather than the interface language', async () => {
+    const bundle = `(async () => ({
+      __runtimeVersion: 1,
+      kind: 'FORM',
+      language: ['en', 'fr'],
+      content: {},
+      details: {
+        description: { en: 'English description', fr: 'Description française' },
+        title: { en: 'English Title', fr: 'Titre français' }
+      },
+      tags: { en: [], fr: [] }
+    }))()`;
+    const { result } = renderHook(() => useInterpretedInstrument(bundle, undefined, 'fr'));
+    await waitFor(() => {
+      expect(result.current).toMatchObject({ instrument: { details: { title: 'Titre français' } }, status: 'DONE' });
+    });
+  });
 });

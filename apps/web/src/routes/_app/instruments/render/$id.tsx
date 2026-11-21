@@ -4,11 +4,13 @@ import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/react-core';
 import type { InstrumentSubmitHandler } from '@opendatacapture/react-core';
+import { $Language } from '@opendatacapture/schemas/core';
 import type { UnilingualInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { CreateInstrumentRecordData, InstrumentRecord } from '@opendatacapture/schemas/instrument-records';
 import { $FileMetadata, $PresignedUrls, $UploadCompleteData } from '@opendatacapture/schemas/storage';
 import { createFileRoute, useLocation, useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
+import { z } from 'zod/v4';
 
 import { NavigationBlocker } from '@/components/NavigationBlocker';
 import { PageHeader } from '@/components/PageHeader';
@@ -20,6 +22,7 @@ const RouteComponent = () => {
   const currentSession = useAppStore((store) => store.currentSession);
 
   const params = Route.useParams();
+  const { language } = Route.useSearch();
   const navigate = useNavigate();
   const notifications = useNotificationsStore();
   const location = useLocation();
@@ -114,6 +117,7 @@ const RouteComponent = () => {
       <div className="grow">
         <InstrumentRenderer
           className="mx-auto max-w-3xl"
+          language={language}
           NavigationBlocker={NavigationBlocker}
           subject={currentSession?.subject ?? undefined}
           target={instrumentBundleQuery.data}
@@ -125,5 +129,6 @@ const RouteComponent = () => {
 };
 
 export const Route = createFileRoute('/_app/instruments/render/$id')({
-  component: RouteComponent
+  component: RouteComponent,
+  validateSearch: z.object({ language: $Language.optional() })
 });

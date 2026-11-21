@@ -1,4 +1,5 @@
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import type { Language } from '@opendatacapture/schemas/core';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MotionGlobalConfig } from 'motion/react';
@@ -62,6 +63,13 @@ const instruments = [beta, gamma, alpha];
 const renderShowcase = (data: TranslatedInstrumentInfo[] = instruments) => {
   const onSelect = vi.fn();
   render(<InstrumentShowcase data={data} onSelect={onSelect} />);
+  return onSelect;
+};
+
+/** The showcase offers a language per card only when it is told which languages are allowed. */
+const renderWithLanguages = (allowedLanguages: Language[], data: TranslatedInstrumentInfo[] = instruments) => {
+  const onSelect = vi.fn();
+  render(<InstrumentShowcase allowedLanguages={allowedLanguages} data={data} onSelect={onSelect} />);
   return onSelect;
 };
 
@@ -144,7 +152,7 @@ describe('InstrumentShowcase', () => {
   it('should select an instrument when its card is clicked', () => {
     const onSelect = renderShowcase();
     fireEvent.click(screen.getByTestId('instrument-card-gamma'));
-    expect(onSelect).toHaveBeenCalledWith(gamma);
+    expect(onSelect).toHaveBeenCalledWith(gamma, undefined);
   });
 
   it('should keep only the instruments whose title matches the search, ignoring case', async () => {
@@ -254,7 +262,7 @@ describe('InstrumentShowcase', () => {
     const onSelect = renderShowcase();
     pressKey('ArrowDown');
     pressKey('Enter');
-    expect(onSelect).toHaveBeenCalledWith(beta);
+    expect(onSelect).toHaveBeenCalledWith(beta, undefined);
   });
 
   it('should move the highlight back to the first match when the search changes', async () => {
@@ -270,5 +278,57 @@ describe('InstrumentShowcase', () => {
     renderShowcase();
     pressKey('ArrowDown');
     expect(scrollIntoView.mock.contexts.at(-1)).toBe(screen.getByTestId('instrument-card-beta').closest('li'));
+  });
+
+  it('should offer no language on a card when no allowed languages are given', () => {
+    const onSelect = renderShowcase();
+    expect(screen.queryByTestId('instrument-language-beta')).toBeNull();
+    fireEvent.click(screen.getByTestId('instrument-card-beta'));
+    expect(onSelect).toHaveBeenCalledWith(beta, undefined);
+  });
+
+  it('should offer the languages a card may be opened in, defaulting to the interface language', () => {
+    renderWithLanguages(['en', 'fr']);
+    expect(screen.getByTestId('instrument-language-beta').textContent).toBe('English');
+  });
+
+  it('should leave the dropdown off a card with only one language to offer', () => {
+    renderWithLanguages(['en']);
+    expect(screen.queryByTestId('instrument-language-beta')).toBeNull();
+  });
+
+  it('should open the card in the language it was left on, rather than asking again', () => {
+    const onSelect = renderWithLanguages(['en', 'fr']);
+    fireEvent.click(screen.getByTestId('instrument-language-beta'));
+    fireEvent.click(screen.getByRole('option', { name: 'French' }));
+    fireEvent.click(screen.getByTestId('instrument-card-beta'));
+    expect(onSelect).toHaveBeenCalledWith(beta, 'fr');
+  });
+
+  it('should not open the instrument when the language dropdown itself is clicked', () => {
+    const onSelect = renderWithLanguages(['en', 'fr']);
+    fireEvent.click(screen.getByTestId('instrument-language-beta'));
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('should not open the highlighted instrument when Enter is pressed on a language dropdown', () => {
+    const onSelect = renderWithLanguages(['en', 'fr']);
+    fireEvent.keyDown(screen.getByTestId('instrument-language-beta'), { key: 'Enter' });
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('should keep each card on its own language, so one choice does not change another', () => {
+    const delta = createInstrument({
+      id: 'delta',
+      kind: 'FORM',
+      supportedLanguages: ['en', 'fr'],
+      tags: ['Mood'],
+      title: 'Delta Questionnaire'
+    });
+    const onSelect = renderWithLanguages(['en', 'fr'], [beta, delta]);
+    fireEvent.click(screen.getByTestId('instrument-language-beta'));
+    fireEvent.click(screen.getByRole('option', { name: 'French' }));
+    fireEvent.click(screen.getByTestId('instrument-card-delta'));
+    expect(onSelect).toHaveBeenCalledWith(delta, 'en');
   });
 });

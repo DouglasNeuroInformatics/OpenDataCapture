@@ -1,3 +1,5 @@
+import type React from 'react';
+
 import { Select } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { $Language } from '@opendatacapture/schemas/core';
@@ -9,6 +11,10 @@ export type LanguageSelectProps = {
   'data-testid'?: string;
   id?: string;
   onChange: (language: Language) => void;
+  /** Forwarded to the trigger, for a select inside something that is itself clickable. */
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  /** Forwarded to the trigger, for a select inside something that handles keys of its own. */
+  onKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
   /** The languages to offer; defaults to every language the application supports. */
   options?: readonly Language[];
   value: Language;
@@ -19,13 +25,15 @@ export const LanguageSelect = ({
   'data-testid': testId,
   id,
   onChange,
+  onClick,
+  onKeyDown,
   options = LANGUAGES,
   value
 }: LanguageSelectProps) => {
   const { t } = useTranslation();
   return (
     <Select value={value} onValueChange={(next) => onChange($Language.parse(next))}>
-      <Select.Trigger className="w-45" data-testid={testId} id={id}>
+      <Select.Trigger className="w-45" data-testid={testId} id={id} onClick={onClick} onKeyDown={onKeyDown}>
         <Select.Value />
       </Select.Trigger>
       <Select.Content>

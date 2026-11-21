@@ -34,7 +34,11 @@ export default defineConfig({
       dependencies: ['setup'],
       name: 'chromium',
       testMatch: '**/specs/**/*.spec.ts',
-      use: { ...devices['Desktop Chrome'], baseURL, channel: 'chromium', headless: true }
+      // `locale` is pinned because the gateway negotiates the language of a link that carries none
+      // from Accept-Language, which a browser derives from its locale: left to the host's, every
+      // assertion on an English string would depend on the developer's own machine. A test about
+      // that negotiation opts into another locale with its own `browser.newContext({ locale })`.
+      use: { ...devices['Desktop Chrome'], baseURL, channel: 'chromium', headless: true, locale: 'en-US' }
     }
   ],
   reporter: [['html', { open: 'never', outputFolder: path.resolve(import.meta.dirname, '.playwright/report') }]],

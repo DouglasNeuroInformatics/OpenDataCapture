@@ -12,4 +12,24 @@ test.describe('gateway landing page', () => {
     await expect(landing).toBeVisible();
     await expect(landing.getByRole('heading')).toHaveText('Bienvenue');
   });
+
+  // A link is created before anyone knows what its reader speaks, so most carry no `lang` at all.
+  // The browser's own Accept-Language is then what decides, server-side, so the first paint is
+  // already in their language rather than swapping after hydration.
+  test('should open a link with no language in the language the browser asks for', async ({ browser }) => {
+    const frenchContext = await browser.newContext({ locale: 'fr-CA' });
+    const frenchPage = await frenchContext.newPage();
+    const landing = await frenchPage.goto(gatewayURL);
+    expect(await landing!.text()).toContain('Bienvenue');
+    await expect(frenchPage.getByTestId('gateway-landing').getByRole('heading')).toHaveText('Bienvenue');
+    await frenchContext.close();
+  });
+
+  test('should prefer the language the link names over the one the browser asks for', async ({ browser }) => {
+    const frenchContext = await browser.newContext({ locale: 'fr-CA' });
+    const frenchPage = await frenchContext.newPage();
+    const english = await frenchPage.goto(`${gatewayURL}/?lang=en`);
+    expect(await english!.text()).toContain('Welcome');
+    await frenchContext.close();
+  });
 });

@@ -12,25 +12,31 @@ import { useGroupQuery } from '@/hooks/useGroupQuery';
 import { useMailErrorMessage } from '@/hooks/useMailErrorMessage';
 import { useSendAssignmentEmailMutation } from '@/hooks/useSendAssignmentEmailMutation';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
+import { getLinkLanguage } from '@/utils/assignment-link';
 import { sendableLanguages } from '@/utils/language';
+
+import { ConfirmEmailLanguageDialog } from './ConfirmEmailLanguageDialog';
 
 const DEFAULT_TEMPLATE_OPTION = '__default__';
 
 export type AssignmentEmailFormProps = {
   assignment: Assignment | null;
+  /** The email language to start from; defaults to the interface language. Read once, on mount. */
+  initialLanguage?: Language;
   instrumentLanguages?: string[];
 };
 
-export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: AssignmentEmailFormProps) => {
+export const AssignmentEmailForm = ({ assignment, initialLanguage, instrumentLanguages }: AssignmentEmailFormProps) => {
   const { resolvedLanguage, t } = useTranslation();
   const setupStateQuery = useSetupStateQuery();
   const sendEmailMutation = useSendAssignmentEmailMutation();
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const mailErrorMessage = useMailErrorMessage();
   const [recipient, setRecipient] = useState('');
-  const [languageChoice, setLanguageChoice] = useState<Language>(resolvedLanguage);
+  const [languageChoice, setLanguageChoice] = useState<Language>(initialLanguage ?? resolvedLanguage);
   const [templateChoice, setTemplateChoice] = useState<null | string>(null);
   const [feedback, setFeedback] = useState<null | { message: string; tone: 'error' | 'success' }>(null);
+  const [isConfirmingLanguage, setIsConfirmingLanguage] = useState(false);
 
   // The server resolves the template from the assignment's own group, so this must query that
   // group rather than whichever one is currently selected in the app store - on the datahub they
@@ -63,10 +69,19 @@ export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: Assignm
   // leave the trigger showing a value with no matching item while a different one is posted.
   const language = languageOptions.includes(languageChoice) ? languageChoice : (languageOptions[0] ?? 'en');
 
+  // The link's own language, which the email's does not have to match — so it is worth confirming,
+  // but only where the sender could pick it: a template authored in neither of the link's languages
+  // leaves them nothing to resolve, and a warning they can only override is a warning they learn to
+  // ignore.
+  const pinnedLinkLanguage = assignment ? getLinkLanguage(assignment.url) : undefined;
+  const linkLanguage =
+    pinnedLinkLanguage && languageOptions.includes(pinnedLinkLanguage) ? pinnedLinkLanguage : undefined;
+
   const handleSendEmail = () => {
     if (!assignment || !recipient) {
       return;
     }
+    setIsConfirmingLanguage(false);
     setFeedback(null);
     const fail = (message: string) => {
       setFeedback({ message, tone: 'error' });
@@ -154,11 +169,10 @@ export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: Assignm
             </Tooltip.Trigger>
             <Tooltip.Content className="max-w-xs">
               <p>
-                {/* Only the email is localized: the gateway does not read the link's `lang` param. */}
                 {t({
-                  en: 'The email is sent in the selected language when the template has been written in it. Participants choose their own language when they open the assignment.',
-                  es: 'El correo se envía en el idioma seleccionado cuando la plantilla se ha redactado en ese idioma. Los participantes eligen su propio idioma al abrir la tarea.',
-                  fr: "Le courriel est envoyé dans la langue sélectionnée lorsque le modèle a été rédigé dans celle-ci. Les participants choisissent leur propre langue à l'ouverture de l'évaluation."
+                  en: 'The email is sent in the selected language when the template has been written in it. The link opens in the language the assignment was created in, whatever language the email is sent in.',
+                  es: 'El correo se envía en el idioma seleccionado cuando la plantilla se ha redactado en ese idioma. El enlace se abre en el idioma en que se creó la tarea, sea cual sea el idioma del correo.',
+                  fr: "Le courriel est envoyé dans la langue sélectionnée lorsque le modèle a été rédigé dans celle-ci. Le lien s'ouvre dans la langue de création de la tâche, quelle que soit la langue du courriel."
                 })}
               </p>
             </Tooltip.Content>
@@ -203,7 +217,13 @@ export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: Assignm
           disabled={!recipient || sendEmailMutation.isPending || groupQuery.isLoading}
           type="button"
           variant="primary"
-          onClick={handleSendEmail}
+          onClick={() => {
+            if (linkLanguage && linkLanguage !== language) {
+              setIsConfirmingLanguage(true);
+              return;
+            }
+            handleSendEmail();
+          }}
         >
           {sendEmailMutation.isPending
             ? t({ en: 'Sending…', es: 'Enviando…', fr: 'Envoi en cours…' })
@@ -221,6 +241,15 @@ export const AssignmentEmailForm = ({ assignment, instrumentLanguages }: Assignm
         >
           {feedback.message}
         </p>
+      )}
+      {linkLanguage && isConfirmingLanguage && (
+        <ConfirmEmailLanguageDialog
+          emailLanguage={language}
+          isPending={sendEmailMutation.isPending}
+          linkLanguage={linkLanguage}
+          onConfirm={handleSendEmail}
+          onOpenChange={setIsConfirmingLanguage}
+        />
       )}
     </div>
   );

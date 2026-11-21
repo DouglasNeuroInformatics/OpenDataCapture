@@ -28,6 +28,12 @@ export class RemoteAssignmentPage extends AppPage {
     this.closeResultButton = page.getByRole('button', { name: 'Close' }).first();
   }
 
+  /** Language options are named in the interface language, e.g. 'French' for an English reader. */
+  async chooseLanguage(name: string) {
+    await this.createDialog.getByTestId('administration-language').click();
+    await this.$ref.getByRole('option', { name }).click();
+  }
+
   /** Cards carry a content-hash testid, so match on the visible title instead. */
   instrumentCard(title: string): Locator {
     return this.instrumentShowcase.locator('[data-testid^="instrument-card-"]').filter({ hasText: title }).first();

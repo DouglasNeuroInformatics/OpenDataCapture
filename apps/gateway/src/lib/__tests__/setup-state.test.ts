@@ -36,4 +36,59 @@ describe('resolveLanguage', () => {
     updateSetupState({ activeLanguages: ['en', 'fr'] });
     expect(resolveLanguage(['fr', 'en'])).toBe('en');
   });
+
+  it('should open a link with no language in the language the browser asks for', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage(undefined, 'fr-CA,fr;q=0.9,en;q=0.8')).toBe('fr');
+  });
+
+  it('should fall back to the browser for a link pinned to a language the instance has since turned off', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage('es', 'fr-CA,fr;q=0.9')).toBe('fr');
+  });
+
+  it('should prefer the language the link names over the one the browser asks for', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage('en', 'fr-CA,fr;q=0.9')).toBe('en');
+  });
+
+  it('should take the most wanted language the instance has active, not merely the first listed', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage(undefined, 'de;q=0.9,fr;q=0.8,en;q=0.7')).toBe('fr');
+  });
+
+  it('should order by quality rather than by the order the header lists them', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage(undefined, 'en;q=0.3,fr;q=0.9')).toBe('fr');
+  });
+
+  it('should ignore a language the browser explicitly refuses with q=0', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage(undefined, 'fr;q=0,en;q=0.5')).toBe('en');
+  });
+
+  it('should fall back to the first active language when the browser asks for none it has', () => {
+    updateSetupState({ activeLanguages: ['fr', 'en'] });
+    expect(resolveLanguage(undefined, 'de,it')).toBe('fr');
+  });
+
+  it('should fall back to the first active language for a header it cannot read', () => {
+    updateSetupState({ activeLanguages: ['fr', 'en'] });
+    expect(resolveLanguage(undefined, ';;;')).toBe('fr');
+  });
+
+  it('should treat an unreadable quality as the strongest preference, since the language was still named', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage(undefined, 'fr;q=high,en;q=0.9')).toBe('fr');
+  });
+
+  it('should treat a quality of punctuation alone as the strongest preference rather than dropping the language', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage(undefined, 'fr;q=.,en;q=0.9')).toBe('fr');
+  });
+
+  it('should read a quality the client spells with a capital Q, which HTTP allows', () => {
+    updateSetupState({ activeLanguages: ['en', 'fr'] });
+    expect(resolveLanguage(undefined, 'fr;Q=0.1,en;Q=0.9')).toBe('en');
+  });
 });

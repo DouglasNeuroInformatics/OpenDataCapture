@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { Heading } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
@@ -8,6 +8,7 @@ import { InstrumentShowcase } from '@/components/InstrumentShowcase';
 import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
+import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 import { selectAdministrableInstruments } from '@/utils/administrable-instruments';
 
@@ -16,6 +17,7 @@ const RouteComponent = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const instrumentInfoQuery = useInstrumentInfoQuery();
+  const setupStateQuery = useSetupStateQuery();
 
   useEffect(() => {
     const input = document.querySelector<HTMLInputElement>('[data-testid="instrument-search-bar"] input');
@@ -32,10 +34,12 @@ const RouteComponent = () => {
       <WithFallback
         Component={InstrumentShowcase}
         props={{
+          allowedLanguages: setupStateQuery.data.activeLanguages,
           data: instrumentInfoQuery.data && selectAdministrableInstruments(instrumentInfoQuery.data, currentGroup),
-          onSelect: (instrument) => {
+          onSelect: (instrument, language) => {
             void navigate({
               params: { id: instrument.id },
+              search: { language },
               state: { info: instrument },
               to: `/instruments/render/$id`
             });

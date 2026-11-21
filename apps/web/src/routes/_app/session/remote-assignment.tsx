@@ -4,16 +4,18 @@ import { Button, Dialog, Form, Heading, Input, Label, Sheet } from '@douglasneur
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { CopyButton } from '@opendatacapture/react-core';
 import type { $CreateAssignmentData, Assignment } from '@opendatacapture/schemas/assignment';
-import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
+import type { Language } from '@opendatacapture/schemas/core';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
+import { AdministrationOptions } from '@/components/AdministrationOptions';
 import { AssignmentEmailForm } from '@/components/AssignmentEmailForm';
 import { InstrumentShowcase } from '@/components/InstrumentShowcase';
 import { PageHeader } from '@/components/PageHeader';
 import { QRCode } from '@/components/QRCode';
 import { WithFallback } from '@/components/WithFallback';
 import { config } from '@/config';
+import { useAdministrationChoice } from '@/hooks/useAdministrationChoice';
 import { useCreateAssignment } from '@/hooks/useCreateAssignment';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
@@ -27,9 +29,10 @@ const AssignmentResultSlider: React.FC<{
   assignment: Assignment | null;
   instrumentLanguages?: string[];
   isOpen: boolean;
+  language: Language | undefined;
   setIsOpen: (isOpen: boolean) => void;
   title: string | undefined;
-}> = ({ assignment, instrumentLanguages, isOpen, setIsOpen, title }) => {
+}> = ({ assignment, instrumentLanguages, isOpen, language, setIsOpen, title }) => {
   const { t } = useTranslation();
   const url = assignment?.url;
 
@@ -62,7 +65,12 @@ const AssignmentResultSlider: React.FC<{
               <CopyButton size="sm" text={url ?? ''} variant="outline" />
             </div>
             <QRCode url={url ?? 'javascript:void(0)'} />
-            <AssignmentEmailForm assignment={assignment} instrumentLanguages={instrumentLanguages} />
+            <AssignmentEmailForm
+              assignment={assignment}
+              initialLanguage={language}
+              instrumentLanguages={instrumentLanguages}
+              key={assignment?.id}
+            />
           </div>
         </Sheet.Body>
         <Sheet.Footer>
@@ -93,8 +101,7 @@ const RouteComponent = () => {
   const instrumentInfoQuery = useInstrumentInfoQuery();
   const setupStateQuery = useSetupStateQuery();
   const createAssignmentMutation = useCreateAssignment();
-
-  const [selectedInstrument, setSelectedInstrument] = useState<null | TranslatedInstrumentInfo>(null);
+  const { choice, pick, setLanguage } = useAdministrationChoice(setupStateQuery.data.activeLanguages);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const createDialogRef = useRef<HTMLDivElement>(null);
   const [isResultSliderOpen, setIsResultSliderOpen] = useState(false);
@@ -131,7 +138,7 @@ const RouteComponent = () => {
         props={{
           data: instrumentInfoQuery.data && selectRemotelyAssignableInstruments(instrumentInfoQuery.data, currentGroup),
           onSelect: (instrument) => {
-            setSelectedInstrument(instrument);
+            pick(instrument);
             setIsCreateModalOpen(true);
           }
         }}
@@ -159,74 +166,81 @@ const RouteComponent = () => {
                   es: 'Asignar "{}" al sujeto actual para que la complete de forma remota.',
                   fr: 'Assigner « {} » au client actuel pour complétion à distance.'
                 },
-                { args: [selectedInstrument?.details.title ?? ''] }
+                { args: [choice?.instrument.details.title ?? ''] }
               )}
             </Dialog.Description>
           </Dialog.Header>
-          <Form
-            suspendWhileSubmitting
-            content={{
-              expiresAt: {
-                kind: 'date',
-                label: t({
-                  en: 'Expires At',
-                  es: 'Vence el',
-                  fr: "Date d'expiration"
-                })
-              },
-              redirectUrl: {
-                description: t({
-                  en: 'Where to send the subject once they finish. Must start with https://.',
-                  es: 'Adónde enviar al sujeto cuando termine. Debe comenzar con https://.',
-                  fr: 'Où envoyer le client une fois terminé. Doit commencer par https://.'
-                }),
-                kind: 'string',
-                label: t({
-                  en: 'Redirect URL (Optional)',
-                  es: 'URL de redirección (opcional)',
-                  fr: 'URL de redirection (facultatif)'
-                }),
-                variant: 'input'
-              }
-            }}
-            initialValues={{
-              expiresAt: getDefaultAssignmentExpiry(setupStateQuery.data.defaultAssignmentDurationDays)
-            }}
-            validationSchema={
-              z.object({
-                expiresAt: z.date().min(new Date(), {
-                  message: t({
-                    en: 'Expiry date must be in the future',
-                    es: 'La fecha de vencimiento debe ser futura',
-                    fr: "La date d'expiration doit être dans le futur"
-                  })
-                }),
-                redirectUrl: $RedirectUrl.optional()
-              }) satisfies z.ZodType<Pick<$CreateAssignmentData, 'expiresAt' | 'redirectUrl'>>
-            }
-            onSubmit={async ({ expiresAt, redirectUrl }) => {
-              const created = await createAssignmentMutation.mutateAsync({
-                data: {
-                  expiresAt,
-                  groupId: currentGroup?.id,
-                  instrumentId: selectedInstrument!.id,
-                  redirectUrl: omittedIfBlank(redirectUrl),
-                  subjectId: currentSession.subjectId
+          {choice && (
+            <React.Fragment>
+              <AdministrationOptions choice={choice} onLanguageChange={setLanguage} />
+              <Form
+                suspendWhileSubmitting
+                content={{
+                  expiresAt: {
+                    kind: 'date',
+                    label: t({
+                      en: 'Expires At',
+                      es: 'Vence el',
+                      fr: "Date d'expiration"
+                    })
+                  },
+                  redirectUrl: {
+                    description: t({
+                      en: 'Where to send the subject once they finish. Must start with https://.',
+                      es: 'Adónde enviar al sujeto cuando termine. Debe comenzar con https://.',
+                      fr: 'Où envoyer le client une fois terminé. Doit commencer par https://.'
+                    }),
+                    kind: 'string',
+                    label: t({
+                      en: 'Redirect URL (Optional)',
+                      es: 'URL de redirección (opcional)',
+                      fr: 'URL de redirection (facultatif)'
+                    }),
+                    variant: 'input'
+                  }
+                }}
+                initialValues={{
+                  expiresAt: getDefaultAssignmentExpiry(setupStateQuery.data.defaultAssignmentDurationDays)
+                }}
+                validationSchema={
+                  z.object({
+                    expiresAt: z.date().min(new Date(), {
+                      message: t({
+                        en: 'Expiry date must be in the future',
+                        es: 'La fecha de vencimiento debe ser futura',
+                        fr: "La date d'expiration doit être dans le futur"
+                      })
+                    }),
+                    redirectUrl: $RedirectUrl.optional()
+                  }) satisfies z.ZodType<Pick<$CreateAssignmentData, 'expiresAt' | 'redirectUrl'>>
                 }
-              });
-              setAssignment(created);
-              setIsCreateModalOpen(false);
-              setIsResultSliderOpen(true);
-            }}
-          />
+                onSubmit={async ({ expiresAt, redirectUrl }) => {
+                  const created = await createAssignmentMutation.mutateAsync({
+                    data: {
+                      expiresAt,
+                      groupId: currentGroup?.id,
+                      instrumentId: choice.instrument.id,
+                      language: choice.language,
+                      redirectUrl: omittedIfBlank(redirectUrl),
+                      subjectId: currentSession.subjectId
+                    }
+                  });
+                  setAssignment(created);
+                  setIsCreateModalOpen(false);
+                  setIsResultSliderOpen(true);
+                }}
+              />
+            </React.Fragment>
+          )}
         </Dialog.Content>
       </Dialog>
       <AssignmentResultSlider
         assignment={assignment}
-        instrumentLanguages={selectedInstrument?.supportedLanguages}
+        instrumentLanguages={choice?.instrument.supportedLanguages}
         isOpen={isResultSliderOpen}
+        language={choice?.language}
         setIsOpen={setIsResultSliderOpen}
-        title={selectedInstrument?.details.title}
+        title={choice?.instrument.details.title}
       />
     </div>
   );

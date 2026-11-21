@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import type { Assignment } from '@opendatacapture/schemas/assignment';
 import type { Session } from '@opendatacapture/schemas/session';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/session/remote-assignment';
@@ -12,11 +12,13 @@ import '@/services/i18n';
 type InstrumentInfoStub = {
   details: { title: string };
   id: string;
+  internal: { edition: number; name: string };
   kind: 'FILE' | 'FORM';
   supportedLanguages: string[];
 };
 
 type MockState = {
+  activeLanguages: string[];
   config: { setup: { isGatewayEnabled: boolean } };
   instrumentInfo: InstrumentInfoStub[] | undefined;
   store: { currentGroup: null | { accessibleInstrumentIds: string[]; id: string }; currentSession: null | Session };
@@ -24,13 +26,16 @@ type MockState = {
 
 const mocks = vi.hoisted(() => {
   const state: MockState = {
+    activeLanguages: ['en', 'fr'],
     config: { setup: { isGatewayEnabled: true } },
     instrumentInfo: undefined,
     store: { currentGroup: null, currentSession: null }
   };
   return {
     ...state,
-    AssignmentEmailForm: vi.fn((_props: { assignment: Assignment | null; instrumentLanguages?: string[] }) => null),
+    AssignmentEmailForm: vi.fn(
+      (_props: { assignment: Assignment | null; initialLanguage?: string; instrumentLanguages?: string[] }) => null
+    ),
     mutateAsync: vi.fn(),
     navigate: vi.fn(),
     QRCode: vi.fn((_props: { url: string }) => null)
@@ -68,7 +73,9 @@ vi.mock('@/hooks/useInstrumentInfoQuery', () => ({
   useInstrumentInfoQuery: () => ({ data: mocks.instrumentInfo })
 }));
 vi.mock('@/hooks/useSetupStateQuery', () => ({
-  useSetupStateQuery: () => ({ data: { defaultAssignmentDurationDays: 7 } })
+  useSetupStateQuery: () => ({
+    data: { activeLanguages: mocks.activeLanguages, defaultAssignmentDurationDays: 7 }
+  })
 }));
 vi.mock('@/store', () => ({
   useAppStore: (selector: (store: typeof mocks.store) => unknown) => selector(mocks.store)
@@ -103,6 +110,7 @@ const assignment: Assignment = {
 const allowed: InstrumentInfoStub = {
   details: { title: 'Allowed' },
   id: 'instrument-1',
+  internal: { edition: 1, name: 'Allowed' },
   kind: 'FORM',
   supportedLanguages: ['en', 'fr']
 };
@@ -118,17 +126,38 @@ const selectInstrument = () => {
 
 const submitForm = () => fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
+/**
+ * Waits out the whole submit cycle, so no state update lands after the test has finished.
+ *
+ * The link renders as soon as `mutateAsync` resolves, but the form is `suspendWhileSubmitting`, so
+ * libui holds `isSubmitting` for 500ms more and clears it once this dialog is already gone. Ending
+ * on the link alone leaves that update to fire after the environment is torn down, which surfaces
+ * as an unhandled `window is not defined` charged to whichever file runs next.
+ */
+const waitForLink = async () => {
+  await waitFor(() => expect(screen.getByRole('link', { name: 'Assignment Link' })).toBeTruthy());
+  await act(async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 600);
+    });
+  });
+};
+
 const createAssignment = async () => {
   selectInstrument();
   submitForm();
-  await waitFor(() => expect(screen.getByRole('link', { name: 'Assignment Link' })).toBeTruthy());
+  await waitForLink();
 };
 
 describe('Route', () => {
   beforeEach(() => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     mocks.config.setup.isGatewayEnabled = true;
-    mocks.instrumentInfo = [allowed, { ...allowed, details: { title: 'Excluded' }, id: 'instrument-2' }];
+    mocks.activeLanguages = ['en', 'fr'];
+    mocks.instrumentInfo = [
+      allowed,
+      { ...allowed, details: { title: 'Excluded' }, id: 'instrument-2', internal: { edition: 1, name: 'Excluded' } }
+    ];
     mocks.store.currentGroup = { accessibleInstrumentIds: ['instrument-1'], id: 'group-1' };
     mocks.store.currentSession = session;
     mocks.mutateAsync.mockResolvedValue(assignment);
@@ -216,9 +245,33 @@ describe('Route', () => {
           expiresAt: new Date('2026-01-08'),
           groupId: 'group-1',
           instrumentId: 'instrument-1',
+          language: undefined,
           subjectId: 'subject-1'
         }
       });
+    });
+
+    it('should leave the language unset by default, so the browser that opens the link decides', async () => {
+      await createAssignment();
+      expect(mocks.mutateAsync).toHaveBeenCalledWith({ data: expect.objectContaining({ language: undefined }) });
+    });
+
+    it('should assign the language chosen in the dialog, so the link opens the gateway in it', async () => {
+      selectInstrument();
+      fireEvent.click(screen.getByTestId('administration-language'));
+      fireEvent.click(screen.getByRole('option', { name: 'French' }));
+      submitForm();
+      await waitForLink();
+      expect(mocks.mutateAsync).toHaveBeenCalledWith({ data: expect.objectContaining({ language: 'fr' }) });
+    });
+
+    it('should offer no language dropdown when the gateway serves only one, since there is nothing to pin', async () => {
+      mocks.activeLanguages = ['fr'];
+      selectInstrument();
+      expect(screen.queryByTestId('administration-language')).toBeNull();
+      submitForm();
+      await waitForLink();
+      expect(mocks.mutateAsync).toHaveBeenCalledWith({ data: expect.objectContaining({ language: undefined }) });
     });
 
     it('should refuse a redirect URL that is not https, without creating the assignment', async () => {
@@ -235,7 +288,7 @@ describe('Route', () => {
         target: { value: 'https://example.com/done' }
       });
       submitForm();
-      await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
+      await waitForLink();
       expect(mocks.mutateAsync).toHaveBeenCalledWith({
         data: expect.objectContaining({ redirectUrl: 'https://example.com/done' })
       });
@@ -247,7 +300,7 @@ describe('Route', () => {
       fireEvent.change(input, { target: { value: 'https://example.com/done' } });
       fireEvent.change(input, { target: { value: '' } });
       submitForm();
-      await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalled());
+      await waitForLink();
       expect(mocks.mutateAsync.mock.lastCall?.[0].data.redirectUrl).toBeUndefined();
     });
 
@@ -267,7 +320,11 @@ describe('Route', () => {
     it('should hand the assignment url to the QR code and the email form', async () => {
       await createAssignment();
       expect(mocks.QRCode.mock.lastCall?.[0]).toEqual({ url: assignment.url });
-      expect(mocks.AssignmentEmailForm.mock.lastCall?.[0]).toEqual({ assignment, instrumentLanguages: ['en', 'fr'] });
+      expect(mocks.AssignmentEmailForm.mock.lastCall?.[0]).toEqual({
+        assignment,
+        initialLanguage: undefined,
+        instrumentLanguages: ['en', 'fr']
+      });
     });
 
     it('should close the link panel when the close button is clicked', async () => {
