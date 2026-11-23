@@ -1,14 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import {
-  Card,
-  Checkbox,
-  Heading,
-  HoverCard,
-  Input,
-  Select,
-  Separator
-} from '@douglasneuroinformatics/libui/components';
+import { Card, Checkbox, Heading, HoverCard, Input, Separator } from '@douglasneuroinformatics/libui/components';
 import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { cn } from '@douglasneuroinformatics/libui/utils';
 import { DEFAULT_ASSIGNMENT_DURATION_DAYS } from '@opendatacapture/schemas/assignment';
@@ -23,8 +15,6 @@ import { SelectTableColorMode } from '@/components/SelectTableColorMode';
 import { config } from '@/config';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateSetupStateMutation } from '@/hooks/useUpdateSetupStateMutation';
-import { useAppStore } from '@/store';
-import type { GroupSwitcherPosition } from '@/store/types';
 import { parseDurationDays } from '@/utils/assignment-duration';
 import { LANGUAGE_LABELS, LANGUAGES } from '@/utils/language';
 
@@ -71,8 +61,6 @@ const RouteComponent = () => {
   const { t } = useTranslation();
   const setupStateQuery = useSetupStateQuery();
   const updateSetupStateMutation = useUpdateSetupStateMutation({ throwOnError: false });
-  const groupSwitcherPosition = useAppStore((store) => store.groupSwitcherPosition);
-  const setGroupSwitcherPosition = useAppStore((store) => store.setGroupSwitcherPosition);
 
   // `mutate` is referentially stable across renders, so callbacks that depend on `autosave` stay stable too.
   const { mutate } = updateSetupStateMutation;
@@ -323,33 +311,6 @@ const RouteComponent = () => {
             <SettingSection
               title={t({ en: 'UI Preferences', es: 'Preferencias de la interfaz', fr: "Préférences de l'interface" })}
             >
-              <div className="flex items-center gap-10">
-                <p className="text-sm font-medium">
-                  {t({
-                    en: 'Group Switcher Position',
-                    es: 'Posición del selector de grupo',
-                    fr: 'Position du sélecteur de groupe'
-                  })}
-                </p>
-                <Select
-                  value={groupSwitcherPosition}
-                  onValueChange={(value) => setGroupSwitcherPosition(value as GroupSwitcherPosition)}
-                >
-                  <Select.Trigger className="w-45 shrink-0" data-testid="group-switcher-position-select">
-                    <Select.Value />
-                  </Select.Trigger>
-                  <Select.Content>
-                    <Select.Group>
-                      <Select.Item value="sidebar">
-                        {t({ en: 'Sidebar Menu', es: 'Menú lateral', fr: 'Menu latéral' })}
-                      </Select.Item>
-                      <Select.Item value="topbar">
-                        {t({ en: 'Top Right Corner', es: 'Esquina superior derecha', fr: 'Coin supérieur droit' })}
-                      </Select.Item>
-                    </Select.Group>
-                  </Select.Content>
-                </Select>
-              </div>
               <div className="flex items-center gap-10">
                 <p className="text-sm font-medium whitespace-nowrap">
                   {t({

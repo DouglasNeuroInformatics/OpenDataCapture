@@ -6,7 +6,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
 import type { NavItem } from '@/hooks/useNavItems';
-import type { GroupSwitcherPosition } from '@/store/types';
 
 import { Sidebar } from '../Sidebar';
 
@@ -15,7 +14,6 @@ import '@/services/i18n';
 type MockStore = {
   currentSession: null | Session;
   endSession: () => void;
-  groupSwitcherPosition: GroupSwitcherPosition;
 };
 
 type Mocks = {
@@ -26,7 +24,7 @@ type Mocks = {
 };
 
 const mocks = vi.hoisted((): Mocks => {
-  const store: MockStore = { currentSession: null, endSession: vi.fn(), groupSwitcherPosition: 'sidebar' };
+  const store: MockStore = { currentSession: null, endSession: vi.fn() };
   return { isGroupSwitcherVisible: false, navigate: vi.fn(), navItems: [], store };
 });
 
@@ -96,7 +94,6 @@ describe('Sidebar', () => {
     mocks.isGroupSwitcherVisible = false;
     mocks.navItems = [globalItems, sessionItems];
     mocks.store.currentSession = null;
-    mocks.store.groupSwitcherPosition = 'sidebar';
     mocks.navigate.mockReset().mockResolvedValue(undefined);
     vi.mocked(mocks.store.endSession).mockReset();
     window.history.replaceState(null, '', '/');
@@ -170,17 +167,10 @@ describe('Sidebar', () => {
     expect(mocks.store.endSession).not.toHaveBeenCalled();
   });
 
-  it('should show the group switcher when it is placed in the sidebar and there is a group to switch between', () => {
+  it('should show the group switcher when there is a group to switch between', () => {
     mocks.isGroupSwitcherVisible = true;
     render(<Sidebar />);
     expect(screen.getByTestId('group-switcher')).toBeTruthy();
-  });
-
-  it('should not show the group switcher when it is placed in the top bar', () => {
-    mocks.isGroupSwitcherVisible = true;
-    mocks.store.groupSwitcherPosition = 'topbar';
-    render(<Sidebar />);
-    expect(screen.queryByTestId('group-switcher')).toBeNull();
   });
 
   it('should not show the group switcher when there is no group to switch between', () => {

@@ -14,8 +14,8 @@ const SURFACE_CLASSNAME =
 
 /**
  * Whether the switcher will render anything. Call sites that draw chrome around it — a separator, a
- * sticky bar — need the same answer before laying that chrome out, otherwise they leave an empty
- * container behind for a user with no group to switch to.
+ * padded container — need the same answer before laying that chrome out, otherwise they leave an
+ * empty container behind for a user with no group to switch to.
  */
 export function useIsGroupSwitcherVisible() {
   return useSwitchableGroups().length > 0;
@@ -23,10 +23,10 @@ export function useIsGroupSwitcherVisible() {
 
 /**
  * The current group, and (when there is more than one to choose from) a control to switch between them.
- * Renders the control alone with no surrounding layout: the sidebar, the mobile nav sheet, and the top
- * bar each place it differently, so spacing and width belong to the caller via `className`.
+ * Renders the control alone with no surrounding layout: the sidebar and the mobile nav sheet each place
+ * it differently, so spacing belongs to the caller.
  */
-export const GroupSwitcher = ({ className }: { className?: string }) => {
+export const GroupSwitcher = () => {
   const changeGroup = useAppStore((store) => store.changeGroup);
   const currentGroup = useAppStore((store) => store.currentGroup);
   const groups = useSwitchableGroups();
@@ -46,10 +46,7 @@ export const GroupSwitcher = ({ className }: { className?: string }) => {
   // static text styled to match the trigger, rather than a select whose only option is the current value.
   if (groups.length === 1 && currentGroup) {
     return (
-      <div
-        className={cn(SURFACE_CLASSNAME, 'flex flex-col items-start rounded-md px-3', className)}
-        data-testid="group-switcher"
-      >
+      <div className={cn(SURFACE_CLASSNAME, 'flex flex-col items-start rounded-md px-3')} data-testid="group-switcher">
         {label}
         <span className="text-[14px]">{currentGroup.name}</span>
       </div>
@@ -64,11 +61,7 @@ export const GroupSwitcher = ({ className }: { className?: string }) => {
       onValueChange={(id) => changeGroup(groups.find((group) => group.id === id)!)}
     >
       <Select.Trigger
-        className={cn(
-          SURFACE_CLASSNAME,
-          'text-[14px] hover:bg-slate-700 [&>svg]:text-white [&>svg]:opacity-100',
-          className
-        )}
+        className={cn(SURFACE_CLASSNAME, 'text-[14px] hover:bg-slate-700 [&>svg]:text-white [&>svg]:opacity-100')}
         data-testid="group-switcher"
       >
         <div className="flex flex-col items-start leading-tight">

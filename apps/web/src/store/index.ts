@@ -17,7 +17,6 @@ import type { AppStore } from './types';
  * derived from the access token or the network at runtime and must not outlive the tab.
  */
 const PERSISTED_KEYS = [
-  'groupSwitcherPosition',
   'isDisclaimerAccepted',
   'isWalkthroughComplete',
   'preferredGroupId'
@@ -44,7 +43,7 @@ export const useAppStore = create(
         name: 'app',
         partialize: (state) => pick(state, PERSISTED_KEYS),
         storage: createJSONStorage(() => localStorage),
-        version: 1
+        version: 2
       }
     )
   )

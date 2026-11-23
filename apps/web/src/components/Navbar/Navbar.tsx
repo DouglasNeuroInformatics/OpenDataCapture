@@ -60,8 +60,7 @@ export const Navbar = () => {
         <Sheet.Header>
           <Branding className="h-10" fontSize="md" />
         </Sheet.Header>
-        {/* Shown regardless of the group-switcher position preference: the mobile layout has no sidebar
-            and no top bar, so the nav sheet is the only place the control can live. */}
+        {/* The mobile layout has no sidebar, so the nav sheet is the only place the control can live. */}
         {isGroupSwitcherVisible && (
           <div className="py-2">
             <GroupSwitcher />
