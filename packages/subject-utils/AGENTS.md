@@ -17,8 +17,8 @@ Treat `generateSubjectHash` as frozen.
 `parseClinicalSubjectIdentificationData` re-checks types the compiler already guarantees, on purpose —
 crashing beats deriving a wrong ID. Leave it in place.
 
-`removeSubjectIdScope` lives in `runtime-internal` rather than here so `apps/api`'s export worker
-(which loads it over the `#runtime/v1/...` subpath import) and the browser share one implementation.
+`removeSubjectIdScope` lives in `runtime-internal` rather than here so the runtime bundle and
+`subject-utils` consumers share one implementation.
 
 ## Tests
 

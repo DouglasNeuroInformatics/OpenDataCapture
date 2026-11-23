@@ -1,36 +1,28 @@
 /* eslint-disable perfectionist/sort-classes -- the single-segment @Get('linear-model') must stay above @Get(':id'), which alphabetical order would put below it, where :id would match it first */
 
 import { ApiOperation, CurrentUser, ParseSchemaPipe, ValidObjectIdPipe } from '@douglasneuroinformatics/libnest';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseInterceptors
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import type { InstrumentKind } from '@opendatacapture/runtime-core';
 import { $DateLike } from '@opendatacapture/schemas/core';
 import {
   $CreateInstrumentRecordData,
+  $ExportInstrumentRecordsData,
   $UpdateInstrumentRecordData,
   $UploadInstrumentRecordsData
 } from '@opendatacapture/schemas/instrument-records';
 
 import type { AppAbility } from '@/auth/auth.types';
 import { RouteAccess } from '@/core/decorators/route-access.decorator';
-import { MsgpackInterceptor } from '@/core/interceptors/msgpack.interceptor';
 
+import { InstrumentRecordsExportService } from './instrument-records-export.service';
 import { InstrumentRecordsService } from './instrument-records.service';
 
 @Controller('instrument-records')
 export class InstrumentRecordsController {
-  constructor(private readonly instrumentRecordsService: InstrumentRecordsService) {}
+  constructor(
+    private readonly instrumentRecordsExportService: InstrumentRecordsExportService,
+    private readonly instrumentRecordsService: InstrumentRecordsService
+  ) {}
 
   @ApiOperation({ summary: 'Create Instrument Record' })
   @Post()
@@ -81,11 +73,18 @@ export class InstrumentRecordsController {
   }
 
   @ApiOperation({ summary: 'Export Records' })
-  @Get('export')
+  @HttpCode(HttpStatus.OK)
+  @Post('export')
   @RouteAccess({ action: 'read', subject: 'InstrumentRecord' })
-  @UseInterceptors(MsgpackInterceptor)
-  exportRecords(@CurrentUser('ability') ability: AppAbility, @Query('groupId') groupId?: string) {
-    return this.instrumentRecordsService.exportRecords({ groupId }, { ability });
+  exportRecords(
+    @Body() data: $ExportInstrumentRecordsData,
+    @CurrentUser('ability') ability: AppAbility,
+    @CurrentUser('groups') groups: { id: string }[]
+  ) {
+    return this.instrumentRecordsExportService.exportRecords(data, {
+      ability,
+      callerGroupIds: groups.map(({ id }) => id)
+    });
   }
 
   @ApiOperation({ description: 'Compute a Linear Model', summary: 'Linear Model' })
