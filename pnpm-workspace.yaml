@@ -26,6 +26,10 @@ catalog:
   '@douglasneuroinformatics/libui': ^6.20.0
   '@douglasneuroinformatics/libui-form-types': ^1.6.0
   '@microsoft/api-extractor': '^7.59.2'
+  '@nestjs/common': '^12.2.0'
+  '@nestjs/core': '^12.2.0'
+  '@nestjs/platform-fastify': '^12.2.0'
+  '@nestjs/testing': '^12.2.0'
   '@oxlint/plugins': '1.93.0'
   '@prisma/client': '^6.9.0'
   '@tailwindcss/vite': '4.3.3'
@@ -37,11 +41,12 @@ catalog:
   esbuild-wasm: '0.28.x'
   eslint-plugin-perfectionist: '5.9.0'
   eslint-plugin-playwright: '^2.12.1'
+  fastify: '^5.12.7'
   happy-dom: '~20.11.15'
   msgpackr: ^2.1.0
   motion: '13.4.4'
   neverthrow: ^8.2.0
-  nodemailer: ^10.0.11
+  nodemailer: ^10.2.1
   oxc-parser: '^0.150.0'
   oxfmt: '0.78.0'
   oxlint: '1.93.0'
@@ -76,8 +81,13 @@ hoistPattern:
 minimumReleaseAge: 10080 # 7 days
 minimumReleaseAgeExclude:
   - '@douglasneuroinformatics/*'
-  - find-my-way
   - type-fest@6.0.1
+overrides:
+  '@tailwindcss/typography>postcss-selector-parser': ^6.1.5
+  '@types/react': '-'
+  '@types/react-dom': '-'
+  sharp: ^0.35.5
+  'yaml@2': ^2.9.0
 # prisma-json-types-generator 3.x parses the generated client with the classic TypeScript compiler API,
 # which typescript@7 no longer ships. The patch under patchedDependencies points its require at this
 # package, which re-exports the TypeScript 6 API. Its 6.x line drops TypeScript, but requires Prisma 7.
