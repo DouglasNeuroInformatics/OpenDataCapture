@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+
 import { SubjectGraphPage } from '../pages/_app/datahub/subjects/$subjectId/graph.page';
 import { SubjectRecordDetailPage } from '../pages/_app/datahub/subjects/$subjectId/table/$recordId.page';
 import { HAPPINESS_RECORD } from '../support/constants';
@@ -56,5 +58,41 @@ test.describe('subject detail', () => {
     await expect(recordDetailPage.instrumentGroupHeading).toBeVisible();
     await expect(recordDetailPage.resultsGroupHeading).toBeVisible();
     await expect(page.getByText('Satisfaction With Personal Life')).toBeVisible();
+  });
+
+  test('should include fields absent from the first record in the subject table and wide CSV export', async ({
+    api,
+    isolatedGroupManager,
+    page,
+    uniqueId
+  }) => {
+    const group = await isolatedGroupManager();
+    const subjectId = `table-union-${uniqueId}`;
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    await api.uploadRecords(group.id, instrumentId, [
+      { data: HAPPINESS_RECORD, date: new Date('2026-01-10T12:00:00Z'), subjectId },
+      {
+        data: { ...HAPPINESS_RECORD, isSatisfiedOverall: false, reasonNotSatisfied: 'Not enough sleep' },
+        date: new Date('2026-01-11T12:00:00Z'),
+        subjectId
+      }
+    ]);
+
+    await page.goto(`/datahub/subjects/${subjectId}/table`);
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: INSTRUMENT_TITLE }).click();
+
+    const cells = page.getByTestId('subject-table-cell-reasonNotSatisfied');
+    await expect(cells).toHaveCount(2);
+    await expect(cells.filter({ hasText: 'Not enough sleep' })).toHaveCount(1);
+    await expect(cells.filter({ hasText: 'undefined' })).toHaveCount(0);
+
+    const downloadStarted = page.waitForEvent('download', (d) => d.suggestedFilename().endsWith('.csv'));
+    await page.getByRole('button', { name: 'Download' }).click();
+    await page.getByRole('menuitem', { exact: true, name: 'CSV' }).click();
+    const download = await downloadStarted;
+    const csv = await readFile(await download.path(), 'utf8');
+    expect(csv.split(/\r?\n/)[0]).toContain('reasonNotSatisfied');
+    expect(csv).toContain('Not enough sleep');
   });
 });

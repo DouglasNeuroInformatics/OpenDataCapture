@@ -70,6 +70,15 @@ describe('Route', () => {
     expect(headers()).toEqual(['DATE_COLLECTED', 'COLLECTION_METHOD', 'SERIES', 'TOTAL_SCORE']);
   });
 
+  it('should add a column for a field absent from the first record but present in a later one', () => {
+    renderTable([record({ __id__: 'record-1' }), record({ __id__: 'record-2', comments: 'Felt rested' })]);
+    expect(headers()).toEqual(['DATE_COLLECTED', 'COLLECTION_METHOD', 'SERIES', 'TOTAL_SCORE', 'COMMENTS']);
+    expect(screen.getAllByTestId('subject-table-cell-comments').map((cell) => cell.textContent)).toEqual([
+      '',
+      'Felt rested'
+    ]);
+  });
+
   it('should sort by a record field, since every column of the record table is sortable', () => {
     renderTable([record({ __id__: 'high', totalScore: 9 }), record({ __id__: 'low', totalScore: 1 })]);
     const button = within(screen.getByTestId('data-table-head')).getByText('TOTAL_SCORE').closest('button')!;

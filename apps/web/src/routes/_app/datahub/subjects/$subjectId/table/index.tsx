@@ -14,7 +14,7 @@ import { TruncatedCell } from '@/components/TruncatedCell';
 import { useInstrumentVisualization } from '@/hooks/useInstrumentVisualization';
 import type { InstrumentVisualizationRecord } from '@/hooks/useInstrumentVisualization';
 import { useRecordMetadataColumns } from '@/hooks/useRecordMetadataColumns';
-import { formatRecordValue } from '@/utils/record-value';
+import { extractRecordColumnKeys, formatRecordValue } from '@/utils/record-value';
 import { timeframeMinDate } from '@/utils/timeframe';
 
 const RouteComponent = () => {
@@ -27,24 +27,19 @@ const RouteComponent = () => {
 
   const { t } = useTranslation();
   const metadataColumns = useRecordMetadataColumns();
+  const columnKeys = useMemo(() => extractRecordColumnKeys(records), [records]);
 
   const columns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(() => {
-    const columns: TanstackTable.ColumnDef<InstrumentVisualizationRecord>[] = [];
-    for (const subItem in records[0]) {
-      if (!subItem.startsWith('__')) {
-        columns.push({
-          accessorKey: subItem,
-          cell: (ctx) => {
-            const value = formatRecordValue(ctx.getValue());
-            return <TruncatedCell data-testid={`subject-table-cell-${subItem}`} title={String(value)} value={value} />;
-          },
-          header: ({ column }) => <SortableHeader column={column} label={camelToSnakeCase(subItem).toUpperCase()} />,
-          id: subItem
-        });
-      }
-    }
-    return columns;
-  }, [records[0]]);
+    return columnKeys.map((subItem) => ({
+      accessorKey: subItem,
+      cell: (ctx) => {
+        const value = formatRecordValue(ctx.getValue());
+        return <TruncatedCell data-testid={`subject-table-cell-${subItem}`} title={value} value={value} />;
+      },
+      header: ({ column }) => <SortableHeader column={column} label={camelToSnakeCase(subItem).toUpperCase()} />,
+      id: subItem
+    }));
+  }, [columnKeys]);
 
   return (
     <div>

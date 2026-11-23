@@ -462,6 +462,19 @@ describe('useInstrumentVisualization', () => {
       expect(mockExcelDownloadFn.mock.calls[0]?.[1]).toMatchObject([{ nested: '{"x":1}' }]);
     });
 
+    it('should export every field any record has in a wide table, so an answer missing from the first record is not dropped', async () => {
+      const result = await renderWithRecords([
+        ...createMockRecords({ score: 8 }),
+        { ...createMockRecords({ comments: 'Felt rested', score: 6 })[0]!, id: 'record-2' }
+      ]);
+      act(() => result.current.dl('CSV'));
+      const [, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
+      const [header, firstRow, secondRow] = (getContentFn() as string).split('\r\n');
+      expect(header).toContain('score,comments');
+      expect(firstRow!.endsWith('8,')).toBe(true);
+      expect(secondRow!.endsWith('6,Felt rested')).toBe(true);
+    });
+
     it('should export each entry of a record array as its own variable in a long table', async () => {
       const result = await renderWithRecords(createMockRecords({ items: [{ a: 1, b: 2 }] }));
       act(() => result.current.dl('Excel Long'));
