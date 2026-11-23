@@ -184,4 +184,17 @@ test.describe('instrument completion', () => {
     expect(second.id).not.toBe(first.id);
     expect([first.assignmentId ?? null, second.assignmentId ?? null]).toEqual([null, null]);
   });
+
+  test('should administer the Breakout Task and record active game time', async ({ getPageModel, page, uniqueId }) => {
+    test.slow();
+    const instrumentPage = await beginInstrument(getPageModel, page, `Breakout${uniqueId}`, 'Breakout Task');
+    const frame = page.frameLocator('iframe[name="interactive-instrument"]');
+    await frame.getByRole('button', { name: 'Start' }).click();
+
+    await expect(instrumentPage.summaryHeading).toBeVisible({ timeout: 35_000 });
+
+    await openSubjectRecords(page, 'Breakout Task');
+    await expect(page.getByTestId('subject-table-cell-livesRemaining').first()).toHaveText('0');
+    await expect(page.getByTestId('subject-table-cell-timeElapsed').first()).toHaveText(/^[1-9]\d*$/);
+  });
 });

@@ -5,6 +5,9 @@ import './styles.css';
 
 const BASE_HEIGHT = 320;
 const BASE_WIDTH = 480;
+const TICK_MS = 1000 / 60;
+const TICK_TOLERANCE_MS = 1;
+const MAX_BACKLOG_MS = 3 * TICK_MS;
 
 const $Data = z.object({
   livesRemaining: z.number().int(),
@@ -26,9 +29,12 @@ function getScale() {
 }
 
 function runTask(root: HTMLDivElement, onComplete: (data: Data) => void) {
-  const startTime = Date.now();
   const ratio = window.devicePixelRatio * 3;
   const scale = getScale();
+
+  let lastTimestamp = performance.now();
+  let backlogMs = 0;
+  let ticksPlayed = 0;
 
   const canvas = document.createElement('canvas');
 
@@ -98,7 +104,7 @@ function runTask(root: HTMLDivElement, onComplete: (data: Data) => void) {
     }
   };
 
-  const collisionDetection = () => {
+  const collisionDetection = (): boolean => {
     for (let i = 0; i < brickColumnCount; i++) {
       for (let j = 0; j < brickRowCount; j++) {
         const b = bricks[i]![j]!;
@@ -109,12 +115,14 @@ function runTask(root: HTMLDivElement, onComplete: (data: Data) => void) {
           if (score === brickRowCount * brickColumnCount) {
             onComplete({
               livesRemaining: lives,
-              timeElapsed: Date.now() - startTime
+              timeElapsed: Math.round(ticksPlayed * TICK_MS)
             });
+            return true;
           }
         }
       }
     }
+    return false;
   };
 
   const drawBall = () => {
@@ -163,14 +171,19 @@ function runTask(root: HTMLDivElement, onComplete: (data: Data) => void) {
     ctx.fillText(`Lives: ${lives}`, width - 65, 20);
   };
 
-  const draw = () => {
+  const renderFrame = () => {
     ctx.clearRect(0, 0, width, height);
     drawBricks();
     drawBall();
     drawPaddle();
     drawScore();
     drawLives();
-    collisionDetection();
+  };
+
+  const tick = (): boolean => {
+    if (collisionDetection()) {
+      return true;
+    }
 
     if (x + dx > width - ballRadius || x + dx < ballRadius) {
       dx = -dx;
@@ -185,26 +198,43 @@ function runTask(root: HTMLDivElement, onComplete: (data: Data) => void) {
         if (!lives) {
           onComplete({
             livesRemaining: lives,
-            timeElapsed: Date.now() - startTime
+            timeElapsed: Math.round(ticksPlayed * TICK_MS)
           });
-        } else {
-          x = width / 2;
-          y = height - 30;
-          dx = 2 * scale;
-          dy = -2 * scale;
-          paddleX = (width - paddleWidth) / 2;
+          return true;
         }
+        x = width / 2;
+        y = height - 30;
+        dx = 2 * scale;
+        dy = -2 * scale;
+        paddleX = (width - paddleWidth) / 2;
       }
     }
 
     if (rightPressed && paddleX < width - paddleWidth) {
-      paddleX += 7;
+      paddleX += 7 * scale;
     } else if (leftPressed && paddleX > 0) {
-      paddleX -= 7;
+      paddleX -= 7 * scale;
     }
 
     x += dx;
     y += dy;
+    return false;
+  };
+
+  const draw = (timestamp?: number) => {
+    renderFrame();
+    const elapsedMs = timestamp === undefined ? TICK_MS : Math.max(0, timestamp - lastTimestamp);
+    if (timestamp !== undefined) {
+      lastTimestamp = timestamp;
+    }
+    backlogMs = Math.min(backlogMs + elapsedMs, MAX_BACKLOG_MS);
+    while (backlogMs >= TICK_MS - TICK_TOLERANCE_MS) {
+      ticksPlayed++;
+      backlogMs -= TICK_MS;
+      if (tick()) {
+        return;
+      }
+    }
     requestAnimationFrame(draw);
   };
 
@@ -256,7 +286,7 @@ export default defineInstrument({
     title: 'Breakout Task'
   },
   internal: {
-    edition: 1,
+    edition: 2,
     name: 'DNP_BREAKOUT_TASK'
   },
   kind: 'INTERACTIVE',
