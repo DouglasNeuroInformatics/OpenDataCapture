@@ -33,7 +33,10 @@ export type ScalarInstrumentRendererProps = {
   disableBegin?: boolean;
   /** Whether to disable copy, download, print in the final summary */
   disableSummaryActions?: boolean;
-  /** The language to run the instrument in, leaving the interface language alone. Defaults to the interface language. */
+  /**
+   * The language to run the instrument in, leaving the interface language alone. Defaults to the interface language.
+   * Naming one also skips an interactive instrument's own language selection screen, since the choice is made.
+   */
   language?: Language;
   NavigationBlocker?: NavigationBlockerComponent;
   /** @deprecated */
@@ -140,7 +143,7 @@ export const ScalarInstrumentRenderer = ({
                 bundle={target.bundle}
                 defaultFullscreen={instrument.content.defaultFullscreen}
                 enableLanguageLock={instrument.content.enableLanguageLock}
-                enableLanguageSelect={instrument.content.enableLanguageSelect}
+                enableLanguageSelect={language === undefined && instrument.content.enableLanguageSelect}
                 enableLanguageToggle={instrument.content.enableLanguageToggle}
                 language={contentLanguage}
                 supportedLanguages={instrument.supportedLanguages}

@@ -19,7 +19,10 @@ export type InstrumentRendererProps = {
   /** Whether to disable copy, download, print in the final summary */
   disableSummaryActions?: boolean;
   initialSeriesIndex?: number;
-  /** The language to run the instrument in, leaving the interface language alone. Defaults to the interface language. */
+  /**
+   * The language to run the instrument in, leaving the interface language alone. Defaults to the interface language.
+   * Naming one also skips an interactive instrument's own language selection screen, since the choice is made.
+   */
   language?: Language;
   NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: InstrumentSubmitHandler;
