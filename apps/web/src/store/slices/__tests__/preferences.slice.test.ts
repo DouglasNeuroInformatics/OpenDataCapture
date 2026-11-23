@@ -18,12 +18,7 @@ describe('createPreferencesSlice', () => {
     store = createStore();
   });
 
-  it('should place the group switcher in the sidebar and prefer no group by default', () => {
-    expect(store.getState()).toMatchObject({ groupSwitcherPosition: 'sidebar', preferredGroupId: null });
-  });
-
-  it('should move the group switcher to the position the user chose', () => {
-    store.getState().setGroupSwitcherPosition('topbar');
-    expect(store.getState().groupSwitcherPosition).toBe('topbar');
+  it('should prefer no group by default, so a first login does not land in an arbitrary one', () => {
+    expect(store.getState()).toMatchObject({ preferredGroupId: null });
   });
 });

@@ -4,7 +4,6 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Route } from '@/routes/_app/admin/settings';
-import type { GroupSwitcherPosition } from '@/store/types';
 
 import '@/services/i18n';
 
@@ -19,14 +18,12 @@ type SetupStateData = {
 type MutateCallbacks = { onError: () => void; onSuccess: () => void };
 
 const mocks = vi.hoisted(() => {
-  const state: { groupSwitcherPosition: GroupSwitcherPosition; setupState: SetupStateData } = {
-    groupSwitcherPosition: 'sidebar',
+  const state: { setupState: SetupStateData } = {
     setupState: { activeLanguages: ['en'], tableColorMode: 'tags' }
   };
   return {
     config: { setup: { isGatewayEnabled: true } },
     mutate: vi.fn<(data: $UpdateSetupStateData, callbacks: MutateCallbacks) => void>(),
-    setGroupSwitcherPosition: vi.fn<(position: GroupSwitcherPosition) => void>(),
     state,
     useUpdateSetupStateMutation: vi.fn()
   };
@@ -42,20 +39,6 @@ vi.mock('@/hooks/useUpdateSetupStateMutation', () => ({
     return { mutate: mocks.mutate };
   }
 }));
-vi.mock('@/store', () => ({
-  useAppStore: <TSelected,>(
-    selector: (store: {
-      groupSwitcherPosition: GroupSwitcherPosition;
-      setGroupSwitcherPosition: typeof mocks.setGroupSwitcherPosition;
-    }) => TSelected
-  ) => {
-    return selector({
-      groupSwitcherPosition: mocks.state.groupSwitcherPosition,
-      setGroupSwitcherPosition: mocks.setGroupSwitcherPosition
-    });
-  }
-}));
-
 const Page = Route.options.component!;
 
 const renderPage = () => render(<Page />);
@@ -72,7 +55,6 @@ describe('Route', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.config.setup.isGatewayEnabled = true;
-    mocks.state.groupSwitcherPosition = 'sidebar';
     mocks.state.setupState = { activeLanguages: ['en'], tableColorMode: 'tags' };
   });
 
@@ -353,21 +335,6 @@ describe('Route', () => {
       fireEvent.keyDown(screen.getByTestId('table-color-mode-select'), { key: 'Enter' });
       fireEvent.click(screen.getByTestId('table-color-mode-option-text'));
       expect(savedData()).toEqual([{ tableColorMode: 'text' }]);
-    });
-  });
-
-  describe('group switcher position', () => {
-    it('should show the position this browser has stored', () => {
-      mocks.state.groupSwitcherPosition = 'topbar';
-      renderPage();
-      expect(screen.getByTestId('group-switcher-position-select').textContent).toBe('Top Right Corner');
-    });
-
-    it('should store the position the admin chooses', () => {
-      renderPage();
-      fireEvent.keyDown(screen.getByTestId('group-switcher-position-select'), { key: 'Enter' });
-      fireEvent.click(screen.getByRole('option', { name: 'Top Right Corner' }));
-      expect(mocks.setGroupSwitcherPosition).toHaveBeenCalledWith('topbar');
     });
   });
 });

@@ -17,7 +17,6 @@ import { NavGroup } from '../NavGroup';
 import { UserDropup } from '../UserDropup';
 
 export const Sidebar = () => {
-  const groupSwitcherPosition = useAppStore((store) => store.groupSwitcherPosition);
   const isGroupSwitcherVisible = useIsGroupSwitcherVisible();
   const navItems = useNavItems();
   const currentSession = useAppStore((store) => store.currentSession);
@@ -35,7 +34,7 @@ export const Sidebar = () => {
         <Branding className="h-12" fontSize="md" logoVariant="light" />
       </div>
       <hr className="my-2 h-px border-none bg-slate-700" />
-      {groupSwitcherPosition === 'sidebar' && isGroupSwitcherVisible && (
+      {isGroupSwitcherVisible && (
         <div className="mb-2">
           <GroupSwitcher />
           <hr className="mt-2 h-px border-none bg-slate-700" />

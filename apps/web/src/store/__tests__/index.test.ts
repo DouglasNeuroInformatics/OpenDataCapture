@@ -30,7 +30,7 @@ describe('useAppStore', () => {
 
   it('should compose every slice into one store', () => {
     expect(Object.keys(useAppStore.getState())).toEqual(
-      expect.arrayContaining(['accessToken', 'pendingRetries', 'isDisclaimerAccepted', 'groupSwitcherPosition'])
+      expect.arrayContaining(['accessToken', 'pendingRetries', 'isDisclaimerAccepted', 'preferredGroupId'])
     );
     expect(Object.keys(useAppStore.getState())).toEqual(
       expect.arrayContaining(['currentSession', 'isWalkthroughComplete'])
@@ -41,24 +41,22 @@ describe('useAppStore', () => {
     useAppStore.setState({
       accessToken: 'secret',
       currentSession: session,
-      groupSwitcherPosition: 'topbar',
       isDisclaimerAccepted: true,
       isWalkthroughComplete: true,
       preferredGroupId: 'group-1'
     });
     expect(readPersistedState()).toEqual({
       state: {
-        groupSwitcherPosition: 'topbar',
         isDisclaimerAccepted: true,
         isWalkthroughComplete: true,
         preferredGroupId: 'group-1'
       },
-      version: 1
+      version: 2
     });
   });
 
   it('should restore persisted preferences when the app loads', async () => {
-    localStorage.setItem('app', JSON.stringify({ state: { isDisclaimerAccepted: true }, version: 1 }));
+    localStorage.setItem('app', JSON.stringify({ state: { isDisclaimerAccepted: true }, version: 2 }));
     const freshStore = await importFreshStore();
     expect(freshStore.getState().isDisclaimerAccepted).toBe(true);
   });
@@ -66,15 +64,25 @@ describe('useAppStore', () => {
   it('should carry preferences across a store version bump, so an upgrade does not reset them', async () => {
     localStorage.setItem(
       'app',
-      JSON.stringify({ state: { groupSwitcherPosition: 'topbar', isWalkthroughComplete: true }, version: 0 })
+      JSON.stringify({ state: { isWalkthroughComplete: true, preferredGroupId: 'group-1' }, version: 0 })
     );
     const freshStore = await importFreshStore();
-    expect(freshStore.getState()).toMatchObject({ groupSwitcherPosition: 'topbar', isWalkthroughComplete: true });
+    expect(freshStore.getState()).toMatchObject({ isWalkthroughComplete: true, preferredGroupId: 'group-1' });
   });
 
   it('should drop stale keys from an older store version, so they never leak back into the store', async () => {
     localStorage.setItem('app', JSON.stringify({ state: { accessToken: 'stale', pendingRetries: 3 }, version: 0 }));
     const freshStore = await importFreshStore();
     expect(freshStore.getState()).toMatchObject({ accessToken: null, pendingRetries: 0 });
+  });
+
+  it('should drop a preference this version no longer has, so a browser that stored one is not left holding it', async () => {
+    localStorage.setItem(
+      'app',
+      JSON.stringify({ state: { groupSwitcherPosition: 'topbar', isDisclaimerAccepted: true }, version: 1 })
+    );
+    const freshStore = await importFreshStore();
+    expect(freshStore.getState()).toMatchObject({ isDisclaimerAccepted: true });
+    expect(Object.keys(freshStore.getState())).not.toContain('groupSwitcherPosition');
   });
 });
