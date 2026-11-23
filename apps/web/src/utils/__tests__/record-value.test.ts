@@ -1,7 +1,7 @@
 import { reviver } from '@douglasneuroinformatics/libjs';
 import { describe, expect, it } from 'vitest';
 
-import { extractRecordColumnKeys, formatRecordValue } from '../record-value';
+import { extractRecordColumnKeys, formatRecordValue, serializeExportValue } from '../record-value';
 
 describe('extractRecordColumnKeys', () => {
   it('should return the union of non-internal keys across all records in first-seen order', () => {
@@ -36,10 +36,11 @@ describe('formatRecordValue', () => {
     expect(formatRecordValue(new Set())).toBe('');
   });
 
-  it('should format dates and plain objects without falling back to [object Object]', () => {
+  it('should format dates, nested sets and plain objects without falling back to [object Object]', () => {
     const date = new Date('2026-01-15T00:00:00.000Z');
     expect(formatRecordValue(date)).toBe(date.toString());
     expect(formatRecordValue({ a: 1 })).toBe('{"a":1}');
+    expect(formatRecordValue([{ tags: new Set(['FRIENDS', 'MONEY']) }])).toBe('[{"tags":"FRIENDS, MONEY"}]');
   });
 
   it('should render scalar and null values in their string form', () => {
@@ -47,5 +48,28 @@ describe('formatRecordValue', () => {
     expect(formatRecordValue(false)).toBe('false');
     expect(formatRecordValue('text')).toBe('text');
     expect(formatRecordValue(null)).toBe('null');
+  });
+});
+
+describe('serializeExportValue', () => {
+  it('should map null and undefined to null so exported cells are empty', () => {
+    expect(serializeExportValue(null)).toBeNull();
+    expect(serializeExportValue(undefined)).toBeNull();
+  });
+
+  it('should write UTC-midnight dates as calendar dates and other instants as ISO timestamps', () => {
+    expect(serializeExportValue(new Date('2000-01-02T00:00:00.000Z'))).toBe('2000-01-02');
+    expect(serializeExportValue(new Date('2000-01-02T14:30:00.000Z'))).toBe('2000-01-02T14:30:00.000Z');
+  });
+
+  it('should format sets at top level and inside serialized objects', () => {
+    expect(serializeExportValue(new Set(['A', 'B']))).toBe('A, B');
+    expect(serializeExportValue({ plain: 1, tags: new Set(['A', 'B']) })).toBe('{"plain":1,"tags":"A, B"}');
+  });
+
+  it('should preserve primitive boolean, number and string values', () => {
+    expect(serializeExportValue(true)).toBe(true);
+    expect(serializeExportValue(42)).toBe(42);
+    expect(serializeExportValue('hello')).toBe('hello');
   });
 });
