@@ -1,6 +1,6 @@
 {
   "name": "@opendatacapture/instrument-guidelines",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "Guidelines for authoring Open Data Capture instruments, intended to be read by an AI agent (e.g. Claude Code).",
   "keywords": [
     "agent",
