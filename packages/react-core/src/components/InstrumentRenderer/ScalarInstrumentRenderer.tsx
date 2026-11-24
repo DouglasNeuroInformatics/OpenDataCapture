@@ -141,12 +141,9 @@ export const ScalarInstrumentRenderer = ({
             .with({ index: 1, instrument: { kind: 'INTERACTIVE' } }, ({ instrument }) => (
               <InteractiveContent
                 bundle={target.bundle}
-                defaultFullscreen={instrument.content.defaultFullscreen}
-                enableLanguageLock={instrument.content.enableLanguageLock}
-                enableLanguageSelect={language === undefined && instrument.content.enableLanguageSelect}
-                enableLanguageToggle={instrument.content.enableLanguageToggle}
+                instrument={instrument}
                 language={contentLanguage}
-                supportedLanguages={instrument.supportedLanguages}
+                skipLanguageSelect={language !== undefined}
                 onChangeLanguage={changeContentLanguage}
                 onLockLanguage={holdContentLanguage}
                 onSubmit={createSubmitHandler(instrument)}

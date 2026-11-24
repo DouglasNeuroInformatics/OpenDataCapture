@@ -136,14 +136,16 @@ export class ApiClient {
     );
   }
 
-  /** Assembles a series owned by the group out of the first two forms available, returning its id. */
-  async createSeries(groupId: string, title: string): Promise<string> {
-    const items = (await this.getInstrumentInfo())
-      .flatMap((info) => (info.kind === 'FORM' ? [{ edition: info.internal.edition, name: info.internal.name }] : []))
-      .slice(0, 2);
+  /** Assembles a series owned by the group, defaulting to the first two forms available, and returns its id. */
+  async createSeries(groupId: string, title: string, items?: { edition: number; name: string }[]): Promise<string> {
+    const resolvedItems =
+      items ??
+      (await this.getInstrumentInfo())
+        .flatMap((info) => (info.kind === 'FORM' ? [{ edition: info.internal.edition, name: info.internal.name }] : []))
+        .slice(0, 2);
     const result = await this.expectJson<{ instrumentId: string; outcome: 'created' }>(
       this.request.post(`${API}/instruments/series`, {
-        data: { confirmDuplicate: true, details: { title }, groupId, items, language: 'en' },
+        data: { confirmDuplicate: true, details: { title }, groupId, items: resolvedItems, language: 'en' },
         headers: this.authHeaders
       }),
       201,

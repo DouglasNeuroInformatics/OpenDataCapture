@@ -83,15 +83,29 @@ function getAnswerInput(): HTMLInputElement {
   return screen.getByLabelText('Answer');
 }
 
-function createInteractiveItemBundle({ schema = '__testInteractiveValidationSchema', withInternal = true } = {}) {
+function createInteractiveItemBundle({
+  bilingual = false,
+  content = '{}',
+  schema = '__testInteractiveValidationSchema',
+  withInternal = true
+}: {
+  bilingual?: boolean;
+  content?: string;
+  schema?: string;
+  withInternal?: boolean;
+} = {}) {
   return `(async () => ({
     __runtimeVersion: 1,
     kind: 'INTERACTIVE',
-    language: 'en',
-    tags: ['Test'],
+    language: ${bilingual ? "['en', 'fr']" : "'en'"},
+    tags: ${bilingual ? "{ en: ['Test'], fr: ['Test'] }" : "['Test']"},
     ${withInternal ? "internal: { edition: 1, name: 'INTERACTIVE_ITEM' }," : ''}
-    content: {},
-    details: { description: 'An interactive series item', license: 'Apache-2.0', title: 'Interactive Item' },
+    content: ${content},
+    details: ${
+      bilingual
+        ? "{ description: { en: 'An interactive series item', fr: 'Un élément interactif' }, license: 'Apache-2.0', title: { en: 'Interactive Item', fr: 'Élément interactif' } }"
+        : "{ description: 'An interactive series item', license: 'Apache-2.0', title: 'Interactive Item' }"
+    },
     measures: null,
     validationSchema: globalThis.${schema}
   }))()`;
@@ -175,7 +189,9 @@ describe('SeriesInstrumentRenderer', () => {
 
   afterEach(() => {
     cleanup();
+    i18n.changeLanguage('en');
     NavigationBlocker.mockClear();
+    Reflect.deleteProperty(HTMLElement.prototype, 'requestFullscreen');
     vi.restoreAllMocks();
     useNotificationsStore.setState({ notifications: [] });
     Reflect.deleteProperty(globalThis, '__testSeriesParams');
@@ -309,6 +325,83 @@ describe('SeriesInstrumentRenderer', () => {
     await waitFor(() => {
       expect(screen.getByText('Thank You!')).toBeTruthy();
     });
+  });
+
+  it('should show the language selection screen for an interactive item that enables it, as the scalar renderer does', async () => {
+    globalThis.__testSeriesParams = { skipProgress: true };
+    const item = createInteractiveItemBundle({ bilingual: true, content: '{ enableLanguageSelect: true }' });
+    render(<SeriesInstrumentRenderer target={createParamsTarget([item])} onSubmit={vi.fn()} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    expect(await screen.findByText('Select Language')).toBeTruthy();
+    expect(document.querySelector('iframe')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /Français/ }));
+    const iframe = await screen.findByTitle('Open Data Capture - Interactive Instrument');
+    expect(iframe.getAttribute('lang')).toBe('fr');
+  });
+
+  it('should skip the language selection screen for an interactive item when the host names a language', async () => {
+    globalThis.__testSeriesParams = { skipProgress: true };
+    const item = createInteractiveItemBundle({ bilingual: true, content: '{ enableLanguageSelect: true }' });
+    render(<SeriesInstrumentRenderer language="fr" target={createParamsTarget([item])} onSubmit={vi.fn()} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    const iframe = await screen.findByTitle('Open Data Capture - Interactive Instrument');
+    expect(iframe.getAttribute('lang')).toBe('fr');
+    expect(screen.queryByText('Select Language')).toBeNull();
+  });
+
+  it('should hold a locked interactive item in its language when the interface language changes', async () => {
+    globalThis.__testSeriesParams = { skipProgress: true };
+    const item = createInteractiveItemBundle({ bilingual: true, content: '{ enableLanguageLock: true }' });
+    render(<SeriesInstrumentRenderer target={createParamsTarget([item])} onSubmit={vi.fn()} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    await screen.findByTitle('Open Data Capture - Interactive Instrument');
+    act(() => i18n.changeLanguage('fr'));
+    const iframe = await screen.findByTitle('Open Data Capture - Interactive Instrument');
+    expect(iframe.getAttribute('lang')).toBe('en');
+  });
+
+  it('should release a locked item language when advancing, so an unlocked next item follows the interface', async () => {
+    globalThis.__testSeriesParams = { skipProgress: true };
+    const lockedItem = createInteractiveItemBundle({ bilingual: true, content: '{ enableLanguageLock: true }' });
+    const unlockedItem = createInteractiveItemBundle({ bilingual: true });
+    render(<SeriesInstrumentRenderer target={createParamsTarget([lockedItem, unlockedItem])} onSubmit={vi.fn()} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    await screen.findByTitle('Open Data Capture - Interactive Instrument');
+    act(() => i18n.changeLanguage('fr'));
+    await finishInteractiveItem();
+    await waitFor(() => {
+      expect(screen.getByTitle('Open Data Capture - Interactive Instrument').getAttribute('lang')).toBe('fr');
+    });
+  });
+
+  it('should switch the interface language again from the next item after a locked item finishes', async () => {
+    globalThis.__testSeriesParams = { skipProgress: true };
+    const item = createInteractiveItemBundle({
+      bilingual: true,
+      content: '{ enableLanguageLock: true, enableLanguageSelect: true }'
+    });
+    render(<SeriesInstrumentRenderer target={createParamsTarget([item, item])} onSubmit={vi.fn()} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    fireEvent.click(await screen.findByRole('button', { name: /Français/ }));
+    await finishInteractiveItem();
+    fireEvent.click(await screen.findByRole('button', { name: /English/ }));
+    await screen.findByTitle('Open Data Capture - Interactive Instrument');
+    expect(i18n.resolvedLanguage).toBe('en');
+  });
+
+  it('should enter fullscreen and offer the language toggle for an interactive item that enables them', async () => {
+    const requestFullscreen = vi.fn(() => Promise.resolve());
+    Object.defineProperty(HTMLElement.prototype, 'requestFullscreen', { configurable: true, value: requestFullscreen });
+    globalThis.__testSeriesParams = { skipProgress: true };
+    const item = createInteractiveItemBundle({
+      bilingual: true,
+      content: '{ defaultFullscreen: true, enableLanguageToggle: true }'
+    });
+    render(<SeriesInstrumentRenderer target={createParamsTarget([item])} onSubmit={vi.fn()} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    const iframe = await screen.findByTitle('Open Data Capture - Interactive Instrument');
+    expect(requestFullscreen.mock.contexts[0]).toBe(iframe);
+    expect(screen.getAllByRole('button').length).toBeGreaterThan(3);
   });
 
   it('should show a placeholder when the series bundle itself fails to interpret', async () => {

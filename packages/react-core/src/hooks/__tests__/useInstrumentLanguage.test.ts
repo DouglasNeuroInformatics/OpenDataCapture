@@ -55,6 +55,23 @@ describe('useInstrumentLanguage', () => {
     expect(result.current.contentLanguage).toBe('en');
   });
 
+  it('should follow and switch the interface language again once a held lock is released', () => {
+    const { result } = renderHook(() => useInstrumentLanguage());
+    act(() => result.current.holdContentLanguage('en'));
+    act(() => i18n.changeLanguage('fr'));
+    act(() => result.current.releaseContentLanguage());
+    expect(result.current.contentLanguage).toBe('fr');
+    act(() => result.current.changeContentLanguage('en'));
+    expect(i18n.resolvedLanguage).toBe('en');
+  });
+
+  it('should keep a requested language when an item lock is released', () => {
+    const { result } = renderHook(() => useInstrumentLanguage('fr'));
+    act(() => result.current.holdContentLanguage('fr'));
+    act(() => result.current.releaseContentLanguage());
+    expect(result.current.contentLanguage).toBe('fr');
+  });
+
   it('should follow the interface language again once nothing is requested', () => {
     const { rerender, result } = renderHook((language?: 'en' | 'fr') => useInstrumentLanguage(language), {
       initialProps: 'fr' as 'en' | 'fr' | undefined

@@ -34,7 +34,10 @@ export type SeriesInstrumentRendererProps = {
   /** When true, the "Begin" button on the overview screen is disabled. */
   disableBegin?: boolean;
   initialSeriesIndex?: number;
-  /** The language to run the instrument in, leaving the interface language alone. Defaults to the interface language. */
+  /**
+   * The language to run the instrument in, leaving the interface language alone. Defaults to the interface language.
+   * Naming one also skips an interactive instrument's own language selection screen, since the choice is made.
+   */
   language?: Language;
   NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: InstrumentSubmitHandler<'SERIES'>;
@@ -71,7 +74,8 @@ export const SeriesInstrumentRenderer = ({
   const scalarBundle = target.items[currentItemIndex]?.bundle;
   const scalarId = target.items[currentItemIndex]?.id;
 
-  const { changeContentLanguage, contentLanguage, holdContentLanguage } = useInstrumentLanguage(language);
+  const { changeContentLanguage, contentLanguage, holdContentLanguage, releaseContentLanguage } =
+    useInstrumentLanguage(language);
   const rootState = useInterpretedInstrument<UnilingualSeriesInstrument>(target.bundle, undefined, contentLanguage);
   const scalarState = useInterpretedInstrument<AnyUnilingualScalarInstrument>(
     scalarBundle ?? '',
@@ -118,6 +122,7 @@ export const SeriesInstrumentRenderer = ({
       if (isLastItem || shouldTerminate) {
         setCompletion({ itemName, terminated: shouldTerminate });
       }
+      releaseContentLanguage();
       if (shouldTerminate) {
         setIndex(2);
         return;
@@ -222,8 +227,10 @@ export const SeriesInstrumentRenderer = ({
                     .with({ instrument: { kind: 'INTERACTIVE' } }, ({ instrument }) => (
                       <InteractiveContent
                         bundle={scalarBundle!}
+                        instrument={instrument}
                         key={currentItemIndex}
                         language={contentLanguage}
+                        skipLanguageSelect={language !== undefined}
                         onChangeLanguage={changeContentLanguage}
                         onLockLanguage={holdContentLanguage}
                         onSubmit={createSubmitHandler(instrument)}
