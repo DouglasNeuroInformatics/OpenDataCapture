@@ -65,7 +65,7 @@ export const ScalarInstrumentRenderer = ({
   target
 }: ScalarInstrumentRendererProps) => {
   const [data, setData] = useState<unknown>();
-  const [contentLanguage, changeContentLanguage] = useInstrumentLanguage(language);
+  const { changeContentLanguage, contentLanguage, holdContentLanguage } = useInstrumentLanguage(language);
   const interpreted = useInterpretedInstrument<AnyUnilingualScalarInstrument>(target.bundle, options, contentLanguage);
   const [index, setIndex] = useState<0 | 1 | 2>(0);
   const { t } = useTranslation();
@@ -148,6 +148,7 @@ export const ScalarInstrumentRenderer = ({
                 language={contentLanguage}
                 supportedLanguages={instrument.supportedLanguages}
                 onChangeLanguage={changeContentLanguage}
+                onLockLanguage={holdContentLanguage}
                 onSubmit={createSubmitHandler(instrument)}
               />
             ))

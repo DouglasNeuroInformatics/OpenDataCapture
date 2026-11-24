@@ -17,11 +17,13 @@ declare global {
   var __testValidationSchema: z.ZodTypeAny;
   var __testFileValidationSchema: z.ZodTypeAny;
   var __testRejectingSchema: z.ZodTypeAny;
+  var __testInteractiveValidationSchema: z.ZodTypeAny;
 }
 
 globalThis.__testValidationSchema = z.object({ answer: z.string().min(1) });
 globalThis.__testFileValidationSchema = z.any();
 globalThis.__testRejectingSchema = z.never();
+globalThis.__testInteractiveValidationSchema = z.object({});
 
 const FORM_BUNDLE = `(async () => ({
   __runtimeVersion: 1,
@@ -86,8 +88,14 @@ const BILINGUAL_INTERACTIVE_BUNDLE = `(async () => ({
     license: 'Apache-2.0',
     title: { en: 'Stub Interactive', fr: 'Instrument interactif' }
   },
-  measures: null
+  measures: null,
+  validationSchema: globalThis.__testInteractiveValidationSchema
 }))()`;
+
+const LOCKED_INTERACTIVE_BUNDLE = BILINGUAL_INTERACTIVE_BUNDLE.replace(
+  'content: {}',
+  'content: { enableLanguageLock: true }'
+);
 
 const SELECTING_INTERACTIVE_BUNDLE = BILINGUAL_INTERACTIVE_BUNDLE.replace(
   'content: {}',
@@ -143,6 +151,7 @@ describe('ScalarInstrumentRenderer', () => {
 
   afterEach(() => {
     cleanup();
+    i18n.changeLanguage('en');
     NavigationBlocker.mockClear();
     vi.restoreAllMocks();
     useNotificationsStore.setState({ notifications: [] });
@@ -201,6 +210,40 @@ describe('ScalarInstrumentRenderer', () => {
     await beginAt(SELECTING_INTERACTIVE_BUNDLE, vi.fn(), 'fr');
     expect(await findIframeLanguage()).toBe('fr');
     expect(screen.queryByText('Select Language')).toBeNull();
+  });
+
+  it('should hold a locked interactive instrument in its language when the interface language changes, as a header toggle does', async () => {
+    await beginAt(LOCKED_INTERACTIVE_BUNDLE);
+    await findIframeLanguage();
+    act(() => i18n.changeLanguage('fr'));
+    expect(await findIframeLanguage()).toBe('en');
+  });
+
+  it('should hold a locked interactive instrument in the language selected for it when the interface language changes', async () => {
+    await beginAt(SELECTING_INTERACTIVE_BUNDLE);
+    fireEvent.click(await screen.findByRole('button', { name: /Français/ }));
+    await findIframeLanguage();
+    act(() => i18n.changeLanguage('en'));
+    expect(await findIframeLanguage()).toBe('fr');
+  });
+
+  it('should summarize a locked interactive instrument in the language it ran in, though the interface language changed', async () => {
+    await beginAt(LOCKED_INTERACTIVE_BUNDLE);
+    await findIframeLanguage();
+    act(() => i18n.changeLanguage('fr'));
+    act(() => {
+      document.dispatchEvent(new CustomEvent('done', { detail: {} }));
+    });
+    expect(await screen.findByText('Stub Interactive')).toBeTruthy();
+  });
+
+  it('should keep an unlocked interactive instrument in step with the interface language', async () => {
+    await beginAt(BILINGUAL_INTERACTIVE_BUNDLE);
+    await findIframeLanguage();
+    act(() => i18n.changeLanguage('fr'));
+    await waitFor(() => {
+      expect(document.querySelector('iframe')?.getAttribute('lang')).toBe('fr');
+    });
   });
 
   it('should render FileInstrumentContent for a FILE instrument', async () => {

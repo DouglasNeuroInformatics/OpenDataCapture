@@ -71,7 +71,7 @@ export const SeriesInstrumentRenderer = ({
   const scalarBundle = target.items[currentItemIndex]?.bundle;
   const scalarId = target.items[currentItemIndex]?.id;
 
-  const [contentLanguage, changeContentLanguage] = useInstrumentLanguage(language);
+  const { changeContentLanguage, contentLanguage, holdContentLanguage } = useInstrumentLanguage(language);
   const rootState = useInterpretedInstrument<UnilingualSeriesInstrument>(target.bundle, undefined, contentLanguage);
   const scalarState = useInterpretedInstrument<AnyUnilingualScalarInstrument>(
     scalarBundle ?? '',
@@ -225,6 +225,7 @@ export const SeriesInstrumentRenderer = ({
                         key={currentItemIndex}
                         language={contentLanguage}
                         onChangeLanguage={changeContentLanguage}
+                        onLockLanguage={holdContentLanguage}
                         onSubmit={createSubmitHandler(instrument)}
                       />
                     ))
