@@ -4,6 +4,12 @@ Every release of Open Data Capture from 2.0.0 onward is recorded here. Each sect
 commit history when the version changes, and becomes the body of the GitHub release. Releases before
 2.0.0 are listed in the [release history](https://github.com/DouglasNeuroinformatics/OpenDataCapture/releases).
 
+## 2.7.1
+
+### Bug Fixes
+
+- **react-core:** apply interactive instrument options in series ([d5149a9](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/d5149a9ca592a8547fd32d2d501f4128ba7f9272))
+
 ## 2.7.0
 
 ### Features
