@@ -24,11 +24,9 @@ import { useInstrumentInfoById } from '@/hooks/useInstrumentInfoById';
 import type { InstrumentVisualizationRecord } from '@/hooks/useInstrumentVisualization';
 import { useRecordMetadataColumns } from '@/hooks/useRecordMetadataColumns';
 import { useAppStore } from '@/store';
-import { formatRecordValue } from '@/utils/record-value';
+import { extractRecordColumnKeys, formatRecordValue } from '@/utils/record-value';
 
 const COLLECTION_METHODS = $SessionType.options;
-
-const FIXED_COLUMN_PREFIX = '__';
 
 const INDIVIDUAL_LABEL_KEY = 'individual';
 
@@ -147,24 +145,14 @@ const RouteComponent = () => {
   const { t } = useTranslation();
   const seriesMembers = useSeriesMemberRows(records, instrumentInfoById);
 
-  const measureKeys = useMemo(() => {
-    const keys = new Set<string>();
-    for (const record of records) {
-      for (const key in record) {
-        if (!key.startsWith(FIXED_COLUMN_PREFIX)) {
-          keys.add(key);
-        }
-      }
-    }
-    return Array.from(keys);
-  }, [records]);
+  const measureKeys = useMemo(() => extractRecordColumnKeys(records), [records]);
 
   const measureColumns = useMemo<TanstackTable.ColumnDef<InstrumentVisualizationRecord>[]>(() => {
     return measureKeys.map((key) => ({
       accessorKey: key,
       cell: (ctx) => {
         const value = formatRecordValue(ctx.getValue());
-        return <TruncatedCell data-testid={`instrument-table-cell-${key}`} title={String(value)} value={value} />;
+        return <TruncatedCell data-testid={`instrument-table-cell-${key}`} title={value} value={value} />;
       },
       header: ({ column }) => <SortableHeader column={column} label={camelToSnakeCase(key).toUpperCase()} />,
       id: key

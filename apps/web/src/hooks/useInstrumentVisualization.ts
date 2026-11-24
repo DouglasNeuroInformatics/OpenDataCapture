@@ -7,7 +7,7 @@ import { DEFAULT_GROUP_NAME } from '@opendatacapture/schemas/core';
 import type { TranslatedInstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type { SessionType } from '@opendatacapture/schemas/session';
 import { removeSubjectIdScope } from '@opendatacapture/subject-utils';
-import { mapValues, omit } from 'lodash-es';
+import { omit } from 'lodash-es';
 import { unparse } from 'papaparse';
 
 import { useInstrument } from '@/hooks/useInstrument';
@@ -17,7 +17,7 @@ import { useInstrumentRecords } from '@/hooks/useInstrumentRecords';
 import { useAppStore } from '@/store';
 import { downloadSubjectTableExcel } from '@/utils/excel';
 import { getEditionOptions } from '@/utils/instrument-editions';
-import { formatRecordValue } from '@/utils/record-value';
+import { formatRecordValue, serializeExportValue } from '@/utils/record-value';
 
 type InstrumentVisualizationRecord = {
   [key: string]: unknown;
@@ -141,9 +141,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
     // Split each record into the metadata every exported row repeats and the measures that vary by
     // row, so the long format cannot mistake a metadata field for a measure.
     const exportRecords = records.map((record) => ({
-      measures: mapValues(omit(record, EXPORT_METADATA_KEYS), (value) => {
-        return value instanceof Set ? formatRecordValue(value) : value;
-      }),
+      measures: omit(record, EXPORT_METADATA_KEYS),
       meta: {
         collectionMethod: record.__method__,
         date: toBasicISOString(record.__date__),
@@ -185,16 +183,9 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
       return exportRecords.map(({ measures, meta }) => {
         const row = withMetadataColumns(meta);
         for (const key of allMeasureKeys) {
-          const value = measures[key];
           // An instrument that does not measure this field leaves the cell empty rather than
           // claiming a value it never collected.
-          if (value === undefined) {
-            row[key] = '';
-          } else if (typeof value === 'object') {
-            row[key] = JSON.stringify(value);
-          } else {
-            row[key] = value;
-          }
+          row[key] = serializeExportValue(measures[key]);
         }
         return row;
       });
@@ -221,7 +212,7 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
           for (const { value, variable } of expandMeasure(measureKey, measureValue)) {
             const row = withMetadataColumns(meta);
             row.Variable = variable;
-            row.Value = value;
+            row.Value = serializeExportValue(value);
             longRecords.push(row);
           }
         }
@@ -269,8 +260,15 @@ export function useInstrumentVisualization({ params }: UseInstrumentVisualizatio
         break;
       }
       case 'JSON': {
-        const rows = makeWideRows();
-        void download(`${baseFilename}.json`, () => Promise.resolve(JSON.stringify(rows, null, 2)));
+        const rows = exportRecords.map(({ measures, meta }) => ({
+          ...withMetadataColumns(meta),
+          ...measures
+        }));
+        void download(`${baseFilename}.json`, () => {
+          return Promise.resolve(
+            JSON.stringify(rows, (_key, value: unknown) => (value instanceof Set ? formatRecordValue(value) : value), 2)
+          );
+        });
         break;
       }
       case 'TSV':

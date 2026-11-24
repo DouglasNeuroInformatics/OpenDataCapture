@@ -462,6 +462,77 @@ describe('useInstrumentVisualization', () => {
       expect(mockExcelDownloadFn.mock.calls[0]?.[1]).toMatchObject([{ nested: '{"x":1}' }]);
     });
 
+    it('should export every field any record has in a wide table, so an answer missing from the first record is not dropped', async () => {
+      const result = await renderWithRecords([
+        ...createMockRecords({ score: 8 }),
+        { ...createMockRecords({ comments: 'Felt rested', score: 6 })[0]!, id: 'record-2' }
+      ]);
+      act(() => result.current.dl('CSV'));
+      const [, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
+      const [header, firstRow, secondRow] = (getContentFn() as string).split('\r\n');
+      expect(header).toContain('score,comments');
+      expect(firstRow!.endsWith('8,')).toBe(true);
+      expect(secondRow!.endsWith('6,Felt rested')).toBe(true);
+    });
+
+    it('should export a date field in a wide table as a plain date, not a JSON-quoted string', async () => {
+      const result = await renderWithRecords(createMockRecords({ dob: new Date('2000-01-02T00:00:00.000Z') }));
+      act(() => result.current.dl('CSV'));
+      const [, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
+      const csv = getContentFn() as string;
+      expect(csv.endsWith(',2000-01-02')).toBe(true);
+      expect(csv).not.toContain('"2000-01-02');
+
+      act(() => result.current.dl('Excel'));
+      expect(mockExcelDownloadFn.mock.calls[0]?.[1]).toMatchObject([{ dob: '2000-01-02' }]);
+    });
+
+    it('should export a null value in a wide table as an empty cell, not the text null', async () => {
+      const result = await renderWithRecords(createMockRecords({ notes: null }));
+      act(() => result.current.dl('CSV'));
+      const [, getContentFn] = mockDownloadFn.mock.calls[0] ?? [];
+      const [, row] = (getContentFn() as string).split('\r\n');
+      expect(row!.endsWith('testusername,')).toBe(true);
+
+      act(() => result.current.dl('Excel'));
+      expect(mockExcelDownloadFn.mock.calls[0]?.[1]).toMatchObject([{ notes: null }]);
+    });
+
+    it('should write a date field in a long Excel export as the date entered rather than a raw Date', async () => {
+      const result = await renderWithRecords(createMockRecords({ dob: new Date('2000-01-02T00:00:00.000Z') }));
+      act(() => result.current.dl('Excel Long'));
+      expect(mockExcelDownloadFn.mock.calls[0]?.[1]).toEqual([
+        expect.objectContaining({ Value: '2000-01-02', Variable: 'dob' })
+      ]);
+    });
+
+    it('should format a set nested inside a record array across wide, long and JSON exports', async () => {
+      const result = await renderWithRecords(createMockRecords({ items: [{ tags: new Set(['FRIENDS', 'MONEY']) }] }));
+      act(() => result.current.dl('Excel'));
+      expect(mockExcelDownloadFn.mock.calls[0]?.[1]).toMatchObject([{ items: '[{"tags":"FRIENDS, MONEY"}]' }]);
+
+      mockExcelDownloadFn.mockClear();
+      act(() => result.current.dl('Excel Long'));
+      expect(mockExcelDownloadFn.mock.calls[0]?.[1]).toEqual([
+        expect.objectContaining({ Value: 'FRIENDS, MONEY', Variable: 'items-tags' })
+      ]);
+
+      act(() => result.current.dl('JSON'));
+      const [, getJsonFn] = mockDownloadFn.mock.calls[0] ?? [];
+      const parsed = JSON.parse(await (getJsonFn() as Promise<string>)) as { items: { tags: string }[] }[];
+      expect(parsed[0]?.items).toEqual([{ tags: 'FRIENDS, MONEY' }]);
+    });
+
+    it('should keep dates as ISO strings and nulls as null in JSON exports', async () => {
+      const result = await renderWithRecords(
+        createMockRecords({ dob: new Date('2000-01-02T00:00:00.000Z'), notes: null })
+      );
+      act(() => result.current.dl('JSON'));
+      const [, getJsonFn] = mockDownloadFn.mock.calls[0] ?? [];
+      const parsed = JSON.parse(await (getJsonFn() as Promise<string>)) as { dob: string; notes: null }[];
+      expect(parsed[0]).toMatchObject({ dob: '2000-01-02T00:00:00.000Z', notes: null });
+    });
+
     it('should export each entry of a record array as its own variable in a long table', async () => {
       const result = await renderWithRecords(createMockRecords({ items: [{ a: 1, b: 2 }] }));
       act(() => result.current.dl('Excel Long'));
