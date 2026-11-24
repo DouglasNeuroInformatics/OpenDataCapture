@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 
 import { parseNumber } from '@douglasneuroinformatics/libjs';
@@ -70,6 +71,18 @@ export default defineConfig(async ({ command }) => {
       importMetaEnv.vite({
         example: path.resolve(import.meta.dirname, '.env.public')
       }) as any,
+      // The import-meta-env CLI that `preview` runs restores dist/index.html from the
+      // dist/index.html.bak it saved on its last run before injecting the environment. With
+      // `emptyOutDir: false` that copy outlives its build and would put an earlier build's page back
+      // over this one, so each build writes its own.
+      {
+        apply: 'build',
+        name: 'import-meta-env-backup',
+        writeBundle() {
+          const indexPath = path.resolve(import.meta.dirname, 'dist/index.html');
+          fs.copyFileSync(indexPath, `${indexPath}.bak`);
+        }
+      },
       runtime({
         rootDir: import.meta.dirname
       }),

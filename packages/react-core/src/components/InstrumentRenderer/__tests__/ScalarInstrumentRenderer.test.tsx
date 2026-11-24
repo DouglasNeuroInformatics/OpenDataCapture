@@ -1,5 +1,6 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { i18n } from '@douglasneuroinformatics/libui/i18n';
+import type { Language } from '@opendatacapture/schemas/core';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod/v4';
@@ -16,11 +17,13 @@ declare global {
   var __testValidationSchema: z.ZodTypeAny;
   var __testFileValidationSchema: z.ZodTypeAny;
   var __testRejectingSchema: z.ZodTypeAny;
+  var __testInteractiveValidationSchema: z.ZodTypeAny;
 }
 
 globalThis.__testValidationSchema = z.object({ answer: z.string().min(1) });
 globalThis.__testFileValidationSchema = z.any();
 globalThis.__testRejectingSchema = z.never();
+globalThis.__testInteractiveValidationSchema = z.object({});
 
 const FORM_BUNDLE = `(async () => ({
   __runtimeVersion: 1,
@@ -73,6 +76,32 @@ const INTERACTIVE_BUNDLE = `(async () => ({
   measures: null
 }))()`;
 
+const BILINGUAL_INTERACTIVE_BUNDLE = `(async () => ({
+  __runtimeVersion: 1,
+  kind: 'INTERACTIVE',
+  language: ['en', 'fr'],
+  tags: { en: ['Test'], fr: ['Test'] },
+  internal: { edition: 1, name: 'STUB_BILINGUAL_INTERACTIVE' },
+  content: {},
+  details: {
+    description: { en: 'An interactive instrument under test', fr: 'Un instrument interactif sous test' },
+    license: 'Apache-2.0',
+    title: { en: 'Stub Interactive', fr: 'Instrument interactif' }
+  },
+  measures: null,
+  validationSchema: globalThis.__testInteractiveValidationSchema
+}))()`;
+
+const LOCKED_INTERACTIVE_BUNDLE = BILINGUAL_INTERACTIVE_BUNDLE.replace(
+  'content: {}',
+  'content: { enableLanguageLock: true }'
+);
+
+const SELECTING_INTERACTIVE_BUNDLE = BILINGUAL_INTERACTIVE_BUNDLE.replace(
+  'content: {}',
+  'content: { enableLanguageLock: true, enableLanguageSelect: true }'
+);
+
 const REJECTING_FILE_BUNDLE = FILE_BUNDLE.replace('__testFileValidationSchema', '__testRejectingSchema');
 
 const UNKNOWN_KIND_BUNDLE = INTERACTIVE_BUNDLE.replace("kind: 'INTERACTIVE'", "kind: 'UNKNOWN'");
@@ -94,9 +123,10 @@ function isNavigationBlocked() {
   return NavigationBlocker.mock.lastCall?.[0].active;
 }
 
-async function beginAt(bundle: string, onSubmit = vi.fn()) {
+async function beginAt(bundle: string, onSubmit = vi.fn(), language?: Language) {
   render(
     <ScalarInstrumentRenderer
+      language={language}
       NavigationBlocker={NavigationBlocker}
       target={{ bundle, id: 'target-id' }}
       onSubmit={onSubmit}
@@ -104,6 +134,11 @@ async function beginAt(bundle: string, onSubmit = vi.fn()) {
   );
   fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
   return { onSubmit };
+}
+
+async function findIframeLanguage() {
+  const iframe = await screen.findByTitle('Open Data Capture - Interactive Instrument');
+  return iframe.getAttribute('lang');
 }
 
 const noop = () => undefined;
@@ -116,6 +151,7 @@ describe('ScalarInstrumentRenderer', () => {
 
   afterEach(() => {
     cleanup();
+    i18n.changeLanguage('en');
     NavigationBlocker.mockClear();
     vi.restoreAllMocks();
     useNotificationsStore.setState({ notifications: [] });
@@ -162,6 +198,51 @@ describe('ScalarInstrumentRenderer', () => {
     await beginAt(INTERACTIVE_BUNDLE);
     await waitFor(() => {
       expect(document.querySelector('iframe')).toBeTruthy();
+    });
+  });
+
+  it('should show the language selection screen when the host names no language, so a remote subject picks their own', async () => {
+    await beginAt(SELECTING_INTERACTIVE_BUNDLE);
+    expect(await screen.findByText('Select Language')).toBeTruthy();
+  });
+
+  it('should skip the language selection screen when the host names a language, so the clinician is not asked twice', async () => {
+    await beginAt(SELECTING_INTERACTIVE_BUNDLE, vi.fn(), 'fr');
+    expect(await findIframeLanguage()).toBe('fr');
+    expect(screen.queryByText('Select Language')).toBeNull();
+  });
+
+  it('should hold a locked interactive instrument in its language when the interface language changes, as a header toggle does', async () => {
+    await beginAt(LOCKED_INTERACTIVE_BUNDLE);
+    await findIframeLanguage();
+    act(() => i18n.changeLanguage('fr'));
+    expect(await findIframeLanguage()).toBe('en');
+  });
+
+  it('should hold a locked interactive instrument in the language selected for it when the interface language changes', async () => {
+    await beginAt(SELECTING_INTERACTIVE_BUNDLE);
+    fireEvent.click(await screen.findByRole('button', { name: /Français/ }));
+    await findIframeLanguage();
+    act(() => i18n.changeLanguage('en'));
+    expect(await findIframeLanguage()).toBe('fr');
+  });
+
+  it('should summarize a locked interactive instrument in the language it ran in, though the interface language changed', async () => {
+    await beginAt(LOCKED_INTERACTIVE_BUNDLE);
+    await findIframeLanguage();
+    act(() => i18n.changeLanguage('fr'));
+    act(() => {
+      document.dispatchEvent(new CustomEvent('done', { detail: {} }));
+    });
+    expect(await screen.findByText('Stub Interactive')).toBeTruthy();
+  });
+
+  it('should keep an unlocked interactive instrument in step with the interface language', async () => {
+    await beginAt(BILINGUAL_INTERACTIVE_BUNDLE);
+    await findIframeLanguage();
+    act(() => i18n.changeLanguage('fr'));
+    await waitFor(() => {
+      expect(document.querySelector('iframe')?.getAttribute('lang')).toBe('fr');
     });
   });
 

@@ -19,6 +19,7 @@ vi.mock('@douglasneuroinformatics/libui/hooks', () => ({
   })
 }));
 
+const lockLanguage = vi.fn();
 const requestFullscreen = vi.fn(() => Promise.resolve());
 const exitFullscreen = vi.fn(() => Promise.resolve());
 
@@ -38,6 +39,7 @@ function renderWithLanguageToggle({ enableLanguageLock }: { enableLanguageLock: 
       language="en"
       supportedLanguages={['en', 'fr']}
       onChangeLanguage={changeLanguage}
+      onLockLanguage={lockLanguage}
       onSubmit={vi.fn()}
     />
   );
@@ -69,6 +71,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -83,6 +86,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en', 'fr']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -98,12 +102,60 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en', 'fr']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
     fireEvent.click(screen.getAllByRole('button')[0]!);
     expect(changeLanguage).toHaveBeenCalled();
     expect(document.querySelector('iframe')).toBeTruthy();
+  });
+
+  it('should ask the host to hold the language a lock engages on as the instrument starts, so nothing outside can move it', () => {
+    render(
+      <InteractiveContent
+        enableLanguageLock
+        bundle="bundle text"
+        language="fr"
+        supportedLanguages={['en', 'fr']}
+        onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
+    expect(lockLanguage).toHaveBeenCalledExactlyOnceWith('fr');
+  });
+
+  it('should ask the host to hold the language picked on the selection screen, once a lock engages on it', () => {
+    render(
+      <InteractiveContent
+        enableLanguageLock
+        enableLanguageSelect
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en', 'fr']}
+        onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
+    expect(lockLanguage).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: /Français/ }));
+    expect(lockLanguage).toHaveBeenCalledExactlyOnceWith('fr');
+  });
+
+  it('should not ask the host to hold the language of an instrument that leaves it unlocked', () => {
+    render(
+      <InteractiveContent
+        bundle="bundle text"
+        language="en"
+        supportedLanguages={['en', 'fr']}
+        onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
+        onSubmit={vi.fn()}
+      />
+    );
+    expect(lockLanguage).not.toHaveBeenCalled();
   });
 
   it("should call onSubmit with the event's parsed JSON detail when the bundle dispatches 'done'", async () => {
@@ -114,6 +166,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={onSubmit}
       />
     );
@@ -131,6 +184,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -147,6 +201,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -165,6 +220,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -182,6 +238,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -199,6 +256,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -216,6 +274,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -232,6 +291,7 @@ describe('InteractiveContent', () => {
         language="fr"
         supportedLanguages={['en', 'fr']}
         onChangeLanguage={vi.fn()}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -246,6 +306,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en', 'fr']}
         onChangeLanguage={onChangeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -263,6 +324,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -287,6 +349,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en', 'fr']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -301,6 +364,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -334,6 +398,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -348,6 +413,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -362,6 +428,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );
@@ -376,6 +443,7 @@ describe('InteractiveContent', () => {
         language="en"
         supportedLanguages={['en']}
         onChangeLanguage={changeLanguage}
+        onLockLanguage={lockLanguage}
         onSubmit={vi.fn()}
       />
     );

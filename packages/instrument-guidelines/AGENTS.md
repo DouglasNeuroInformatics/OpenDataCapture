@@ -523,7 +523,7 @@ content: {
   /** Enter fullscreen automatically when the instrument content is shown */
   defaultFullscreen?: boolean;
 
-  /** Show an initial screen to select a language before the instrument begins */
+  /** Show an initial screen to select a language before the instrument begins, unless the host has already chosen one */
   enableLanguageSelect?: boolean;
 
   /** Show a button above the instrument to change languages */

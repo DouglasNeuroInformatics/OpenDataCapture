@@ -25,6 +25,9 @@ export const Default: Story = {
     onChangeLanguage() {
       // The host owns the instrument's language; this story holds it fixed.
     },
+    onLockLanguage() {
+      // Already fixed, so there is nothing further to hold.
+    },
     onSubmit({ data }) {
       alert(JSON.stringify(data, null, 2));
     }

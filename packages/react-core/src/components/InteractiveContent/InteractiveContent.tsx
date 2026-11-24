@@ -25,6 +25,7 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
   enableLanguageToggle,
   language,
   onChangeLanguage,
+  onLockLanguage,
   onSubmit,
   supportedLanguages = []
 }) {
@@ -32,12 +33,13 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
   const { resolvedLanguage, t } = useTranslation();
   const [_, updateTheme] = useTheme();
   const [scale, setScale] = useState(100);
-  const [hasSelectedLanguage, setHasSelectedLanguage] = useState(
-    !enableLanguageSelect || supportedLanguages.length <= 1
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    !enableLanguageSelect || supportedLanguages.length <= 1 ? language : null
   );
   const [lockDialogOpen, setLockDialogOpen] = useState(false);
   const iFrameRef = useRef<HTMLIFrameElement>(null);
 
+  const hasSelectedLanguage = selectedLanguage !== null;
   const isLocked = Boolean(enableLanguageLock) && hasSelectedLanguage;
 
   // The payload crosses from an instrument bundle running in the iframe, so it is parsed rather
@@ -99,6 +101,12 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
       void iFrameRef.current?.requestFullscreen();
     }
   }, [hasSelectedLanguage]);
+
+  useEffect(() => {
+    if (enableLanguageLock && selectedLanguage) {
+      onLockLanguage(selectedLanguage);
+    }
+  }, [selectedLanguage]);
 
   useEffect(() => {
     document.addEventListener('changeLanguage', handleChangeLanguageEvent, false);
@@ -204,7 +212,7 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
                     type="button"
                     onClick={() => {
                       onChangeLanguage(language);
-                      setHasSelectedLanguage(true);
+                      setSelectedLanguage(language);
                     }}
                   >
                     <div className="flex flex-col gap-0.5">
@@ -265,6 +273,11 @@ export type InteractiveContentProps = Simplify<
     /** The language the instrument runs in, held by the host instead of the interface language. */
     language: InterfaceLanguage;
     onChangeLanguage: (language: InterfaceLanguage) => void;
+    /**
+     * Called with the language a lock engages on. The host holds the instrument to it from then on,
+     * since a host whose language follows the interface would otherwise move it when that changes.
+     */
+    onLockLanguage: (language: InterfaceLanguage) => void;
   } & {
     bundle: string;
     onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
