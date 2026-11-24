@@ -54,11 +54,11 @@ Open Data Capture is a web-based platform designed for continuous clinical data 
 
 Try out Open Data Capture without installation at [demo.opendatacapture.org](https://demo.opendatacapture.org). This demo includes a number of publicly-available instruments along with several months of simulated data. To access the platform, please select a user from the options below:
 
-| Username          | Group(s)                                | Role           |
-| ----------------- | --------------------------------------- | -------------- |
-| JaneDoe           | Depression Clinic, Psychosis Lab        | Group Manager  |
-| JohnSmith         | Depression Clinic                       | Group Manager  |
-| FrançoisBouchard  | Psychosis Lab                           | Standard       |
+| Username         | Group(s)                         | Role          |
+| ---------------- | -------------------------------- | ------------- |
+| JaneDoe          | Depression Clinic, Psychosis Lab | Group Manager |
+| JohnSmith        | Depression Clinic                | Group Manager |
+| FrançoisBouchard | Psychosis Lab                    | Standard      |
 
 > **Note:** All data in the demo instance is fake and generated for testing purposes only.
 
