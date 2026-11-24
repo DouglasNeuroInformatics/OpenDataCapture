@@ -7,6 +7,46 @@ Every release of Open Data Capture from 2.0.0 onward is recorded here. Each sect
 commit history when the version changes, and becomes the body of the GitHub release. Releases before
 2.0.0 are listed in the [release history](https://github.com/DouglasNeuroinformatics/OpenDataCapture/releases).
 
+## 2.7.0
+
+### Features
+
+- **web:** leave a remote assignment's language to the subject's browser by default ([b8b185e](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/b8b185e86ae2184f096470b95fe69655c1ec4834))
+- **gateway:** open a link with no language in the language the browser asks for ([4b26ea2](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/4b26ea283e69e68c6a7e654f373dff6a1dc97748))
+- choose the language when administering or assigning an instrument ([84656b6](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/84656b68a494a59a39bb9371c8ffac605116e25e))
+- **api:** let a deployment turn off the password breach check ([5f68ecb](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/5f68ecb5f037e7fb935707607f7acd78f7e90736))
+- **web:** show each user's groups in the admin users list ([5d130eb](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/5d130ebf157efdae80dc22666d04df626044da74))
+- **outreach:** publish the blog in French ([e58753d](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/e58753d4668e867b04316a79495d690a3291df87))
+- archive groups instead of deleting them ([7870a45](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/7870a45ac2795c9d9acd712418307af67ea7122b))
+- support date-time date fields and exclusive set options in form instruments ([2a7f6ce](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/2a7f6ce69ba42cb826d40875c680ef4458d5d4cb))
+
+### Bug Fixes
+
+- **react-core:** hold a locked interactive instrument in its language ([b9d7f05](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/b9d7f0530bb2f4c2fafc3dc5c9ad6880c8b12950))
+- **react-core:** skip an interactive instrument's language screen when its host chose one ([e0ea345](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/e0ea3458f55c119263f8068e024ac76319e0d4bb))
+- **web:** keep the group switcher in the navigation menu ([4d2068e](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/4d2068eed75abd9f06f26139136e84f788d81491))
+- **gateway:** read a quality the client spells with a capital Q ([c20f29e](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/c20f29ef96d225a544bb2294471ff56c62b7422a))
+- **web:** ask about a language mismatch only where the sender can resolve it ([476d71e](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/476d71e1b9eb5250a8f6915f2a5d9c839231fdac))
+- **web:** start an assignment's email in the language its link opens in ([cc63a81](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/cc63a81366e3f5b6bf25066deb2858ff6bb2deef))
+- **gateway:** open a link pinned to an inactive language in one the reader asks for ([9594ed9](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/9594ed94875a182b9b7f92bf98e0cbc5861c1c72))
+- **release-info:** build for production without RELEASE_VERSION ([ac55d34](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/ac55d34499623b6a4f55fdf2cecc224a04598d2b))
+- **web:** return a list to the page and sort it was left on ([f9c95d3](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/f9c95d363c58cb2d79030635776b14e0992198fb))
+- report what a repository sync actually did ([8adf22b](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/8adf22b0ba3d0cce85513d9399a71069bebdee04))
+- **outreach:** translate the remaining English-only strings ([eb33c95](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/eb33c953eb1e27dd6be88672ff3514b49589dfdd))
+- **web:** return the audit log pagination to the first page when the sort changes ([ad2795f](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/ad2795fc8e06cee2d3537039e2ddaa3c6d054f04))
+- **web:** close the archive confirmation a closing sheet ignores ([8280aeb](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/8280aeb7558e4f0e0dc014d414b51f319ad7d95d))
+- **web:** deselect a group an admin archives while it is selected ([301a741](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/301a7418809732753b7d343b5f6c3de5874b9986))
+- **web:** sort the groups table by status ([f0b2e02](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/f0b2e02fb0c635a459438070c2bb08eab7e39f2f))
+- throttle each client on its own address behind the bundled Caddy ([fe7142d](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/fe7142dc1bb5fff4a92cd35d3cc3af8cb782956e))
+- **api:** record when a remote assignment was completed ([d28ff67](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/d28ff67e61614bceba1a829d2381623f5590690f))
+- **api:** link the records a remote assignment produces to that assignment ([a4f3239](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/a4f3239091d2b4b3f9f8e64b374760474925a961))
+- **api:** enable storage for the e2e api whatever .env says ([2bc6feb](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/2bc6feb45d2eb73be23ab29a5c995cdab3767732))
+
+### Performance
+
+- build api and gateway runtime images on node:24-slim ([47bed5c](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/47bed5cbf79614a653b08a3a8825b04c06bbb5c6))
+- compress api responses in the bundled Caddy ([c715c2c](https://github.com/DouglasNeuroinformatics/OpenDataCapture/commit/c715c2cbcc12f5dfe6f4dfc9f4475b2febe07d5d))
+
 ## 2.6.0
 
 ### Features
