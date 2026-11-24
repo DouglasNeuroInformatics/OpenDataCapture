@@ -4,37 +4,36 @@ import { Button, Dialog, DropdownMenu, Separator } from '@douglasneuroinformatic
 import { useNotificationsStore, useTheme, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import type { Theme } from '@douglasneuroinformatics/libui/hooks';
 import type {
+  AnyUnilingualInteractiveInstrument,
   InstrumentKind,
-  InteractiveInstrument,
   Language,
   RuntimeNotification
 } from '@opendatacapture/runtime-core';
 import { $InstrumentAuthoringLanguage, $Json } from '@opendatacapture/schemas/core';
 import type { Language as InterfaceLanguage, Json } from '@opendatacapture/schemas/core';
 import { ChevronRightIcon, FullscreenIcon, LanguagesIcon, ZoomInIcon, ZoomOutIcon } from 'lucide-react';
-import type { Promisable, Simplify } from 'type-fest';
+import type { Promisable } from 'type-fest';
 
 import { LANGUAGE_LABELS } from '../../utils/language';
 
 // eslint-disable-next-line react/function-component-definition -- the named function passed to memo gives the component its display name
 const _InteractiveContent = React.memo<InteractiveContentProps>(function _InteractiveContent({
   bundle,
-  defaultFullscreen,
-  enableLanguageLock,
-  enableLanguageSelect,
-  enableLanguageToggle,
+  instrument,
   language,
   onChangeLanguage,
   onLockLanguage,
   onSubmit,
-  supportedLanguages = []
+  skipLanguageSelect
 }) {
+  const { defaultFullscreen, enableLanguageLock, enableLanguageSelect, enableLanguageToggle } = instrument.content;
+  const { supportedLanguages } = instrument;
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const { resolvedLanguage, t } = useTranslation();
   const [_, updateTheme] = useTheme();
   const [scale, setScale] = useState(100);
   const [selectedLanguage, setSelectedLanguage] = useState(
-    !enableLanguageSelect || supportedLanguages.length <= 1 ? language : null
+    !enableLanguageSelect || skipLanguageSelect || supportedLanguages.length <= 1 ? language : null
   );
   const [lockDialogOpen, setLockDialogOpen] = useState(false);
   const iFrameRef = useRef<HTMLIFrameElement>(null);
@@ -98,7 +97,9 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
 
   useEffect(() => {
     if (defaultFullscreen && hasSelectedLanguage) {
-      void iFrameRef.current?.requestFullscreen();
+      iFrameRef.current?.requestFullscreen().catch((error: unknown) => {
+        console.error(error);
+      });
     }
   }, [hasSelectedLanguage]);
 
@@ -156,7 +157,7 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
             <Button size="icon" type="button" variant="outline" onClick={() => void handleToggleFullScreen()}>
               <FullscreenIcon />
             </Button>
-            {enableLanguageToggle && supportedLanguages?.length > 1 && (
+            {enableLanguageToggle && supportedLanguages.length > 1 && (
               <DropdownMenu>
                 <DropdownMenu.Trigger asChild>
                   <Button size="icon" type="button" variant="outline">
@@ -265,25 +266,21 @@ export type InteractiveContentSubmitResult = {
   kind: Extract<InstrumentKind, 'INTERACTIVE'>;
 };
 
-export type InteractiveContentProps = Simplify<
-  Pick<
-    InteractiveInstrument['content'],
-    'defaultFullscreen' | 'enableLanguageLock' | 'enableLanguageSelect' | 'enableLanguageToggle'
-  > & {
-    /** The language the instrument runs in, held by the host instead of the interface language. */
-    language: InterfaceLanguage;
-    onChangeLanguage: (language: InterfaceLanguage) => void;
-    /**
-     * Called with the language a lock engages on. The host holds the instrument to it from then on,
-     * since a host whose language follows the interface would otherwise move it when that changes.
-     */
-    onLockLanguage: (language: InterfaceLanguage) => void;
-  } & {
-    bundle: string;
-    onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
-    supportedLanguages?: Language[];
-  }
->;
+export type InteractiveContentProps = {
+  bundle: string;
+  instrument: AnyUnilingualInteractiveInstrument & { supportedLanguages: Language[] };
+  /** The language the instrument runs in, held by the host instead of the interface language. */
+  language: InterfaceLanguage;
+  onChangeLanguage: (language: InterfaceLanguage) => void;
+  /**
+   * Called with the language a lock engages on. The host holds the instrument to it from then on,
+   * since a host whose language follows the interface would otherwise move it when that changes.
+   */
+  onLockLanguage: (language: InterfaceLanguage) => void;
+  onSubmit: (result: InteractiveContentSubmitResult) => Promisable<void>;
+  /** Whether the host already settled the language, skipping the instrument's own selection screen. */
+  skipLanguageSelect: boolean;
+};
 
 // eslint-disable-next-line react/function-component-definition -- the named function passed to memo gives the component its display name
 export const InteractiveContent = React.memo<InteractiveContentProps>(function InteractiveContent(props) {

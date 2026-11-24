@@ -1,4 +1,5 @@
 import { interactiveInstrument } from '@opendatacapture/instrument-stubs/interactive';
+import type { AnyUnilingualInteractiveInstrument } from '@opendatacapture/runtime-core';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { InteractiveContent } from './InteractiveContent';
@@ -21,6 +22,10 @@ export default {
 export const Default: Story = {
   args: {
     bundle: interactiveInstrument.bundle,
+    instrument: {
+      ...(interactiveInstrument.instance as AnyUnilingualInteractiveInstrument),
+      supportedLanguages: ['en']
+    },
     language: 'en',
     onChangeLanguage() {
       // The host owns the instrument's language; this story holds it fixed.
@@ -30,6 +35,7 @@ export const Default: Story = {
     },
     onSubmit({ data }) {
       alert(JSON.stringify(data, null, 2));
-    }
+    },
+    skipLanguageSelect: false
   }
 };
