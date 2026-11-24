@@ -16,5 +16,5 @@ Open Data Capture and REDCap are both electronic data capture (EDC) platforms th
 - Open Data Capture is modern and easy-to-use, whereas REDCap looks like it was built in the 90s
 - Open Data Capture is open source, REDCap is proprietary (refer to other article on this)
 - Open Data Capture offers additional capabilities including much better interactive instruments
-- Open Data Capture has REST API with proper fine-grained access controls. REDCap has an API, but any API token issued includes full admin access, representing a threat to data security. 
+- Open Data Capture has REST API with proper fine-grained access controls. REDCap has an API, but any API token issued includes full admin access, representing a threat to data security.
 - Open Data Capture and REDCap both offer remote assessment.
