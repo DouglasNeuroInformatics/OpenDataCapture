@@ -18,6 +18,8 @@ export class RenderInstrumentPage extends AppPage {
   readonly happinessSatisfiedRadio: Locator;
   /** Asks the clinician to confirm leaving an instrument whose responses have not been submitted. */
   readonly leaveDialog: Locator;
+  /** Confirms, inside the instrument, that the submission reached the server. */
+  readonly savedNotice: Locator;
   /** Shown once every item of a series has been administered, in place of a scalar summary. */
   readonly seriesCompletionHeading: Locator;
   readonly submitButton: Locator;
@@ -29,6 +31,7 @@ export class RenderInstrumentPage extends AppPage {
     this.consentPreamble = page.getByTestId('consent-preamble');
     this.happinessSatisfiedRadio = this.$ref.getByRole('radio', { name: 'Yes' });
     this.leaveDialog = page.getByTestId('blocker-dialog');
+    this.savedNotice = page.getByTestId('submission-saved-notice');
     this.seriesCompletionHeading = page.getByRole('heading', { name: /Thank You/i });
     this.submitButton = page.getByRole('button', { name: 'Submit' });
     this.summaryHeading = page.getByRole('heading', { name: /Summary of Results/i });

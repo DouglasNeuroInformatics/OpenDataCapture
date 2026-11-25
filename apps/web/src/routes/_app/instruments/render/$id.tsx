@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
-import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
+import { useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { InstrumentRenderer } from '@opendatacapture/react-core';
 import type { InstrumentSubmitHandler } from '@opendatacapture/react-core';
 import { $Language } from '@opendatacapture/schemas/core';
@@ -24,7 +24,6 @@ const RouteComponent = () => {
   const params = Route.useParams();
   const { language } = Route.useSearch();
   const navigate = useNavigate();
-  const notifications = useNotificationsStore();
   const location = useLocation();
   const { t } = useTranslation();
 
@@ -53,7 +52,6 @@ const RouteComponent = () => {
       subjectId: currentSession!.subject!.id
     } satisfies CreateInstrumentRecordData);
     if (result.kind !== 'FILE') {
-      notifications.addNotification({ type: 'success' });
       return;
     }
     const record = createRecordResponse.data;
@@ -116,6 +114,7 @@ const RouteComponent = () => {
       </PageHeader>
       <div className="grow">
         <InstrumentRenderer
+          savesSubmissions
           className="mx-auto max-w-3xl"
           language={language}
           NavigationBlocker={NavigationBlocker}

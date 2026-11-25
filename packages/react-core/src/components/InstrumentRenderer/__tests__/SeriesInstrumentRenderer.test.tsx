@@ -147,11 +147,18 @@ function isNavigationBlocked() {
   return NavigationBlocker.mock.lastCall?.[0].active;
 }
 
-async function beginSeries({ skipProgress }: { skipProgress: boolean }) {
+async function beginSeries({
+  savesSubmissions = false,
+  skipProgress
+}: {
+  savesSubmissions?: boolean;
+  skipProgress: boolean;
+}) {
   const onSubmit = vi.fn();
   render(
     <SeriesInstrumentRenderer
       NavigationBlocker={NavigationBlocker}
+      savesSubmissions={savesSubmissions}
       target={createTarget({ skipProgress })}
       onSubmit={onSubmit}
     />
@@ -226,10 +233,35 @@ describe('SeriesInstrumentRenderer', () => {
     const { onSubmit } = await beginSeries({ skipProgress: false });
     await answerAndSubmit('first administration', onSubmit);
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin Next Instrument' }));
     await waitFor(() => {
       expect(getAnswerInput().value).toBe('');
     });
+  });
+
+  it('should confirm the save between items when the host persists each submission, so the subject is not told to watch a toast', async () => {
+    const { onSubmit } = await beginSeries({ savesSubmissions: true, skipProgress: false });
+    await answerAndSubmit('first administration', onSubmit);
+
+    expect(await screen.findByText('Your Results Have Been Saved')).toBeTruthy();
+  });
+
+  it('should not confirm a save before the first item has been submitted', async () => {
+    render(
+      <SeriesInstrumentRenderer savesSubmissions target={createTarget({ skipProgress: false })} onSubmit={vi.fn()} />
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+
+    expect(await screen.findByText('Series Instrument in Progress')).toBeTruthy();
+    expect(screen.queryByTestId('submission-saved-notice')).toBeNull();
+  });
+
+  it('should not claim a save between items where the host does not persist them, such as a preview', async () => {
+    const { onSubmit } = await beginSeries({ skipProgress: false });
+    await answerAndSubmit('first administration', onSubmit);
+
+    expect(await screen.findByText('Series Instrument in Progress')).toBeTruthy();
+    expect(screen.queryByTestId('submission-saved-notice')).toBeNull();
   });
 
   it('should show the completion screen once every item has been submitted', async () => {
@@ -243,6 +275,42 @@ describe('SeriesInstrumentRenderer', () => {
     await waitFor(() => {
       expect(screen.getByText('Thank You!')).toBeTruthy();
     });
+  });
+
+  it('should confirm the save on the completion screen, since the last item of a series shows no interstitial', async () => {
+    const { onSubmit } = await beginSeries({ savesSubmissions: true, skipProgress: true });
+    await answerAndSubmit('first administration', onSubmit);
+    await waitFor(() => {
+      expect(getAnswerInput().value).toBe('');
+    });
+    await answerAndSubmit('second administration', onSubmit);
+
+    expect(await screen.findByText('Your results have been saved.')).toBeTruthy();
+  });
+
+  it('should go straight to the completion screen from the last item, rather than inviting the subject to begin an item that does not exist', async () => {
+    const { onSubmit } = await beginSeries({ savesSubmissions: true, skipProgress: false });
+    await answerAndSubmit('first administration', onSubmit);
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin Next Instrument' }));
+    await waitFor(() => {
+      expect(getAnswerInput().value).toBe('');
+    });
+    await answerAndSubmit('second administration', onSubmit);
+
+    await screen.findByText('Thank You!');
+    expect(screen.queryByRole('button', { name: 'Begin Next Instrument' })).toBeNull();
+  });
+
+  it('should celebrate the end of a series on its completion screen', async () => {
+    const { onSubmit } = await beginSeries({ savesSubmissions: true, skipProgress: true });
+    await answerAndSubmit('first administration', onSubmit);
+    await waitFor(() => {
+      expect(getAnswerInput().value).toBe('');
+    });
+    await answerAndSubmit('second administration', onSubmit);
+
+    await screen.findByText('Thank You!');
+    expect(screen.getByTestId('completion-confetti')).toBeTruthy();
   });
 
   it('should keep blocking navigation between items, so leaving cannot abandon the series partway', async () => {

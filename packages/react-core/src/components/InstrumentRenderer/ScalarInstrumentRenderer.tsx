@@ -19,6 +19,7 @@ import { InstrumentSummary } from '../InstrumentSummary';
 import { InteractiveContent } from '../InteractiveContent';
 import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
+import { SubmissionSavedNotice } from './SubmissionSavedNotice';
 import { validateSubmission } from './validateSubmission';
 
 import type { LocalizedText, SubjectDisplayInfo } from '../../types';
@@ -44,6 +45,11 @@ export type ScalarInstrumentRendererProps = {
   onSubmit: InstrumentSubmitHandler<AnyScalarInstrument['kind']>;
   /** @deprecated */
   options?: InterpretOptions;
+  /**
+   * Whether the host's `onSubmit` persists the submission, and so whether the subject may be told
+   * their results were saved. A preview leaves it off, since nothing it submits is kept.
+   */
+  savesSubmissions?: boolean;
   subject?: SubjectDisplayInfo;
   /** A localizable label for the form's submit button. */
   submitButtonLabel?: LocalizedText;
@@ -60,6 +66,7 @@ export const ScalarInstrumentRenderer = ({
   onCompileError,
   onSubmit,
   options,
+  savesSubmissions,
   subject,
   submitButtonLabel,
   target
@@ -153,13 +160,16 @@ export const ScalarInstrumentRenderer = ({
               return <FileInstrumentContent instrument={instrument} onSubmit={createSubmitHandler(instrument)} />;
             })
             .with({ index: 2 }, () => (
-              <InstrumentSummary
-                data={data}
-                disableActions={disableSummaryActions}
-                instrument={instrument}
-                subject={subject}
-                timeCollected={Date.now()}
-              />
+              <div className="space-y-8">
+                {savesSubmissions && <SubmissionSavedNotice />}
+                <InstrumentSummary
+                  data={data}
+                  disableActions={disableSummaryActions}
+                  instrument={instrument}
+                  subject={subject}
+                  timeCollected={Date.now()}
+                />
+              </div>
             ))
             .otherwise(() => null);
         })
