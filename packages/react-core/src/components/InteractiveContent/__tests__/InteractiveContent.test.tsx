@@ -338,6 +338,34 @@ describe('InteractiveContent', () => {
     expect(requestFullscreen.mock.contexts[0]).toBe(document.querySelector('iframe'));
   });
 
+  it('should focus the iframe once it loads, so key presses reach the instrument without a click', () => {
+    const focus = vi.spyOn(HTMLIFrameElement.prototype, 'focus');
+    renderInteractiveContent();
+    fireEvent.load(document.querySelector('iframe')!);
+    expect(focus).toHaveBeenCalled();
+  });
+
+  it('should focus the iframe when it enters or leaves fullscreen, which otherwise leaves focus here', () => {
+    renderInteractiveContent();
+    const iFrame = document.querySelector('iframe')!;
+    const focus = vi.spyOn(HTMLIFrameElement.prototype, 'focus');
+    installFullscreen(iFrame);
+    act(() => {
+      document.dispatchEvent(new Event('fullscreenchange'));
+    });
+    expect(focus).toHaveBeenCalled();
+  });
+
+  it('should leave focus alone when something other than the iframe goes fullscreen', () => {
+    renderInteractiveContent();
+    const focus = vi.spyOn(HTMLIFrameElement.prototype, 'focus');
+    installFullscreen(document.createElement('div'));
+    act(() => {
+      document.dispatchEvent(new Event('fullscreenchange'));
+    });
+    expect(focus).not.toHaveBeenCalled();
+  });
+
   it('should leave fullscreen from the fullscreen button when already fullscreen', () => {
     renderInteractiveContent();
     installFullscreen(document.querySelector('iframe'));
