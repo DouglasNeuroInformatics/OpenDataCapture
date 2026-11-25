@@ -1,9 +1,8 @@
-import type { InstrumentRecordsExport } from '@opendatacapture/schemas/instrument-records';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { WorkBook } from 'xlsx';
 import { utils, writeFileXLSX } from 'xlsx';
 
-import { downloadExcel, downloadSubjectTableExcel } from '../excel';
+import { downloadSubjectTableExcel, EXCEL_MAX_DATA_ROWS, ExcelRowLimitExceededError } from '../excel';
 
 vi.mock('xlsx', async (importOriginal) => ({
   ...(await importOriginal<typeof import('xlsx')>()),
@@ -20,44 +19,6 @@ const sheetNameFor = (name: string) => {
   downloadSubjectTableExcel('subject.xlsx', [{ score: 1 }], name);
   return lastDownload().workbook.SheetNames[0];
 };
-
-const recordsExport: InstrumentRecordsExport = [
-  {
-    groupId: 'group-1',
-    instrumentEdition: 1,
-    instrumentName: 'HAPPINESS_QUESTIONNAIRE',
-    measure: 'overallHappiness',
-    seriesId: null,
-    seriesName: null,
-    sessionDate: '2026-01-01',
-    sessionId: 'session-1',
-    sessionType: 'IN_PERSON',
-    subjectAge: 30,
-    subjectId: 'subject-1',
-    subjectSex: 'MALE',
-    timestamp: '2026-01-01T12:00:00.000Z',
-    username: 'admin',
-    value: 7
-  }
-];
-
-describe('downloadExcel', () => {
-  afterEach(() => {
-    vi.mocked(writeFileXLSX).mockClear();
-  });
-
-  it('should download the workbook under the given filename', () => {
-    downloadExcel('records.xlsx', recordsExport);
-    expect(lastDownload().filename).toBe('records.xlsx');
-  });
-
-  it('should write every exported record into a single ULTRA_LONG sheet', () => {
-    downloadExcel('records.xlsx', recordsExport);
-    const { workbook } = lastDownload();
-    expect(workbook.SheetNames).toEqual(['ULTRA_LONG']);
-    expect(utils.sheet_to_json(workbook.Sheets.ULTRA_LONG!)).toEqual(recordsExport);
-  });
-});
 
 describe('downloadSubjectTableExcel', () => {
   afterEach(() => {
@@ -90,5 +51,11 @@ describe('downloadSubjectTableExcel', () => {
 
   it('should fall back to a generic sheet name when nothing usable remains', () => {
     expect(sheetNameFor("'")).toBe('Subject');
+  });
+
+  it('should refuse to build a subject worksheet exceeding Excel row capacity', () => {
+    const oversized = new Array<{ [key: string]: unknown }>(EXCEL_MAX_DATA_ROWS + 1);
+    expect(() => downloadSubjectTableExcel('subject.xlsx', oversized, 'Records')).toThrow(ExcelRowLimitExceededError);
+    expect(writeFileXLSX).not.toHaveBeenCalled();
   });
 });

@@ -220,6 +220,13 @@ describe('axios', () => {
       expect(adapter).toHaveBeenCalledOnce();
     });
 
+    it('should retry a POST marked idempotent when it fails transiently, since a read-only query body causes no duplicate write', async () => {
+      const adapter = createAdapter({ fail: 503 }, { status: 200 });
+      const response = await axios.post('/v1/instrument-records/export', {}, { adapter, meta: { idempotent: true } });
+      expect(response.status).toBe(200);
+      expect(adapter).toHaveBeenCalledTimes(2);
+    });
+
     it('should not retry a request whose method is unknown, since it may not be idempotent', async () => {
       const adapter = vi.fn<AxiosAdapter>(() => Promise.reject(createError({ headers: new AxiosHeaders() })));
       await expect(axios.get('/v1/subjects', { adapter })).rejects.toBeInstanceOf(AxiosError);

@@ -389,11 +389,11 @@ export default defineSuite('authorization', function () {
     expect(assignments.json()).toStrictEqual([]);
   });
 
-  // The web client exports only the current group and then keeps only the subjects its table lists,
-  // so no screen can show whether the api itself leaves another group's records out. Both records
-  // belong to one subject enrolled in both groups, so only each record's own group separates them.
-  // The body is msgpack, whose entries carry their record's group id as a plain string, so its bytes
-  // are searched.
+  // The web client always passes the current group and listed subject ids in its export POST body, so
+  // no screen can show whether an unscoped POST to the api itself leaves another group's records out.
+  // Both records belong to one subject enrolled in both groups, so only each record's own group
+  // separates them. The body is a stream of msgpack frames whose entries carry their record's group id
+  // as a plain string and never the subject's groups, so its bytes are searched.
   it("should leave another group's records out of a group manager's export, even of a subject enrolled in both groups", async () => {
     const exportingGroup = await createGroup();
     const headers = await login((await createUser('GROUP_MANAGER', [exportingGroup.id])).username);
@@ -401,7 +401,7 @@ export default defineSuite('authorization', function () {
     await uploadRecords(exportingGroup.id, [sharedSubjectId]);
     await uploadRecords(foreignGroup.id, [sharedSubjectId]);
 
-    const response = await request(headers, { method: 'GET', url: '/v1/instrument-records/export' });
+    const response = await request(headers, { method: 'POST', payload: {}, url: '/v1/instrument-records/export' });
 
     expect(response.statusCode).toBe(200);
     expect(response.rawPayload.includes(exportingGroup.id)).toBe(true);
