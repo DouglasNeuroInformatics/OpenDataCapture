@@ -44,9 +44,11 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
   // A fullscreened iframe does not receive keyboard focus: the browser leaves focus wherever it
   // was in this document, so an instrument that listens for key presses on its own document stays
   // unresponsive until the participant clicks inside the frame. Focusing the frame moves focus into
-  // the document the instrument runs in, which is where its key listeners are.
+  // the document the instrument runs in, which is where its key listeners are. The frame is also
+  // focused once it loads, since a key-only instrument that never goes fullscreen has the same
+  // problem; preventScroll keeps that from moving the page behind it.
   const handleFocusIFrame = useCallback(() => {
-    iFrameRef.current?.focus();
+    iFrameRef.current?.focus({ preventScroll: true });
     iFrameRef.current?.contentWindow?.focus();
   }, []);
 

@@ -338,22 +338,40 @@ describe('InteractiveContent', () => {
     expect(requestFullscreen.mock.contexts[0]).toBe(document.querySelector('iframe'));
   });
 
-  it('should focus the iframe once it loads, so key presses reach the instrument without a click', () => {
-    const focus = vi.spyOn(HTMLIFrameElement.prototype, 'focus');
-    renderInteractiveContent();
-    fireEvent.load(document.querySelector('iframe')!);
-    expect(focus).toHaveBeenCalled();
-  });
-
-  it('should focus the iframe when it enters or leaves fullscreen, which otherwise leaves focus here', () => {
+  it('should focus the iframe and its document once it loads, so key presses reach the instrument without a click', () => {
     renderInteractiveContent();
     const iFrame = document.querySelector('iframe')!;
-    const focus = vi.spyOn(HTMLIFrameElement.prototype, 'focus');
+    const focus = vi.spyOn(iFrame, 'focus');
+    const focusWindow = vi.fn();
+    Object.defineProperty(iFrame, 'contentWindow', { value: { focus: focusWindow } });
+    fireEvent.load(iFrame);
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(focusWindow).toHaveBeenCalled();
+  });
+
+  it('should focus the iframe and its document when it enters fullscreen, which otherwise leaves focus here', () => {
+    renderInteractiveContent();
+    const iFrame = document.querySelector('iframe')!;
+    const focus = vi.spyOn(iFrame, 'focus');
+    const focusWindow = vi.fn();
+    Object.defineProperty(iFrame, 'contentWindow', { value: { focus: focusWindow } });
     installFullscreen(iFrame);
     act(() => {
       document.dispatchEvent(new Event('fullscreenchange'));
     });
-    expect(focus).toHaveBeenCalled();
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(focusWindow).toHaveBeenCalled();
+  });
+
+  it('should focus the iframe when it leaves fullscreen, so escape does not strand focus here', () => {
+    renderInteractiveContent();
+    const iFrame = document.querySelector('iframe')!;
+    const focus = vi.spyOn(iFrame, 'focus');
+    installFullscreen(null);
+    act(() => {
+      document.dispatchEvent(new Event('fullscreenchange'));
+    });
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
   });
 
   it('should leave focus alone when something other than the iframe goes fullscreen', () => {
