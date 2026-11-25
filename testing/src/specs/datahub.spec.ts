@@ -121,3 +121,36 @@ test.describe('data hub', () => {
     await expect(datahubPage.rows).toHaveCount(1);
   });
 });
+
+test.describe('data hub export', () => {
+  // The export used to date each row by the day the record was inserted, which loses both the
+  // collection date of anything entered later and the time of day of everything.
+  test('should export the collection date and time of each record and its session', async ({
+    api,
+    isolatedGroupManager,
+    page,
+    uniqueId
+  }) => {
+    const group = await isolatedGroupManager();
+    const instrumentId = await api.findInstrumentIdByName('DNP_HAPPINESS_QUESTIONNAIRE');
+    const collectedAt = '2024-01-15T10:30:00.000Z';
+    await api.uploadRecords(group.id, instrumentId, [
+      { data: HAPPINESS_RECORD, date: new Date(collectedAt), subjectId: `dated-${uniqueId}` }
+    ]);
+
+    const datahubPage = new DatahubPage(page);
+    await datahubPage.goto('/datahub/subjects');
+    await expect(datahubPage.rows).toHaveCount(1);
+
+    const download = await datahubPage.exportAs('JSON');
+    const payload = JSON.parse(await readFile(await download.path(), 'utf8')) as {
+      sessionDate: string;
+      timestamp: string;
+    }[];
+
+    expect(payload.length).toBeGreaterThan(0);
+    for (const row of payload) {
+      expect(row).toMatchObject({ sessionDate: collectedAt, timestamp: collectedAt });
+    }
+  });
+});

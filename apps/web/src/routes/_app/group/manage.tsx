@@ -30,6 +30,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { WithFallback } from '@/components/WithFallback';
 import { useCreateSeriesInstrumentMutation } from '@/hooks/useCreateSeriesInstrumentMutation';
 import { useDeleteSeriesInstrumentMutation } from '@/hooks/useDeleteSeriesInstrumentMutation';
+import { groupQueryOptions, useGroupQuery } from '@/hooks/useGroupQuery';
 import { useInstrumentInfoQuery } from '@/hooks/useInstrumentInfoQuery';
 import { useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useUpdateGroupMutation } from '@/hooks/useUpdateGroupMutation';
@@ -80,6 +81,9 @@ const expandSelectedSeriesIds = ({
   return expandedIds;
 };
 
+/** The select's value for a group requiring no session instrument; instrument ids are hashes, so none is this. */
+const NO_SESSION_INSTRUMENT = 'NONE';
+
 type SettingsValues = {
   defaultIdentificationMethod?: SubjectIdentificationMethod;
   idValidationRegex?: null | string;
@@ -87,6 +91,7 @@ type SettingsValues = {
   idValidationRegexErrorMessageFr?: null | string;
   minimumAge?: null | number;
   minimumAgeApplied?: boolean | null;
+  sessionInstrumentId?: string;
   subjectIdDisplayLength?: null | number;
 };
 
@@ -594,6 +599,17 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
     [instruments]
   );
 
+  // Only a form the group will be able to access may be required, so the options follow the selection.
+  // The list holds the latest edition of each form, so a shared title is two forms, told apart by name.
+  const selectedForms = instruments.form.filter((item) => selectedIds.has(item.id));
+  const sessionInstrumentOptions = Object.fromEntries(
+    selectedForms.map((item) => {
+      const isTitleShared = selectedForms.some((other) => other !== item && other.title === item.title);
+      const label = isTitleShared && item.internal ? `${item.title} (${item.internal.name})` : item.title;
+      return [item.id, label];
+    })
+  );
+
   return (
     <div className="mx-auto max-w-4xl">
       {previewItem && (
@@ -795,6 +811,25 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
               }
             },
             title: t('group.manage.groupSettings')
+          },
+          {
+            fields: {
+              sessionInstrumentId: {
+                description: t({
+                  en: 'A form completed as part of starting every session in this group. The session is created only once the form is submitted.',
+                  es: 'Un formulario que se completa al iniciar cada sesión en este grupo. La sesión se crea solo cuando se envía el formulario.',
+                  fr: "Un formulaire rempli au démarrage de chaque session dans ce groupe. La session n'est créée qu'une fois le formulaire soumis."
+                }),
+                kind: 'string',
+                label: t({ en: 'Session Instrument', es: 'Instrumento de sesión', fr: 'Instrument de session' }),
+                options: {
+                  [NO_SESSION_INSTRUMENT]: t({ en: 'None', es: 'Ninguno', fr: 'Aucun' }),
+                  ...sessionInstrumentOptions
+                },
+                variant: 'select'
+              }
+            },
+            title: t({ en: 'Starting a Session', es: 'Inicio de una sesión', fr: "Démarrage d'une session" })
           }
         ]}
         initialValues={settingsInitialValues}
@@ -807,9 +842,27 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
             idValidationRegexErrorMessageFr: z.string().optional(),
             minimumAge: z.number().int().positive().optional(),
             minimumAgeApplied: z.boolean().optional(),
+            sessionInstrumentId: z.string().optional(),
             subjectIdDisplayLength: z.number().int().min(1).optional()
           })
           .check((ctx) => {
+            const { sessionInstrumentId } = ctx.value;
+            if (
+              sessionInstrumentId &&
+              sessionInstrumentId !== NO_SESSION_INSTRUMENT &&
+              !(selectedIds.has(sessionInstrumentId) || hiddenAccessibleIds.includes(sessionInstrumentId))
+            ) {
+              ctx.issues.push({
+                code: 'custom',
+                input: sessionInstrumentId,
+                message: t({
+                  en: "The session instrument must be one of the group's instruments. Select it above, or choose another session instrument.",
+                  es: 'El instrumento de sesión debe ser uno de los instrumentos del grupo. Selecciónelo arriba o elija otro instrumento de sesión.',
+                  fr: "L'instrument de session doit faire partie des instruments du groupe. Sélectionnez-le ci-dessus ou choisissez un autre instrument de session."
+                }),
+                path: ['sessionInstrumentId']
+              });
+            }
             if (ctx.value.minimumAgeApplied && !ctx.value.minimumAge) {
               ctx.issues.push({
                 code: 'custom',
@@ -841,6 +894,8 @@ const ManageGroupForm = ({ data, onSubmit, readOnly }: ManageGroupFormProps) => 
                 fr: formData.idValidationRegexErrorMessageFr
               },
               minimumAge: formData.minimumAgeApplied ? formData.minimumAge : null,
+              sessionInstrumentId:
+                formData.sessionInstrumentId === NO_SESSION_INSTRUMENT ? null : formData.sessionInstrumentId,
               subjectIdDisplayLength: formData.subjectIdDisplayLength
             }
           });
@@ -857,20 +912,20 @@ const RouteComponent = () => {
   const currentGroup = useAppStore((store) => store.currentGroup);
   const changeGroup = useAppStore((store) => store.changeGroup);
   const setupState = useSetupStateQuery();
+  // The store holds the group as it was at sign-in, and a save sends back every setting the form was
+  // seeded with, so seeding it from that copy would undo any change made since.
+  const groupQuery = useGroupQuery(currentGroup?.id);
+  const group = groupQuery.data;
 
   const availableInstruments = instrumentInfoQuery.data;
 
-  const accessibleInstrumentIds = currentGroup?.accessibleInstrumentIds;
-  const instrumentRepoIds = currentGroup?.instrumentRepoIds;
-  const defaultIdentificationMethod = currentGroup?.settings.defaultIdentificationMethod;
-
   const data = useMemo(() => {
-    if (!availableInstruments) {
+    if (!availableInstruments || !group) {
       return null;
     }
 
-    const accessibleSet = new Set(accessibleInstrumentIds ?? []);
-    const assignedRepos = new Set(instrumentRepoIds ?? []);
+    const accessibleSet = new Set(group.accessibleInstrumentIds);
+    const assignedRepos = new Set(group.instrumentRepoIds);
 
     const instruments: CategorizedInstruments = { form: [], interactive: [], series: [] };
     const visibleIds = new Set<string>();
@@ -903,12 +958,12 @@ const RouteComponent = () => {
       const seriesGroupId = instrument.kind === 'SERIES' ? (instrument.seriesGroupId ?? null) : null;
       const item: InstrumentItem = {
         authors: instrument.details.authors,
-        availability: buildSeriesAvailability({ currentGroup, instrumentKind: instrument.kind, seriesGroupId }),
+        availability: buildSeriesAvailability({ currentGroup: group, instrumentKind: instrument.kind, seriesGroupId }),
         createdAt: instrument.createdAt ?? null,
         description: instrument.details.description,
         id: instrument.id,
         internal: instrument.kind === 'SERIES' ? null : instrument.internal,
-        isDeletable: instrument.kind === 'SERIES' && seriesGroupId === currentGroup?.id,
+        isDeletable: instrument.kind === 'SERIES' && seriesGroupId === group.id,
         kind: instrument.kind,
         seriesItems: instrument.kind === 'SERIES' ? instrument.seriesItems : undefined,
         source,
@@ -927,42 +982,31 @@ const RouteComponent = () => {
     // Preserve any accessible ids we are not displaying (defensive: e.g. instruments that failed to load).
     const hiddenAccessibleIds = [...accessibleSet].filter((id) => !visibleIds.has(id));
 
-    const settings = currentGroup?.settings;
+    const settings = group.settings;
     const settingsInitialValues: SettingsValues = {
-      defaultIdentificationMethod,
-      idValidationRegex: settings?.idValidationRegex,
-      idValidationRegexErrorMessageEn: settings?.idValidationRegexErrorMessage?.en,
-      idValidationRegexErrorMessageFr: settings?.idValidationRegexErrorMessage?.fr,
-      minimumAge: settings?.minimumAge,
-      minimumAgeApplied: typeof settings?.minimumAge === 'number',
-      subjectIdDisplayLength: settings?.subjectIdDisplayLength
+      defaultIdentificationMethod: settings.defaultIdentificationMethod,
+      idValidationRegex: settings.idValidationRegex,
+      idValidationRegexErrorMessageEn: settings.idValidationRegexErrorMessage?.en,
+      idValidationRegexErrorMessageFr: settings.idValidationRegexErrorMessage?.fr,
+      minimumAge: settings.minimumAge,
+      minimumAgeApplied: typeof settings.minimumAge === 'number',
+      sessionInstrumentId: settings.sessionInstrumentId ?? NO_SESSION_INSTRUMENT,
+      subjectIdDisplayLength: settings.subjectIdDisplayLength
     };
 
     const existingTitles = [...instruments.form, ...instruments.interactive, ...instruments.series].map(
       (item) => item.title
     );
 
-    return currentGroup
-      ? {
-          existingTitles,
-          groupId: currentGroup.id,
-          hiddenAccessibleIds,
-          initialSelectedIds,
-          instruments,
-          settingsInitialValues
-        }
-      : null;
-  }, [
-    accessibleInstrumentIds,
-    availableInstruments,
-    currentGroup?.id,
-    currentGroup?.name,
-    defaultIdentificationMethod,
-    instrumentRepoIds,
-    resolvedLanguage,
-    t,
-    currentGroup?.settings
-  ]);
+    return {
+      existingTitles,
+      groupId: group.id,
+      hiddenAccessibleIds,
+      initialSelectedIds,
+      instruments,
+      settingsInitialValues
+    };
+  }, [availableInstruments, group, resolvedLanguage, t]);
 
   return (
     <React.Fragment>
@@ -990,5 +1034,12 @@ const RouteComponent = () => {
 };
 
 export const Route = createFileRoute('/_app/group/manage')({
-  component: RouteComponent
+  component: RouteComponent,
+  // Fetched even when cached, since the form is seeded once and saves every setting it was seeded with.
+  loader: async ({ context }) => {
+    const { currentGroup } = useAppStore.getState();
+    if (currentGroup) {
+      await context.queryClient.fetchQuery(groupQueryOptions(currentGroup.id));
+    }
+  }
 });

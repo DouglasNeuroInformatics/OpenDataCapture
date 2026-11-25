@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
 
-import { $BaseModel, $DateLike } from '../core/core.js';
+import { $BaseModel, $DateLike, $Json } from '../core/core.js';
 import { $CreateSubjectData, $Subject } from '../subject/subject.js';
 
 export type SessionType = z.infer<typeof $SessionType>;
@@ -23,6 +23,12 @@ export const $CreateSessionData = z.object({
   subjectData: $CreateSubjectData,
   type: $SessionType,
   username: z.string().nullish()
+});
+
+export type $StartSessionData = z.infer<typeof $StartSessionData>;
+export const $StartSessionData = $CreateSessionData.extend({
+  // Required exactly when the session's group has a session instrument.
+  sessionInstrumentAnswers: z.object({ data: $Json, instrumentId: z.string() }).optional()
 });
 
 export type SessionWithUser = Session & {

@@ -1,10 +1,12 @@
 import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import { $Group } from '@opendatacapture/schemas/group';
 import type { $UpdateGroupData } from '@opendatacapture/schemas/group';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
 import { useAppStore } from '@/store';
+
+import { groupQueryOptions } from './useGroupQuery';
 
 type UpdateGroupMutationOptions = {
   /** Whether a success toast is raised. Opt out where the caller renders its own save feedback. */
@@ -22,6 +24,7 @@ export function useUpdateGroupMutation({
 }: UpdateGroupMutationOptions = {}) {
   const addNotification = useNotificationsStore((store) => store.addNotification);
   const currentGroup = useAppStore((store) => store.currentGroup);
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: $UpdateGroupData) => {
       // A caller that opts out of throwing is declaring it renders its own failure feedback, so
@@ -31,7 +34,9 @@ export function useUpdateGroupMutation({
       });
       return $Group.parseAsync(response.data);
     },
-    onSuccess() {
+    onSuccess(group) {
+      // Pages that read the group fresh rather than from the store must see what was just saved.
+      queryClient.setQueryData(groupQueryOptions(group.id).queryKey, group);
       if (successNotification) {
         addNotification({ type: 'success' });
       }

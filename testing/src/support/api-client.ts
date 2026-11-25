@@ -3,7 +3,7 @@ import { AUDIT_LOGS_MAX_PAGE_SIZE } from '@opendatacapture/schemas/audit';
 import type { $AuditLog, $AuditLogAction, $AuditLogsPage } from '@opendatacapture/schemas/audit';
 import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import type { Permissions } from '@opendatacapture/schemas/core';
-import type { $CreateGroupData, Group } from '@opendatacapture/schemas/group';
+import type { $CreateGroupData, $UpdateGroupData, Group } from '@opendatacapture/schemas/group';
 import type { InstrumentInfo } from '@opendatacapture/schemas/instrument';
 import type {
   $CreateInstrumentRecordData,
@@ -321,6 +321,15 @@ export class ApiClient {
    */
   async setUserPermissions(id: string, permissions: Permissions): Promise<User> {
     return this.putUserPermissions(id, { kind: 'custom', permissions });
+  }
+
+  /** Updates a group as admin, for settings a spec needs in place before a user signs in to it. */
+  async updateGroup(id: string, data: $UpdateGroupData): Promise<Group> {
+    return this.expectJson<Group>(
+      this.request.patch(`${API}/groups/${id}`, { data, headers: this.authHeaders }),
+      200,
+      `update group '${id}'`
+    );
   }
 
   /**

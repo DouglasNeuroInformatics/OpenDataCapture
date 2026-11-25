@@ -107,6 +107,8 @@ type GroupSettings {
   idValidationRegexErrorMessage LocalizedString?
   subjectIdDisplayLength        Int?
   minimumAge                    Int?
+  // A form instrument that must be completed to start a session in the group, if any.
+  sessionInstrumentId           String?
 }
 
 // Mirrors $LocalizedString in @opendatacapture/schemas/core; each field is optional so
