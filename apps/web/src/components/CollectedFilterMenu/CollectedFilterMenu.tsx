@@ -34,12 +34,18 @@ export const CollectedFilterMenu = ({ onChange, testIdPrefix, value }: Collected
           onChange={(event) => onChange(selectCollectedPreset(event.target.value as CollectedPreset, value))}
         >
           <option value="all">{t({ en: 'Any time', es: 'Cualquier fecha', fr: 'Toute période' })}</option>
-          <option value="pastWeek">{t({ en: 'This week', es: 'Esta semana', fr: 'Cette semaine' })}</option>
-          <option value="pastMonth">{t({ en: 'This month', es: 'Este mes', fr: 'Ce mois-ci' })}</option>
-          <option value="pastThreeMonths">{t({ en: '3 months', es: '3 meses', fr: '3 mois' })}</option>
-          <option value="pastSixMonths">{t({ en: '6 months', es: '6 meses', fr: '6 mois' })}</option>
-          <option value="pastYear">{t({ en: 'This year', es: 'Este año', fr: 'Cette année' })}</option>
-          <option value="pastTwoYears">{t({ en: '2 years', es: '2 años', fr: '2 ans' })}</option>
+          <option value="pastWeek">{t({ en: 'Past week', es: 'Última semana', fr: 'Semaine écoulée' })}</option>
+          <option value="pastMonth">{t({ en: 'Past month', es: 'Último mes', fr: 'Mois écoulé' })}</option>
+          <option value="pastThreeMonths">
+            {t({ en: 'Past 3 months', es: 'Últimos 3 meses', fr: '3 derniers mois' })}
+          </option>
+          <option value="pastSixMonths">
+            {t({ en: 'Past 6 months', es: 'Últimos 6 meses', fr: '6 derniers mois' })}
+          </option>
+          <option value="pastYear">{t({ en: 'Past year', es: 'Último año', fr: 'Année écoulée' })}</option>
+          <option value="pastTwoYears">
+            {t({ en: 'Past 2 years', es: 'Últimos 2 años', fr: '2 dernières années' })}
+          </option>
           <option value="custom">{t({ en: 'Custom', es: 'Personalizado', fr: 'Personnalisé' })}</option>
         </select>
       </div>
