@@ -177,7 +177,7 @@ export const SeriesInstrumentRenderer = ({
               />
             ))
             .with({ index: 1, isInstrumentInProgress: false }, () => (
-              <div className="flex grow flex-col items-center justify-center space-y-1 py-32 text-center">
+              <div className="flex flex-col items-center space-y-1 pt-4 text-center">
                 <Heading variant="h4">
                   {t({
                     en: 'Series Instrument in Progress',
