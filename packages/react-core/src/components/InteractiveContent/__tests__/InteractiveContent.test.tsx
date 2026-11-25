@@ -338,6 +338,52 @@ describe('InteractiveContent', () => {
     expect(requestFullscreen.mock.contexts[0]).toBe(document.querySelector('iframe'));
   });
 
+  it('should focus the iframe and its document once it loads, so key presses reach the instrument without a click', () => {
+    renderInteractiveContent();
+    const iFrame = document.querySelector('iframe')!;
+    const focus = vi.spyOn(iFrame, 'focus');
+    const focusWindow = vi.fn();
+    Object.defineProperty(iFrame, 'contentWindow', { value: { focus: focusWindow } });
+    fireEvent.load(iFrame);
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(focusWindow).toHaveBeenCalled();
+  });
+
+  it('should focus the iframe and its document when it enters fullscreen, which otherwise leaves focus here', () => {
+    renderInteractiveContent();
+    const iFrame = document.querySelector('iframe')!;
+    const focus = vi.spyOn(iFrame, 'focus');
+    const focusWindow = vi.fn();
+    Object.defineProperty(iFrame, 'contentWindow', { value: { focus: focusWindow } });
+    installFullscreen(iFrame);
+    act(() => {
+      document.dispatchEvent(new Event('fullscreenchange'));
+    });
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(focusWindow).toHaveBeenCalled();
+  });
+
+  it('should focus the iframe when it leaves fullscreen, so escape does not strand focus here', () => {
+    renderInteractiveContent();
+    const iFrame = document.querySelector('iframe')!;
+    const focus = vi.spyOn(iFrame, 'focus');
+    installFullscreen(null);
+    act(() => {
+      document.dispatchEvent(new Event('fullscreenchange'));
+    });
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+  });
+
+  it('should leave focus alone when something other than the iframe goes fullscreen', () => {
+    renderInteractiveContent();
+    const focus = vi.spyOn(HTMLIFrameElement.prototype, 'focus');
+    installFullscreen(document.createElement('div'));
+    act(() => {
+      document.dispatchEvent(new Event('fullscreenchange'));
+    });
+    expect(focus).not.toHaveBeenCalled();
+  });
+
   it('should leave fullscreen from the fullscreen button when already fullscreen', () => {
     renderInteractiveContent();
     installFullscreen(document.querySelector('iframe'));

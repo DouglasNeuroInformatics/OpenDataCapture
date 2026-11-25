@@ -41,6 +41,17 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
   const hasSelectedLanguage = selectedLanguage !== null;
   const isLocked = Boolean(enableLanguageLock) && hasSelectedLanguage;
 
+  // A fullscreened iframe does not receive keyboard focus: the browser leaves focus wherever it
+  // was in this document, so an instrument that listens for key presses on its own document stays
+  // unresponsive until the participant clicks inside the frame. Focusing the frame moves focus into
+  // the document the instrument runs in, which is where its key listeners are. The frame is also
+  // focused once it loads, since a key-only instrument that never goes fullscreen has the same
+  // problem; preventScroll keeps that from moving the page behind it.
+  const handleFocusIFrame = useCallback(() => {
+    iFrameRef.current?.focus({ preventScroll: true });
+    iFrameRef.current?.contentWindow?.focus();
+  }, []);
+
   // The payload crosses from an instrument bundle running in the iframe, so it is parsed rather
   // than trusted — an instrument may only ask for a language instruments can be authored in.
   const handleChangeLanguageEvent = useCallback(
@@ -102,6 +113,18 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
       });
     }
   }, [hasSelectedLanguage]);
+
+  // Covers both entering and leaving fullscreen, however it was triggered: the button here, the
+  // instrument asking to start fullscreen, or the participant pressing escape.
+  useEffect(() => {
+    const handler = () => {
+      if (!document.fullscreenElement || document.fullscreenElement === iFrameRef.current) {
+        handleFocusIFrame();
+      }
+    };
+    document.addEventListener('fullscreenchange', handler, false);
+    return () => document.removeEventListener('fullscreenchange', handler, false);
+  }, [handleFocusIFrame]);
 
   useEffect(() => {
     if (enableLanguageLock && selectedLanguage) {
@@ -194,6 +217,7 @@ const _InteractiveContent = React.memo<InteractiveContentProps>(function _Intera
               src="/runtime/v1/@opendatacapture/runtime-internal/interactive/iframe.html"
               style={{ backgroundColor: 'white', height: dimensions, scale: `${scale}%`, width: dimensions }}
               title="Open Data Capture - Interactive Instrument"
+              onLoad={handleFocusIFrame}
             />
           </div>
         </>
