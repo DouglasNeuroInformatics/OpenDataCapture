@@ -68,6 +68,14 @@ All of the required configuration is stored in the file `.env`, which can be gen
 ./scripts/generate-env.sh && source .env
 ```
 
+The generated `.env` enables S3-compatible file storage (`STORAGE_ENABLED=true`) at `http://localhost:9000`, which the development Docker Compose file below does not start. Unless you run your own S3-compatible service on that address, set `STORAGE_ENABLED=false` in `.env` so the API does not exit on startup:
+
+```sh
+STORAGE_ENABLED=false
+```
+
+With `STORAGE_ENABLED=false`, file instruments answer `503` and the rest of the platform works normally.
+
 ### System Dependencies
 
 Now, in order to run the code, we need to install some additional system dependencies (i.e., a JavaScript runtime and database).

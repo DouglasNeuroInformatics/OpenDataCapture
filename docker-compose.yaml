@@ -31,8 +31,10 @@ services:
       args:
         - RELEASE_VERSION
     depends_on:
-      - mongo
-      - rustfs
+      mongo:
+        condition: service_started
+      rustfs:
+        condition: service_healthy
     restart: unless-stopped
     environment:
       - GATEWAY_INTERNAL_NETWORK_URL=http://gateway:80
@@ -131,8 +133,21 @@ services:
       - '' #load by default without having to specify docker compose --profile
       - fullstack
       - nogateway
+  rustfs-init:
+    image: rustfs/rustfs:${RUSTFS_VERSION:-1.0.6}
+    user: '0:0'
+    entrypoint: ['chown', '-R', 'rustfs:rustfs', '/data']
+    volumes:
+      - ./rustfs/data:/data
+    profiles:
+      - '' #load by default without having to specify docker compose --profile
+      - fullstack
+      - nogateway
   rustfs:
-    image: rustfs/rustfs:${RUSTFS_VERSION:-latest}
+    image: rustfs/rustfs:${RUSTFS_VERSION:-1.0.6}
+    depends_on:
+      rustfs-init:
+        condition: service_completed_successfully
     restart: unless-stopped
     environment:
       - RUSTFS_VOLUMES=/data
