@@ -94,6 +94,17 @@ named, with every finding it returned.
 
 ## Open
 
+Commit first, then run the workflow's check on the body file. It prints the report the workflow would post
+and exits non-zero where the workflow would close the PR:
+
+```sh
+jq -n --rawfile body <path> --arg sha "$(git rev-parse HEAD)" --arg ref "$(git branch --show-current)" \
+  '{action: "opened", pull_request: {body: $body, head: {ref: $ref, sha: $sha}, user: {login: "local", type: "User"}}}' \
+  > <dir>/event.json
+git log --format=%B upstream/main..HEAD > <dir>/commits.txt
+node scripts/check-pr-body.ts <dir>/event.json <dir>/commits.txt
+```
+
 ```sh
 git push -u origin HEAD
 gh pr create --repo DouglasNeuroInformatics/OpenDataCapture --base main --title "<type(scope): subject>" --body-file <path>
@@ -104,9 +115,10 @@ The title follows the commit convention in root `AGENTS.md`; `origin` is the for
 ## Follow-up pushes
 
 A push moves the head, so the stamp goes stale and the workflow closes the PR on the push unless the body
-already names the new head. Commit, read `git rev-parse HEAD`, edit the body, and only then push. When the
-follow-up adds code, re-run the review and rewrite the block for the new head. When it only addresses
-findings, add this as its own line directly after the `Reviewed at commit` line:
+already names the new head. Commit, read `git rev-parse HEAD`, edit the body file, run the check under Open
+on it, then `gh pr edit` and only then push. When the follow-up adds code, re-run the review and rewrite the
+block for the new head. When it only addresses findings, add this as its own line directly after the
+`Reviewed at commit` line:
 
 ```
 Follow-up <full new head sha>: addresses findings <n, m>; no new code.
