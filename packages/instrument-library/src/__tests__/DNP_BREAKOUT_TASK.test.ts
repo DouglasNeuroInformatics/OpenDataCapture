@@ -31,12 +31,14 @@ let context: RecordingContext;
 let nextFrame: FrameRequestCallback | undefined;
 let done: ReturnType<typeof vi.fn<(data: BreakoutData) => void>>;
 let addDocumentListener: MockInstance<typeof document.addEventListener>;
+let currentTimestamp: number;
 
 const CANVAS_WIDTH = 480;
 const BALL_RADIUS = 10;
 const BALL_SPEED = 2;
 const PADDLE_STEP = 7;
 const PADDLE_WIDTH = 75;
+const TICK_MS = 1000 / 60;
 const FRAMES_TO_CROSS_CANVAS = Math.ceil(CANVAS_WIDTH / PADDLE_STEP);
 
 function render() {
@@ -48,12 +50,13 @@ function start() {
   document.querySelector<HTMLButtonElement>('#root button')!.click();
 }
 
-function step(frames = 1) {
+function step(frames = 1, frameDurationMs = TICK_MS) {
   for (let i = 0; i < frames; i++) {
     const frame = nextFrame!;
     nextFrame = undefined;
     addDocumentListener = vi.spyOn(document, 'addEventListener');
-    frame(performance.now());
+    currentTimestamp += frameDurationMs;
+    frame(currentTimestamp);
   }
 }
 
@@ -96,30 +99,41 @@ function computeMeasure(key: string, data: BreakoutData) {
   return measure.value(data);
 }
 
+function resetTask() {
+  for (const [type, listener, options] of addDocumentListener.mock.calls) {
+    document.removeEventListener(type, listener, options);
+  }
+  addDocumentListener.mockClear();
+  document.body.replaceChildren();
+  context = createRecordingContext();
+  currentTimestamp = 0;
+  nextFrame = undefined;
+}
+
 describe('DNP_BREAKOUT_TASK', () => {
   beforeEach(() => {
     context = createRecordingContext();
+    currentTimestamp = 0;
     done = vi.fn<(data: BreakoutData) => void>();
     nextFrame = undefined;
     addDocumentListener = vi.spyOn(document, 'addEventListener');
     // The page under test only calls the 2D context methods recorded here, and happy-dom has no canvas
     // adapter, so getContext would otherwise return null.
-    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context as unknown as CanvasRenderingContext2D);
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(
+      () => context as unknown as CanvasRenderingContext2D
+    );
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
       nextFrame = callback;
       return 0;
     });
+    vi.spyOn(performance, 'now').mockImplementation(() => currentTimestamp);
     vi.spyOn(window, 'devicePixelRatio', 'get').mockReturnValue(1);
     setViewport(480, 320);
   });
 
   afterEach(() => {
-    for (const [type, listener, options] of addDocumentListener.mock.calls) {
-      document.removeEventListener(type, listener, options);
-    }
+    resetTask();
     vi.restoreAllMocks();
-    vi.useRealTimers();
-    document.body.replaceChildren();
   });
 
   describe('measures', () => {
@@ -242,6 +256,17 @@ describe('DNP_BREAKOUT_TASK', () => {
       step();
       expect(lastPaddleX()).toBe(202.5);
     });
+
+    it('should scale keyboard paddle movement with the canvas scale, so larger screens cross in the same time', () => {
+      setViewport(1080, 720);
+      start();
+      pressKey('keydown', 'ArrowRight');
+      step(2);
+      const paddleWidth = 75 * 2;
+      const startX = (960 - paddleWidth) / 2;
+      const scaledPaddleCalls = context.rect.mock.calls.filter(([, y]) => y === 620);
+      expect(scaledPaddleCalls.at(-1)?.[0]).toBe(startX + 7 * 2);
+    });
   });
 
   describe('game', () => {
@@ -284,21 +309,78 @@ describe('DNP_BREAKOUT_TASK', () => {
     });
 
     it('should complete with no lives remaining after the paddle misses three times', () => {
-      vi.useFakeTimers({ toFake: ['Date'] });
-      vi.setSystemTime(1000);
       start();
-      vi.setSystemTime(4000);
-      stepUntil(() => done.mock.calls.length > 0);
-      expect(done).toHaveBeenCalledWith({ livesRemaining: 0, timeElapsed: 3000 });
+      let frames = 0;
+      stepUntil(
+        () => done.mock.calls.length > 0,
+        () => {
+          frames++;
+        }
+      );
+      expect(done).toHaveBeenCalledWith({
+        livesRemaining: 0,
+        timeElapsed: Math.round((frames + 1) * TICK_MS)
+      });
+      expect(nextFrame).toBeUndefined();
     });
 
     it('should complete with the lives remaining once every brick is broken', () => {
-      vi.useFakeTimers({ toFake: ['Date'] });
-      vi.setSystemTime(0);
       start();
-      vi.setSystemTime(2500);
-      stepUntil(() => done.mock.calls.length > 0, followBallWithMouse);
-      expect(done).toHaveBeenCalledWith({ livesRemaining: 3, timeElapsed: 2500 });
+      let frames = 0;
+      stepUntil(
+        () => done.mock.calls.length > 0,
+        () => {
+          frames++;
+          followBallWithMouse();
+        }
+      );
+      expect(done).toHaveBeenCalledWith({
+        livesRemaining: 3,
+        timeElapsed: Math.round((frames + 1) * TICK_MS)
+      });
+      expect(nextFrame).toBeUndefined();
+    });
+
+    it('should move the ball and paddle by elapsed time rather than per frame, so a 120 Hz display matches a 60 Hz display', () => {
+      start();
+      pressKey('keydown', 'ArrowRight');
+      step(20, 1000 / 60);
+      const at60Hz = { ball: lastBall(), paddleX: lastPaddleX() };
+
+      resetTask();
+
+      start();
+      pressKey('keydown', 'ArrowRight');
+      step(40, 1000 / 120);
+      expect({ ball: lastBall(), paddleX: lastPaddleX() }).toEqual(at60Hz);
+    });
+
+    it('should run one tick per frame when 60 Hz timestamps are rounded to 0.1 ms, so coarsened browser clocks do not stutter', () => {
+      start();
+      for (let i = 1; i <= 60; i++) {
+        const frame = nextFrame!;
+        nextFrame = undefined;
+        frame(Math.round(((i * 1000) / 60) * 10) / 10);
+      }
+      const roundedBall = lastBall();
+
+      resetTask();
+
+      start();
+      step(60, 1000 / 60);
+      expect(roundedBall).toEqual(lastBall());
+    });
+
+    it('should cap the catch-up step after a long gap between frames, so returning to a backgrounded tab advances at most three ticks', () => {
+      start();
+      step(1);
+      step(1, 10_000);
+      step(1);
+      // 1 tick on start + 1 tick on first frame + 3 capped ticks on the 10 s gap = 5 ticks reflected in the next draw
+      expect(lastBall()).toEqual({ x: 240 + 5 * BALL_SPEED, y: 290 - 5 * BALL_SPEED });
+
+      stepUntil(() => done.mock.calls.length > 0);
+      expect(done.mock.calls[0]![0].timeElapsed).toBeLessThan(20_000);
     });
   });
 });
