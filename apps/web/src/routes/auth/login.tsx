@@ -1,40 +1,21 @@
 import { Card, Heading, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { LanguageToggle, Logo } from '@opendatacapture/react-core';
-import type { $LoginCredentials, AuthPayload } from '@opendatacapture/schemas/auth';
+import type { $LoginCredentials } from '@opendatacapture/schemas/auth';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import axios from 'axios';
 
 import { DemoBanner } from '@/components/DemoBanner';
 import { LoginBrandingPanel } from '@/components/LoginBranding';
 import { LoginForm } from '@/components/LoginForm';
+import { useLoginMutation } from '@/hooks/useLoginMutation';
 import { setupStateQueryOptions, useSetupStateQuery } from '@/hooks/useSetupStateQuery';
 import { useAppStore } from '@/store';
 import { getRightPanelGradient } from '@/utils/branding';
 import { getValueForLanguage } from '@/utils/language';
 
-type LoginResult =
-  | { accessToken: string; kind: 'success' }
-  | { kind: 'archived' }
-  | { kind: 'disabled' }
-  | { kind: 'unauthorized' };
-
-const loginRequest = async (credentials: $LoginCredentials): Promise<LoginResult> => {
-  const response = await axios.post<AuthPayload>('/v1/auth/login', credentials, {
-    validateStatus: (status) => status === 200 || status === 401 || status === 403
-  });
-  if (response.status === 403) {
-    const message = (response.data as { message?: string }).message;
-    return { kind: message === 'Account Archived' ? 'archived' : 'disabled' };
-  }
-  if (response.status === 401) {
-    return { kind: 'unauthorized' };
-  }
-  return { accessToken: response.data.accessToken, kind: 'success' };
-};
-
 const RouteComponent = () => {
   const login = useAppStore((store) => store.login);
+  const loginMutation = useLoginMutation();
   const setupStateQuery = useSetupStateQuery();
   const notifications = useNotificationsStore();
   const { resolvedLanguage, t } = useTranslation('auth');
@@ -46,35 +27,19 @@ const RouteComponent = () => {
     getValueForLanguage(branding?.instanceName ?? {}, resolvedLanguage)?.trim() ?? 'Open Data Capture';
 
   const handleLogin = async (credentials: $LoginCredentials) => {
-    const result = await loginRequest(credentials);
+    const result = await loginMutation.mutateAsync(credentials);
     if (result.kind === 'archived') {
       notifications.addNotification({
-        message: t({
-          en: 'Your account has been archived. Please contact an administrator to restore it.',
-          es: 'Su cuenta ha sido archivada. Comuníquese con un administrador para restaurarla.',
-          fr: 'Votre compte a été archivé. Veuillez contacter un administrateur pour le restaurer.'
-        }),
-        title: t({
-          en: 'Account Archived',
-          es: 'Cuenta archivada',
-          fr: 'Compte archivé'
-        }),
+        message: t('archivedError.message'),
+        title: t('archivedError.title'),
         type: 'error'
       });
       return;
     }
     if (result.kind === 'disabled') {
       notifications.addNotification({
-        message: t({
-          en: 'This account is disabled. Please contact an administrator.',
-          es: 'Esta cuenta está desactivada. Comuníquese con un administrador.',
-          fr: 'Ce compte est désactivé. Veuillez contacter un administrateur.'
-        }),
-        title: t({
-          en: 'Account Disabled',
-          es: 'Cuenta desactivada',
-          fr: 'Compte désactivé'
-        }),
+        message: t('disabledError.message'),
+        title: t('disabledError.title'),
         type: 'error'
       });
       return;
@@ -83,6 +48,17 @@ const RouteComponent = () => {
       notifications.addNotification({
         message: t('unauthorizedError.message'),
         title: t('unauthorizedError.title'),
+        type: 'error'
+      });
+      return;
+    }
+    if (result.kind === 'forbidden') {
+      notifications.addNotification({
+        message: t({
+          en: 'The server refused the sign-in request. Try again, and contact an administrator if it keeps happening.',
+          es: 'El servidor rechazó la solicitud de inicio de sesión. Inténtelo de nuevo y comuníquese con un administrador si sigue ocurriendo.',
+          fr: 'Le serveur a refusé la demande de connexion. Réessayez, et contactez un administrateur si le problème persiste.'
+        }),
         type: 'error'
       });
       return;

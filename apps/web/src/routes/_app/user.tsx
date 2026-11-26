@@ -34,6 +34,7 @@ type PasswordFormData = {
 
 const RouteComponent = () => {
   const currentUser = useAppStore((store) => store.currentUser);
+  const requireReauthentication = useAppStore((store) => store.requireReauthentication);
   const updateSelfUserMutation = useSelfUpdateUserMutation();
   const resetPasswordMutation = useResetPasswordMutation();
   const passwordErrorMessage = usePasswordErrorMessage();
@@ -249,6 +250,9 @@ const RouteComponent = () => {
                     onSuccess: () => {
                       addNotification({ type: 'success' });
                       setIsPasswordDialogOpen(false);
+                      // The API stops renewing a token issued before the password changed. Asking for
+                      // the new password now beats the dialog turning up unannounced a minute later.
+                      requireReauthentication();
                     }
                   }
                 );

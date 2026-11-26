@@ -5,17 +5,38 @@ import type { Session } from '@opendatacapture/schemas/session';
 import type { Simplify } from 'type-fest';
 import type { StateCreator } from 'zustand';
 
-export type CurrentUser = Omit<TokenPayload, 'basePermissionLevel' | 'kind' | 'permissions'> & {
+export type CurrentUser = Omit<TokenPayload, 'basePermissionLevel' | 'kind' | 'permissions' | 'renewal'> & {
   ability: BaseAppAbility;
+};
+
+/** Both times are on this tab's clock, counted from the moment the token arrived. */
+export type AccessTokenValidity = {
+  expiresAt: number;
+  /** False once the token already runs to the end of the sign-in, so activity cannot extend it. */
+  isRenewable: boolean;
+  receivedAt: number;
 };
 
 export type AuthSlice = {
   accessToken: null | string;
+  accessTokenValidity: AccessTokenValidity | null;
   changeGroup: (group: Group | null) => void;
   currentGroup: Group | null;
   currentUser: CurrentUser | null;
+  /** Marks the token in hand as the last this sign-in gets, for when a renewal can never be used. */
+  endAccessTokenRenewal: () => void;
+  /** Treats the token in hand as run out from now, for when the API has refused to renew it. */
+  expireAccessToken: () => void;
+  isReauthenticationRequired: boolean;
   login: (accessToken: string) => void;
   logout: () => void;
+  /**
+   * Swaps in a newer token, keeping the group and session the user is working in. A token is refused,
+   * and nothing changes, when it could not carry on that work: it belongs to someone else, or it is
+   * confined to resetting a password the tab was not already resetting.
+   */
+  reauthenticate: (accessToken: string) => 'accepted' | 'differentUser' | 'mustResetPassword';
+  requireReauthentication: () => void;
 };
 
 export type ConnectivitySlice = {

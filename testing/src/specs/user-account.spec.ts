@@ -41,6 +41,11 @@ test.describe('user account', () => {
     await userPage.submitNewPassword(newPassword);
     await expect(userPage.passwordDialog).toBeHidden();
 
+    // The API stops renewing a token issued under the old password, so the app asks for the new one
+    // at once rather than a minute later.
+    await expect(userPage.reauthenticationDialog).toBeVisible();
+    await userPage.signInAgain(newPassword);
+
     await ApiClient.login(apiRequestContext, { password: newPassword, username: credentials.username });
     const oldPasswordLogin = await apiRequestContext.post('/api/v1/auth/login', { data: credentials });
     expect(oldPasswordLogin.status()).toBe(401);

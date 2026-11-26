@@ -192,7 +192,8 @@ export class PrismaModuleOptionsFactory implements OnApplicationShutdown {
           encryptionKeyPair: true
         },
         user: {
-          hashedPassword: true
+          hashedPassword: true,
+          tokenGenerationId: true
         }
       }
     }).$extends(LibnestPrismaExtension);

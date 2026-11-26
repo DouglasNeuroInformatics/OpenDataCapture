@@ -4,24 +4,21 @@ import type { BrandingConfig } from '@opendatacapture/schemas/setup';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { LoginResult } from '@/hooks/useLoginMutation';
 import { Route } from '@/routes/auth/login';
 
 import '@/services/i18n';
 
 const mocks = vi.hoisted(() => ({
   login: vi.fn(),
+  mutateAsync: vi.fn<(credentials: $LoginCredentials) => Promise<LoginResult>>(),
   navigate: vi.fn(),
-  post: vi.fn<
-    (
-      url: string,
-      data: unknown,
-      config: { validateStatus: (status: number) => boolean }
-    ) => Promise<{ data: object; status: number }>
-  >(),
   setupState: { activeLanguages: ['en'], branding: null as BrandingConfig | null, isDemo: false }
 }));
 
-vi.mock('axios', () => ({ default: { post: mocks.post } }));
+vi.mock('@/hooks/useLoginMutation', () => ({
+  useLoginMutation: () => ({ mutateAsync: mocks.mutateAsync })
+}));
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@tanstack/react-router')>()),
   useNavigate: () => mocks.navigate
@@ -56,7 +53,7 @@ const renderPage = () => {
   return render(<Component />);
 };
 
-const respondWith = (status: number, data: object) => mocks.post.mockResolvedValue({ data, status });
+const respondWith = (result: LoginResult) => mocks.mutateAsync.mockResolvedValue(result);
 
 const lastNotification = () => useNotificationsStore.getState().notifications.at(-1);
 
@@ -66,7 +63,7 @@ describe('Route', () => {
     useNotificationsStore.setState({ notifications: [] });
     mocks.setupState.branding = null;
     mocks.setupState.isDemo = false;
-    respondWith(200, { accessToken: 'token-123' });
+    respondWith({ accessToken: 'token-123', kind: 'success' });
   });
 
   afterEach(cleanup);
@@ -80,25 +77,10 @@ describe('Route', () => {
     expect(ensureQueryData).toHaveBeenCalledWith({ queryKey: ['setup-state'] });
   });
 
-  it('should post the submitted credentials to the login endpoint', async () => {
+  it('should sign in with the submitted credentials', async () => {
     renderPage();
     fireEvent.click(screen.getByTestId('login-submit'));
-    await waitFor(() => expect(mocks.post).toHaveBeenCalled());
-    expect(mocks.post.mock.lastCall?.slice(0, 2)).toEqual(['/v1/auth/login', { password: 'secret', username: 'jane' }]);
-  });
-
-  it('should accept only 200, 401 and 403 as answers, so any other status still throws', async () => {
-    renderPage();
-    fireEvent.click(screen.getByTestId('login-submit'));
-    await waitFor(() => expect(mocks.post).toHaveBeenCalled());
-    const validateStatus = mocks.post.mock.lastCall?.[2].validateStatus;
-    expect([200, 401, 403, 404, 500].map((status) => validateStatus?.(status))).toEqual([
-      true,
-      true,
-      true,
-      false,
-      false
-    ]);
+    await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalledWith({ password: 'secret', username: 'jane' }));
   });
 
   it('should store the access token and open the dashboard after a successful login', async () => {
@@ -109,7 +91,7 @@ describe('Route', () => {
   });
 
   it('should explain that the credentials were rejected without logging in', async () => {
-    respondWith(401, {});
+    respondWith({ kind: 'unauthorized' });
     renderPage();
     fireEvent.click(screen.getByTestId('login-submit'));
     await waitFor(() => expect(lastNotification()).toBeDefined());
@@ -122,7 +104,7 @@ describe('Route', () => {
   });
 
   it('should tell an archived user to ask an administrator to restore their account', async () => {
-    respondWith(403, { message: 'Account Archived' });
+    respondWith({ kind: 'archived' });
     renderPage();
     fireEvent.click(screen.getByTestId('login-submit'));
     await waitFor(() => expect(lastNotification()).toBeDefined());
@@ -130,12 +112,22 @@ describe('Route', () => {
     expect(mocks.login).not.toHaveBeenCalled();
   });
 
-  it('should tell a user refused for any other reason that their account is disabled', async () => {
-    respondWith(403, { message: 'Forbidden' });
+  it('should tell a user whose account is disabled that it is', async () => {
+    respondWith({ kind: 'disabled' });
     renderPage();
     fireEvent.click(screen.getByTestId('login-submit'));
     await waitFor(() => expect(lastNotification()).toBeDefined());
     expect(lastNotification()).toMatchObject({ title: 'Account Disabled', type: 'error' });
+    expect(mocks.login).not.toHaveBeenCalled();
+  });
+
+  it('should say the server refused the request, not that the account is disabled, when a 403 is not about the account', async () => {
+    respondWith({ kind: 'forbidden' });
+    renderPage();
+    fireEvent.click(screen.getByTestId('login-submit'));
+    await waitFor(() => expect(lastNotification()).toBeDefined());
+    expect(lastNotification()).toMatchObject({ type: 'error' });
+    expect(lastNotification()?.message).toMatch(/server refused the sign-in request/);
     expect(mocks.login).not.toHaveBeenCalled();
   });
 
@@ -162,7 +154,7 @@ describe('Route', () => {
     renderPage();
     fireEvent.click(screen.getByTestId('demo-login'));
     await waitFor(() => expect(mocks.login).toHaveBeenCalledWith('token-123'));
-    expect(mocks.post.mock.lastCall?.[1]).toEqual({ password: 'demo', username: 'david' });
+    expect(mocks.mutateAsync).toHaveBeenLastCalledWith({ password: 'demo', username: 'david' });
   });
 
   describe('when branding is enabled', () => {

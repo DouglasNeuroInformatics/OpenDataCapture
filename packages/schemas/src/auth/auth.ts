@@ -4,15 +4,34 @@ import type { Permissions } from '../core/core.js';
 import type { Group } from '../group/group.js';
 import type { BasePermissionLevel } from '../user/user.js';
 
-export type AuthPayload = {
-  accessToken: string;
-};
+export type AuthPayload = z.infer<typeof $AuthPayload>;
+export const $AuthPayload = z.object({
+  accessToken: z.jwt()
+});
 
 export type $LoginCredentials = z.infer<typeof $LoginCredentials>;
 export const $LoginCredentials = z.object({
   password: z.string().min(1),
   username: z.string().min(1)
 });
+
+/**
+ * Sent with the value `true` on `POST /auth/login` by a client a person is sitting at. The token it
+ * gets expires after the idle limit instead of an hour, so it has to be renewed while they work.
+ */
+export const INTERACTIVE_SIGN_IN_HEADER = 'odc-interactive-sign-in';
+
+/** Both times are milliseconds since the epoch, unlike the JWT's own `iat` and `exp`, which are seconds. */
+export type TokenRenewal = {
+  authenticatedAt: number;
+  endsAt: number;
+  /**
+   * The holder's `tokenGenerationId` when the token was signed. The API renews the token only while
+   * the two still match.
+   */
+  generationId: null | string;
+  isInteractive: boolean;
+};
 
 export type TokenPayload = {
   additionalPermissions?: Permissions;
@@ -34,5 +53,10 @@ export type TokenPayload = {
    */
   mustResetPassword: boolean;
   permissions: Permissions;
+  /**
+   * Absent on an `'instrument'` token and on a login token signed before `POST /auth/refresh` existed.
+   * The API renews neither.
+   */
+  renewal?: TokenRenewal;
   username: string;
 };

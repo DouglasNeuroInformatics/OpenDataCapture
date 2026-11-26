@@ -13,17 +13,31 @@ type StoreFixture = {
   accessToken: null | string;
   beginRetry: Mock;
   endRetry: Mock;
+  requireReauthentication: Mock;
   setIsOnline: Mock;
 };
+
+type StoreListener = (state: StoreFixture) => void;
 
 const store = vi.hoisted((): StoreFixture => ({
   accessToken: null,
   beginRetry: vi.fn(),
   endRetry: vi.fn(),
+  requireReauthentication: vi.fn(),
   setIsOnline: vi.fn()
 }));
 
-vi.mock('@/store', () => ({ useAppStore: { getState: () => store } }));
+const storeListeners = vi.hoisted(() => new Set<StoreListener>());
+
+vi.mock('@/store', () => ({
+  useAppStore: {
+    getState: () => store,
+    subscribe: (listener: StoreListener) => {
+      storeListeners.add(listener);
+      return () => storeListeners.delete(listener);
+    }
+  }
+}));
 
 vi.mock('@/config', () => ({
   config: {
@@ -64,12 +78,34 @@ const createAdapter = (...outcomes: ({ fail?: number | true } | { status: number
 
 const getNotifications = () => useNotificationsStore.getState().notifications;
 
+const notifyStoreListeners = () => {
+  for (const listener of [...storeListeners]) {
+    listener(store);
+  }
+};
+
+const signInAgainWith = (accessToken: string) => {
+  store.accessToken = accessToken;
+  notifyStoreListeners();
+};
+
+const flushTask = () => {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
+};
+
+const waitUntilPasswordIsRequired = () => {
+  return vi.waitFor(() => expect(store.requireReauthentication).toHaveBeenCalledOnce());
+};
+
 describe('axios', () => {
   beforeEach(() => {
     i18n.changeLanguage('en');
     vi.stubEnv('DEV', false);
     vi.spyOn(Math, 'random').mockReturnValue(0);
     store.accessToken = null;
+    storeListeners.clear();
     useNotificationsStore.setState({ notifications: [] });
   });
 
@@ -142,6 +178,120 @@ describe('axios', () => {
       expect(onResolved).not.toHaveBeenCalled();
       await vi.advanceTimersByTimeAsync(1);
       expect(onResolved).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('reauthentication', () => {
+    it('should hold a request refused for an expired token and send it again once the user has signed in again', async () => {
+      store.accessToken = 'expired';
+      const adapter = createAdapter({ fail: 401 }, { status: 200 });
+      const request = axios.post('/v1/instrument-records', {}, { adapter });
+      await waitUntilPasswordIsRequired();
+      signInAgainWith('fresh');
+      expect((await request).status).toBe(200);
+      expect(adapter.mock.lastCall?.[0].headers.getAuthorization()).toBe('Bearer fresh');
+    });
+
+    it('should keep holding the request while the store changes for some other reason', async () => {
+      store.accessToken = 'expired';
+      const adapter = createAdapter({ fail: 401 }, { status: 200 });
+      const onSettled = vi.fn();
+      void axios.get('/v1/subjects', { adapter }).finally(onSettled);
+      await waitUntilPasswordIsRequired();
+      notifyStoreListeners();
+      // A released request reaches the adapter several microtasks later, so a whole task is let pass.
+      await flushTask();
+      expect(adapter).toHaveBeenCalledOnce();
+      expect(onSettled).not.toHaveBeenCalled();
+      // The same wait is enough for a request that is released, so the lines above prove it was held.
+      signInAgainWith('fresh');
+      await flushTask();
+      expect(adapter).toHaveBeenCalledTimes(2);
+      expect(onSettled).toHaveBeenCalledOnce();
+    });
+
+    it('should show no error for a held request, since the password dialog already says what happened', async () => {
+      store.accessToken = 'expired';
+      const request = axios.get('/v1/subjects', { adapter: createAdapter({ fail: 401 }, { status: 200 }) });
+      await waitUntilPasswordIsRequired();
+      signInAgainWith('fresh');
+      await request;
+      expect(getNotifications()).toHaveLength(0);
+    });
+
+    it('should give a request it sends again its full patience for a network blip, however long it was held', async () => {
+      const now = vi.spyOn(Date, 'now').mockReturnValue(0);
+      store.accessToken = 'expired';
+      const adapter = createAdapter({ fail: 503 }, { fail: 401 }, { fail: 503 }, { status: 200 });
+      const request = axios.get('/v1/subjects', { adapter });
+      await waitUntilPasswordIsRequired();
+      // Long past the fifteen seconds a retried request is given, counted from its first failure.
+      now.mockReturnValue(60_000);
+      signInAgainWith('fresh');
+      expect((await request).status).toBe(200);
+      expect(adapter).toHaveBeenCalledTimes(4);
+    });
+
+    it('should send a request again at once when the token was renewed while it was in flight', async () => {
+      store.accessToken = 'superseded';
+      const adapter = vi.fn<AxiosAdapter>((config) => {
+        if (store.accessToken === 'superseded') {
+          store.accessToken = 'renewed';
+          return Promise.reject(createError(config, 401));
+        }
+        return Promise.resolve(createResponse(config, 200));
+      });
+      await axios.get('/v1/subjects', { adapter });
+      expect(store.requireReauthentication).not.toHaveBeenCalled();
+      expect(adapter.mock.lastCall?.[0].headers.getAuthorization()).toBe('Bearer renewed');
+    });
+
+    it('should reject a 401 for a request sent without a token, such as a wrong password at login', async () => {
+      const request = axios.post('/v1/auth/login', {}, { adapter: createAdapter({ fail: 401 }) });
+      await expect(request).rejects.toMatchObject({ response: { status: 401 } });
+      expect(store.requireReauthentication).not.toHaveBeenCalled();
+    });
+
+    it('should reject a 401 for a request that opts out, which is how renewal learns it was refused', async () => {
+      store.accessToken = 'expired';
+      const request = axios.post('/v1/auth/refresh', undefined, {
+        adapter: createAdapter({ fail: 401 }),
+        meta: { disableDefaultReauthentication: true }
+      });
+      await expect(request).rejects.toMatchObject({ response: { status: 401 } });
+      expect(store.requireReauthentication).not.toHaveBeenCalled();
+    });
+
+    describe('while an instrument fills the screen', () => {
+      const exitFullscreen = vi.fn<() => Promise<void>>();
+
+      // happy-dom implements neither half of the Fullscreen API.
+      beforeEach(() => {
+        exitFullscreen.mockResolvedValue(undefined);
+        Object.defineProperty(document, 'fullscreenElement', { configurable: true, value: document.body });
+        document.exitFullscreen = exitFullscreen;
+        store.accessToken = 'expired';
+      });
+
+      afterEach(() => {
+        Reflect.deleteProperty(document, 'fullscreenElement');
+        Reflect.deleteProperty(document, 'exitFullscreen');
+      });
+
+      it('should leave fullscreen before asking for the password, since the dialog cannot be seen over it', async () => {
+        void axios.get('/v1/subjects', { adapter: createAdapter({ fail: 401 }) });
+        await waitUntilPasswordIsRequired();
+        expect(exitFullscreen).toHaveBeenCalledOnce();
+      });
+
+      it('should still ask for the password when the browser refuses to leave fullscreen', async () => {
+        const error = new Error('Not allowed');
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        exitFullscreen.mockRejectedValue(error);
+        void axios.get('/v1/subjects', { adapter: createAdapter({ fail: 401 }) });
+        await waitUntilPasswordIsRequired();
+        expect(consoleError).toHaveBeenCalledWith(error);
+      });
     });
   });
 

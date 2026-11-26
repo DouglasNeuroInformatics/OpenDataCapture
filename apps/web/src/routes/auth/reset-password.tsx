@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
 import { Button, Card, Form, Heading, ThemeToggle } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { LanguageToggle, Logo } from '@opendatacapture/react-core';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod/v4';
 
 import { usePasswordErrorMessage } from '@/hooks/usePasswordErrorMessage';
@@ -26,6 +26,17 @@ const RouteComponent = () => {
   const passwordErrorMessage = usePasswordErrorMessage();
   const notifications = useNotificationsStore();
   const [isChanged, setIsChanged] = useState(false);
+  const navigate = useNavigate();
+
+  // The password dialog can open over this page, when the token that performed the reset is refused
+  // renewal. Signing in through it yields a token that no longer needs the reset, and this page has
+  // nothing left to ask of its holder.
+  const mustResetPassword = currentUser?.mustResetPassword;
+  useEffect(() => {
+    if (mustResetPassword === false) {
+      void navigate({ to: '/dashboard' });
+    }
+  }, [mustResetPassword]);
 
   const $ResetPasswordFormData = useMemo(() => {
     return z
@@ -165,7 +176,7 @@ const RouteComponent = () => {
             </div>
             {!isChanged && (
               <Button size="sm" type="button" variant="ghost" onClick={logout}>
-                {t({ en: 'Sign out', es: 'Cerrar sesión', fr: 'Se déconnecter' })}
+                {t('auth.signOut')}
               </Button>
             )}
           </Card.Footer>

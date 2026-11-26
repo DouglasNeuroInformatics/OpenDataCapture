@@ -23,23 +23,36 @@ const createGroup = (id: string): Group => ({
   userIds: []
 });
 
-const createPayload = (groups: Group[]): TokenPayload => ({
+type AccessTokenClaims = TokenPayload & { exp: number; iat: number };
+
+const ISSUED_AT = 1_800_000_000;
+
+const createPayload = (groups: Group[], overrides: Partial<AccessTokenClaims> = {}): AccessTokenClaims => ({
   basePermissionLevel: null,
+  exp: ISSUED_AT + 900,
   firstName: 'Jane',
   groups,
+  iat: ISSUED_AT,
   id: 'user-1',
   kind: 'login',
   lastName: 'Doe',
   mustResetPassword: false,
   permissions: [{ action: 'read', groupId: null, subject: 'Subject' }],
-  username: 'jdoe'
+  renewal: {
+    authenticatedAt: ISSUED_AT * 1000,
+    endsAt: (ISSUED_AT + 43_200) * 1000,
+    generationId: null,
+    isInteractive: true
+  },
+  username: 'jdoe',
+  ...overrides
 });
 
 const encodeSegment = (value: object) => {
   return btoa(JSON.stringify(value)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
 };
 
-const createAccessToken = (payload: TokenPayload) => {
+const createAccessToken = (payload: AccessTokenClaims) => {
   return [encodeSegment({ alg: 'none', typ: 'JWT' }), encodeSegment(payload), 'signature'].join('.');
 };
 
@@ -67,6 +80,7 @@ describe('createAuthSlice', () => {
   afterEach(() => {
     delete window.__PLAYWRIGHT_ACCESS_TOKEN__;
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('should start signed out when no token was injected, so the login page is shown', () => {
@@ -141,5 +155,202 @@ describe('createAuthSlice', () => {
     const freshStore = createStore();
     expect(freshStore.getState().currentUser?.username).toBe('jdoe');
     expect(freshStore.getState().currentGroup?.id).toBe('e2e');
+  });
+
+  describe('access token validity', () => {
+    it('should count the lifetime from when the token arrives, so a wrong workstation clock does not move the expiry', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2001-01-01T00:00:00.000Z'));
+      store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+      expect(store.getState().accessTokenValidity).toMatchObject({
+        expiresAt: Date.now() + 900_000,
+        receivedAt: Date.now()
+      });
+    });
+
+    it('should let activity renew a token that stops short of the end of the sign-in', () => {
+      store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+      expect(store.getState().accessTokenValidity?.isRenewable).toBe(true);
+    });
+
+    it('should not renew a token that already runs to the end of the sign-in, since a new one would last no longer', () => {
+      const renewal = {
+        authenticatedAt: ISSUED_AT * 1000,
+        endsAt: (ISSUED_AT + 900) * 1000 + 999,
+        generationId: null,
+        isInteractive: true
+      };
+      store.getState().login(createAccessToken(createPayload([createGroup('a')], { renewal })));
+      expect(store.getState().accessTokenValidity?.isRenewable).toBe(false);
+    });
+
+    it('should not renew a token signed before renewal existed, which the API refuses', () => {
+      store.getState().login(createAccessToken(createPayload([createGroup('a')], { renewal: undefined })));
+      expect(store.getState().accessTokenValidity?.isRenewable).toBe(false);
+    });
+
+    it('should have no validity while nobody is signed in', () => {
+      expect(store.getState().accessTokenValidity).toBeNull();
+    });
+
+    it.each(['exp', 'iat'] as const)(
+      'should refuse a token without %s, which it could not count down, rather than sign in with it',
+      (claim) => {
+        const payload = createPayload([createGroup('a')], { [claim]: undefined });
+        expect(() => store.getState().login(createAccessToken(payload))).toThrow(/expected number/);
+        expect(store.getState().accessToken).toBeNull();
+      }
+    );
+
+    it('should stop a token being renewed when its renewal is ended, leaving its expiry as it was', () => {
+      store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+      const { expiresAt } = store.getState().accessTokenValidity!;
+      store.getState().endAccessTokenRenewal();
+      expect(store.getState().accessTokenValidity).toMatchObject({ expiresAt, isRenewable: false });
+    });
+
+    it('should have nothing to end while nobody is signed in', () => {
+      store.getState().endAccessTokenRenewal();
+      expect(store.getState().accessTokenValidity).toBeNull();
+    });
+
+    it('should count a token as run out from the moment it is expired, and as beyond renewing', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2001-01-01T00:00:00.000Z'));
+      store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+      vi.setSystemTime(new Date('2001-01-01T00:05:00.000Z'));
+      store.getState().expireAccessToken();
+      expect(store.getState().accessTokenValidity).toMatchObject({ expiresAt: Date.now(), isRenewable: false });
+    });
+
+    it('should have nothing to expire while nobody is signed in', () => {
+      store.getState().expireAccessToken();
+      expect(store.getState().accessTokenValidity).toBeNull();
+    });
+  });
+
+  describe('reauthentication', () => {
+    it('should ask for the password again when required', () => {
+      store.getState().requireReauthentication();
+      expect(store.getState().isReauthenticationRequired).toBe(true);
+    });
+
+    it('should stop asking once the user logs in', () => {
+      store.getState().requireReauthentication();
+      store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+      expect(store.getState().isReauthenticationRequired).toBe(false);
+    });
+
+    it('should swap in the newer token and stop asking for the password', () => {
+      store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+      store.getState().requireReauthentication();
+      const renewed = createAccessToken(
+        createPayload([createGroup('a')], { exp: ISSUED_AT + 960, iat: ISSUED_AT + 60 })
+      );
+      expect(store.getState().reauthenticate(renewed)).toBe('accepted');
+      expect(store.getState().accessToken).toBe(renewed);
+      expect(store.getState().isReauthenticationRequired).toBe(false);
+    });
+
+    it('should keep the session and the group in use, so an instrument being filled in stays mounted', () => {
+      const groups = [createGroup('a'), createGroup('b')];
+      store.getState().login(createAccessToken(createPayload(groups)));
+      store.getState().changeGroup(groups[1]!);
+      store.setState({ currentSession: session });
+      store.getState().reauthenticate(createAccessToken(createPayload(groups)));
+      expect(store.getState().currentGroup?.id).toBe('b');
+      expect(store.getState().currentSession).toBe(session);
+    });
+
+    it('should hand out the same user and group objects when nothing in them changed, so a renewal re-runs no effect', () => {
+      store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+      const { currentGroup, currentUser } = store.getState();
+      store.getState().reauthenticate(createAccessToken(createPayload([createGroup('a')], { exp: ISSUED_AT + 960 })));
+      expect(store.getState().currentGroup).toBe(currentGroup);
+      expect(store.getState().currentUser).toBe(currentUser);
+    });
+
+    it('should take the group from the new token when its settings changed', () => {
+      store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+      const renamed = { ...createGroup('a'), name: 'Renamed' };
+      store.getState().reauthenticate(createAccessToken(createPayload([renamed])));
+      expect(store.getState().currentGroup?.name).toBe('Renamed');
+    });
+
+    it('should rebuild the ability when the permissions changed', () => {
+      store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+      const permissions: TokenPayload['permissions'] = [{ action: 'delete', groupId: null, subject: 'Subject' }];
+      store.getState().reauthenticate(createAccessToken(createPayload([createGroup('a')], { permissions })));
+      expect(store.getState().currentUser?.ability.can('delete', 'Subject')).toBe(true);
+    });
+
+    it('should take the user from the new token when their details changed', () => {
+      store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+      store.getState().reauthenticate(createAccessToken(createPayload([createGroup('a')], { firstName: 'Janet' })));
+      expect(store.getState().currentUser?.firstName).toBe('Janet');
+    });
+
+    describe('when the group in use is missing from the new token', () => {
+      const ADMIN_PERMISSIONS: TokenPayload['permissions'] = [{ action: 'manage', groupId: null, subject: 'all' }];
+
+      it('should keep it for an administrator, who may work in a group they do not belong to', () => {
+        store.getState().login(createAccessToken(createPayload([], { permissions: ADMIN_PERMISSIONS })));
+        const group = createGroup('elsewhere');
+        store.getState().changeGroup(group);
+        store.setState({ currentSession: session });
+        store.getState().reauthenticate(createAccessToken(createPayload([], { permissions: ADMIN_PERMISSIONS })));
+        expect(store.getState().currentGroup).toBe(group);
+        expect(store.getState().currentSession).toBe(session);
+      });
+
+      it('should move anyone else to a group they still belong to, since they were removed from it or it was archived', () => {
+        const groups = [createGroup('a'), createGroup('b')];
+        store.getState().login(createAccessToken(createPayload(groups)));
+        store.getState().changeGroup(groups[1]!);
+        store.getState().reauthenticate(createAccessToken(createPayload([groups[0]!])));
+        expect(store.getState().currentGroup?.id).toBe('a');
+      });
+
+      it('should end the session, which belonged to the group that was lost', () => {
+        const groups = [createGroup('a'), createGroup('b')];
+        store.getState().login(createAccessToken(createPayload(groups)));
+        store.getState().changeGroup(groups[1]!);
+        store.setState({ currentSession: session });
+        store.getState().reauthenticate(createAccessToken(createPayload([groups[0]!])));
+        expect(store.getState().currentSession).toBeNull();
+      });
+
+      it('should leave no group selected for someone removed from their last one', () => {
+        store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+        store.getState().reauthenticate(createAccessToken(createPayload([])));
+        expect(store.getState().currentGroup).toBeNull();
+      });
+    });
+
+    it("should refuse another user's token, so their requests are never sent as this tab's user", () => {
+      const accessToken = createAccessToken(createPayload([createGroup('a')]));
+      store.getState().login(accessToken);
+      const other = createAccessToken(createPayload([createGroup('a')], { id: 'user-2' }));
+      expect(store.getState().reauthenticate(other)).toBe('differentUser');
+      expect(store.getState().accessToken).toBe(accessToken);
+    });
+
+    it('should refuse any token while nobody is signed in', () => {
+      expect(store.getState().reauthenticate(createAccessToken(createPayload([])))).toBe('differentUser');
+    });
+
+    it('should refuse a token confined to resetting the password, which could not carry on the work in progress', () => {
+      const accessToken = createAccessToken(createPayload([createGroup('a')]));
+      store.getState().login(accessToken);
+      const confined = createAccessToken(createPayload([createGroup('a')], { mustResetPassword: true }));
+      expect(store.getState().reauthenticate(confined)).toBe('mustResetPassword');
+      expect(store.getState().accessToken).toBe(accessToken);
+    });
+
+    it('should renew a token confined to resetting the password while the user is still resetting it', () => {
+      store.getState().login(createAccessToken(createPayload([], { mustResetPassword: true })));
+      const renewed = createAccessToken(createPayload([], { exp: ISSUED_AT + 960, mustResetPassword: true }));
+      expect(store.getState().reauthenticate(renewed)).toBe('accepted');
+    });
   });
 });

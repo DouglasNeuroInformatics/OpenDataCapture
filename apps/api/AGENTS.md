@@ -144,9 +144,10 @@ on a `User` action; the route inventory in the architecture doc below says why.
 
 A user may instead hold a **permission set** (`src/permission-sets/`): an admin-defined, named list
 of rules, linked through `User.permissionSetId`, whose rules `createForPayload` applies alongside the
-base level. It takes them as a **required** second parameter, so the one caller, `AuthService.login`,
-cannot drop them; login reads the set through `UsersService.findByUsername`'s include and never puts
-it on the token payload. A rule's scope is relative — `HOLDER_GROUPS` is the holder's groups at
+base level. It takes them as a **required** second parameter, so the one caller,
+`AuthService.signLoginToken`, cannot drop them; login and token renewal reach it with the set read
+through `UsersService.findByUsername`'s and `findTokenHolder`'s include, and it never puts the set on
+the token payload. A rule's scope is relative — `HOLDER_GROUPS` is the holder's groups at
 sign-in, through the same `GROUP_SCOPED_CONDITIONS` — so a set names no group. A set and custom
 `additionalPermissions` are mutually exclusive: `PUT /v1/users/:id/permissions` takes
 `{ kind: 'permissionSet' }` or `{ kind: 'custom' }` and each write empties the other. An `ADMIN` never
@@ -157,8 +158,8 @@ on promotion — and deleting a set clears every holder through `onDelete: SetNu
 A group is never deleted, only **archived**: `PATCH /v1/groups/:id/archive` and `/unarchive` are
 `ADMIN_ONLY`, and `$UpdateGroupData` omits `archivedAt`, so a group manager's update cannot set it.
 Short of `SetupService` dropping the whole database, nothing in this app deletes a group, so every
-`groupId` keeps naming a real row. What an archived group stops granting is decided at sign-in, in
-`AuthService.login` — see the architecture doc below.
+`groupId` keeps naming a real row. What an archived group stops granting is decided at sign-in and at
+each token renewal, in `AuthService.signLoginToken` — see the architecture doc below.
 
 Background: `.agents/docs/architecture/auth-and-permissions.md`.
 

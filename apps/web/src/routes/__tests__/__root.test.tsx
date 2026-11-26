@@ -15,6 +15,14 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/components/ConnectivityBanner', () => ({
   ConnectivityBanner: () => <div data-testid="connectivity-banner" />
 }));
+vi.mock('@/components/InactivityWarning', () => ({
+  InactivityWarning: () => <div data-testid="inactivity-warning" />
+}));
+vi.mock('@/components/ReauthenticationDialog', () => ({
+  ReauthenticationDialog: () => <div data-testid="reauthentication-dialog" />
+}));
+// It listens on the window and the store as soon as it is imported.
+vi.mock('@/services/token-renewal', () => ({}));
 vi.mock('@/services/zod', () => ({
   localizeValidationErrors: mocks.localizeValidationErrors
 }));
@@ -59,6 +67,14 @@ describe('Route', () => {
     renderRootRoute();
     expect(await screen.findByTestId('connectivity-banner')).toBeTruthy();
   });
+
+  it.each(['inactivity-warning', 'reauthentication-dialog'])(
+    'should render the %s above every page, so it shows wherever the token runs out',
+    async (testId) => {
+      renderRootRoute();
+      expect(await screen.findByTestId(testId)).toBeTruthy();
+    }
+  );
 
   it('should localize validation errors as soon as the app loads', async () => {
     mocks.localizeValidationErrors.mockClear();

@@ -402,6 +402,13 @@ model User {
   email                 String?
   disabled              Boolean?
   archivedAt            DateTime?            @db.Date
+  /// Signed into every login token, and `POST /v1/auth/refresh` renews a token only while it still
+  /// carries the current value. Replaced whenever what the holder's password proved stops holding:
+  /// the password changes, a reset is forced, or the account is disabled or archived. An id rather
+  /// than a time, because it is written in the same document update as the change it marks, so a
+  /// sign-in reads the old password with the old id or the new with the new, whatever the clocks
+  /// say. Optional, so users created before this field existed read back as `null`.
+  tokenGenerationId     String?
   /// The permission set this user holds, if any. Mutually exclusive with a non-empty
   /// `additionalPermissions`: `PUT /v1/users/:id/permissions` is the one writer of both, and always
   /// writes them together. Optional, so users created before this field existed read back as none.

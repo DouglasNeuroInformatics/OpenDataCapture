@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import { ConfigService, CryptoService, InjectModel } from '@douglasneuroinformatics/libnest';
 import type { Model, RequestUser } from '@douglasneuroinformatics/libnest';
 import { estimatePasswordStrength } from '@douglasneuroinformatics/libpasswd';
@@ -46,7 +48,7 @@ export class UsersService {
       throw new ForbiddenException('You may not archive your own account');
     }
     const user = await this.userModel.update({
-      data: { archivedAt: new Date() },
+      data: { archivedAt: new Date(), tokenGenerationId: randomUUID() },
       omit: {
         hashedPassword: true
       },
@@ -169,12 +171,14 @@ export class UsersService {
 
   async findByUsername(
     username: string,
-    { ability, includeHashedPassword }: EntityOperationOptions & { includeHashedPassword?: boolean } = {}
+    { ability, includeSignInFields }: EntityOperationOptions & { includeSignInFields?: boolean } = {}
   ) {
     const query = {
       include: { groups: true, permissionSet: true },
+      // Read together, so the token a sign-in issues carries the generation of the password it proved.
       omit: {
-        hashedPassword: !includeHashedPassword
+        hashedPassword: !includeSignInFields,
+        tokenGenerationId: !includeSignInFields
       }
     };
     const readScope = accessibleQuery(ability, 'read', 'User');
@@ -197,6 +201,25 @@ export class UsersService {
     const [user] = caseInsensitiveMatches;
     if (!user) {
       throw new NotFoundException(`Failed to find user with username: ${username}`);
+    }
+    return user;
+  }
+
+  /**
+   * The user a login token names, with what reissuing that token takes. Unscoped, as login's own
+   * lookup is: the id comes off a verified token, and scoping the read by that token's ability loses
+   * every user whose rules do not let them read themselves.
+   */
+  async findTokenHolder(id: string) {
+    const user = await this.userModel.findFirst({
+      include: { groups: true, permissionSet: true },
+      omit: {
+        tokenGenerationId: false
+      },
+      where: { id }
+    });
+    if (!user) {
+      throw new NotFoundException(`Failed to find user with ID: ${id}`);
     }
     return user;
   }
@@ -250,7 +273,10 @@ export class UsersService {
         hashedPassword,
         // An administrator already holds every permission, so a set they kept would only inflate its
         // holder count. Relation syntax because `groups` above is one, and Prisma will not mix the two.
-        permissionSet: data.basePermissionLevel === 'ADMIN' ? { disconnect: true } : undefined
+        permissionSet: data.basePermissionLevel === 'ADMIN' ? { disconnect: true } : undefined,
+        // Each of these ends what the holder's last password entry proved. Without a new generation,
+        // a token issued before a disabled account is enabled again would go on being renewed.
+        tokenGenerationId: password || data.disabled || data.mustResetPassword ? randomUUID() : undefined
       },
       omit: {
         hashedPassword: true
@@ -323,7 +349,8 @@ export class UsersService {
         // on the password having changed rather than on anything the caller asked for.
         mustResetPassword: password ? false : undefined,
         phoneNumber,
-        sex
+        sex,
+        tokenGenerationId: password ? randomUUID() : undefined
       },
       omit: {
         hashedPassword: true

@@ -59,9 +59,9 @@ copy.
 
 ## A schema only where something is parsed
 
-`src/auth/auth.ts` is the whole rule in one file: `$LoginCredentials` is a schema because a request
-body is parsed against it; `AuthPayload` and `TokenPayload` are plain types because nothing ever
-parses them. Do not add a schema for a shape that only crosses a typed boundary.
+`src/auth/auth.ts` is the whole rule in one file: `$LoginCredentials` and `$AuthPayload` are schemas
+because a request body and a response are parsed against them; `TokenPayload` is a plain type because
+nothing ever parses it. Do not add a schema for a shape that only crosses a typed boundary.
 
 Variants are composed with `.extend()` / `.pick()` / `.omit()` / `.partial()` off an existing shape,
 never rewritten — `$UpdateUserData = $BaseUserData.partial().extend({...})`. Rewriting is how the
