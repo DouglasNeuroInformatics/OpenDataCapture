@@ -57,12 +57,42 @@ describe('AuthController', () => {
     });
   });
 
+  // Renewing an instrument token would let the playground's copy outlive the hour it is minted for.
+  it('should not accept an instrument token on the refresh route, so only a login token can be renewed', () => {
+    const accepts = new Reflector().get<true | undefined>(
+      ACCEPTS_INSTRUMENT_TOKEN_METADATA_KEY,
+      Object.getOwnPropertyDescriptor(AuthController.prototype, 'refresh')!.value
+    );
+    expect(accepts).toBeUndefined();
+  });
+
   describe('login', () => {
+    const credentials = { password: 'secret', username: 'test-user' };
+
     it('should exchange the submitted credentials for the access token the service issues', async () => {
-      const credentials = { password: 'secret', username: 'test-user' };
       authService.login.mockResolvedValueOnce({ accessToken: '__TOKEN__' });
-      await expect(authController.login(credentials)).resolves.toStrictEqual({ accessToken: '__TOKEN__' });
-      expect(authService.login).toHaveBeenCalledExactlyOnceWith(credentials);
+      await expect(authController.login(credentials, undefined)).resolves.toStrictEqual({ accessToken: '__TOKEN__' });
+    });
+
+    it.each([
+      { header: undefined, isInteractive: false },
+      { header: 'false', isInteractive: false },
+      { header: 'yes', isInteractive: false },
+      { header: 'true', isInteractive: true }
+    ])(
+      'should sign in with isInteractive $isInteractive when the header is $header, so only a client that asks gets the shorter lifetime',
+      async ({ header, isInteractive }) => {
+        await authController.login(credentials, header);
+        expect(authService.login).toHaveBeenCalledExactlyOnceWith(credentials, { isInteractive });
+      }
+    );
+  });
+
+  describe('refresh', () => {
+    it('should renew the token of the current user', async () => {
+      authService.refresh.mockResolvedValueOnce({ accessToken: '__TOKEN__' });
+      await expect(authController.refresh(currentUser)).resolves.toStrictEqual({ accessToken: '__TOKEN__' });
+      expect(authService.refresh).toHaveBeenCalledExactlyOnceWith(currentUser);
     });
   });
 });

@@ -402,6 +402,11 @@ model User {
   email                 String?
   disabled              Boolean?
   archivedAt            DateTime?            @db.Date
+  /// `POST /v1/auth/refresh` refuses a token whose holder entered their password at or before this
+  /// instant. Set whenever what that password proved stops holding: it changes, a reset is forced, or
+  /// the account is disabled or archived. Optional, so users created before this field existed read
+  /// back as having no cut-off.
+  tokensValidAfter      DateTime?            @db.Date
   /// The permission set this user holds, if any. Mutually exclusive with a non-empty
   /// `additionalPermissions`: `PUT /v1/users/:id/permissions` is the one writer of both, and always
   /// writes them together. Optional, so users created before this field existed read back as none.

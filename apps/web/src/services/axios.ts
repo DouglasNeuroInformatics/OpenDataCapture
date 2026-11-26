@@ -16,12 +16,17 @@ declare module 'axios' {
       // Suppress the generic "HTTP Request Failed" toast so a caller can show its own specific error
       // message (e.g. a mutation onError) without the user seeing two notifications.
       disableDefaultErrorNotification?: boolean;
+      // Let a 401 reject like any other error instead of holding the request until the user has
+      // signed in again. For the request that renews the token, which is how the app learns it cannot.
+      disableDefaultReauthentication?: boolean;
       disableDefaultTimeout?: boolean;
     };
     // Internal: number of transient-failure retries already attempted for this request.
     retryCount?: number;
     // Internal: timestamp (ms) of the first transient failure, used to bound total retry patience.
     retryStartedAt?: number;
+    // Internal: the access token this request was sent with, if any.
+    sentAccessToken?: string;
   }
 }
 
@@ -97,6 +102,17 @@ function waitForOnline(timeout: number): Promise<void> {
   });
 }
 
+function waitForAccessTokenOtherThan(accessToken: string): Promise<void> {
+  return new Promise((resolve) => {
+    const unsubscribe = useAppStore.subscribe((state) => {
+      if (state.accessToken !== accessToken) {
+        unsubscribe();
+        resolve();
+      }
+    });
+  });
+}
+
 // Reflect the browser's connectivity in the store so the UI (banner, recovery screen) can react.
 window.addEventListener('online', () => useAppStore.getState().setIsOnline(true));
 window.addEventListener('offline', () => useAppStore.getState().setIsOnline(false));
@@ -119,6 +135,7 @@ axios.interceptors.request.use((config) => {
 
   if (accessToken && !config.meta?.disableDefaultAuth) {
     config.headers.set('Authorization', `Bearer ${accessToken}`);
+    config.sentAccessToken = accessToken;
   }
 
   return config;
@@ -137,6 +154,28 @@ axios.interceptors.response.use(
   },
   async (error) => {
     const requestConfig = isAxiosError(error) ? error.config : undefined;
+
+    // The API answers 401 on an authenticated route only from its guard, before the handler runs, so
+    // sending the request again once the user has a valid token cannot repeat a write. Holding it,
+    // instead of rejecting, is what keeps an instrument the user is filling in on the screen.
+    if (
+      requestConfig?.sentAccessToken &&
+      isAxiosError(error) &&
+      error.response?.status === 401 &&
+      !requestConfig.meta?.disableDefaultReauthentication
+    ) {
+      const { sentAccessToken } = requestConfig;
+      // Otherwise the token was renewed while this request was in flight, and only needs resending.
+      if (useAppStore.getState().accessToken === sentAccessToken) {
+        // The password dialog cannot be seen while an instrument fills the screen.
+        if (document.fullscreenElement) {
+          await document.exitFullscreen().catch(console.error);
+        }
+        useAppStore.getState().requireReauthentication();
+        await waitForAccessTokenOtherThan(sentAccessToken);
+      }
+      return axios(requestConfig);
+    }
 
     // Retry transient failures on idempotent requests before showing anything to the user. We keep
     // retrying (waiting out offline periods) until the overall time budget is exhausted.

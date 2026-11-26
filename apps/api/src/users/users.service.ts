@@ -45,8 +45,9 @@ export class UsersService {
     if (id === currentUser.id) {
       throw new ForbiddenException('You may not archive your own account');
     }
+    const archivedAt = new Date();
     const user = await this.userModel.update({
-      data: { archivedAt: new Date() },
+      data: { archivedAt, tokensValidAfter: archivedAt },
       omit: {
         hashedPassword: true
       },
@@ -201,6 +202,25 @@ export class UsersService {
     return user;
   }
 
+  /**
+   * The user a login token names, with what reissuing that token takes. Unscoped, as login's own
+   * lookup is: the id comes off a verified token, and scoping the read by that token's ability loses
+   * every user whose rules do not let them read themselves.
+   */
+  async findTokenHolder(id: string) {
+    const user = await this.userModel.findFirst({
+      include: { groups: true, permissionSet: true },
+      omit: {
+        tokensValidAfter: false
+      },
+      where: { id }
+    });
+    if (!user) {
+      throw new NotFoundException(`Failed to find user with ID: ${id}`);
+    }
+    return user;
+  }
+
   async unarchiveById(id: string, currentUser: RequestUser) {
     if (id === currentUser.id) {
       throw new ForbiddenException('You may not unarchive your own account');
@@ -250,7 +270,10 @@ export class UsersService {
         hashedPassword,
         // An administrator already holds every permission, so a set they kept would only inflate its
         // holder count. Relation syntax because `groups` above is one, and Prisma will not mix the two.
-        permissionSet: data.basePermissionLevel === 'ADMIN' ? { disconnect: true } : undefined
+        permissionSet: data.basePermissionLevel === 'ADMIN' ? { disconnect: true } : undefined,
+        // Each of these ends what the holder's last password entry proved. Without the cut-off, a
+        // token issued before a disabled account is enabled again would go on being renewed.
+        tokensValidAfter: password || data.disabled || data.mustResetPassword ? new Date() : undefined
       },
       omit: {
         hashedPassword: true
@@ -323,7 +346,8 @@ export class UsersService {
         // on the password having changed rather than on anything the caller asked for.
         mustResetPassword: password ? false : undefined,
         phoneNumber,
-        sex
+        sex,
+        tokensValidAfter: password ? new Date() : undefined
       },
       omit: {
         hashedPassword: true

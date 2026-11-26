@@ -14,6 +14,19 @@ export const $LoginCredentials = z.object({
   username: z.string().min(1)
 });
 
+/**
+ * Sent with the value `true` on `POST /auth/login` by a client a person is sitting at. The token it
+ * gets expires after the idle limit instead of an hour, so it has to be renewed while they work.
+ */
+export const INTERACTIVE_SIGN_IN_HEADER = 'odc-interactive-sign-in';
+
+/** Both times are milliseconds since the epoch, unlike the JWT's own `iat` and `exp`, which are seconds. */
+export type TokenRenewal = {
+  authenticatedAt: number;
+  endsAt: number;
+  isInteractive: boolean;
+};
+
 export type TokenPayload = {
   additionalPermissions?: Permissions;
   basePermissionLevel: BasePermissionLevel | null;
@@ -34,5 +47,10 @@ export type TokenPayload = {
    */
   mustResetPassword: boolean;
   permissions: Permissions;
+  /**
+   * Absent on an `'instrument'` token and on a login token signed before `POST /auth/refresh` existed.
+   * The API renews neither.
+   */
+  renewal?: TokenRenewal;
   username: string;
 };

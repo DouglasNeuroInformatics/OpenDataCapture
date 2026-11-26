@@ -21,14 +21,15 @@ const mocks = vi.hoisted(() => ({
   currentUser: { id: 'user-1', username: 'jdoe' },
   dataUpdatedAt: 0,
   mutate: vi.fn(),
+  requireReauthentication: vi.fn(),
   resetPassword: vi.fn<(variables: unknown, options: PasswordMutateOptions) => void>(),
   useFindUserQuery: vi.fn(),
   userData: {}
 }));
 
 vi.mock('@/store', () => ({
-  useAppStore: (selector: (store: { currentUser: typeof mocks.currentUser }) => unknown) => {
-    return selector({ currentUser: mocks.currentUser });
+  useAppStore: (selector: (store: Pick<typeof mocks, 'currentUser' | 'requireReauthentication'>) => unknown) => {
+    return selector({ currentUser: mocks.currentUser, requireReauthentication: mocks.requireReauthentication });
   }
 }));
 vi.mock('@/hooks/useFindUserQuery', () => ({
@@ -189,6 +190,15 @@ describe('Route', () => {
       expect(screen.queryByRole('dialog')).toBeNull();
     });
     expect(useNotificationsStore.getState().notifications[0]).toMatchObject({ type: 'success' });
+  });
+
+  it('should ask for the new password at once, since the API no longer renews a token issued before the change', async () => {
+    renderPage();
+    submitPasswords(openPasswordDialog(), STRONG_PASSWORD, STRONG_PASSWORD);
+    await waitFor(() => expect(mocks.resetPassword).toHaveBeenCalled());
+    const [, options] = mocks.resetPassword.mock.lastCall!;
+    act(() => options.onSuccess());
+    expect(mocks.requireReauthentication).toHaveBeenCalledOnce();
   });
 
   it.each([

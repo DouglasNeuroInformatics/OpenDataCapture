@@ -22,6 +22,7 @@ one; the guard turns a missing one into a 500. Nothing checks the value. Routes 
 | Route                             | Declaration                                   | Why it is safe                                                                                                                   |
 | --------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `POST /v1/auth/login`             | `'public'`                                    | `@ThrottleLoginRequest()`; credentials checked in `AuthService.login`.                                                           |
+| `POST /v1/auth/refresh`           | `[]`                                          | Any login token that has not expired. Which of them is renewed is not a permission; `AuthService.refresh` decides it (below).    |
 | `GET /v1/setup`                   | `'public'`                                    | Returns only `SetupState`.                                                                                                       |
 | `POST /v1/setup`                  | `'public'`                                    | **`SetupService.initApp` drops the whole database.** It refuses only when `isSetup` is true and `NODE_ENV` is not `development`. |
 | `DELETE /v1/setup`                | `{ action: 'delete', subject: 'all' }`        | Also refuses unless `NODE_ENV === 'test'`.                                                                                       |
@@ -30,7 +31,7 @@ one; the guard turns a missing one into a 500. Nothing checks the value. Routes 
 | `PATCH /v1/users/self-update/:id` | `{ action: 'read', subject: 'User' }`         | Deliberately weak; `UsersService.updateSelfById` refuses unless `id === currentUser.id`.                                         |
 | `GET /v1/summary`                 | five `read` rules                             | The only multi-element array; all five must pass.                                                                                |
 
-Adding a fourth `'public'` route or a second `[]` is a security decision: raise it rather than
+Adding a fourth `'public'` route or a third `[]` is a security decision: raise it rather than
 deciding alone.
 
 **`ADMIN_ONLY` (`manage all`) is the only way to confine a route to administrators**, because a
@@ -47,9 +48,13 @@ route.
 
 **Deliberately unscoped service paths:** `AuditService.find` and
 `InstrumentsService.findSeriesOverview` (an administrator belongs to no group), each behind an
-`ADMIN_ONLY` guard; and `InstrumentsService.findBundleById` called without a `currentUser`, which the
-API's gateway module does to resolve an assignment's bundle. That parameter is optional for this
-reason, so a new call site that omits it compiles and reads every group's instruments.
+`ADMIN_ONLY` guard; `InstrumentsService.findBundleById` called without a `currentUser`, which the
+API's gateway module does to resolve an assignment's bundle; and `UsersService.findTokenHolder`,
+which `AuthService.refresh` calls with the id off a verified token. That last one must stay
+unscoped: a user with no `read User` rule, or a group manager whose groups are all archived, cannot
+read themselves, and a scoped lookup would refuse every renewal they ask for. The `currentUser`
+parameter of `findBundleById` is optional for the gateway's sake, so a new call site that omits it
+compiles and reads every group's instruments.
 
 ## Layer 2: row scoping
 
@@ -79,34 +84,75 @@ spread silently drops a condition when the generated query and the literal share
 
 ## Where an ability comes from
 
-1. `AuthService.login` builds it with `AbilityFactory.createForPayload`: the `basePermissionLevel`
-   switch, then the permission set's rules (`HOLDER_GROUPS` conditioned on the holder's groups,
-   `ALL_GROUPS` unconditional), then `additionalPermissions` (a `groupId` applies that model's
-   `GROUP_SCOPED_CONDITIONS` entry). It first leaves every **archived** group (`Group.archivedAt`
+1. `AuthService.signLoginToken`, which login and renewal both sign through, builds it with
+   `AbilityFactory.createForPayload`: the `basePermissionLevel` switch, then the permission set's
+   rules (`HOLDER_GROUPS` conditioned on the holder's groups, `ALL_GROUPS` unconditional), then
+   `additionalPermissions` (a `groupId` applies that model's `GROUP_SCOPED_CONDITIONS` entry). It first leaves every **archived** group (`Group.archivedAt`
    set) off the payload's `groups`, so no rule derived from them applies, and drops every grant
    confined to a group outside the remaining ones; since a grant is accepted only for a group the
    user belongs to, that is exactly the grants confined to an archived group. A rule that is not
    confined (a `null` `groupId`, `ALL_GROUPS`, an admin's `manage all`) still reads an archived
    group's rows, which is how administrators see and unarchive it. Its records, files and series
    stay where they are.
-2. The serialized rules are signed into the JWT with the payload, `expiresIn: '1h'`.
+2. The serialized rules are signed into the JWT with the payload. The token lasts one hour, or the
+   idle limit for an interactive sign-in (see "Token lifetime and renewal").
 3. On every request `JwtStrategy.validate` rebuilds the ability with `createForPermissions` and
    attaches it to `request.user`.
+4. `POST /v1/auth/refresh` repeats steps 1 and 2 for the holder of an unexpired login token, reading
+   the user, their groups and their permission set from the database again.
 
 Consequences:
 
-- **Permissions are frozen into the token.** A change to a user's groups, level, grants or permission
-  set, to the set itself, or the archiving of a group they belong to takes effect only at their next
-  login. There is no refresh endpoint.
+- **Permissions are frozen into the token until it is renewed or replaced.** A change to a user's
+  groups, level, grants or permission set, to the set itself, or the archiving of a group they belong
+  to takes effect at their next renewal or login. The web app renews while its user is working; a
+  client that never renews keeps what its token says for the hour it lasts.
 - **`basePermissionLevel` is nullable** and the switch has no `default`, so a `null` user gets only
   what their set or grants give.
 - **JWT expiry is ignored in development** (`ignoreExpiration` in
-  `src/auth/strategies/jwt.strategy.ts`). Local testing proves nothing about expiry.
+  `src/auth/strategies/jwt.strategy.ts`). Local testing proves nothing about expiry: an expired token
+  is even renewed there, until the absolute limit, which the service enforces itself.
 - **Every token carries a `kind`.** `getCreateInstrumentToken` mints an `'instrument'` token holding
   only `manage Instrument`, for the playground's uploads. `JwtAuthGuard` refuses it on any route not
   marked `@AcceptsInstrumentToken()`; the one marked route takes no `@CurrentUser()`, so the `id`,
-  `username` and `groups` the token lacks are never read. The minting route is not marked, or one
-  token could renew itself forever.
+  `username` and `groups` the token lacks are never read. Neither the minting route nor
+  `POST /v1/auth/refresh` is marked, or one token could renew itself forever. It expires after an
+  hour, or when the sign-in of the login token that minted it ends, whichever is first.
+
+## Token lifetime and renewal
+
+Nothing is stored per sign-in: no session row, no cookie, no refresh token. Everything below is
+decided from the signed token and the user's row.
+
+- **A login token lasts one hour unless the login asks for less.** `POST /v1/auth/login` sent with
+  the header `INTERACTIVE_SIGN_IN_HEADER` (`packages/schemas/src/auth/auth.ts`) set to `true` gets a
+  token lasting `AUTH_IDLE_TIMEOUT_MINUTES` instead (default 15), which is how the web app signs in.
+  Any other value, like no header at all, gets the plain hour. That hour is what scripts,
+  `cli/odc-cli` and the playground rely on, and it is not configurable.
+- **The idle limit is the token's lifetime, not a timer.** The web app renews while it sees input;
+  when it stops, the token expires and nothing can renew it, because the refresh route sits behind
+  the ordinary guard and takes only an unexpired token.
+- **Every login token carries `renewal`** (`TokenRenewal`): when the password was entered, when the
+  sign-in ends (`AUTH_ABSOLUTE_TIMEOUT_HOURS` later, default 12) and whether it is interactive. A
+  renewal copies the first and the last unchanged, so no amount of activity moves the end, and no
+  token's `exp` passes it. `AuthService.login` takes the time of entry before it reads the user, so
+  a password changed while the old one is still being checked cuts that token off.
+- **`AuthService.refresh` refuses with 401** a token with no `renewal`, one whose holder no longer
+  exists, one past the absolute limit and one cut off by `tokensValidAfter`; and with 403 and login's
+  own messages an archived or disabled account. A token signed before the route existed has no
+  `renewal`, and its `iat` is not a substitute: each renewal would restart the limit.
+- **`User.tokensValidAfter` is the only revocation there is.** `UsersService` sets it when a password
+  changes, a reset is forced, or the account is disabled or archived, and a token whose password was
+  entered at or before it is never renewed. Without it, a token from before an account was disabled
+  would be renewed again once the account was enabled. The field is omitted from every user query
+  (`src/core/prisma.ts`) and read only by `UsersService.findTokenHolder`. A token already issued
+  still works until it expires.
+- **A copied token can be renewed until the absolute limit.** Accepted when renewal was added
+  (#1535): before it, a copy died within the hour. Both limits are capped in `$Env`, the idle one at
+  60 minutes and the absolute one at 12 hours, so configuration cannot loosen either past that.
+- **Renewals are throttled per user, not per address** (`@ThrottleRefreshRequest()`), since every
+  tab in a hospital renews from one address. The throttler guard runs before `JwtAuthGuard`, so the
+  tracker reads the id off the unverified token and pairs it with the address.
 
 ## Grantable subjects
 

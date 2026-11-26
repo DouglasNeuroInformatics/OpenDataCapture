@@ -82,4 +82,29 @@ describe('$Env', () => {
       false
     );
   });
+
+  it('should end an interactive sign-in after 15 idle minutes and any sign-in after 12 hours unless told otherwise', () => {
+    expect($Env.parse(testEnv)).toMatchObject({ AUTH_ABSOLUTE_TIMEOUT_HOURS: 12, AUTH_IDLE_TIMEOUT_MINUTES: 15 });
+  });
+
+  it('should accept limits tighter than the defaults', () => {
+    expect($Env.parse({ ...testEnv, AUTH_ABSOLUTE_TIMEOUT_HOURS: '8', AUTH_IDLE_TIMEOUT_MINUTES: '5' })).toMatchObject({
+      AUTH_ABSOLUTE_TIMEOUT_HOURS: 8,
+      AUTH_IDLE_TIMEOUT_MINUTES: 5
+    });
+  });
+
+  it.each(['61', '4', '7.5'])(
+    'should refuse an idle limit of %s minutes, so no token outlives the hour one lasted before renewal existed',
+    (AUTH_IDLE_TIMEOUT_MINUTES) => {
+      expect($Env.safeParse({ ...testEnv, AUTH_IDLE_TIMEOUT_MINUTES }).success).toBe(false);
+    }
+  );
+
+  it.each(['13', '0'])(
+    'should refuse an absolute limit of %s hours, which is outside what a stolen token is allowed to be renewed for',
+    (AUTH_ABSOLUTE_TIMEOUT_HOURS) => {
+      expect($Env.safeParse({ ...testEnv, AUTH_ABSOLUTE_TIMEOUT_HOURS }).success).toBe(false);
+    }
+  );
 });

@@ -256,6 +256,28 @@ describe('UsersService', () => {
     });
   });
 
+  describe('findTokenHolder', () => {
+    it('should read the user by id alone, so one whose own rules do not let them read themselves is still found', async () => {
+      userModel.findFirst.mockResolvedValue({ id: 'user-1' });
+      await expect(usersService.findTokenHolder('user-1')).resolves.toMatchObject({ id: 'user-1' });
+      expect(userModel.findFirst.mock.lastCall?.[0].where).toStrictEqual({ id: 'user-1' });
+    });
+
+    it('should read what reissuing a token takes: the groups, the permission set and the cut-off', async () => {
+      userModel.findFirst.mockResolvedValue({ id: 'user-1' });
+      await usersService.findTokenHolder('user-1');
+      expect(userModel.findFirst.mock.lastCall?.[0]).toMatchObject({
+        include: { groups: true, permissionSet: true },
+        omit: { tokensValidAfter: false }
+      });
+    });
+
+    it('should throw when the user no longer exists', async () => {
+      userModel.findFirst.mockResolvedValue(null);
+      await expect(usersService.findTokenHolder('user-1')).rejects.toThrow(NotFoundException);
+    });
+  });
+
   describe('create (password policy)', () => {
     it('creates the user when the password is strong, unique, and not breached', async () => {
       await usersService.create({ ...baseUser });
@@ -413,6 +435,22 @@ describe('UsersService', () => {
         disabled: true
       });
     });
+
+    it.each([{ password: 'jf8&Kd0!mZq2wLx' }, { disabled: true }, { mustResetPassword: true }])(
+      'should cut off the tokens issued before an update of %o, so none of them can be renewed past it',
+      async (data) => {
+        await usersService.updateById('user-1', data, admin);
+        expect(userModel.update.mock.lastCall?.[0].data.tokensValidAfter).toBeInstanceOf(Date);
+      }
+    );
+
+    it.each([{ disabled: false }, { mustResetPassword: false }, { firstName: 'Janet' }, { groupIds: ['group-1'] }])(
+      'should leave the cut-off alone on an update of %o, which a renewal picks up by reading the user again',
+      async (data) => {
+        await usersService.updateById('user-1', data, admin);
+        expect(userModel.update.mock.lastCall?.[0].data.tokensValidAfter).toBeUndefined();
+      }
+    );
   });
 
   describe('archiveById', () => {
@@ -429,6 +467,13 @@ describe('UsersService', () => {
       await usersService.archiveById('user-1', admin);
       expect(userModel.update.mock.lastCall?.[0].data.archivedAt).toBeInstanceOf(Date);
       expect(userModel.update.mock.lastCall?.[0].where).toMatchObject({ id: 'user-1' });
+    });
+
+    it('should cut off the tokens issued before the archiving, so unarchiving the account does not revive them', async () => {
+      await usersService.archiveById('user-1', admin);
+      const { archivedAt, tokensValidAfter } = userModel.update.mock.lastCall![0].data;
+      expect(tokensValidAfter).toBeInstanceOf(Date);
+      expect(tokensValidAfter).toBe(archivedAt);
     });
   });
 
@@ -552,6 +597,16 @@ describe('UsersService', () => {
     it('should leave mustResetPassword untouched when no password is set, so editing a profile cannot lift it', async () => {
       await usersService.updateSelfById('user-1', { firstName: 'Janet' }, currentUser);
       expect(userModel.update.mock.lastCall?.[0].data.mustResetPassword).toBeUndefined();
+    });
+
+    it('should cut off the tokens issued before the user set a new password, including the one that set it', async () => {
+      await usersService.updateSelfById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, currentUser);
+      expect(userModel.update.mock.lastCall?.[0].data.tokensValidAfter).toBeInstanceOf(Date);
+    });
+
+    it('should leave the cut-off alone when no password is set, so editing a profile does not end the sign-in', async () => {
+      await usersService.updateSelfById('user-1', { firstName: 'Janet' }, currentUser);
+      expect(userModel.update.mock.lastCall?.[0].data.tokensValidAfter).toBeUndefined();
     });
 
     it("should refuse to update another user's account through the self-update route", async () => {

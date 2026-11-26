@@ -8,6 +8,10 @@ export const $Env = $BaseEnv
   .extend($MongoEnv.shape)
   .extend({
     API_DEV_SERVER_PORT: $NumberLike.pipe(z.number().int().nonnegative()).optional(),
+    // Both are capped where the limits stood before tokens could be renewed: no token outlives the
+    // hour one always lasted, and no chain of renewals outlives what was accepted when they were added.
+    AUTH_ABSOLUTE_TIMEOUT_HOURS: $NumberLike.pipe(z.number().int().min(1).max(12)).default(12),
+    AUTH_IDLE_TIMEOUT_MINUTES: $NumberLike.pipe(z.number().int().min(5).max(60)).default(15),
     GATEWAY_API_KEY: z.string().min(32),
     GATEWAY_DEV_SERVER_PORT: $NumberLike.pipe(z.number().positive().int()).optional(),
     GATEWAY_ENABLED: $BooleanLike,
