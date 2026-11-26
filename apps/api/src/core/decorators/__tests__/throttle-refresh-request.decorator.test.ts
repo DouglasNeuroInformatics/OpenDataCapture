@@ -43,11 +43,11 @@ describe('ThrottleRefreshRequest', () => {
     return response.statusCode;
   };
 
-  const exhaustMediumLimit = async (authorization?: string): Promise<void> => {
+  const exhaustMediumLimit = async (authorization?: string, remoteAddress?: string): Promise<void> => {
     for (let i = 0; i < MEDIUM_LIMIT; i++) {
-      expect(await request(authorization)).toBe(HttpStatus.OK);
+      expect(await request(authorization, remoteAddress)).toBe(HttpStatus.OK);
     }
-    expect(await request(authorization)).toBe(HttpStatus.TOO_MANY_REQUESTS);
+    expect(await request(authorization, remoteAddress)).toBe(HttpStatus.TOO_MANY_REQUESTS);
   };
 
   beforeEach(async () => {
@@ -79,6 +79,12 @@ describe('ThrottleRefreshRequest', () => {
   it('should count a user at another address separately, so an id forged elsewhere cannot spend their limit', async () => {
     await exhaustMediumLimit(bearer({ id: 'user-1' }));
     expect(await request(bearer({ id: 'user-1' }), '203.0.113.2')).toBe(HttpStatus.OK);
+  });
+
+  it('should count every address in one IPv6 subnet together, so changing address within it does not get a fresh limit', async () => {
+    await exhaustMediumLimit(bearer({ id: 'user-1' }), '2001:db8:0:1::1');
+    expect(await request(bearer({ id: 'user-1' }), '2001:db8:0:1::2')).toBe(HttpStatus.TOO_MANY_REQUESTS);
+    expect(await request(bearer({ id: 'user-1' }), '2001:db8:0:2::1')).toBe(HttpStatus.OK);
   });
 
   it.each([

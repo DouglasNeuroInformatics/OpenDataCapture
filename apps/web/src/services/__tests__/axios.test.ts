@@ -219,6 +219,19 @@ describe('axios', () => {
       expect(getNotifications()).toHaveLength(0);
     });
 
+    it('should give a request it sends again its full patience for a network blip, however long it was held', async () => {
+      const now = vi.spyOn(Date, 'now').mockReturnValue(0);
+      store.accessToken = 'expired';
+      const adapter = createAdapter({ fail: 503 }, { fail: 401 }, { fail: 503 }, { status: 200 });
+      const request = axios.get('/v1/subjects', { adapter });
+      await waitUntilPasswordIsRequired();
+      // Long past the fifteen seconds a retried request is given, counted from its first failure.
+      now.mockReturnValue(60_000);
+      signInAgainWith('fresh');
+      expect((await request).status).toBe(200);
+      expect(adapter).toHaveBeenCalledTimes(4);
+    });
+
     it('should send a request again at once when the token was renewed while it was in flight', async () => {
       store.accessToken = 'superseded';
       const adapter = vi.fn<AxiosAdapter>((config) => {

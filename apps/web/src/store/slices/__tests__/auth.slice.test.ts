@@ -38,7 +38,12 @@ const createPayload = (groups: Group[], overrides: Partial<AccessTokenClaims> = 
   lastName: 'Doe',
   mustResetPassword: false,
   permissions: [{ action: 'read', groupId: null, subject: 'Subject' }],
-  renewal: { authenticatedAt: ISSUED_AT * 1000, endsAt: (ISSUED_AT + 43_200) * 1000, isInteractive: true },
+  renewal: {
+    authenticatedAt: ISSUED_AT * 1000,
+    endsAt: (ISSUED_AT + 43_200) * 1000,
+    generationId: null,
+    isInteractive: true
+  },
   username: 'jdoe',
   ...overrides
 });
@@ -172,6 +177,7 @@ describe('createAuthSlice', () => {
       const renewal = {
         authenticatedAt: ISSUED_AT * 1000,
         endsAt: (ISSUED_AT + 900) * 1000 + 999,
+        generationId: null,
         isInteractive: true
       };
       store.getState().login(createAccessToken(createPayload([createGroup('a')], { renewal })));
@@ -187,6 +193,15 @@ describe('createAuthSlice', () => {
       expect(store.getState().accessTokenValidity).toBeNull();
     });
 
+    it.each(['exp', 'iat'] as const)(
+      'should refuse a token without %s, which it could not count down, rather than sign in with it',
+      (claim) => {
+        const payload = createPayload([createGroup('a')], { [claim]: undefined });
+        expect(() => store.getState().login(createAccessToken(payload))).toThrow(/expected number/);
+        expect(store.getState().accessToken).toBeNull();
+      }
+    );
+
     it('should stop a token being renewed when its renewal is ended, leaving its expiry as it was', () => {
       store.getState().login(createAccessToken(createPayload([createGroup('a')])));
       const { expiresAt } = store.getState().accessTokenValidity!;
@@ -196,6 +211,20 @@ describe('createAuthSlice', () => {
 
     it('should have nothing to end while nobody is signed in', () => {
       store.getState().endAccessTokenRenewal();
+      expect(store.getState().accessTokenValidity).toBeNull();
+    });
+
+    it('should count a token as run out from the moment it is expired, and as beyond renewing', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2001-01-01T00:00:00.000Z'));
+      store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+      vi.setSystemTime(new Date('2001-01-01T00:05:00.000Z'));
+      store.getState().expireAccessToken();
+      expect(store.getState().accessTokenValidity).toMatchObject({ expiresAt: Date.now(), isRenewable: false });
+    });
+
+    it('should have nothing to expire while nobody is signed in', () => {
+      store.getState().expireAccessToken();
       expect(store.getState().accessTokenValidity).toBeNull();
     });
   });
@@ -261,12 +290,41 @@ describe('createAuthSlice', () => {
       expect(store.getState().currentUser?.firstName).toBe('Janet');
     });
 
-    it('should keep a group the token does not list, since an administrator may work in one they do not belong to', () => {
-      store.getState().login(createAccessToken(createPayload([])));
-      const group = createGroup('elsewhere');
-      store.getState().changeGroup(group);
-      store.getState().reauthenticate(createAccessToken(createPayload([])));
-      expect(store.getState().currentGroup).toBe(group);
+    describe('when the group in use is missing from the new token', () => {
+      const ADMIN_PERMISSIONS: TokenPayload['permissions'] = [{ action: 'manage', groupId: null, subject: 'all' }];
+
+      it('should keep it for an administrator, who may work in a group they do not belong to', () => {
+        store.getState().login(createAccessToken(createPayload([], { permissions: ADMIN_PERMISSIONS })));
+        const group = createGroup('elsewhere');
+        store.getState().changeGroup(group);
+        store.setState({ currentSession: session });
+        store.getState().reauthenticate(createAccessToken(createPayload([], { permissions: ADMIN_PERMISSIONS })));
+        expect(store.getState().currentGroup).toBe(group);
+        expect(store.getState().currentSession).toBe(session);
+      });
+
+      it('should move anyone else to a group they still belong to, since they were removed from it or it was archived', () => {
+        const groups = [createGroup('a'), createGroup('b')];
+        store.getState().login(createAccessToken(createPayload(groups)));
+        store.getState().changeGroup(groups[1]!);
+        store.getState().reauthenticate(createAccessToken(createPayload([groups[0]!])));
+        expect(store.getState().currentGroup?.id).toBe('a');
+      });
+
+      it('should end the session, which belonged to the group that was lost', () => {
+        const groups = [createGroup('a'), createGroup('b')];
+        store.getState().login(createAccessToken(createPayload(groups)));
+        store.getState().changeGroup(groups[1]!);
+        store.setState({ currentSession: session });
+        store.getState().reauthenticate(createAccessToken(createPayload([groups[0]!])));
+        expect(store.getState().currentSession).toBeNull();
+      });
+
+      it('should leave no group selected for someone removed from their last one', () => {
+        store.getState().login(createAccessToken(createPayload([createGroup('a')])));
+        store.getState().reauthenticate(createAccessToken(createPayload([])));
+        expect(store.getState().currentGroup).toBeNull();
+      });
     });
 
     it("should refuse another user's token, so their requests are never sent as this tab's user", () => {

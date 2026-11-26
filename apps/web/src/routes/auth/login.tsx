@@ -52,6 +52,17 @@ const RouteComponent = () => {
       });
       return;
     }
+    if (result.kind === 'forbidden') {
+      notifications.addNotification({
+        message: t({
+          en: 'The server refused the sign-in request. Try again, and contact an administrator if it keeps happening.',
+          es: 'El servidor rechazó la solicitud de inicio de sesión. Inténtelo de nuevo y comuníquese con un administrador si sigue ocurriendo.',
+          fr: 'Le serveur a refusé la demande de connexion. Réessayez, et contactez un administrateur si le problème persiste.'
+        }),
+        type: 'error'
+      });
+      return;
+    }
     login(result.accessToken);
     await navigate({ to: '/dashboard' });
   };

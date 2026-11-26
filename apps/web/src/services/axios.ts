@@ -174,6 +174,10 @@ axios.interceptors.response.use(
         useAppStore.getState().requireReauthentication();
         await waitForAccessTokenOtherThan(sentAccessToken);
       }
+      // What follows is a new attempt, minutes later when it was held. Left in place, the time of an
+      // earlier transient failure would leave it no patience for another.
+      requestConfig.retryCount = undefined;
+      requestConfig.retryStartedAt = undefined;
       return axios(requestConfig);
     }
 

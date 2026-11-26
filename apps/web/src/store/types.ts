@@ -25,6 +25,8 @@ export type AuthSlice = {
   currentUser: CurrentUser | null;
   /** Marks the token in hand as the last this sign-in gets, for when a renewal can never be used. */
   endAccessTokenRenewal: () => void;
+  /** Treats the token in hand as run out from now, for when the API has refused to renew it. */
+  expireAccessToken: () => void;
   isReauthenticationRequired: boolean;
   login: (accessToken: string) => void;
   logout: () => void;

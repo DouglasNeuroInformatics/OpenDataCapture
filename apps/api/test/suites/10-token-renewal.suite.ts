@@ -200,6 +200,12 @@ export default defineSuite('token renewal', function () {
         const accessToken = await tokenFor('renewal.rekeyed', { interactive: true, password: OTHER_PASSWORD });
         expect((await refresh(accessToken)).statusCode).toBe(200);
       });
+
+      it('should leave the token generation out of what the API returns for the user, as it was before the field existed', async () => {
+        const response = await this.app.inject({ headers: adminHeaders, method: 'GET', url: `/v1/users/${user.id}` });
+        expect(response.statusCode).toBe(200);
+        expect(response.json()).not.toHaveProperty('tokenGenerationId');
+      });
     });
 
     describe('for an account disabled and then enabled again', () => {

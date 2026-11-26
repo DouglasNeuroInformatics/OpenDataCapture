@@ -19,8 +19,13 @@ const mocks = vi.hoisted(() => {
     accessToken: 'token-123',
     currentUser: { id: 'user-1', mustResetPassword: true, username: 'Zebra-Quantum-Lantern-42' }
   };
-  return { logout: vi.fn(), mutate: vi.fn(), state };
+  return { logout: vi.fn(), mutate: vi.fn(), navigate: vi.fn(), state };
 });
+
+vi.mock('@tanstack/react-router', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tanstack/react-router')>()),
+  useNavigate: () => mocks.navigate
+}));
 
 vi.mock('@/hooks/useResetPasswordMutation', () => ({ useResetPasswordMutation: () => ({ mutate: mocks.mutate }) }));
 vi.mock('@/hooks/useSetupStateQuery', () => ({
@@ -181,5 +186,18 @@ describe('Route', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: 'Sign out' }));
     expect(mocks.logout).toHaveBeenCalledOnce();
+  });
+
+  it('should stay put while the reset is still owed', () => {
+    renderPage();
+    expect(mocks.navigate).not.toHaveBeenCalled();
+  });
+
+  it('should open the dashboard once a new token lifts the reset, as when the user signs in through the password dialog over this page', () => {
+    const { rerender } = renderPage();
+    mocks.state.currentUser = { id: 'user-1', mustResetPassword: false, username: 'Zebra-Quantum-Lantern-42' };
+    const Component = Route.options.component!;
+    rerender(<Component />);
+    expect(mocks.navigate).toHaveBeenCalledExactlyOnceWith({ to: '/dashboard' });
   });
 });

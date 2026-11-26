@@ -79,8 +79,10 @@ export const subjectsQueryOptions = ({ params }: { params?: SubjectsQueryParams 
   boundary, so do not write `if (query.isError)` UI.
 - **Do not add a React Query `retry`, and do not create a second axios instance.** Retries live in
   `src/services/axios.ts`: it retries only idempotent methods on transient errors, under a total
-  budget, and drives `ConnectivityBanner` through the store. Opt out of its defaults per-request with
-  the `meta` bag (`disableDefaultTimeout`, `disableDefaultErrorNotification`, `disableDefaultAuth`).
+  budget, and drives `ConnectivityBanner` through the store. It also holds any request refused with
+  401 until the user has signed in again, then sends it again. Opt out of its defaults per-request
+  with the `meta` bag (`disableDefaultTimeout`, `disableDefaultErrorNotification`,
+  `disableDefaultAuth`, `disableDefaultReauthentication`).
   Only the second half is mechanically enforced — oxlint bans `axios.create`, but nothing stops you
   setting a React Query `retry`, so that one is on you.
 

@@ -32,7 +32,8 @@ export class AuthController {
   @ThrottleLoginRequest()
   async login(
     @Body() credentials: $LoginCredentials,
-    @Headers(INTERACTIVE_SIGN_IN_HEADER) interactiveSignInHeader: string | undefined
+    // Optional rather than `string | undefined`, which reflects as `Object` and documents as `{}`.
+    @Headers(INTERACTIVE_SIGN_IN_HEADER) interactiveSignInHeader?: string
   ): Promise<AuthPayload> {
     return this.authService.login(credentials, { isInteractive: interactiveSignInHeader === 'true' });
   }

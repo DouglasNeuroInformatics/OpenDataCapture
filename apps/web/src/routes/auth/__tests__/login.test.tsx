@@ -112,12 +112,22 @@ describe('Route', () => {
     expect(mocks.login).not.toHaveBeenCalled();
   });
 
-  it('should tell a user refused for any other reason that their account is disabled', async () => {
+  it('should tell a user whose account is disabled that it is', async () => {
     respondWith({ kind: 'disabled' });
     renderPage();
     fireEvent.click(screen.getByTestId('login-submit'));
     await waitFor(() => expect(lastNotification()).toBeDefined());
     expect(lastNotification()).toMatchObject({ title: 'Account Disabled', type: 'error' });
+    expect(mocks.login).not.toHaveBeenCalled();
+  });
+
+  it('should say the server refused the request, not that the account is disabled, when a 403 is not about the account', async () => {
+    respondWith({ kind: 'forbidden' });
+    renderPage();
+    fireEvent.click(screen.getByTestId('login-submit'));
+    await waitFor(() => expect(lastNotification()).toBeDefined());
+    expect(lastNotification()).toMatchObject({ type: 'error' });
+    expect(lastNotification()?.message).toMatch(/server refused the sign-in request/);
     expect(mocks.login).not.toHaveBeenCalled();
   });
 

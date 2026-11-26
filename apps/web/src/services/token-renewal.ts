@@ -1,4 +1,4 @@
-import type { AuthPayload } from '@opendatacapture/schemas/auth';
+import { $AuthPayload } from '@opendatacapture/schemas/auth';
 import axios, { isAxiosError } from 'axios';
 
 import { useAppStore } from '@/store';
@@ -26,18 +26,27 @@ async function requestRenewedAccessToken(): Promise<void> {
   lastAttemptAt = Date.now();
   let renewedAccessToken: string;
   try {
-    const response = await axios.post<AuthPayload>('/v1/auth/refresh', undefined, {
+    const response = await axios.post<unknown>('/v1/auth/refresh', undefined, {
       meta: { disableDefaultErrorNotification: true, disableDefaultReauthentication: true }
     });
-    renewedAccessToken = response.data.accessToken;
+    // Parsed here, so that a page a captive portal serves in the API's place is one more failure to
+    // wait out below.
+    renewedAccessToken = $AuthPayload.parse(response.data).accessToken;
   } catch (error) {
-    if (isAxiosError(error) && (error.response?.status === 401 || error.response?.status === 403)) {
-      useAppStore.getState().requireReauthentication();
+    if (!isAxiosError(error) || (error.response?.status !== 401 && error.response?.status !== 403)) {
+      // A dropped connection, a throttled request or a server fault says nothing about the sign-in.
+      // The token in hand still works, so later activity tries again.
+      console.error(error);
       return;
     }
-    // A dropped connection, a throttled request or a server fault says nothing about the sign-in.
-    // The token in hand still works, so later activity tries again.
-    console.error(error);
+    // Unless the user signed in again while this request was in flight, which the refusal of the
+    // token they held before says nothing about. The token is marked as run out rather than the
+    // password asked for here, so that an instrument filling the screen is left alone as at any
+    // other expiry.
+    const store = useAppStore.getState();
+    if (store.accessToken === accessToken) {
+      store.expireAccessToken();
+    }
     return;
   }
   const store = useAppStore.getState();
@@ -53,7 +62,7 @@ async function requestRenewedAccessToken(): Promise<void> {
     return;
   }
   if (store.reauthenticate(renewedAccessToken) !== 'accepted') {
-    store.requireReauthentication();
+    store.expireAccessToken();
   }
 }
 
@@ -126,7 +135,12 @@ document.addEventListener(
   'load',
   (event) => {
     if (event.target instanceof HTMLIFrameElement && event.target.contentWindow) {
-      watchForActivity(event.target.contentWindow);
+      try {
+        watchForActivity(event.target.contentWindow);
+      } catch {
+        // A frame from another origin, such as one a password manager's extension adds beside a
+        // password field, refuses listeners. Input inside it is not this app's to count.
+      }
     }
   },
   { capture: true }

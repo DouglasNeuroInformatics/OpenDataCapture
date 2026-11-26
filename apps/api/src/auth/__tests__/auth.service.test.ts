@@ -117,6 +117,7 @@ describe('AuthService', () => {
       permissionSetId: null,
       phoneNumber: null,
       sex: null,
+      tokenGenerationId: null,
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       username: 'test-user',
       ...overrides
@@ -333,22 +334,27 @@ describe('AuthService', () => {
         expect(lastSigned().payload.renewal).toStrictEqual({
           authenticatedAt: NOW,
           endsAt: NOW + 12 * HOUR,
+          generationId: null,
           isInteractive: options.isInteractive
         });
       }
     );
 
-    it('should take the time of entry before the user is read, so a password changed during the check still cuts the token off', async () => {
-      usersService.findByUsername.mockImplementation(() => {
-        vi.advanceTimersByTime(5000);
-        return Promise.resolve(storedUser());
-      });
+    it("should sign the token generation read with the password, so a later password change stops this token's renewal", async () => {
+      usersService.findByUsername.mockResolvedValue(storedUser({ tokenGenerationId: 'generation-1' }));
       cryptoService.comparePassword.mockResolvedValue(true);
       await authService.login(credentials, PLAIN);
-      expect(lastSigned().payload.renewal?.authenticatedAt).toBe(NOW);
+      expect(lastSigned().payload.renewal?.generationId).toBe('generation-1');
     });
 
-    it('should cut the token short where the sign-in ends, so no token outlives the absolute limit', async () => {
+    it('should read the hashed password and the token generation in one lookup', async () => {
+      usersService.findByUsername.mockResolvedValue(storedUser());
+      cryptoService.comparePassword.mockResolvedValue(true);
+      await authService.login(credentials, PLAIN);
+      expect(usersService.findByUsername).toHaveBeenCalledExactlyOnceWith('test-user', { includeSignInFields: true });
+    });
+
+    it('should still sign a plain login for a full hour under the lowest absolute limit, however long the password check took', async () => {
       configService.get.mockImplementation(
         (key: keyof typeof ENV) => ({ ...ENV, AUTH_ABSOLUTE_TIMEOUT_HOURS: 1 })[key]
       );
@@ -358,7 +364,8 @@ describe('AuthService', () => {
       });
       cryptoService.comparePassword.mockResolvedValue(true);
       await authService.login(credentials, PLAIN);
-      expect(lastSigned().options).toStrictEqual({ expiresIn: 3595 });
+      expect(lastSigned().options).toStrictEqual({ expiresIn: 3600 });
+      expect(lastSigned().payload.renewal?.authenticatedAt).toBe(NOW + 5000);
     });
   });
 
@@ -382,7 +389,7 @@ describe('AuthService', () => {
       permissionSetId: null,
       phoneNumber: null,
       sex: null,
-      tokensValidAfter: null,
+      tokenGenerationId: null,
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
       username: 'test-user',
       ...overrides
@@ -391,7 +398,13 @@ describe('AuthService', () => {
     /** A user holding a token whose password was entered `age` milliseconds ago. */
     const currentUser = (age: number, renewal: Partial<TokenRenewal> = {}): RequestUser => ({
       ...requestUserFor('STANDARD'),
-      renewal: { authenticatedAt: NOW - age, endsAt: NOW - age + 12 * HOUR, isInteractive: true, ...renewal }
+      renewal: {
+        authenticatedAt: NOW - age,
+        endsAt: NOW - age + 12 * HOUR,
+        generationId: null,
+        isInteractive: true,
+        ...renewal
+      }
     });
 
     it('should return a newly signed token for a holder still entitled to one', async () => {
@@ -426,25 +439,31 @@ describe('AuthService', () => {
       await expect(authService.refresh(currentUser(HOUR))).rejects.toThrow(new ForbiddenException('Account Archived'));
     });
 
-    it('should tell the holder of a disabled account why, even though disabling also sets the cut-off', async () => {
-      usersService.findTokenHolder.mockResolvedValue(tokenHolder({ disabled: true, tokensValidAfter: new Date(NOW) }));
+    it('should tell the holder of a disabled account why, even though disabling also starts a new generation', async () => {
+      usersService.findTokenHolder.mockResolvedValue(
+        tokenHolder({ disabled: true, tokenGenerationId: 'generation-1' })
+      );
       await expect(authService.refresh(currentUser(HOUR))).rejects.toThrow(new ForbiddenException('Account Disabled'));
     });
 
-    it.each([0, MINUTE])(
-      'should refuse a password entered %d ms before the cut-off, so a token from before a password change cannot be kept alive',
-      async (margin) => {
-        usersService.findTokenHolder.mockResolvedValue(
-          tokenHolder({ tokensValidAfter: new Date(NOW - HOUR + margin) })
+    it.each([
+      { current: 'generation-1', held: null },
+      { current: 'generation-2', held: 'generation-1' }
+    ])(
+      'should refuse a token of generation $held once its holder is on $current, so one from before a password change cannot be kept alive',
+      async ({ current, held }) => {
+        usersService.findTokenHolder.mockResolvedValue(tokenHolder({ tokenGenerationId: current }));
+        await expect(authService.refresh(currentUser(HOUR, { generationId: held }))).rejects.toThrow(
+          UnauthorizedException
         );
-        await expect(authService.refresh(currentUser(HOUR))).rejects.toThrow(UnauthorizedException);
         expect(jwtService.signAsync).not.toHaveBeenCalled();
       }
     );
 
-    it('should renew a token whose password was entered after the cut-off, so signing in again restores renewal', async () => {
-      usersService.findTokenHolder.mockResolvedValue(tokenHolder({ tokensValidAfter: new Date(NOW - HOUR - 1) }));
-      await expect(authService.refresh(currentUser(HOUR))).resolves.toStrictEqual({ accessToken: '__TOKEN__' });
+    it("should renew a token of its holder's current generation, so signing in again after a password change restores renewal", async () => {
+      usersService.findTokenHolder.mockResolvedValue(tokenHolder({ tokenGenerationId: 'generation-2' }));
+      await authService.refresh(currentUser(HOUR, { generationId: 'generation-2' }));
+      expect(lastSigned().payload.renewal?.generationId).toBe('generation-2');
     });
 
     it.each([12 * HOUR, 13 * HOUR])(
@@ -468,6 +487,7 @@ describe('AuthService', () => {
       expect(lastSigned().payload.renewal).toStrictEqual({
         authenticatedAt: NOW - HOUR,
         endsAt: NOW + 11 * HOUR,
+        generationId: null,
         isInteractive: true
       });
     });
@@ -527,14 +547,29 @@ describe('AuthService', () => {
       const renewal = {
         authenticatedAt: NOW - 12 * HOUR + 10 * MINUTE,
         endsAt: NOW + 10 * MINUTE,
+        generationId: null,
         isInteractive: true
       };
       await authService.getCreateInstrumentToken({ ...requestUserFor('ADMIN'), renewal });
       expect(lastSigned().options).toStrictEqual({ expiresIn: 10 * 60 });
     });
 
+    it('should work out where the sign-in ends from the configured limit, so one lowered since the token was signed applies', async () => {
+      configService.get.mockImplementation(
+        (key: keyof typeof ENV) => ({ ...ENV, AUTH_ABSOLUTE_TIMEOUT_HOURS: 1 })[key]
+      );
+      const renewal = {
+        authenticatedAt: NOW - 30 * MINUTE,
+        endsAt: NOW + 11 * HOUR + 30 * MINUTE,
+        generationId: null,
+        isInteractive: true
+      };
+      await authService.getCreateInstrumentToken({ ...requestUserFor('ADMIN'), renewal });
+      expect(lastSigned().options).toStrictEqual({ expiresIn: 30 * 60 });
+    });
+
     it('should mint an already expired token for a sign-in that has ended, which only a server ignoring expiry lets this far', async () => {
-      const renewal = { authenticatedAt: NOW - 13 * HOUR, endsAt: NOW - HOUR, isInteractive: true };
+      const renewal = { authenticatedAt: NOW - 13 * HOUR, endsAt: NOW - HOUR, generationId: null, isInteractive: true };
       await authService.getCreateInstrumentToken({ ...requestUserFor('ADMIN'), renewal });
       expect(lastSigned().options).toStrictEqual({ expiresIn: 0 });
     });

@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import type { ExecutionContext } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
+import { normalizeIp, Throttle } from '@nestjs/throttler';
 import type { FastifyRequest } from 'fastify';
 import { z } from 'zod/v4';
 
@@ -34,7 +34,11 @@ function getUserTracker(_request: unknown, context: ExecutionContext): string {
   // The throttler hands over this same request as its first argument, typed as a record of `any`.
   const request = context.switchToHttp().getRequest<FastifyRequest>();
   const userId = readUnverifiedUserId(request.headers.authorization);
-  return userId === null ? request.ip : `${request.ip}:${userId}`;
+  // As the throttler's own tracker does, so that a client cannot get a fresh count for each address
+  // in its IPv6 subnet.
+  const address = normalizeIp(request.ip);
+  // Encoded as a pair, so the key reads one way whatever characters the caller put in the id.
+  return userId === null ? address : JSON.stringify([address, userId]);
 }
 
 /**

@@ -4,9 +4,10 @@ import type { Permissions } from '../core/core.js';
 import type { Group } from '../group/group.js';
 import type { BasePermissionLevel } from '../user/user.js';
 
-export type AuthPayload = {
-  accessToken: string;
-};
+export type AuthPayload = z.infer<typeof $AuthPayload>;
+export const $AuthPayload = z.object({
+  accessToken: z.jwt()
+});
 
 export type $LoginCredentials = z.infer<typeof $LoginCredentials>;
 export const $LoginCredentials = z.object({
@@ -24,6 +25,11 @@ export const INTERACTIVE_SIGN_IN_HEADER = 'odc-interactive-sign-in';
 export type TokenRenewal = {
   authenticatedAt: number;
   endsAt: number;
+  /**
+   * The holder's `tokenGenerationId` when the token was signed. The API renews the token only while
+   * the two still match.
+   */
+  generationId: null | string;
   isInteractive: boolean;
 };
 

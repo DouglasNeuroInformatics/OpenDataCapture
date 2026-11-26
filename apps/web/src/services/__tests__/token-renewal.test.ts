@@ -8,6 +8,7 @@ type StoreFixture = {
   accessToken: null | string;
   accessTokenValidity: AccessTokenValidity | null;
   endAccessTokenRenewal: Mock;
+  expireAccessToken: Mock;
   isReauthenticationRequired: boolean;
   reauthenticate: Mock<AuthSlice['reauthenticate']>;
   requireReauthentication: Mock;
@@ -19,6 +20,7 @@ const store = vi.hoisted((): StoreFixture => ({
   accessToken: null,
   accessTokenValidity: null,
   endAccessTokenRenewal: vi.fn(),
+  expireAccessToken: vi.fn(),
   isReauthenticationRequired: false,
   reauthenticate: vi.fn(),
   requireReauthentication: vi.fn()
@@ -27,7 +29,7 @@ const store = vi.hoisted((): StoreFixture => ({
 const storeListeners = vi.hoisted(() => new Set<StoreListener>());
 
 const mocks = vi.hoisted(() => ({
-  post: vi.fn<(url: string, data: undefined, config: object) => Promise<{ data: { accessToken: string } }>>()
+  post: vi.fn<(url: string, data: undefined, config: object) => Promise<{ data: unknown }>>()
 }));
 
 vi.mock('@/store', () => ({
@@ -54,6 +56,15 @@ class RefusedRequest extends Error {
 }
 
 const MINUTE = 60_000;
+
+const encodeSegment = (value: object) => btoa(JSON.stringify(value)).replace(/=+$/, '');
+
+const TOKEN_PREFIX = `${encodeSegment({ alg: 'HS256', typ: 'JWT' })}.${encodeSegment({ id: 'user-1' })}.`;
+
+/** A token of the shape the API signs, padded in its signature to an exact length. */
+const createAccessToken = (length = TOKEN_PREFIX.length + 9) => TOKEN_PREFIX + 'x'.repeat(length - TOKEN_PREFIX.length);
+
+const RENEWED_TOKEN = createAccessToken();
 
 let now = new Date('2026-01-01T00:00:00.000Z').getTime();
 
@@ -92,7 +103,7 @@ describe('token-renewal', () => {
     vi.setSystemTime(now);
     store.isReauthenticationRequired = false;
     store.reauthenticate.mockReturnValue('accepted');
-    mocks.post.mockResolvedValue({ data: { accessToken: 'renewed-token' } });
+    mocks.post.mockResolvedValue({ data: { accessToken: RENEWED_TOKEN } });
   });
 
   afterEach(() => {
@@ -114,7 +125,7 @@ describe('token-renewal', () => {
         expect(mocks.post).toHaveBeenCalledWith('/v1/auth/refresh', undefined, {
           meta: { disableDefaultErrorNotification: true, disableDefaultReauthentication: true }
         });
-        expect(store.reauthenticate).toHaveBeenCalledWith('renewed-token');
+        expect(store.reauthenticate).toHaveBeenCalledWith(RENEWED_TOKEN);
       }
     );
 
@@ -176,7 +187,7 @@ describe('token-renewal', () => {
   });
 
   describe('frames', () => {
-    const loadFrameWith = (contentWindow: EventTarget | null) => {
+    const loadFrameWith = (contentWindow: unknown) => {
       const frame = document.createElement('iframe');
       Object.defineProperty(frame, 'contentWindow', { value: contentWindow });
       document.body.append(frame);
@@ -195,6 +206,19 @@ describe('token-renewal', () => {
 
     it('should leave alone a frame that has no window', () => {
       expect(() => loadFrameWith(null)).not.toThrow();
+    });
+
+    it("should leave alone a frame from another origin, such as a password manager's, which refuses listeners", () => {
+      const onError = vi.fn();
+      window.addEventListener('error', onError);
+      const contentWindow = {
+        addEventListener: () => {
+          throw new DOMException('Blocked a frame from accessing a cross-origin frame.', 'SecurityError');
+        }
+      };
+      expect(() => loadFrameWith(contentWindow)).not.toThrow();
+      window.removeEventListener('error', onError);
+      expect(onError).not.toHaveBeenCalled();
     });
 
     it('should leave alone anything else that loads', () => {
@@ -221,13 +245,40 @@ describe('token-renewal', () => {
       expect(mocks.post).toHaveBeenCalledTimes(2);
     });
 
-    it.each([401, 403])('should ask for the password when the API refuses with %d', async (status) => {
-      mocks.post.mockRejectedValue(new RefusedRequest(status));
+    it.each([401, 403])(
+      'should count the token as run out when the API refuses with %d, rather than open the dialog over an instrument that fills the screen',
+      async (status) => {
+        mocks.post.mockRejectedValue(new RefusedRequest(status));
+        signIn(MINUTE);
+        await tokenRenewal.renewAccessToken();
+        expect(store.expireAccessToken).toHaveBeenCalledOnce();
+        expect(store.requireReauthentication).not.toHaveBeenCalled();
+        expect(store.reauthenticate).not.toHaveBeenCalled();
+      }
+    );
+
+    it('should ignore a refusal that arrives after the user has signed in again, which says nothing about their new token', async () => {
       signIn(MINUTE);
+      mocks.post.mockImplementation(() => {
+        store.accessToken = 'token-from-the-password-dialog';
+        return Promise.reject(new RefusedRequest(401));
+      });
       await tokenRenewal.renewAccessToken();
-      expect(store.requireReauthentication).toHaveBeenCalledOnce();
-      expect(store.reauthenticate).not.toHaveBeenCalled();
+      expect(store.expireAccessToken).not.toHaveBeenCalled();
     });
+
+    it.each(['<html>Sign in to the network</html>', null, { accessToken: 42 }, { accessToken: 'not-a-token' }])(
+      'should keep the token it has when the answer is not from the API, such as a captive portal page (%o)',
+      async (data) => {
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        mocks.post.mockResolvedValue({ data });
+        signIn(MINUTE);
+        await tokenRenewal.renewAccessToken();
+        expect(consoleError).toHaveBeenCalledOnce();
+        expect(store.reauthenticate).not.toHaveBeenCalled();
+        expect(store.expireAccessToken).not.toHaveBeenCalled();
+      }
+    );
 
     it.each([new RefusedRequest(429), new RefusedRequest(503), new Error('Network Error')])(
       'should keep the token it has and log the failure when the request fails otherwise (%s)',
@@ -245,7 +296,7 @@ describe('token-renewal', () => {
       signIn(MINUTE);
       mocks.post.mockImplementation(() => {
         store.accessToken = 'token-from-the-password-dialog';
-        return Promise.resolve({ data: { accessToken: 'renewed-token' } });
+        return Promise.resolve({ data: { accessToken: RENEWED_TOKEN } });
       });
       await tokenRenewal.renewAccessToken();
       expect(store.reauthenticate).not.toHaveBeenCalled();
@@ -253,7 +304,7 @@ describe('token-renewal', () => {
 
     it('should keep the token it has when the renewed one is too large for a request header', async () => {
       const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-      mocks.post.mockResolvedValue({ data: { accessToken: 'x'.repeat(14 * 1024 + 1) } });
+      mocks.post.mockResolvedValue({ data: { accessToken: createAccessToken(14 * 1024 + 1) } });
       signIn(MINUTE);
       await tokenRenewal.renewAccessToken();
       expect(store.reauthenticate).not.toHaveBeenCalled();
@@ -262,25 +313,25 @@ describe('token-renewal', () => {
 
     it('should stop renewing once a renewed token is too large, since every later one would be too', async () => {
       vi.spyOn(console, 'error').mockImplementation(() => undefined);
-      mocks.post.mockResolvedValue({ data: { accessToken: 'x'.repeat(14 * 1024 + 1) } });
+      mocks.post.mockResolvedValue({ data: { accessToken: createAccessToken(14 * 1024 + 1) } });
       signIn(MINUTE);
       await tokenRenewal.renewAccessToken();
       expect(store.endAccessTokenRenewal).toHaveBeenCalledOnce();
     });
 
     it('should accept a renewed token at the largest size a request can carry', async () => {
-      const accessToken = 'x'.repeat(14 * 1024);
+      const accessToken = createAccessToken(14 * 1024);
       mocks.post.mockResolvedValue({ data: { accessToken } });
       signIn(MINUTE);
       await tokenRenewal.renewAccessToken();
       expect(store.reauthenticate).toHaveBeenCalledWith(accessToken);
     });
 
-    it('should ask for the password when the renewed token cannot carry on this tab', async () => {
+    it('should count the token as run out when the renewed one cannot carry on this tab', async () => {
       store.reauthenticate.mockReturnValue('differentUser');
       signIn(MINUTE);
       await tokenRenewal.renewAccessToken();
-      expect(store.requireReauthentication).toHaveBeenCalledOnce();
+      expect(store.expireAccessToken).toHaveBeenCalledOnce();
     });
   });
 

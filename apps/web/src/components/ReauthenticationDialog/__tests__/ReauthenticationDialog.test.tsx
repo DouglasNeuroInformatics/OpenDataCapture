@@ -122,13 +122,32 @@ describe('ReauthenticationDialog', () => {
 
   it.each([
     ['archived', /has been archived/],
-    ['disabled', /account is disabled/]
-  ] as const)('should leave only sign out for an account that is %s', async (kind, message) => {
-    mocks.mutateAsync.mockResolvedValue({ kind });
-    render(<ReauthenticationDialog />);
+    ['disabled', /account is disabled/],
+    ['forbidden', /Sign-in failed/]
+  ] as const)(
+    'should keep the form for a sign-in that is %s, so the user can try again once an administrator has put it right',
+    async (kind, message) => {
+      mocks.mutateAsync.mockResolvedValue({ kind });
+      render(<ReauthenticationDialog />);
+      submitPassword('secret');
+      expect(await screen.findByText(message)).toBeTruthy();
+      expect(screen.getByTestId('reauthentication-form')).toBeTruthy();
+      expect(mocks.reauthenticate).not.toHaveBeenCalled();
+    }
+  );
+
+  it('should start with the form again the next time it opens, whatever it showed before', async () => {
+    mocks.reauthenticate.mockReturnValue('differentUser');
+    const { rerender } = render(<ReauthenticationDialog />);
     submitPassword('secret');
-    expect((await screen.findByTestId('reauthentication-refusal')).textContent).toMatch(message);
-    expect(screen.queryByTestId('reauthentication-form')).toBeNull();
+    await screen.findByTestId('reauthentication-refusal');
+    mocks.store.isReauthenticationRequired = false;
+    rerender(<ReauthenticationDialog />);
+    await waitFor(() => expect(screen.queryByTestId('reauthentication-dialog')).toBeNull());
+    mocks.store.isReauthenticationRequired = true;
+    rerender(<ReauthenticationDialog />);
+    expect(await screen.findByTestId('reauthentication-form')).toBeTruthy();
+    expect(screen.queryByTestId('reauthentication-refusal')).toBeNull();
   });
 
   it.each([

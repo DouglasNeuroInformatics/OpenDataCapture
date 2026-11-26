@@ -133,20 +133,24 @@ decided from the signed token and the user's row.
   when it stops, the token expires and nothing can renew it, because the refresh route sits behind
   the ordinary guard and takes only an unexpired token.
 - **Every login token carries `renewal`** (`TokenRenewal`): when the password was entered, when the
-  sign-in ends (`AUTH_ABSOLUTE_TIMEOUT_HOURS` later, default 12) and whether it is interactive. A
-  renewal copies the first and the last unchanged, so no amount of activity moves the end, and no
-  token's `exp` passes it. `AuthService.login` takes the time of entry before it reads the user, so
-  a password changed while the old one is still being checked cuts that token off.
+  sign-in ends (`AUTH_ABSOLUTE_TIMEOUT_HOURS` later, default 12), the holder's token generation and
+  whether it is interactive. A renewal copies the first and the last unchanged, so no amount of
+  activity moves the end, and no token's `exp` passes it. The end is always worked out again from the
+  time of entry and the current setting, never read off the token, so lowering the limit applies to
+  tokens already issued.
 - **`AuthService.refresh` refuses with 401** a token with no `renewal`, one whose holder no longer
-  exists, one past the absolute limit and one cut off by `tokensValidAfter`; and with 403 and login's
-  own messages an archived or disabled account. A token signed before the route existed has no
-  `renewal`, and its `iat` is not a substitute: each renewal would restart the limit.
-- **`User.tokensValidAfter` is the only revocation there is.** `UsersService` sets it when a password
-  changes, a reset is forced, or the account is disabled or archived, and a token whose password was
-  entered at or before it is never renewed. Without it, a token from before an account was disabled
-  would be renewed again once the account was enabled. The field is omitted from every user query
-  (`src/core/prisma.ts`) and read only by `UsersService.findTokenHolder`. A token already issued
-  still works until it expires.
+  exists, one past the absolute limit and one of an earlier token generation; and with 403 and
+  login's own messages an archived or disabled account. A token signed before the route existed has
+  no `renewal`, and its `iat` is not a substitute: each renewal would restart the limit.
+- **`User.tokenGenerationId` is the only revocation there is.** `UsersService` replaces it with a
+  new random id when a password changes, a reset is forced, or the account is disabled or archived,
+  and a token carrying any other value is never renewed. Without it, a token from before an account
+  was disabled would be renewed again once the account was enabled. It is an id, not a time, because
+  it is written in the same document update as the change: login reads it with the hashed password
+  (`findByUsername({ includeSignInFields: true })`), so a sign-in racing a password change gets the
+  old password with the old id or the new with the new, and no two clocks are compared. The field
+  is omitted from every other user query (`src/core/prisma.ts`); `UsersService.findTokenHolder` is
+  its one other reader. A token already issued still works until it expires.
 - **A copied token can be renewed until the absolute limit.** Accepted when renewal was added
   (#1535): before it, a copy died within the hour. Both limits are capped in `$Env`, the idle one at
   60 minutes and the absolute one at 12 hours, so configuration cannot loosen either past that.
@@ -181,7 +185,7 @@ that a grantable pair used to reach belongs in the same predicate.
 - **Audit logging is not automatic.** Only explicit `AuditLogger.log` calls write one
   (`grep -rn 'auditLogger.log' apps/api/src`); do not assume a new mutation is recorded.
 - **`user.hashedPassword` and `assignment.encryptionKeyPair` are globally omitted** by the client in
-  `src/core/prisma.ts`. `UsersService.findByUsername({ includeHashedPassword: true })` is how login
+  `src/core/prisma.ts`. `UsersService.findByUsername({ includeSignInFields: true })` is how login
   reads the hash; `AssignmentsService.findPrivateKeyById`, called only by the gateway synchronizer,
   is the only read of the key.
 - **Password policy is `UsersService.validatePassword`**: strength via libpasswd, not equal to the

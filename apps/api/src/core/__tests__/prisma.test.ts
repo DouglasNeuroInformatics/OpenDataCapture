@@ -278,9 +278,9 @@ describe('PrismaModuleOptionsFactory', () => {
     expect(prismaClient.constructorOptions.at(-1)).toMatchObject({ omit: { user: { hashedPassword: true } } });
   });
 
-  it('should omit the token cut-off from every user query by default, so adding it changed no response', async () => {
+  it('should omit the token generation from every user query by default, so adding it changed no response', async () => {
     await (await createFactory(externalEnv)).create();
-    expect(prismaClient.constructorOptions.at(-1)).toMatchObject({ omit: { user: { tokensValidAfter: true } } });
+    expect(prismaClient.constructorOptions.at(-1)).toMatchObject({ omit: { user: { tokenGenerationId: true } } });
   });
 
   it('should connect and reconcile indexes before handing out the client', async () => {

@@ -16,7 +16,14 @@ const HOUR = 60 * MINUTE;
 
 type TokenHolder = Pick<
   User,
-  'additionalPermissions' | 'basePermissionLevel' | 'firstName' | 'id' | 'lastName' | 'mustResetPassword' | 'username'
+  | 'additionalPermissions'
+  | 'basePermissionLevel'
+  | 'firstName'
+  | 'id'
+  | 'lastName'
+  | 'mustResetPassword'
+  | 'tokenGenerationId'
+  | 'username'
 > & {
   groups: Group[];
   permissionSet: null | PermissionSet;
@@ -47,8 +54,15 @@ export class AuthService {
       accessToken: await this.jwtService.signAsync(
         { kind: 'instrument', permissions: limitedAbility.rules },
         // Cut short where the sign-in that mints it ends, or a login token renewed up to that moment
-        // could still run code here for an hour past it.
-        { expiresIn: this.lifetimeInSeconds(HOUR, currentUser.renewal?.endsAt) }
+        // could still run code here for an hour past it. The end is worked out again rather than read
+        // off the token, as `refresh` does, so a limit lowered since the token was signed applies.
+        {
+          expiresIn: this.lifetimeInSeconds(
+            HOUR,
+            currentUser.renewal ? this.signInEnd(currentUser.renewal.authenticatedAt) : Infinity,
+            Date.now()
+          )
+        }
       )
     };
   }
@@ -57,13 +71,9 @@ export class AuthService {
     credentials: $LoginCredentials,
     { isInteractive }: Pick<TokenRenewal, 'isInteractive'>
   ): Promise<AuthPayload> {
-    // Taken before the user is read, so a password changed while this one is still being checked
-    // sets `tokensValidAfter` later than it, and the token signed below is refused renewal.
-    const authenticatedAt = Date.now();
-
     let user: Awaited<ReturnType<UsersService['findByUsername']>>;
     try {
-      user = await this.usersService.findByUsername(credentials.username, { includeHashedPassword: true });
+      user = await this.usersService.findByUsername(credentials.username, { includeSignInFields: true });
     } catch (err) {
       if (err instanceof NotFoundException) {
         throw new UnauthorizedException('Invalid Credentials');
@@ -80,7 +90,8 @@ export class AuthService {
 
     this.assertAccountActive(user);
 
-    const accessToken = await this.signLoginToken(user, { authenticatedAt, isInteractive });
+    const now = Date.now();
+    const accessToken = await this.signLoginToken(user, { authenticatedAt: now, isInteractive }, now);
 
     await this.auditLogger.log('LOGIN', 'USER', {
       groupId: null,
@@ -108,15 +119,15 @@ export class AuthService {
       throw err;
     }
 
-    // Ahead of the cut-off, which both of these states also set, so that the holder is told why.
+    // Ahead of the generation check, which both of these states also fail, so that the holder is told why.
     this.assertAccountActive(user);
 
-    const isCutOff = user.tokensValidAfter !== null && user.tokensValidAfter.getTime() >= renewal.authenticatedAt;
-    if (isCutOff || Date.now() >= this.signInEnd(renewal.authenticatedAt)) {
+    const now = Date.now();
+    if (user.tokenGenerationId !== renewal.generationId || now >= this.signInEnd(renewal.authenticatedAt)) {
       throw new UnauthorizedException('Token Not Renewable');
     }
 
-    return { accessToken: await this.signLoginToken(user, renewal) };
+    return { accessToken: await this.signLoginToken(user, renewal, now) };
   }
 
   private assertAccountActive(user: Pick<User, 'archivedAt' | 'disabled'>): void {
@@ -128,9 +139,9 @@ export class AuthService {
     }
   }
 
-  /** Whole seconds a token signed now lives: its usual lifetime, cut short where its sign-in ends first. */
-  private lifetimeInSeconds(lifetime: number, signInEnd = Infinity): number {
-    return Math.floor(Math.max(0, Math.min(lifetime, signInEnd - Date.now())) / 1000);
+  /** Whole seconds a token signed at `now` lives: its usual lifetime, cut short where its sign-in ends first. */
+  private lifetimeInSeconds(lifetime: number, signInEnd: number, now: number): number {
+    return Math.floor(Math.max(0, Math.min(lifetime, signInEnd - now)) / 1000);
   }
 
   private signInEnd(authenticatedAt: number): number {
@@ -140,7 +151,8 @@ export class AuthService {
   /** The one place a login token is built, so a renewed token cannot differ from one signed at login. */
   private async signLoginToken(
     user: TokenHolder,
-    { authenticatedAt, isInteractive }: Pick<TokenRenewal, 'authenticatedAt' | 'isInteractive'>
+    { authenticatedAt, isInteractive }: Pick<TokenRenewal, 'authenticatedAt' | 'isInteractive'>,
+    now: number
   ): Promise<string> {
     // An archived group grants its members nothing: every group rule `createForPayload` writes,
     // including a permission set's, is derived from `groups`. A grant confined to a group is accepted
@@ -162,7 +174,7 @@ export class AuthService {
       kind: 'login',
       lastName: user.lastName,
       mustResetPassword: user.mustResetPassword ?? false,
-      renewal: { authenticatedAt, endsAt, isInteractive },
+      renewal: { authenticatedAt, endsAt, generationId: user.tokenGenerationId, isInteractive },
       username: user.username
     };
 
@@ -174,7 +186,7 @@ export class AuthService {
 
     return this.jwtService.signAsync(
       { ...tokenPayload, permissions: ability.rules },
-      { expiresIn: this.lifetimeInSeconds(lifetime, endsAt) }
+      { expiresIn: this.lifetimeInSeconds(lifetime, endsAt, now) }
     );
   }
 }

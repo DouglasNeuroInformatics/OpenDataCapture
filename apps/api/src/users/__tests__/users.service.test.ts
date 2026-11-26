@@ -214,16 +214,16 @@ describe('UsersService', () => {
   });
 
   describe('findByUsername', () => {
-    it('should omit the hashed password by default, so it never leaks into a response', async () => {
+    it('should omit the hashed password and the token generation by default, so neither leaks into a response', async () => {
       userModel.findFirst.mockResolvedValue({ id: 'user-1' });
       await usersService.findByUsername('jane.doe');
-      expect(userModel.findFirst.mock.lastCall?.[0].omit).toEqual({ hashedPassword: true });
+      expect(userModel.findFirst.mock.lastCall?.[0].omit).toEqual({ hashedPassword: true, tokenGenerationId: true });
     });
 
-    it('should include the hashed password when asked, so login can verify it', async () => {
+    it('should read the hashed password and the token generation together when asked, so a sign-in gets the generation of the password it proves', async () => {
       userModel.findFirst.mockResolvedValue({ hashedPassword: 'hashed', id: 'user-1' });
-      await usersService.findByUsername('jane.doe', { includeHashedPassword: true });
-      expect(userModel.findFirst.mock.lastCall?.[0].omit).toEqual({ hashedPassword: false });
+      await usersService.findByUsername('jane.doe', { includeSignInFields: true });
+      expect(userModel.findFirst.mock.lastCall?.[0].omit).toEqual({ hashedPassword: false, tokenGenerationId: false });
     });
 
     it('should throw when no accessible user has the username', async () => {
@@ -263,12 +263,12 @@ describe('UsersService', () => {
       expect(userModel.findFirst.mock.lastCall?.[0].where).toStrictEqual({ id: 'user-1' });
     });
 
-    it('should read what reissuing a token takes: the groups, the permission set and the cut-off', async () => {
+    it('should read what reissuing a token takes: the groups, the permission set and the token generation', async () => {
       userModel.findFirst.mockResolvedValue({ id: 'user-1' });
       await usersService.findTokenHolder('user-1');
       expect(userModel.findFirst.mock.lastCall?.[0]).toMatchObject({
         include: { groups: true, permissionSet: true },
-        omit: { tokensValidAfter: false }
+        omit: { tokenGenerationId: false }
       });
     });
 
@@ -437,18 +437,20 @@ describe('UsersService', () => {
     });
 
     it.each([{ password: 'jf8&Kd0!mZq2wLx' }, { disabled: true }, { mustResetPassword: true }])(
-      'should cut off the tokens issued before an update of %o, so none of them can be renewed past it',
+      'should start a new token generation on an update of %o, so no token issued before it can be renewed',
       async (data) => {
         await usersService.updateById('user-1', data, admin);
-        expect(userModel.update.mock.lastCall?.[0].data.tokensValidAfter).toBeInstanceOf(Date);
+        expect(userModel.update.mock.lastCall?.[0].data.tokenGenerationId).toEqual(
+          expect.stringMatching(/^[0-9a-f-]{36}$/)
+        );
       }
     );
 
     it.each([{ disabled: false }, { mustResetPassword: false }, { firstName: 'Janet' }, { groupIds: ['group-1'] }])(
-      'should leave the cut-off alone on an update of %o, which a renewal picks up by reading the user again',
+      'should keep the token generation on an update of %o, which a renewal picks up by reading the user again',
       async (data) => {
         await usersService.updateById('user-1', data, admin);
-        expect(userModel.update.mock.lastCall?.[0].data.tokensValidAfter).toBeUndefined();
+        expect(userModel.update.mock.lastCall?.[0].data.tokenGenerationId).toBeUndefined();
       }
     );
   });
@@ -469,11 +471,18 @@ describe('UsersService', () => {
       expect(userModel.update.mock.lastCall?.[0].where).toMatchObject({ id: 'user-1' });
     });
 
-    it('should cut off the tokens issued before the archiving, so unarchiving the account does not revive them', async () => {
+    it('should start a new token generation in the same write, so unarchiving the account does not revive its tokens', async () => {
       await usersService.archiveById('user-1', admin);
-      const { archivedAt, tokensValidAfter } = userModel.update.mock.lastCall![0].data;
-      expect(tokensValidAfter).toBeInstanceOf(Date);
-      expect(tokensValidAfter).toBe(archivedAt);
+      expect(userModel.update.mock.lastCall?.[0].data.tokenGenerationId).toEqual(
+        expect.stringMatching(/^[0-9a-f-]{36}$/)
+      );
+    });
+
+    it('should start a different token generation each time', async () => {
+      await usersService.archiveById('user-1', admin);
+      const first: unknown = userModel.update.mock.lastCall?.[0].data.tokenGenerationId;
+      await usersService.archiveById('user-1', admin);
+      expect(userModel.update.mock.lastCall?.[0].data.tokenGenerationId).not.toBe(first);
     });
   });
 
@@ -599,14 +608,16 @@ describe('UsersService', () => {
       expect(userModel.update.mock.lastCall?.[0].data.mustResetPassword).toBeUndefined();
     });
 
-    it('should cut off the tokens issued before the user set a new password, including the one that set it', async () => {
+    it('should start a new token generation when the user sets a new password, ending renewal of the token that set it too', async () => {
       await usersService.updateSelfById('user-1', { password: 'jf8&Kd0!mZq2wLx' }, currentUser);
-      expect(userModel.update.mock.lastCall?.[0].data.tokensValidAfter).toBeInstanceOf(Date);
+      expect(userModel.update.mock.lastCall?.[0].data.tokenGenerationId).toEqual(
+        expect.stringMatching(/^[0-9a-f-]{36}$/)
+      );
     });
 
-    it('should leave the cut-off alone when no password is set, so editing a profile does not end the sign-in', async () => {
+    it('should keep the token generation when no password is set, so editing a profile does not end the sign-in', async () => {
       await usersService.updateSelfById('user-1', { firstName: 'Janet' }, currentUser);
-      expect(userModel.update.mock.lastCall?.[0].data.tokensValidAfter).toBeUndefined();
+      expect(userModel.update.mock.lastCall?.[0].data.tokenGenerationId).toBeUndefined();
     });
 
     it("should refuse to update another user's account through the self-update route", async () => {
