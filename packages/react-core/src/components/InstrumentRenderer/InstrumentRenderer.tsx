@@ -26,6 +26,11 @@ export type InstrumentRendererProps = {
   language?: Language;
   NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: InstrumentSubmitHandler;
+  /**
+   * Whether the host's `onSubmit` persists each submission, and so whether the subject may be told
+   * their results were saved. A preview leaves it off, since nothing it submits is kept.
+   */
+  savesSubmissions?: boolean;
   subject?: SubjectDisplayInfo;
   /** A localizable label for the submit button shown on the instrument's form(s). */
   submitButtonLabel?: LocalizedText;

@@ -184,7 +184,7 @@ describe('ScalarInstrumentRenderer', () => {
     expect(await screen.findByLabelText('Answer')).toBeTruthy();
   });
 
-  it('should call onSubmit and show the summary for a valid submission', async () => {
+  it('should call onSubmit and show the summary for a valid submission, claiming no save the host has not made', async () => {
     const { onSubmit } = await beginAt(FORM_BUNDLE);
     fireEvent.change(screen.getByLabelText('Answer'), { target: { value: 'hello' } });
     fireEvent.submit(screen.getByTestId('form-content'));
@@ -192,6 +192,20 @@ describe('ScalarInstrumentRenderer', () => {
       expect(onSubmit).toHaveBeenCalledOnce();
     });
     expect(await screen.findByText('Stub Form')).toBeTruthy();
+    expect(screen.queryByTestId('submission-saved-notice')).toBeNull();
+  });
+
+  it('should confirm the save above the summary when the host persists the submission, so the subject reads it before the results', async () => {
+    render(
+      <ScalarInstrumentRenderer savesSubmissions target={{ bundle: FORM_BUNDLE, id: 'target-id' }} onSubmit={vi.fn()} />
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Begin' }));
+    fireEvent.change(await screen.findByLabelText('Answer'), { target: { value: 'hello' } });
+    fireEvent.submit(screen.getByTestId('form-content'));
+
+    const notice = await screen.findByTestId('submission-saved-notice');
+    const summary = await screen.findByText('Stub Form');
+    expect(notice.compareDocumentPosition(summary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('should render InteractiveContent for an INTERACTIVE instrument', async () => {

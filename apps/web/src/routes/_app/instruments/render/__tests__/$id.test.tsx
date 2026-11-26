@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 
-import { useNotificationsStore } from '@douglasneuroinformatics/libui/hooks';
 import type { InstrumentSubmitHandler } from '@opendatacapture/react-core';
 import type { Session } from '@opendatacapture/schemas/session';
 import type { Subject } from '@opendatacapture/schemas/subject';
@@ -16,6 +15,7 @@ type InstrumentRendererProps = {
   language?: string;
   NavigationBlocker?: unknown;
   onSubmit: InstrumentSubmitHandler;
+  savesSubmissions?: boolean;
   subject?: Subject;
   target: unknown;
 };
@@ -113,7 +113,6 @@ describe('Route', () => {
     mocks.store.currentSession = createSession();
     mocks.axios.post.mockResolvedValue({ data: { id: 'record-1' } });
     mocks.axios.put.mockResolvedValue({});
-    useNotificationsStore.setState({ notifications: [] });
   });
 
   afterEach(() => {
@@ -185,6 +184,11 @@ describe('Route', () => {
       expect(mocks.navigate).toHaveBeenCalledWith({ ignoreBlocker: true, to: '/instruments/accessible-instruments' });
     });
 
+    it('should let the renderer confirm the save, so the message appears where the subject is reading rather than as a toast', () => {
+      render(<InstrumentRenderPage />);
+      expect(rendererProps().savesSubmissions).toBe(true);
+    });
+
     it('should stay on the page while a session is active', () => {
       render(<InstrumentRenderPage />);
       expect(mocks.navigate).not.toHaveBeenCalled();
@@ -203,11 +207,6 @@ describe('Route', () => {
         sessionId: 'session-1',
         subjectId: 'subject-1'
       });
-    });
-
-    it('should notify the user once a non-file result is recorded', async () => {
-      await submit({ data: {}, instrumentId: 'instrument-1', kind: 'INTERACTIVE' });
-      expect(useNotificationsStore.getState().notifications).toMatchObject([{ type: 'success' }]);
     });
 
     it('should record a series item with the id of the series that orchestrated it', async () => {
@@ -295,12 +294,6 @@ describe('Route', () => {
         "Files to upload (2) for file group with basename 'scans' exceeds available presigned URLs (1)"
       );
       expect(mocks.axios.put).not.toHaveBeenCalled();
-    });
-
-    it('should not notify on a file result, since the upload progress already reports completion', async () => {
-      mocks.axios.get.mockResolvedValue({ data: {} });
-      await submit(createFileContext({}));
-      expect(useNotificationsStore.getState().notifications).toEqual([]);
     });
   });
 });

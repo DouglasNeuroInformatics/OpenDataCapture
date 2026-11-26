@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { replacer } from '@douglasneuroinformatics/libjs';
-import { Button, Heading, Spinner } from '@douglasneuroinformatics/libui/components';
+import { Heading, Spinner } from '@douglasneuroinformatics/libui/components';
 import { useNotificationsStore, useTranslation } from '@douglasneuroinformatics/libui/hooks';
 import { getSeriesInstrumentParams } from '@opendatacapture/instrument-utils';
 import type { AnyUnilingualScalarInstrument, Json, UnilingualSeriesInstrument } from '@opendatacapture/runtime-core';
@@ -16,8 +16,10 @@ import { useInterpretedInstrument } from '../../hooks/useInterpretedInstrument';
 import { FormContent } from '../FormContent';
 import { InstrumentOverview } from '../InstrumentOverview';
 import { InteractiveContent } from '../InteractiveContent';
+import { CompletionConfetti } from './CompletionConfetti';
 import { ContentPlaceholder } from './ContentPlaceholder';
 import { InstrumentRendererContainer } from './InstrumentRendererContainer';
+import { SeriesInterstitial } from './SeriesInterstitial';
 import { SeriesProgressBar } from './SeriesProgressBar';
 import { validateSubmission } from './validateSubmission';
 
@@ -41,6 +43,11 @@ export type SeriesInstrumentRendererProps = {
   language?: Language;
   NavigationBlocker?: NavigationBlockerComponent;
   onSubmit: InstrumentSubmitHandler<'SERIES'>;
+  /**
+   * Whether the host's `onSubmit` persists each submission, and so whether the subject may be told
+   * their results were saved. A preview leaves it off, since nothing it submits is kept.
+   */
+  savesSubmissions?: boolean;
   /** A localizable label for each constituent form's submit button. */
   submitButtonLabel?: LocalizedText;
   target: SeriesInstrumentBundleContainer;
@@ -54,6 +61,7 @@ export const SeriesInstrumentRenderer = ({
   language,
   NavigationBlocker,
   onSubmit,
+  savesSubmissions,
   submitButtonLabel,
   target
 }: SeriesInstrumentRendererProps) => {
@@ -128,6 +136,12 @@ export const SeriesInstrumentRenderer = ({
         return;
       }
       setCurrentItemIndex(currentItemIndex + 1);
+      if (isLastItem) {
+        // Decided here rather than left to an effect: an effect runs after the commit, so the
+        // interstitial would first paint an invitation to begin an item that does not exist.
+        setIndex(2);
+        return;
+      }
       if (!skipProgress) {
         setIsInstrumentInProgress(false);
       }
@@ -136,12 +150,6 @@ export const SeriesInstrumentRenderer = ({
 
   const completionMessage =
     params.completionMessage?.({ itemName: completion?.itemName, terminated: completion?.terminated ?? false }) ?? null;
-
-  useEffect(() => {
-    if (currentItemIndex === target.items.length) {
-      setIndex(2);
-    }
-  }, [currentItemIndex, target.items.length]);
 
   return (
     <InstrumentRendererContainer className={className} index={index} NavigationBlocker={NavigationBlocker}>
@@ -177,20 +185,11 @@ export const SeriesInstrumentRenderer = ({
               />
             ))
             .with({ index: 1, isInstrumentInProgress: false }, () => (
-              <div className="flex grow flex-col items-center justify-center space-y-1 py-32 text-center">
-                <Heading variant="h4">
-                  {t({
-                    en: 'Series Instrument in Progress',
-                    es: 'Serie de instrumentos en proceso',
-                    fr: "Série d'instruments en cours"
-                  })}
-                </Heading>
-                <div className="pt-2">
-                  <Button type="button" onClick={() => setIsInstrumentInProgress(true)}>
-                    {t({ en: 'Begin', es: 'Comenzar', fr: 'Commencer' })}
-                  </Button>
-                </div>
-              </div>
+              <SeriesInterstitial
+                completedItem={currentItemIndex > (initialSeriesIndex ?? 0)}
+                savesSubmissions={savesSubmissions ?? false}
+                onBegin={() => setIsInstrumentInProgress(true)}
+              />
             ))
             .with({ index: 1, isInstrumentInProgress: true }, () => {
               return match(scalarState)
@@ -241,32 +240,44 @@ export const SeriesInstrumentRenderer = ({
                 .exhaustive();
             })
             .with({ index: 2 }, () => (
-              <div className="mx-auto flex max-w-prose grow flex-col items-center justify-center space-y-1 py-32 text-center">
-                <CircleCheckIcon
-                  className="fill-green-600 stroke-white [&>circle]:stroke-transparent"
-                  style={{ height: '36px', width: '36px' }}
-                />
-                <Heading variant="h3">
-                  {t({
-                    en: 'Thank You!',
-                    es: '¡Gracias!',
-                    fr: 'Merci'
-                  })}
-                </Heading>
-                <p className="text-muted-foreground text-sm">
-                  {/*
-                   * `completionMessage?.en` is deliberate on the Spanish line, not a typo.
-                   * `CompletionMessage` is keyed by runtime-core's `Language`, which is `'en' | 'fr'`
-                   * — instruments are authored in those two only, while Spanish is an interface
-                   * language. So a Spanish reader gets the author's English message when there is
-                   * one, and the Spanish default when there is not.
-                   */}
-                  {t({
-                    en: completionMessage?.en ?? 'You have successfully completed all steps of this instrument.',
-                    es: completionMessage?.en ?? 'Ha completado con éxito todos los pasos de este instrumento.',
-                    fr: completionMessage?.fr ?? 'Vous avez terminé avec succès toutes les étapes de cet instrument.'
-                  })}
-                </p>
+              <div className="relative flex grow flex-col items-center justify-center py-32">
+                <CompletionConfetti />
+                <div className="mx-auto flex max-w-prose flex-col items-center space-y-1 text-center">
+                  <CircleCheckIcon
+                    className="fill-green-600 stroke-white [&>circle]:stroke-transparent"
+                    style={{ height: '36px', width: '36px' }}
+                  />
+                  <Heading variant="h3">
+                    {t({
+                      en: 'Thank You!',
+                      es: '¡Gracias!',
+                      fr: 'Merci'
+                    })}
+                  </Heading>
+                  {savesSubmissions && (
+                    <p className="pt-1 text-sm font-medium text-green-800 dark:text-green-500">
+                      {t({
+                        en: 'Your results have been saved.',
+                        es: 'Sus resultados se han guardado.',
+                        fr: 'Vos résultats ont été enregistrés.'
+                      })}
+                    </p>
+                  )}
+                  <p className="text-muted-foreground text-sm">
+                    {/*
+                     * `completionMessage?.en` is deliberate on the Spanish line, not a typo.
+                     * `CompletionMessage` is keyed by runtime-core's `Language`, which is `'en' | 'fr'`
+                     * — instruments are authored in those two only, while Spanish is an interface
+                     * language. So a Spanish reader gets the author's English message when there is
+                     * one, and the Spanish default when there is not.
+                     */}
+                    {t({
+                      en: completionMessage?.en ?? 'You have successfully completed all steps of this instrument.',
+                      es: completionMessage?.en ?? 'Ha completado con éxito todos los pasos de este instrumento.',
+                      fr: completionMessage?.fr ?? 'Vous avez terminé avec succès toutes les étapes de cet instrument.'
+                    })}
+                  </p>
+                </div>
               </div>
             ))
             .exhaustive();

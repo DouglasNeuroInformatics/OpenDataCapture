@@ -67,6 +67,9 @@ test.describe('instrument completion', () => {
     await instrumentPage.submit();
 
     await expect(instrumentPage.summaryHeading).toBeVisible();
+    // The save is confirmed on the instrument itself, where the clinician is reading, rather than
+    // by a toast in the corner of the viewport.
+    await expect(instrumentPage.savedNotice).toBeVisible();
 
     await openSubjectRecords(page, INSTRUMENT_TITLE);
     await expect(page.getByTestId('data-table-body').getByTestId('data-table-row').first()).toBeVisible();
